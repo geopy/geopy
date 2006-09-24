@@ -10,6 +10,15 @@ from urllib import quote_plus, urlencode
 from urllib2 import urlopen, HTTPError
 from xml.parsers.expat import ExpatError
 
+import util
+
+try:
+    set
+except NameError:
+    import sets.Set as set
+
+# Now try some more exotic modules...
+
 try:
     from BeautifulSoup import BeautifulSoup
 except ImportError:
@@ -26,115 +35,22 @@ except ImportError:
               "Geocoders relying on JSON parsing will not work."
 
 try:
-    set
-except NameError:
-    import sets.Set as set
+    from elementsoap import ElementSOAP
+except ImportError:
+    print "ElementSOAP (or its dependency, ElementTree) was not found." \
+          "Geocoders relying on SOAP transmission will not work."
 
 class Geocoder(object):
     """Base class for all geocoders."""
-    DEGREE = unichr(htmlentitydefs.name2codepoint['deg'])
-    ARCMIN = unichr(htmlentitydefs.name2codepoint['prime'])
-    ARCSEC = unichr(htmlentitydefs.name2codepoint['Prime'])
-
-    STREETS = [r'road', r'rd\.?', r'street', r'st\.?', r'drive', r'dr\.?',
-               r'avenue', r'ave\.?', r'parkway', r'pkwy\.?', r'lane', r'ln\.?',
-               r'boulevard\.?', r'blvd\.?', r'court', r'ct\.?', r'square',
-               r'sq\.?', r'loop', r'way']
 
     def geocode(self, string):
         raise NotImplementedError
 
-    @classmethod
-    def parse_geo(cls, string, regex=None):
-        """Return a 2-tuple of floats parsed from ``string``. The default
-        regular expression can parse most common coordinate formats,
-        including:
-            41.5;-81.0
-            41.5,-81.0
-            41.5 -81.0
-            41.5 N -81.0 W
-            -41.5 S;81.0 E
-            23 26m 22s N 23 27m 30s E
-            23 26' 22" N 23 27' 30" E
-        ...and more whitespace and separator variations. UTF-8 characters such
-        as the degree symbol, prime (arcminutes), and double prime (arcseconds)
-        are also supported. Coordinates given from South and East will be
-        converted appropriately (by switching their signs).
-        
-        A custom expression can be given using the ``regex`` argument. It can
-        be a string or compiled regular expression, and must contain groups
-        named 'latitude_degrees' and 'longitude_degrees'. It can optionally
-        contain groups named 'latitude_minutes', 'latitude_seconds',
-        'longitude_minutes', 'longitude_seconds' for increased precision.
-        Optional single-character groups named 'north_south' and 'east_west' may
-        be included to indicate direction, it is assumed that the coordinates
-        reference North and East otherwise.
-        """
-        string = string.strip()
-        if regex is None:
-            sep = r"(\s*[;,\s]\s*)"
-            try:
-                lat, _, lng = re.split(sep, string)
-                return (float(lat), float(lng))
-            except ValueError:
-                coord = r"(?P<%%s_degrees>-?\d+\.?\d*)%s?" % cls.DEGREE
-                arcmin = r"((?P<%%s_minutes>\d+\.?\d*)[m'%s])?" % cls.ARCMIN
-                arcsec = r'((?P<%%s_seconds>\d+\.?\d*)[s"%s])?' % cls.ARCSEC
-                coord_lat = r"\s*".join([coord % 'latitude',
-                                         arcmin % 'latitude',
-                                         arcsec % 'latitude'])
-                coord_lng = r"\s*".join([coord % 'longitude',
-                                         arcmin % 'longitude',
-                                         arcsec % 'longitude'])
-                direction_lat = r"(?P<north_south>[NS])?"
-                direction_lng = r"(?P<east_west>[EW])?"
-                lat = r"\s*".join([coord_lat, direction_lat])
-                lng = r"\s*".join([coord_lng, direction_lng])
-                regex = sep.join([lat, lng])
 
-        match = re.match(regex, string)
-        if match:
-            d = match.groupdict()
-            lat = d.get('latitude_degrees')
-            lng = d.get('longitude_degrees')
-            if lat:
-                lat = float(lat)
-                lat += cls._arc_angle(d.get('latitude_minutes', 0),
-                                      d.get('latitude_seconds', 0))
-                n_s = d.get('north_south', 'N').upper()
-                if n_s == 'S':
-                    lat *= -1 
-            if lng:
-                lng = float(lng)
-                lng += cls._arc_angle(d.get('longitude_minutes', 0),
-                                      d.get('longitude_seconds', 0))
-                e_w = d.get('east_west', 'E').upper()
-                if e_w == 'W':
-                    lng *= -1
-            return (lat, lng)
-        else:
-            return (None, None)
-
-    @classmethod
-    def parse_address(cls, string):
-        pass
-
-    #
-    # The following are utility methods and may be moved in the future.
-    #
-
-    @classmethod
-    def _arc_angle(cls, arcminutes=None, arcseconds=None):
-        """Calculate the decimal equivalent of the sum of ``arcminutes`` and
-        ``arcseconds``."""
-        if arcminutes is None:
-            arcminutes = 0
-        if arcseconds is None:
-            arcseconds = 0
-        arcmin = float(arcminutes)
-        arcsec = float(arcseconds)
-        return arcmin * 1/60. + arcsec * 1/3600.
-
+class WebGeocoder(Geocoder):
+    """A Geocoder subclass with utility methods helpful for handling results
+    given by web-based geocoders."""
+    
     @classmethod
     def _get_encoding(cls, page, contents=None):
         """Get the last encoding (charset) listed in the header of ``page``."""
@@ -177,7 +93,7 @@ class Geocoder(object):
         return sep.join([unicode(i) for i in seq if pred(i)])
 
 
-class MediaWiki(Geocoder):
+class MediaWiki(WebGeocoder):
     def __init__(self, format_url, transform_string=None):
         """Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
@@ -221,7 +137,7 @@ class MediaWiki(Geocoder):
         meta = soup.head.find('meta', {'name': 'geo.position'})
         if meta:
             position = meta['content']
-            latitude, longitude = self.parse_geo(position)
+            latitude, longitude = util.parse_geo(position)
             if latitude == 0 or longitude == 0:
                 latitude = longitude = None
         else:
@@ -298,7 +214,7 @@ class SemanticMediaWiki(MediaWiki):
             
             attributes = self.get_attributes(thing)
             for attribute, value in attributes:
-                latitude, longitude = self.parse_geo(value)
+                latitude, longitude = util.parse_geo(value)
                 if None not in (latitude, longitude):
                     break
             
@@ -360,7 +276,7 @@ class SemanticMediaWiki(MediaWiki):
                 yield (relation, resource)
 
 
-class Google(Geocoder):
+class Google(WebGeocoder):
     """Geocoder using the Google Maps API."""
     
     def __init__(self, api_key=None, domain='maps.google.com',
@@ -530,7 +446,7 @@ class Google(Geocoder):
        
         def parse_marker(marker):
             location, coords = marker
-            latitude, longitude = self.parse_geo(coords)
+            latitude, longitude = util.parse_geo(coords)
             return location, (latitude, longitude)
         
         LOCATION = r"<input value=\\042(.*?) \(.*?@(-?\d+\.\d+,-?\d+\.\d+)"
@@ -551,7 +467,7 @@ class Google(Geocoder):
             return (parse_marker(m) for m, g in groupby(it, key=groups))
 
 
-class Yahoo(Geocoder):
+class Yahoo(WebGeocoder):
     """Geocoder using the Yahoo! Maps API.
     
     Note: The Terms of Use dictate that the stand-alone geocoder may only be
@@ -641,7 +557,7 @@ class Yahoo(Geocoder):
             return (parse_result(result) for result in results)
 
 
-class GeocoderDotUS(Geocoder):
+class GeocoderDotUS(WebGeocoder):
     """Geocoder using the United States-only geocoder.us API at
     http://geocoder.us. This geocoder is free for non-commercial purposes,
     otherwise you must register and pay per call. This class supports both free
@@ -768,11 +684,7 @@ class GeocoderDotUS(Geocoder):
             return (parse_point(point) for point in points)
 
 
-class LocalSearchMaps(Geocoder):
-    pass
-
-
-class VirtualEarth(Geocoder):
+class VirtualEarth(WebGeocoder):
     """Geocoder using Microsoft's Windows Live Local web service, powered by
     Virtual Earth.
     
@@ -785,8 +697,14 @@ class VirtualEarth(Geocoder):
     STRING_QUOTE = re.compile(r"(?<!\\)'")
 
     def __init__(self, domain='local.live.com', format_string='%s'):
-        self.format_string = format_string
-        self.url = "http://" + domain + "/search.ashx?%s"
+        self.domain = domain
+        self.format_string = format_strin
+
+    @property
+    def url(self):
+        domain = self.domain
+        resource = "search.ashx"
+        return "http://%(domain)s/%(resource)s?%%s" % locals()
 
     def geocode(self, string, exactly_one=True):
         params = {'b': self.format_string % string}
@@ -828,5 +746,205 @@ class VirtualEarth(Geocoder):
             return (parse_match(match) for match in matches)
 
 
-__all__ = ['Geocoder', 'MediaWiki', 'SemanticMediaWiki',
-           'Google', 'Yahoo', 'GeocoderDotUS', 'VirtualEarth']
+class GeoNames(WebGeocoder):
+    def __init__(self, format_string='%s', output_format='xml'):
+        self.format_string = format_string
+        self.output_format = output_format
+
+    @property
+    def url(self):
+        domain = "ws.geonames.org"
+        output_format = self.output_format.lower()
+        append_formats = {'json': 'JSON'}
+        resource = "postalCodeSearch" + append_formats.get(output_format, '')
+        return "http://%(domain)s/%(resource)s?%%s" % locals()
+
+    def geocode(self, string, exactly_one=True):
+        params = {'placename': string}
+        url = self.url % urlencode(params)
+        return self.geocode_url(url, exactly_one)
+
+    def geocode_url(self, url, exactly_one=True):
+        page = urlopen(url)
+        dispatch = getattr(self, 'parse_' + self.output_format)
+        return dispatch(page, exactly_one)
+
+    def parse_json(self, page, exactly_one):
+        if not isinstance(page, basestring):
+            page = self._decode_page(page)
+        json = simplejson.loads(page)
+        codes = json.get('postalCodes', [])
+        
+        if exactly_one and len(codes) != 1:
+            raise ValueError("Didn't find exactly one code! " \
+                             "(Found %d.)" % len(codes))
+        
+        def parse_code(code):
+            place = self._join_filter(", ", [code.get('placeName'),
+                                             code.get('countryCode')])
+            location = self._join_filter(" ", [place,
+                                               code.get('postalCode')]) or None
+            latitude = code.get('lat')
+            longitude = code.get('lng')
+            latitude = latitude and float(latitude)
+            longitude = longitude and float(longitude)
+            return (location, (latitude, longitude))
+
+        if exactly_one:
+            return parse_code(codes[0])
+        else:
+            return (parse_code(code) for code in codes)
+
+    def parse_xml(self, page, exactly_one):
+        if not isinstance(page, basestring):
+            page = self._decode_page(page)
+        doc = xml.dom.minidom.parseString(page)
+        codes = doc.getElementsByTagName('code')
+        
+        if exactly_one and len(codes) != 1:
+            raise ValueError("Didn't find exactly one code! " \
+                             "(Found %d.)" % len(codes))
+
+        def parse_code(code):
+            place_name = self._get_first_text(code, 'name')
+            country_code = self._get_first_text(code, 'countryCode')
+            postal_code = self._get_first_text(code, 'postalcode')
+            place = self._join_filter(", ", [place_name, country_code])
+            location = self._join_filter(" ", [place, postal_code]) or None
+            latitude = self._get_first_text(code, 'lat') or None
+            longitude = self._get_first_text(code, 'lng') or None
+            latitude = latitude and float(latitude)
+            longitude = longitude and float(longitude)
+            return (location, (latitude, longitude))
+        
+        if exactly_one:
+            return parse_code(codes[0])
+        else:
+            return (parse_code(code) for code in codes)
+
+
+#################################### NOTE ####################################
+#     The following geocoders don't work yet or are highly experimental!     #
+##############################################################################
+
+try:
+    ElementSOAP.SoapService
+except NameError:
+    pass
+else:
+    class Map24(Geocoder, ElementSOAP.SoapService):
+        XSLT_BASE_URL = "xslt/ajax/1.2.1/"
+        
+        def __init__(self, app_key=None, directory=None, format_string='%s'):
+            self.app_key = app_key
+            self.format_string = format_string
+            self.directory = directory
+            self.session_id = self.generate_session_id()
+            ElementSOAP.SoapService.__init__(self, self.url)
+        
+        @property
+        def url(self):
+            if self.app_key and self.app_key[32] == 'X':
+                number = int(self.app_key[33:35])
+            else:
+                number = 13
+            domain = "maptp%(number)d.map24.com" % locals()
+            resource = "map24/webservices1.5"
+            return "http://%(domain)s/%(resource)s?%%s" % locals()
+        
+        @property
+        def auth_url(self):
+            auth_xsl = "Map24AuthenticationService/getMap24Application.xsl"
+            params = {'cgi': 'Map24AuthenticationService',
+                      'action': 'getMap24Application',
+                      'applicationkey': self.app_key,
+                      'sid': self.session_id,
+                      'requestid': self.generate_session_id()[:8],
+                      'xslt': self.XSLT_BASE_URL + auth_xsl,
+                      'xslt-mime': 'application/x-javascript',
+                      'referer': self.directory
+                      }
+            return self.url % urlencode(params)
+            
+        
+        def generate_session_id(self):
+            """Generate the session ID that will be passed to API calls.
+            According to the Map24 documentation, this session ID can change the
+            behavior of responses when making simultaneous API calls from
+            the same session ID, so the ID generation should be somewhat legit.
+            That said, this current method is probably overkill. The
+            makeUniqueId function of the Map24 API simply appends the MD5 of
+            the time and a random number until the ID is the desired length.
+            """
+            import md5, time, base64, socket
+            m = md5.new()
+            m.update(str(time.time()))
+            m.update(socket.gethostname())
+            m.update(sys.version)
+            m.update(str(self))
+            return base64.urlsafe_b64encode(m.digest()).rstrip('=')
+
+        def geocode(self, string, exactly_one=True):
+            action = "tns:searchFree"
+            request = SoapRequest("MapSearchFree")
+            ElementSOAP.SoapElement(request, "SearchText", "string", string)
+            return self.call(action, request).find("return")
+
+
+        def make_search_request(self, string, request_id=None):
+            app_key = self.app_key
+            session_id = self.session_id
+            if request_id is None:
+                request_id = self.generate_session_id()[:8]
+            xml = """<?xml version='1.0' encoding='UTF-8'?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <SOAP-ENV:Body>
+        <tns:searchFree xmlns:tns="Map24Geocoder51"
+            SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <RequestHeader>
+                <Map24ID>%(app_key)s</Map24ID>
+                <ClientID>%(session_id)s</ClientID>
+                <AuthenticationKey>%(request_id)s</AuthenticationKey>
+            </RequestHeader>
+            <MapSearchFreeRequest>
+                <MaxNoOfAlternatives>1</MaxNoOfAlternatives>
+                <ResponseStyle>COMPLETE</ResponseStyle>
+                <SearchText><![CDATA[%(string)s]]></SearchText>
+            </MapSearchFreeRequest>
+        </tns:searchFree>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>"""
+            xml %= locals()
+            request = ElementSOAP.ElementTree.fromstring(xml)[0][0]
+            return request
+
+        def make_auth_request(self):
+            app_key = self.app_key
+            session_id = self.session_id
+            request_id = self.generate_session_id()[:8]
+            xml = """<?xml version='1.0' encoding='UTF-8'?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <SOAP-ENV:Body>
+        <tns:getMap24Application xmlns:tns="Map24AuthenticationService"
+            SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <RequestHeader>
+                <Map24ID>%(app_key)s</Map24ID>
+                <ClientID>%(session_id)s</ClientID>
+            </RequestHeader>
+            <GetMap24ApplicationRequest>
+                <ApplicationKey>%(app_key)s</ApplicationKey>
+            </GetMap24ApplicationRequest>
+        </tns:getMap24Application>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>"""
+            xml %= locals()
+            request = ElementSOAP.ElementTree.fromstring(xml)[0][0]
+            return request_id, request
+
+
+__all__ = ['Geocoder', 'MediaWiki', 'SemanticMediaWiki', 'Google', 'Yahoo',
+           'GeocoderDotUS', 'VirtualEarth', 'GeoNames', 'Map24']
