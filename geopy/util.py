@@ -1,5 +1,9 @@
 import re
+import math
 import htmlentitydefs
+from decimal import Decimal, getcontext
+
+D = Decimal
 
 # Unicode characters for symbols that appear in coordinate strings:
 DEGREE = unichr(htmlentitydefs.name2codepoint['deg'])
@@ -7,7 +11,7 @@ ARCMIN = unichr(htmlentitydefs.name2codepoint['prime'])
 ARCSEC = unichr(htmlentitydefs.name2codepoint['Prime'])
 
 def parse_geo(string, regex=None):
-    """Return a 2-tuple of floats parsed from ``string``. The default
+    """Return a 2-tuple of Decimals parsed from ``string``. The default
     regular expression can parse most common coordinate formats,
     including:
         41.5;-81.0
@@ -19,7 +23,7 @@ def parse_geo(string, regex=None):
         23 26' 22" N 23 27' 30" E
     ...and more whitespace and separator variations. UTF-8 characters such
     as the degree symbol, prime (arcminutes), and double prime (arcseconds)
-    are also supported. Coordinates given from South and East will be
+    are also supported. Coordinates given from South and West will be
     converted appropriately (by switching their signs).
     
     A custom expression can be given using the ``regex`` argument. It can
@@ -86,4 +90,149 @@ def arc_angle(arcminutes=None, arcseconds=None):
         arcseconds = 0
     arcmin = float(arcminutes)
     arcsec = float(arcseconds)
-    return arcmin * 1/60. + arcsec * 1/3600.
+    return arcmin * 1 / 60. + arcsec * 1 / 3600.
+
+
+# NOTE:
+# The stuff below is for Decimal usage. It is not currently used by geopy,
+# but it might be in the future.
+
+# The following Decimal recipes were copied from the Decimal documentation:
+# http://docs.python.org/lib/decimal-recipes.html
+
+def pi():
+    """Compute Pi to the current precision.
+
+    >>> print pi()
+    3.141592653589793238462643383
+    
+    """
+    getcontext().prec += 2
+    lasts, t, s, n, na, d, da = 0, D(3), 3, 1, 0, 0, 24
+    while s != lasts:
+        lasts = s
+        n, na = n + na, na + 8
+        d, da = d + da, da + 32
+        t = (t * n) / d
+        s += t
+    getcontext().prec -= 2
+    return +s
+
+def exp(x):
+    """Return e raised to the power of x.  Result type matches input type.
+
+    >>> print exp(Decimal(1))
+    2.718281828459045235360287471
+    >>> print exp(Decimal(2))
+    7.389056098930650227230427461
+    >>> print exp(2.0)
+    7.38905609893
+    >>> print exp(2+0j)
+    (7.38905609893+0j)
+    
+    """
+    getcontext().prec += 2
+    i, lasts, s, fact, num = 0, 0, 1, 1, 1
+    while s != lasts:
+        lasts = s    
+        i += 1
+        fact *= i
+        num *= x     
+        s += num / fact   
+    getcontext().prec -= 2        
+    return +s
+
+def cos(x):
+    """Return the cosine of x as measured in radians.
+
+    >>> print cos(Decimal('0.5'))
+    0.8775825618903727161162815826
+    >>> print cos(0.5)
+    0.87758256189
+    >>> print cos(0.5+0j)
+    (0.87758256189+0j)
+    
+    """
+    getcontext().prec += 2
+    i, lasts, s, fact, num, sign = 0, 0, 1, 1, 1, 1
+    while s != lasts:
+        lasts = s    
+        i += 2
+        fact *= i * (i - 1)
+        num *= x * x
+        sign *= -1
+        s += num / fact * sign 
+    getcontext().prec -= 2        
+    return +s
+
+def sin(x):
+    """Return the sine of x as measured in radians.
+
+    >>> print sin(Decimal('0.5'))
+    0.4794255386042030002732879352
+    >>> print sin(0.5)
+    0.479425538604
+    >>> print sin(0.5+0j)
+    (0.479425538604+0j)
+    
+    """
+    getcontext().prec += 2
+    i, lasts, s, fact, num, sign = 1, 0, x, 1, x, 1
+    while s != lasts:
+        lasts = s    
+        i += 2
+        fact *= i * (i - 1)
+        num *= x * x
+        sign *= -1
+        s += num / fact * sign
+    getcontext().prec -= 2
+    return +s
+
+def asin(x):
+    getcontext().prec += 2
+    i, lasts, s, fact, num = D(0), 0, x, 1, x
+    while s != lasts and i < 100:
+        lasts = s
+        i += 2
+        fact *= (i - 1) / i
+        num *= x * x
+        s += fact * num / (i + 1)
+    getcontext().prec -= 2
+    return +s
+
+def tan(x):
+    return sin(x) / cos(x)
+
+def atan(x):
+    if x == D('-Inf'):
+        return pi() / -2
+    elif x == 0:
+        return D(0)
+    elif x == D('Inf'):
+        return pi() / 2
+    
+    if x < -1:
+        c = pi() / -2
+        x = 1 / x
+    elif x > 1:
+        c = pi() / 2
+        x = 1 / x
+    else:
+        c = 0
+    
+    getcontext().prec += 2
+    x_squared = x ** 2
+    y = x_squared / (1 + x_squared)
+    y_over_x = y / x
+    i, lasts, s, coeff, num = D(0), 0, y_over_x, 1, y_over_x
+    while s != lasts:
+        lasts = s    
+        i += 2
+        coeff *= i / (i + 1)
+        num *= y
+        s += num * coeff
+    if c:
+        s = c - s
+    getcontext().prec -= 2
+    return +s
+
