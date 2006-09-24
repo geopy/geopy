@@ -81,13 +81,9 @@ def parse_geo(string, regex=None):
         return (None, None)
 
 
-def arc_angle(arcminutes=None, arcseconds=None):
+def arc_angle(arcminutes=0, arcseconds=0):
     """Calculate the decimal equivalent of the sum of ``arcminutes`` and
     ``arcseconds``."""
-    if arcminutes is None:
-        arcminutes = 0
-    if arcseconds is None:
-        arcseconds = 0
     arcmin = float(arcminutes)
     arcsec = float(arcseconds)
     return arcmin * 1 / 60. + arcsec * 1 / 3600.
