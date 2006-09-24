@@ -299,7 +299,7 @@ class VincentyDistance(GeodesicDistance):
             iter_limit -= 1
             
         if iter_limit == 0:
-            raise ValueError("Vincenity formula failed to converge!")
+            raise ValueError("Vincenty formula failed to converge!")
         
         u_sq = cos_sq_alpha * (major ** 2 - minor ** 2) / minor ** 2
         
