@@ -97,12 +97,7 @@ def arc_angle(arcminutes=0, arcseconds=0):
 # http://docs.python.org/lib/decimal-recipes.html
 
 def pi():
-    """Compute Pi to the current precision.
-
-    >>> print pi()
-    3.141592653589793238462643383
-    
-    """
+    """Compute Pi to the current precision."""
     getcontext().prec += 2
     lasts, t, s, n, na, d, da = 0, D(3), 3, 1, 0, 0, 24
     while s != lasts:
@@ -114,8 +109,13 @@ def pi():
     getcontext().prec -= 2
     return +s
 
+def e():
+    """Compute the base of the natural logarithm to the current precision."""
+    return exp(D(1))
+
 def golden_ratio():
-    return (1 + D(5).sqrt()) / 2
+    """Calculate the golden ratio to the current precision."""
+    return  +((1 + D(5).sqrt()) / 2)
 
 def exp(x):
     """Return e raised to the power of x.  Result type matches input type.
@@ -188,6 +188,7 @@ def sin(x):
     return +s
 
 def cosh(x):
+    """Return the hyperbolic cosine of Decimal x."""
     if x == 0:
         return D(1)
     
@@ -203,6 +204,7 @@ def cosh(x):
     return +s
 
 def sinh(x):
+    """Return the hyperbolic sine of Decimal x."""
     if x == 0:
         return D(0)
     
@@ -217,9 +219,14 @@ def sinh(x):
     getcontext().prec -= 2
     return +s
 
+# The version below is actually overwritten by the version using atan2 below
+# it, since it is much faster. If possible, I'd like to write a fast version
+# independent of atan2.
 def asin(x):
+    """Return the arc sine (measured in radians) of Decimal x."""
     if abs(x) > 1:
         raise ValueError("Domain error: asin accepts -1 <= x <= 1")
+    
     if x == -1:
         return pi() / -2
     elif x == 0:
@@ -243,13 +250,20 @@ def asin(x):
 
 # This is way faster, I wonder if there's a downside?
 def asin(x):
+    """Return the arc sine (measured in radians) of Decimal x."""
     if abs(x) > 1:
         raise ValueError("Domain error: asin accepts -1 <= x <= 1")
+    
     return atan2(x, D.sqrt(1 - x ** 2))
 
+# The version below is actually overwritten by the version using atan2 below
+# it, since it is much faster. If possible, I'd like to write a fast version
+# independent of atan2.
 def acos(x):
+    """Return the arc cosine (measured in radians) of Decimal x."""
     if abs(x) > 1:
         raise ValueError("Domain error: acos accepts -1 <= x <= 1")
+    
     if x == -1:
         return pi()
     elif x == 0:
@@ -273,22 +287,27 @@ def acos(x):
 
 # This is way faster, I wonder if there's a downside?
 def acos(x):
+    """Return the arc cosine (measured in radians) of Decimal x."""
     if abs(x) > 1:
         raise ValueError("Domain error: acos accepts -1 <= x <= 1")
+    
     getcontext().prec += 1
     a =  pi() / 2 - atan2(x, D.sqrt(1 - x ** 2))
     getcontext().prec -= 1
     return +a
 
 def tan(x):
+    """Return the tangent of Decimal x (measured in radians)."""
     t = sin(x) / cos(x)
     return +t
 
 def tanh(x):
+    """Return the hyperbolic tangent of Decimal x."""
     t = sinh(x) / cosh(x)
     return +t
 
 def atan(x):
+    """Return the arc tangent (measured in radians) of Decimal x."""
     if x == D('-Inf'):
         return pi() / -2
     elif x == 0:
@@ -322,9 +341,13 @@ def atan(x):
     return +s
 
 def sign(x):
+    """Return -1 for negative numbers and 1 for positive numbers."""
     return 2 * D(x >= 0) - 1
 
 def atan2(y, x):
+    """Return the arc tangent (measured in radians) of y/x.
+    Unlike atan(y/x), the signs of both x and y are considered.
+    """
     abs_y = abs(y)
     abs_x = abs(x)
     y_is_real = abs_y != D('Inf')
@@ -345,3 +368,37 @@ def atan2(y, x):
         return sign(y) * pi()
     else:
         return D(0)
+
+def log(x, base=None):
+    """log(x[, base]) -> the logarithm of Decimal x to the given Decimal base.
+    If the base not specified, returns the natural logarithm (base e) of x.
+    """
+    if x < 0:
+        return D('NaN')
+    elif base == 1:
+        raise ValueError("Base was 1!")
+    elif x == base:
+        return D(1)
+    elif x == 0:
+        return D('-Inf')
+    
+    getcontext().prec += 2    
+    
+    if base is None:
+        log_base = 1
+        approx = math.log(x)
+    else:
+        log_base = log(base)
+        approx = math.log(x, base)
+
+    lasts, s = 0, Decimal(repr(approx))
+    while lasts != s:
+        lasts = s
+        s = s - 1 + x / exp(s)
+    s /= log_base
+    getcontext().prec -= 2
+    return +s
+
+def log10(x):
+    """log10(x) -> the base 10 logarithm of Decimal x."""
+    return log(x, D(10))
