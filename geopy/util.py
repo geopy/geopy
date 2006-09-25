@@ -114,6 +114,9 @@ def pi():
     getcontext().prec -= 2
     return +s
 
+def golden_ratio():
+    return (1 + D(5).sqrt()) / 2
+
 def exp(x):
     """Return e raised to the power of x.  Result type matches input type.
 
@@ -184,7 +187,39 @@ def sin(x):
     getcontext().prec -= 2
     return +s
 
+def cosh(x):
+    if x == 0:
+        return D(1)
+    
+    getcontext().prec += 2
+    i, lasts, s, fact, num = 0, 0, 1, 1, 1
+    while s != lasts:
+        lasts = s
+        i += 2
+        num *= x * x
+        fact *= i * (i - 1)
+        s += num / fact
+    getcontext().prec -= 2
+    return +s
+
+def sinh(x):
+    if x == 0:
+        return D(0)
+    
+    getcontext().prec += 2
+    i, lasts, s, fact, num = 1, 0, x, 1, x
+    while s != lasts:
+        lasts = s
+        i += 2
+        num *= x * x
+        fact *= i * (i - 1)
+        s += num / fact
+    getcontext().prec -= 2
+    return +s
+
 def asin(x):
+    if abs(x) > 1:
+        raise ValueError("Domain error: asin accepts -1 <= x <= 1")
     if x == -1:
         return pi() / -2
     elif x == 0:
@@ -193,20 +228,28 @@ def asin(x):
         return pi() / 2
     
     getcontext().prec += 2
+    one_half = D('0.5')
     i, lasts, s, gamma, fact, num = D(0), 0, x, 1, 1, x
     while s != lasts:
         lasts = s
         i += 1
         fact *= i
         num *= x * x
-        gamma *= i - D('0.5')
+        gamma *= i - one_half
         coeff = gamma / ((2 * i + 1) * fact)
         s += coeff * num
-    print i
     getcontext().prec -= 2
     return +s
 
+# This is way faster, I wonder if there's a downside?
+def asin(x):
+    if abs(x) > 1:
+        raise ValueError("Domain error: asin accepts -1 <= x <= 1")
+    return atan2(x, D.sqrt(1 - x ** 2))
+
 def acos(x):
+    if abs(x) > 1:
+        raise ValueError("Domain error: acos accepts -1 <= x <= 1")
     if x == -1:
         return pi()
     elif x == 0:
@@ -215,21 +258,35 @@ def acos(x):
         return D(0)
     
     getcontext().prec += 2
+    one_half = D('0.5')
     i, lasts, s, gamma, fact, num = D(0), 0, pi() / 2 - x, 1, 1, x
     while s != lasts:
         lasts = s
         i += 1
         fact *= i
         num *= x * x
-        gamma *= i - D('0.5')
+        gamma *= i - one_half
         coeff = gamma / ((2 * i + 1) * fact)
         s -= coeff * num
-    print i
     getcontext().prec -= 2
     return +s
 
+# This is way faster, I wonder if there's a downside?
+def acos(x):
+    if abs(x) > 1:
+        raise ValueError("Domain error: acos accepts -1 <= x <= 1")
+    getcontext().prec += 1
+    a =  pi() / 2 - atan2(x, D.sqrt(1 - x ** 2))
+    getcontext().prec -= 1
+    return +a
+
 def tan(x):
-    return sin(x) / cos(x)
+    t = sin(x) / cos(x)
+    return +t
+
+def tanh(x):
+    t = sinh(x) / cosh(x)
+    return +t
 
 def atan(x):
     if x == D('-Inf'):
@@ -254,7 +311,7 @@ def atan(x):
     y_over_x = y / x
     i, lasts, s, coeff, num = D(0), 0, y_over_x, 1, y_over_x
     while s != lasts:
-        lasts = s    
+        lasts = s 
         i += 2
         coeff *= i / (i + 1)
         num *= y
