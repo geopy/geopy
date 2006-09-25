@@ -185,14 +185,46 @@ def sin(x):
     return +s
 
 def asin(x):
+    if x == -1:
+        return pi() / -2
+    elif x == 0:
+        return D(0)
+    elif x == 1:
+        return pi() / 2
+    
     getcontext().prec += 2
-    i, lasts, s, fact, num = D(0), 0, x, 1, x
-    while s != lasts and i < 100:
+    i, lasts, s, gamma, fact, num = D(0), 0, x, 1, 1, x
+    while s != lasts:
         lasts = s
-        i += 2
-        fact *= (i - 1) / i
+        i += 1
+        fact *= i
         num *= x * x
-        s += fact * num / (i + 1)
+        gamma *= i - D('0.5')
+        coeff = gamma / ((2 * i + 1) * fact)
+        s += coeff * num
+    print i
+    getcontext().prec -= 2
+    return +s
+
+def acos(x):
+    if x == -1:
+        return pi()
+    elif x == 0:
+        return pi() / 2
+    elif x == 1:
+        return D(0)
+    
+    getcontext().prec += 2
+    i, lasts, s, gamma, fact, num = D(0), 0, pi() / 2 - x, 1, 1, x
+    while s != lasts:
+        lasts = s
+        i += 1
+        fact *= i
+        num *= x * x
+        gamma *= i - D('0.5')
+        coeff = gamma / ((2 * i + 1) * fact)
+        s -= coeff * num
+    print i
     getcontext().prec -= 2
     return +s
 
@@ -226,9 +258,33 @@ def atan(x):
         i += 2
         coeff *= i / (i + 1)
         num *= y
-        s += num * coeff
+        s += coeff * num
     if c:
         s = c - s
     getcontext().prec -= 2
     return +s
 
+def sign(x):
+    return 2 * D(x >= 0) - 1
+
+def atan2(y, x):
+    abs_y = abs(y)
+    abs_x = abs(x)
+    y_is_real = abs_y != D('Inf')
+    
+    if x:
+        if y_is_real:
+            a = y and atan(y / x) or D(0)
+            if x < 0:
+                a += sign(y) * pi()
+            return a
+        elif abs_y == abs_x:
+            x = sign(x)
+            y = sign(y)
+            return pi() * (D(2) * abs(x) - x) / (D(4) * y)
+    if y:
+        return atan(sign(y) * D('Inf'))
+    elif x < 0:
+        return sign(y) * pi()
+    else:
+        return D(0)
