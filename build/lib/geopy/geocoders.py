@@ -11,6 +11,17 @@ from urllib2 import urlopen, HTTPError
 from xml.parsers.expat import ExpatError
 
 try:
+    set
+except NameError:
+    import sets.Set as set
+
+# Other submodules from geopy:
+
+import util
+
+# Now try some more exotic modules...
+
+try:
     from BeautifulSoup import BeautifulSoup
 except ImportError:
     print "BeautifulSoup was not found. " \
@@ -25,116 +36,18 @@ except ImportError:
         print "simplejson was not found. " \
               "Geocoders relying on JSON parsing will not work."
 
-try:
-    set
-except NameError:
-    import sets.Set as set
 
 class Geocoder(object):
     """Base class for all geocoders."""
-    DEGREE = unichr(htmlentitydefs.name2codepoint['deg'])
-    ARCMIN = unichr(htmlentitydefs.name2codepoint['prime'])
-    ARCSEC = unichr(htmlentitydefs.name2codepoint['Prime'])
-
-    STREETS = [r'road', r'rd\.?', r'street', r'st\.?', r'drive', r'dr\.?',
-               r'avenue', r'ave\.?', r'parkway', r'pkwy\.?', r'lane', r'ln\.?',
-               r'boulevard\.?', r'blvd\.?', r'court', r'ct\.?', r'square',
-               r'sq\.?', r'loop', r'way']
 
     def geocode(self, string):
         raise NotImplementedError
 
-    @classmethod
-    def parse_geo(cls, string, regex=None):
-        """Return a 2-tuple of floats parsed from ``string``. The default
-        regular expression can parse most common coordinate formats,
-        including:
-            41.5;-81.0
-            41.5,-81.0
-            41.5 -81.0
-            41.5 N -81.0 W
-            -41.5 S;81.0 E
-            23 26m 22s N 23 27m 30s E
-            23 26' 22" N 23 27' 30" E
-        ...and more whitespace and separator variations. UTF-8 characters such
-        as the degree symbol, prime (arcminutes), and double prime (arcseconds)
-        are also supported. Coordinates given from South and East will be
-        converted appropriately (by switching their signs).
-        
-        A custom expression can be given using the ``regex`` argument. It can
-        be a string or compiled regular expression, and must contain groups
-        named 'latitude_degrees' and 'longitude_degrees'. It can optionally
-        contain groups named 'latitude_minutes', 'latitude_seconds',
-        'longitude_minutes', 'longitude_seconds' for increased precision.
-        Optional single-character groups named 'north_south' and 'east_west' may
-        be included to indicate direction, it is assumed that the coordinates
-        reference North and East otherwise.
-        """
-        string = string.strip()
-        if regex is None:
-            sep = r"(\s*[;,\s]\s*)"
-            try:
-                lat, _, lng = re.split(sep, string)
-                return (float(lat), float(lng))
-            except ValueError:
-                coord = r"(?P<%%s_degrees>-?\d+\.?\d*)%s?" % cls.DEGREE
-                arcmin = r"((?P<%%s_minutes>\d+\.?\d*)[m'%s])?" % cls.ARCMIN
-                arcsec = r'((?P<%%s_seconds>\d+\.?\d*)[s"%s])?' % cls.ARCSEC
-                coord_lat = r"\s*".join([coord % 'latitude',
-                                         arcmin % 'latitude',
-                                         arcsec % 'latitude'])
-                coord_lng = r"\s*".join([coord % 'longitude',
-                                         arcmin % 'longitude',
-                                         arcsec % 'longitude'])
-                direction_lat = r"(?P<north_south>[NS])?"
-                direction_lng = r"(?P<east_west>[EW])?"
-                lat = r"\s*".join([coord_lat, direction_lat])
-                lng = r"\s*".join([coord_lng, direction_lng])
-                regex = sep.join([lat, lng])
 
-        match = re.match(regex, string)
-        if match:
-            d = match.groupdict()
-            lat = d.get('latitude_degrees')
-            lng = d.get('longitude_degrees')
-            if lat:
-                lat = float(lat)
-                lat += cls._arc_angle(d.get('latitude_minutes', 0),
-                                      d.get('latitude_seconds', 0))
-                n_s = d.get('north_south', 'N').upper()
-                if n_s == 'S':
-                    lat *= -1 
-            if lng:
-                lng = float(lng)
-                lng += cls._arc_angle(d.get('longitude_minutes', 0),
-                                      d.get('longitude_seconds', 0))
-                e_w = d.get('east_west', 'E').upper()
-                if e_w == 'W':
-                    lng *= -1
-            return (lat, lng)
-        else:
-            return (None, None)
-
-    @classmethod
-    def parse_address(cls, string):
-        pass
-
-    #
-    # The following are utility methods and may be moved in the future.
-    #
-
-    @classmethod
-    def _arc_angle(cls, arcminutes=None, arcseconds=None):
-        """Calculate the decimal equivalent of the sum of ``arcminutes`` and
-        ``arcseconds``."""
-        if arcminutes is None:
-            arcminutes = 0
-        if arcseconds is None:
-            arcseconds = 0
-        arcmin = float(arcminutes)
-        arcsec = float(arcseconds)
-        return arcmin * 1/60. + arcsec * 1/3600.
-
+class WebGeocoder(Geocoder):
+    """A Geocoder subclass with utility methods helpful for handling results
+    given by web-based geocoders."""
+    
     @classmethod
     def _get_encoding(cls, page, contents=None):
         """Get the last encoding (charset) listed in the header of ``page``."""
@@ -177,7 +90,7 @@ class Geocoder(object):
         return sep.join([unicode(i) for i in seq if pred(i)])
 
 
-class MediaWiki(Geocoder):
+class MediaWiki(WebGeocoder):
     def __init__(self, format_url, transform_string=None):
         """Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
@@ -221,7 +134,7 @@ class MediaWiki(Geocoder):
         meta = soup.head.find('meta', {'name': 'geo.position'})
         if meta:
             position = meta['content']
-            latitude, longitude = self.parse_geo(position)
+            latitude, longitude = util.parse_geo(position)
             if latitude == 0 or longitude == 0:
                 latitude = longitude = None
         else:
@@ -298,7 +211,7 @@ class SemanticMediaWiki(MediaWiki):
             
             attributes = self.get_attributes(thing)
             for attribute, value in attributes:
-                latitude, longitude = self.parse_geo(value)
+                latitude, longitude = util.parse_geo(value)
                 if None not in (latitude, longitude):
                     break
             
@@ -360,7 +273,7 @@ class SemanticMediaWiki(MediaWiki):
                 yield (relation, resource)
 
 
-class Google(Geocoder):
+class Google(WebGeocoder):
     """Geocoder using the Google Maps API."""
     
     def __init__(self, api_key=None, domain='maps.google.com',
@@ -423,45 +336,6 @@ class Google(Geocoder):
 
     def parse_xml(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an XML response.
-        XML responses look like this:
-        
-<kml>
-  <Response>
-    <name>1600 amphitheatre mtn view ca</name>
-    <Status>
-      <code>200</code>
-      <request>geocode</request>
-    </Status>
-    <Placemark>
-      <address> 
-        1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA
-      </address>
-      <AddressDetails Accuracy="8">
-        <Country>
-          <CountryNameCode>US</CountryNameCode>
-          <AdministrativeArea>
-            <AdministrativeAreaName>CA</AdministrativeAreaName>
-           <SubAdministrativeArea>
-             <SubAdministrativeAreaName>Santa Clara</SubAdministrativeAreaName>
-             <Locality>
-               <LocalityName>Mountain View</LocalityName>
-               <Thoroughfare>
-                 <ThoroughfareName>1600 Amphitheatre Pkwy</ThoroughfareName>
-               </Thoroughfare>
-               <PostalCode>
-                 <PostalCodeNumber>94043</PostalCodeNumber>
-               </PostalCode>
-             </Locality>
-           </SubAdministrativeArea>
-         </AdministrativeArea>
-       </Country>
-     </AddressDetails>
-     <Point>
-       <coordinates>-122.083739,37.423021,0</coordinates>
-     </Point>
-   </Placemark>
-  </Response>
-</kml>
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
@@ -527,18 +401,25 @@ class Google(Geocoder):
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
-       
+
+        LATITUDE = r"[\s,]lat:\s*(?P<latitude>-?\d+\.\d+)"
+        LONGITUDE = r"[\s,]lng:\s*(?P<longitude>-?\d+\.\d+)"
+        LOCATION = r"[\s,]laddr:\s*'(?P<location>.*?)(?<!\\)',"
+        ADDRESS = r"(?P<address>.*?)(?:(?: \(.*?@)|$)"
+        MARKER = '.*?'.join([LATITUDE, LONGITUDE, LOCATION])
+        MARKERS = r"{markers: (?P<markers>\[.*?\]),\s*polylines:"            
+
         def parse_marker(marker):
-            location, coords = marker
-            latitude, longitude = self.parse_geo(coords)
-            return location, (latitude, longitude)
-        
-        LOCATION = r"<input value=\\042(.*?) \(.*?@(-?\d+\.\d+,-?\d+\.\d+)"
-        
+            latitude, longitude, location = marker
+            location = re.match(ADDRESS, location).group('address')
+            latitude, longitude = float(latitude), float(longitude)
+            return (location, (latitude, longitude))
+
+        match = re.search(MARKERS, page)
+        markers = match and match.group('markers') or ''
+        markers = re.findall(MARKER, markers)
+       
         if exactly_one:
-            markers = re.findall(LOCATION, page)
-            markers = sorted(set(markers), key=markers.index)
-            
             if len(markers) != 1:
                 raise ValueError("Didn't find exactly one marker! " \
                                  "(Found %d.)" % len(markers))
@@ -546,12 +427,10 @@ class Google(Geocoder):
             marker = markers[0]
             return parse_marker(marker)
         else:
-            it = re.finditer(LOCATION, page)
-            groups = lambda m: m.groups()
-            return (parse_marker(m) for m, g in groupby(it, key=groups))
+            return (parse_marker(marker) for marker in markers)
 
 
-class Yahoo(Geocoder):
+class Yahoo(WebGeocoder):
     """Geocoder using the Yahoo! Maps API.
     
     Note: The Terms of Use dictate that the stand-alone geocoder may only be
@@ -595,20 +474,6 @@ class Yahoo(Geocoder):
 
     def parse_xml(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an XML response.
-        XML responses look like this:
-        
-<?xml version="1.0" encoding="UTF-8"?>
-<ResultSet ...>
-  <Result precision="address">
-    <Latitude>37.416384</Latitude>
-    <Longitude>-122.024853</Longitude>
-    <Address>701 FIRST AVE</Address>
-    <City>SUNNYVALE</City>
-    <State>CA</State>
-    <Zip>94089-1019</Zip>
-    <Country>US</Country>
-  </Result>
-</ResultSet>
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
@@ -641,7 +506,7 @@ class Yahoo(Geocoder):
             return (parse_result(result) for result in results)
 
 
-class GeocoderDotUS(Geocoder):
+class GeocoderDotUS(WebGeocoder):
     """Geocoder using the United States-only geocoder.us API at
     http://geocoder.us. This geocoder is free for non-commercial purposes,
     otherwise you must register and pay per call. This class supports both free
@@ -731,17 +596,6 @@ class GeocoderDotUS(Geocoder):
 
     def parse_rdf(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an RDF response.
-        RDF responses look like this:
-        
-<?xml version="1.0"?>
-<rdf:RDF ...>
-
-<geo:Point rdf:nodeID="aid86903358">
-    <dc:description>10900 Euclid Ave, Cleveland OH 44106</dc:description>
-    <geo:long>-81.610149</geo:long>
-    <geo:lat>41.505251</geo:lat>
-</geo:Point>
-</rdf:RDF>
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
@@ -768,11 +622,7 @@ class GeocoderDotUS(Geocoder):
             return (parse_point(point) for point in points)
 
 
-class LocalSearchMaps(Geocoder):
-    pass
-
-
-class VirtualEarth(Geocoder):
+class VirtualEarth(WebGeocoder):
     """Geocoder using Microsoft's Windows Live Local web service, powered by
     Virtual Earth.
     
@@ -785,8 +635,14 @@ class VirtualEarth(Geocoder):
     STRING_QUOTE = re.compile(r"(?<!\\)'")
 
     def __init__(self, domain='local.live.com', format_string='%s'):
+        self.domain = domain
         self.format_string = format_string
-        self.url = "http://" + domain + "/search.ashx?%s"
+
+    @property
+    def url(self):
+        domain = self.domain
+        resource = "search.ashx"
+        return "http://%(domain)s/%(resource)s?%%s" % locals()
 
     def geocode(self, string, exactly_one=True):
         params = {'b': self.format_string % string}
@@ -828,5 +684,82 @@ class VirtualEarth(Geocoder):
             return (parse_match(match) for match in matches)
 
 
-__all__ = ['Geocoder', 'MediaWiki', 'SemanticMediaWiki',
-           'Google', 'Yahoo', 'GeocoderDotUS', 'VirtualEarth']
+class GeoNames(WebGeocoder):
+    def __init__(self, format_string='%s', output_format='xml'):
+        self.format_string = format_string
+        self.output_format = output_format
+
+    @property
+    def url(self):
+        domain = "ws.geonames.org"
+        output_format = self.output_format.lower()
+        append_formats = {'json': 'JSON'}
+        resource = "postalCodeSearch" + append_formats.get(output_format, '')
+        return "http://%(domain)s/%(resource)s?%%s" % locals()
+
+    def geocode(self, string, exactly_one=True):
+        params = {'placename': string}
+        url = self.url % urlencode(params)
+        return self.geocode_url(url, exactly_one)
+
+    def geocode_url(self, url, exactly_one=True):
+        page = urlopen(url)
+        dispatch = getattr(self, 'parse_' + self.output_format)
+        return dispatch(page, exactly_one)
+
+    def parse_json(self, page, exactly_one):
+        if not isinstance(page, basestring):
+            page = self._decode_page(page)
+        json = simplejson.loads(page)
+        codes = json.get('postalCodes', [])
+        
+        if exactly_one and len(codes) != 1:
+            raise ValueError("Didn't find exactly one code! " \
+                             "(Found %d.)" % len(codes))
+        
+        def parse_code(code):
+            place = self._join_filter(", ", [code.get('placeName'),
+                                             code.get('countryCode')])
+            location = self._join_filter(" ", [place,
+                                               code.get('postalCode')]) or None
+            latitude = code.get('lat')
+            longitude = code.get('lng')
+            latitude = latitude and float(latitude)
+            longitude = longitude and float(longitude)
+            return (location, (latitude, longitude))
+
+        if exactly_one:
+            return parse_code(codes[0])
+        else:
+            return (parse_code(code) for code in codes)
+
+    def parse_xml(self, page, exactly_one):
+        if not isinstance(page, basestring):
+            page = self._decode_page(page)
+        doc = xml.dom.minidom.parseString(page)
+        codes = doc.getElementsByTagName('code')
+        
+        if exactly_one and len(codes) != 1:
+            raise ValueError("Didn't find exactly one code! " \
+                             "(Found %d.)" % len(codes))
+
+        def parse_code(code):
+            place_name = self._get_first_text(code, 'name')
+            country_code = self._get_first_text(code, 'countryCode')
+            postal_code = self._get_first_text(code, 'postalcode')
+            place = self._join_filter(", ", [place_name, country_code])
+            location = self._join_filter(" ", [place, postal_code]) or None
+            latitude = self._get_first_text(code, 'lat') or None
+            longitude = self._get_first_text(code, 'lng') or None
+            latitude = latitude and float(latitude)
+            longitude = longitude and float(longitude)
+            return (location, (latitude, longitude))
+        
+        if exactly_one:
+            return parse_code(codes[0])
+        else:
+            return (parse_code(code) for code in codes)
+
+
+__all__ = ['Geocoder', 'MediaWiki', 'SemanticMediaWiki', 'Google', 'Yahoo',
+           'GeocoderDotUS', 'VirtualEarth', 'GeoNames']

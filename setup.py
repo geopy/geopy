@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='geopy',
-      version='0.92',
+      version='0.93',
       description='Python Geocoding Toolbox',
       author='Brian Beck',
       author_email='exogen@gmail.com',
@@ -9,7 +9,7 @@ setup(name='geopy',
       download_url='http://geopy.googlecode.com/svn/trunk/',
       packages=find_packages(),
       license='MIT',
-      keywords='geocode geocoding gis geographical maps earth',
+      keywords='geocode geocoding gis geographical maps earth distance',
       classifiers=["Development Status :: 3 - Alpha",
                    "Intended Audience :: Developers",
                    "Intended Audience :: Science/Research",
