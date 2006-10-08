@@ -1,0 +1,20 @@
+Metadata-Version: 1.0
+Name: geopy
+Version: 0.93
+Summary: Python Geocoding Toolbox
+Home-page: http://exogen.case.edu/projects/geopy/
+Author: Brian Beck
+Author-email: exogen@gmail.com
+License: MIT
+Download-URL: http://geopy.googlecode.com/svn/trunk/
+Description: UNKNOWN
+Keywords: geocode geocoding gis geographical maps earth distance
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering :: GIS
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
