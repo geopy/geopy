@@ -1,6 +1,5 @@
-from util import parse_geo
 from math import *
-from decimal import Decimal as D
+import util
 
 # Average great-circle radius in kilometers, from Wikipedia.
 # Using a sphere with this radius results in an error of up to about 0.5%.
@@ -23,6 +22,16 @@ ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / 298.257223563),
               'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
               }
 
+def arc_degrees(arcminutes=0, arcseconds=0):
+    """Calculate the decimal equivalent of the sum of ``arcminutes`` and
+    ``arcseconds`` in degrees."""
+    if arcminutes is None:
+        arcminutes = 0
+    if arcseconds is None:
+        arcseconds = 0
+    arcmin = float(arcminutes)
+    arcsec = float(arcseconds)
+    return arcmin * 1 / 60. + arcsec * 1 / 3600.
 
 def kilometers(miles=0, feet=0, nautical=0):
     d = 0
@@ -162,9 +171,9 @@ class GeodesicDistance(Distance):
         determine this distance.
         """
         if isinstance(a, basestring):
-            a = parse_geo(a)
+            a = util.parse_geo(a)
         if isinstance(b, basestring):
-            b = parse_geo(b)
+            b = util.parse_geo(b)
         
         self.a = a
         self.b = b

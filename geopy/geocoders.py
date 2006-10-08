@@ -10,12 +10,14 @@ from urllib import quote_plus, urlencode
 from urllib2 import urlopen, HTTPError
 from xml.parsers.expat import ExpatError
 
-import util
-
 try:
     set
 except NameError:
     import sets.Set as set
+
+# Other submodules from geopy:
+
+import util
 
 # Now try some more exotic modules...
 
@@ -34,11 +36,6 @@ except ImportError:
         print "simplejson was not found. " \
               "Geocoders relying on JSON parsing will not work."
 
-try:
-    from elementsoap import ElementSOAP
-except ImportError:
-    print "ElementSOAP (or its dependency, ElementTree) was not found." \
-          "Geocoders relying on SOAP transmission will not work."
 
 class Geocoder(object):
     """Base class for all geocoders."""
@@ -339,45 +336,6 @@ class Google(WebGeocoder):
 
     def parse_xml(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an XML response.
-        XML responses look like this:
-        
-<kml>
-  <Response>
-    <name>1600 amphitheatre mtn view ca</name>
-    <Status>
-      <code>200</code>
-      <request>geocode</request>
-    </Status>
-    <Placemark>
-      <address> 
-        1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA
-      </address>
-      <AddressDetails Accuracy="8">
-        <Country>
-          <CountryNameCode>US</CountryNameCode>
-          <AdministrativeArea>
-            <AdministrativeAreaName>CA</AdministrativeAreaName>
-           <SubAdministrativeArea>
-             <SubAdministrativeAreaName>Santa Clara</SubAdministrativeAreaName>
-             <Locality>
-               <LocalityName>Mountain View</LocalityName>
-               <Thoroughfare>
-                 <ThoroughfareName>1600 Amphitheatre Pkwy</ThoroughfareName>
-               </Thoroughfare>
-               <PostalCode>
-                 <PostalCodeNumber>94043</PostalCodeNumber>
-               </PostalCode>
-             </Locality>
-           </SubAdministrativeArea>
-         </AdministrativeArea>
-       </Country>
-     </AddressDetails>
-     <Point>
-       <coordinates>-122.083739,37.423021,0</coordinates>
-     </Point>
-   </Placemark>
-  </Response>
-</kml>
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
@@ -443,18 +401,25 @@ class Google(WebGeocoder):
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
-       
+
+        LATITUDE = r"[\s,]lat:\s*(?P<latitude>-?\d+\.\d+)"
+        LONGITUDE = r"[\s,]lng:\s*(?P<longitude>-?\d+\.\d+)"
+        LOCATION = r"[\s,]laddr:\s*'(?P<location>.*?)(?<!\\)',"
+        ADDRESS = r"(?P<address>.*?)(?:(?: \(.*?@)|$)"
+        MARKER = '.*?'.join([LATITUDE, LONGITUDE, LOCATION])
+        MARKERS = r"{markers: (?P<markers>\[.*?\]),\s*polylines:"            
+
         def parse_marker(marker):
-            location, coords = marker
-            latitude, longitude = util.parse_geo(coords)
-            return location, (latitude, longitude)
-        
-        LOCATION = r"<input value=\\042(.*?) \(.*?@(-?\d+\.\d+,-?\d+\.\d+)"
-        
+            latitude, longitude, location = marker
+            location = re.match(ADDRESS, location).group('address')
+            latitude, longitude = float(latitude), float(longitude)
+            return (location, (latitude, longitude))
+
+        match = re.search(MARKERS, page)
+        markers = match and match.group('markers') or ''
+        markers = re.findall(MARKER, markers)
+       
         if exactly_one:
-            markers = re.findall(LOCATION, page)
-            markers = sorted(set(markers), key=markers.index)
-            
             if len(markers) != 1:
                 raise ValueError("Didn't find exactly one marker! " \
                                  "(Found %d.)" % len(markers))
@@ -462,9 +427,7 @@ class Google(WebGeocoder):
             marker = markers[0]
             return parse_marker(marker)
         else:
-            it = re.finditer(LOCATION, page)
-            groups = lambda m: m.groups()
-            return (parse_marker(m) for m, g in groupby(it, key=groups))
+            return (parse_marker(marker) for marker in markers)
 
 
 class Yahoo(WebGeocoder):
@@ -511,20 +474,6 @@ class Yahoo(WebGeocoder):
 
     def parse_xml(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an XML response.
-        XML responses look like this:
-        
-<?xml version="1.0" encoding="UTF-8"?>
-<ResultSet ...>
-  <Result precision="address">
-    <Latitude>37.416384</Latitude>
-    <Longitude>-122.024853</Longitude>
-    <Address>701 FIRST AVE</Address>
-    <City>SUNNYVALE</City>
-    <State>CA</State>
-    <Zip>94089-1019</Zip>
-    <Country>US</Country>
-  </Result>
-</ResultSet>
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
@@ -647,17 +596,6 @@ class GeocoderDotUS(WebGeocoder):
 
     def parse_rdf(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an RDF response.
-        RDF responses look like this:
-        
-<?xml version="1.0"?>
-<rdf:RDF ...>
-
-<geo:Point rdf:nodeID="aid86903358">
-    <dc:description>10900 Euclid Ave, Cleveland OH 44106</dc:description>
-    <geo:long>-81.610149</geo:long>
-    <geo:lat>41.505251</geo:lat>
-</geo:Point>
-</rdf:RDF>
         """
         if not isinstance(page, basestring):
             page = self._decode_page(page)
@@ -698,7 +636,7 @@ class VirtualEarth(WebGeocoder):
 
     def __init__(self, domain='local.live.com', format_string='%s'):
         self.domain = domain
-        self.format_string = format_strin
+        self.format_string = format_string
 
     @property
     def url(self):
@@ -823,128 +761,5 @@ class GeoNames(WebGeocoder):
             return (parse_code(code) for code in codes)
 
 
-#################################### NOTE ####################################
-#     The following geocoders don't work yet or are highly experimental!     #
-##############################################################################
-
-try:
-    ElementSOAP.SoapService
-except NameError:
-    pass
-else:
-    class Map24(Geocoder, ElementSOAP.SoapService):
-        XSLT_BASE_URL = "xslt/ajax/1.2.1/"
-        
-        def __init__(self, app_key=None, directory=None, format_string='%s'):
-            self.app_key = app_key
-            self.format_string = format_string
-            self.directory = directory
-            self.session_id = self.generate_session_id()
-            ElementSOAP.SoapService.__init__(self, self.url)
-        
-        @property
-        def url(self):
-            if self.app_key and self.app_key[32] == 'X':
-                number = int(self.app_key[33:35])
-            else:
-                number = 13
-            domain = "maptp%(number)d.map24.com" % locals()
-            resource = "map24/webservices1.5"
-            return "http://%(domain)s/%(resource)s?%%s" % locals()
-        
-        @property
-        def auth_url(self):
-            auth_xsl = "Map24AuthenticationService/getMap24Application.xsl"
-            params = {'cgi': 'Map24AuthenticationService',
-                      'action': 'getMap24Application',
-                      'applicationkey': self.app_key,
-                      'sid': self.session_id,
-                      'requestid': self.generate_session_id()[:8],
-                      'xslt': self.XSLT_BASE_URL + auth_xsl,
-                      'xslt-mime': 'application/x-javascript',
-                      'referer': self.directory
-                      }
-            return self.url % urlencode(params)
-            
-        
-        def generate_session_id(self):
-            """Generate the session ID that will be passed to API calls.
-            According to the Map24 documentation, this session ID can change the
-            behavior of responses when making simultaneous API calls from
-            the same session ID, so the ID generation should be somewhat legit.
-            That said, this current method is probably overkill. The
-            makeUniqueId function of the Map24 API simply appends the MD5 of
-            the time and a random number until the ID is the desired length.
-            """
-            import md5, time, base64, socket
-            m = md5.new()
-            m.update(str(time.time()))
-            m.update(socket.gethostname())
-            m.update(sys.version)
-            m.update(str(self))
-            return base64.urlsafe_b64encode(m.digest()).rstrip('=')
-
-        def geocode(self, string, exactly_one=True):
-            action = "tns:searchFree"
-            request = SoapRequest("MapSearchFree")
-            ElementSOAP.SoapElement(request, "SearchText", "string", string)
-            return self.call(action, request).find("return")
-
-
-        def make_search_request(self, string, request_id=None):
-            app_key = self.app_key
-            session_id = self.session_id
-            if request_id is None:
-                request_id = self.generate_session_id()[:8]
-            xml = """<?xml version='1.0' encoding='UTF-8'?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <SOAP-ENV:Body>
-        <tns:searchFree xmlns:tns="Map24Geocoder51"
-            SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-            <RequestHeader>
-                <Map24ID>%(app_key)s</Map24ID>
-                <ClientID>%(session_id)s</ClientID>
-                <AuthenticationKey>%(request_id)s</AuthenticationKey>
-            </RequestHeader>
-            <MapSearchFreeRequest>
-                <MaxNoOfAlternatives>1</MaxNoOfAlternatives>
-                <ResponseStyle>COMPLETE</ResponseStyle>
-                <SearchText><![CDATA[%(string)s]]></SearchText>
-            </MapSearchFreeRequest>
-        </tns:searchFree>
-    </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>"""
-            xml %= locals()
-            request = ElementSOAP.ElementTree.fromstring(xml)[0][0]
-            return request
-
-        def make_auth_request(self):
-            app_key = self.app_key
-            session_id = self.session_id
-            request_id = self.generate_session_id()[:8]
-            xml = """<?xml version='1.0' encoding='UTF-8'?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <SOAP-ENV:Body>
-        <tns:getMap24Application xmlns:tns="Map24AuthenticationService"
-            SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-            <RequestHeader>
-                <Map24ID>%(app_key)s</Map24ID>
-                <ClientID>%(session_id)s</ClientID>
-            </RequestHeader>
-            <GetMap24ApplicationRequest>
-                <ApplicationKey>%(app_key)s</ApplicationKey>
-            </GetMap24ApplicationRequest>
-        </tns:getMap24Application>
-    </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>"""
-            xml %= locals()
-            request = ElementSOAP.ElementTree.fromstring(xml)[0][0]
-            return request_id, request
-
-
 __all__ = ['Geocoder', 'MediaWiki', 'SemanticMediaWiki', 'Google', 'Yahoo',
-           'GeocoderDotUS', 'VirtualEarth', 'GeoNames', 'Map24']
+           'GeocoderDotUS', 'VirtualEarth', 'GeoNames']
