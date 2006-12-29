@@ -282,7 +282,9 @@ class VincentyDistance(GeodesicDistance):
                               cos_reduced2 * cos_lambda_lng) ** 2)
             
             if sin_sigma == 0:
-                return 0 # Coincident points
+                # Coincident points
+                self._kilometers = self.initial_bearing = self.final_bearing = 0
+                return
             
             cos_sigma = (sin_reduced1 * sin_reduced2 +
                          cos_reduced1 * cos_reduced2 * cos_lambda_lng)
