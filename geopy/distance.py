@@ -167,7 +167,7 @@ class GreatCircleDistance(Distance):
         if isinstance(distance, Distance):
             distance = distance.kilometers
 
-        d_div_r = float(distance) / self.radius
+        d_div_r = float(distance) / self.RADIUS
 
         lat2 = asin(
             sin(lat1) * cos(d_div_r) +
