@@ -1,4 +1,5 @@
-from math import *
+from math import atan, tan, sin, cos, pi, sqrt, atan2
+from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
 
@@ -27,9 +28,12 @@ class Distance(object):
     def __init__(self, *args, **kwargs):
         kilometers = kwargs.pop('kilometers', 0)
         if len(args) == 1:
+            # if we only get one argument we assume
+            # it's a known distance instead of 
+            # calculating it first
             kilometers += args[0]
         elif len(args) > 1:
-            for a, b in util.pairwise(points):
+            for a, b in util.pairwise(args):
                 kilometers += self.measure(a, b)
         
         kilometers += units.kilometers(**kwargs)
