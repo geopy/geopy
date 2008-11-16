@@ -1,79 +1,87 @@
 import re
 import htmlentitydefs
-from distance import arc_degrees
+import xml.dom.minidom
+from xml.parsers.expat import ExpatError
 
-# Unicode characters for symbols that appear in coordinate strings:
-DEGREE = unichr(htmlentitydefs.name2codepoint['deg'])
-ARCMIN = unichr(htmlentitydefs.name2codepoint['prime'])
-ARCSEC = unichr(htmlentitydefs.name2codepoint['Prime'])
+try:
+    from decimal import Decimal
+except ImportError:
+    NUMBER_TYPES = (int, long, float)
+else:
+    NUMBER_TYPES = (int, long, float, Decimal)
 
-def parse_geo(string, regex=None):
-    """Return a 2-tuple of Decimals parsed from ``string``. The default
-    regular expression can parse most common coordinate formats,
-    including:
-        41.5;-81.0
-        41.5,-81.0
-        41.5 -81.0
-        41.5 N -81.0 W
-        -41.5 S;81.0 E
-        23 26m 22s N 23 27m 30s E
-        23 26' 22" N 23 27' 30" E
-    ...and more whitespace and separator variations. UTF-8 characters such
-    as the degree symbol, prime (arcminutes), and double prime (arcseconds)
-    are also supported. Coordinates given from South and West will be
-    converted appropriately (by switching their signs).
-    
-    A custom expression can be given using the ``regex`` argument. It can
-    be a string or compiled regular expression, and must contain groups
-    named 'latitude_degrees' and 'longitude_degrees'. It can optionally
-    contain groups named 'latitude_minutes', 'latitude_seconds',
-    'longitude_minutes', 'longitude_seconds' for increased precision.
-    Optional single-character groups named 'north_south' and 'east_west' may
-    be included to indicate direction, it is assumed that the coordinates
-    reference North and East otherwise.
-    """
-    string = string.strip()
-    if regex is None:
-        sep = r"(\s*[;,\s]\s*)"
+def pairwise(seq):
+    for i in range(0, len(seq) - 1):
+        return seq[i], seq[i + 1]
+
+def join_filter(sep, seq, pred=bool):
+    return sep.join([unicode(i) for i in seq if pred(i)])
+ 
+def get_encoding(page, contents=None):
+    plist = page.headers.getplist()
+    if plist:
+        key, value = plist[-1].split('=')
+        if key.lower() == 'charset':
+            return value
+
+    if contents:
         try:
-            lat, _, lng = re.split(sep, string)
-            return (float(lat), float(lng))
-        except ValueError:
-            coord = r"(?P<%%s_degrees>-?\d+\.?\d*)%s?" % DEGREE
-            arcmin = r"((?P<%%s_minutes>\d+\.?\d*)[m'%s])?" % ARCMIN
-            arcsec = r'((?P<%%s_seconds>\d+\.?\d*)[s"%s])?' % ARCSEC
-            coord_lat = r"\s*".join([coord % 'latitude',
-                                     arcmin % 'latitude',
-                                     arcsec % 'latitude'])
-            coord_lng = r"\s*".join([coord % 'longitude',
-                                     arcmin % 'longitude',
-                                     arcsec % 'longitude'])
-            direction_lat = r"(?P<north_south>[NS])?"
-            direction_lng = r"(?P<east_west>[EW])?"
-            lat = r"\s*".join([coord_lat, direction_lat])
-            lng = r"\s*".join([coord_lng, direction_lng])
-            regex = sep.join([lat, lng])
+            return xml.dom.minidom.parseString(contents).encoding
+        except ExpatError:
+            pass
 
-    match = re.match(regex, string)
-    if match:
-        d = match.groupdict()
-        lat = d.get('latitude_degrees')
-        lng = d.get('longitude_degrees')
-        if lat:
-            lat = float(lat)
-            lat += arc_degrees(d.get('latitude_minutes', 0),
-                               d.get('latitude_seconds', 0))
-            n_s = d.get('north_south', 'N').upper()
-            if n_s == 'S':
-                lat *= -1 
-        if lng:
-            lng = float(lng)
-            lng += arc_degrees(d.get('longitude_minutes', 0),
-                               d.get('longitude_seconds', 0))
-            e_w = d.get('east_west', 'E').upper()
-            if e_w == 'W':
-                lng *= -1
-        return (lat, lng)
-    else:
-        return (None, None)
+def decode_page(page):
+    contents = page.read()
+    encoding = get_encoding(page, contents) or sys.getdefaultencoding()
+    return unicode(contents, encoding=encoding).encode('utf-8')
 
+def get_first_text(node, tag_names, strip=None):
+    if isinstance(tag_names, basestring):
+            tag_names = [tag_names]
+    if node:
+        while tag_names:
+            nodes = node.getElementsByTagName(tag_names.pop(0))
+            if nodes:
+                child = nodes[0].firstChild
+                return child and child.nodeValue.strip(strip)
+
+def join_filter(sep, seq, pred=bool):
+    return sep.join([unicode(i) for i in seq if pred(i)])
+
+    import re, htmlentitydefs
+
+def unescape(text):
+    """
+    Removes HTML or XML character references and entities from a text string.
+    
+    """
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16))
+                else:
+                    return unichr(int(text[2:-1]))
+            except ValueError:
+                pass
+        else:
+            # named entity
+            try:
+                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+            except KeyError:
+                pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)
+
+try:
+    reversed
+except NameError:
+    def reversed(seq):
+        i = len(seq)
+        while i > 0:
+            i -= 1
+            yield seq[i]
+else:
+    reversed = reversed
