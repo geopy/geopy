@@ -1,4 +1,4 @@
-from math import atan, tan, sin, cos, pi, sqrt, atan2
+from math import atan, tan, sin, cos, pi, sqrt, atan2, acos
 from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
