@@ -12,7 +12,7 @@ else:
 
 def pairwise(seq):
     for i in range(0, len(seq) - 1):
-        return seq[i], seq[i + 1]
+        yield (seq[i], seq[i + 1])
 
 def join_filter(sep, seq, pred=bool):
     return sep.join([unicode(i) for i in seq if pred(i)])

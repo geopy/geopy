@@ -35,7 +35,7 @@ class Distance(object):
         elif len(args) > 1:
             for a, b in util.pairwise(args):
                 kilometers += self.measure(a, b)
-        
+       
         kilometers += units.kilometers(**kwargs)
         self.__kilometers = kilometers
     
