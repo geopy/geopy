@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 from geopy import format, Location, Point
-from geopy.parsers.microformat import GeoMicroformat
+from geopy.parsers.html import GeoMicroformat
 
 
 class GeoMicroformatFound(object):
