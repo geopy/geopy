@@ -1,4 +1,5 @@
 import re
+import logging
 import htmlentitydefs
 import xml.dom.minidom
 from xml.parsers.expat import ExpatError
@@ -9,6 +10,12 @@ except ImportError:
     NUMBER_TYPES = (int, long, float)
 else:
     NUMBER_TYPES = (int, long, float, Decimal)
+
+class NullHandler(logging.Handler):
+    def emit(self, record):
+        pass
+
+NULL_HANDLER = NullHandler()
 
 def pairwise(seq):
     for i in range(0, len(seq) - 1):
