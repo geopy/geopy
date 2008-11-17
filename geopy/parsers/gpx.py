@@ -1,7 +1,17 @@
 from geopy import Point
-from geopy.parsers.iso6709 import parse_iso6709
+from geopy.util import NULL_HANDLER
+from geopy.parsers.iso8601 import parse_iso8601
+
+import sys, re, logging
+from xml.etree import ElementTree
+
+log = logging.getLogger(__name__)
+log.addHandler(NULL_HANDLER)
 
 class VersionError(Exception):
+    pass
+
+class Waypoint(Point):
     pass
 
 class GPX(object):
@@ -11,6 +21,11 @@ class GPX(object):
     VERSION = '1.1'
     FIX_TYPES =  set(('none', '2d', '3d', 'dgps', 'pps'))
     DECIMAL_RE = re.compile(r'([+-]?\d*\.?\d+)$')
+
+    # Each "type tuple" is a tuple of two items:
+    #   1. Dictionary of attributes in the type
+    #   2. Dictionary of child elements that can appear in the type
+
     GPX_TYPE = ({'version': 'string', 'creator': 'string'}, {
         'metadata': 'metadata', 'wpt': ['waypoint'], 'rte': ['route'],
         'trk': ['track'], 'extensions': 'extensions'
@@ -55,7 +70,7 @@ class GPX(object):
         'minlat': 'latitude', 'minlon': 'longitude',
         'maxlat': 'latitude', 'maxlon': 'longitude'
     }, {})
-    
+
     def __init__(self, document=None, cache=True):
         self.cache = cache
         self._waypoints = {}
@@ -73,17 +88,20 @@ class GPX(object):
             'waypoint': self._parse_waypoint,
             'segment': self._parse_segment,
             'unsigned': self._parse_unsigned,
-            'degrees': self._parse_degrees
+            'degrees': self._parse_degrees,
         }
-        
+
         if document is not None:
-            if isinstance(document, basestring):
-                document = ElementTree.fromstring(document)
-            elif not ElementTree.iselement(document):
-                document = ElementTree.parse(document)
-            if document.tag == self._get_qname('gpx'):
-                self._root = document
-    
+            self.open(document)
+
+    def open(self, string_or_file):
+        if isinstance(string_or_file, basestring):
+            string_or_file = ElementTree.fromstring(string_or_file)
+        elif not ElementTree.iselement(string_or_file):
+            string_or_file = ElementTree.parse(string_or_file)
+        if string_or_file.getroot().tag == self._get_qname('gpx'):
+            self._root = string_or_file.getroot()
+
     @property
     def version(self):
         if not hasattr(self, '_version'):
@@ -93,13 +111,13 @@ class GPX(object):
             else:
                 raise VersionError("%r" % (version,))
         return self._version
-    
+
     @property
     def creator(self):
         if not hasattr(self, '_creator'):
             self._creator = self._root.get('creator')
         return self._creator
-    
+
     @property
     def metadata(self):
         if not hasattr(self, '_metadata'):
@@ -116,32 +134,75 @@ class GPX(object):
                     metadata['time'] = self._parse_datetime(metadata['time'])
             self._metadata = metadata
         return self._metadata
-    
+
     @property
     def waypoints(self):
         tag = self._get_qname('wpt')
         return self._cache_parsed(tag, self._parse_waypoint, self._waypoints)
-    
+
     def _parse_waypoint(self, element):
         waypoint = {}
         point = Point(element.get('lat'), element.get('lon'))
-    
+
+    def _parse_segment(self, element):
+        pass
+
     @property
     def routes(self):
         tag = self._get_qname('rte')
         return self._cache_parsed(tag, self._parse_route, self._routes)
-    
+
     def _parse_route(self, element):
         pass
-    
+
+    @property
+    def route_names(self):
+        for route in self._root.findall(self._get_qname('rte')):
+            yield route.findtext(self._get_qname('name'))
+
+    @property
+    def waypoints(self):
+        return self.get_waypoints()
+
+    def get_waypoints(self, route=None):
+        if route is None:
+            root = self._root
+            waypoint_name = self._get_qname('wpt')
+        else:
+            root = self.get_route_by_name(route)
+            waypoint_name = self._get_qname('rtept')
+
+        for rtept in root.findall(waypoint_name):
+            yield Waypoint(
+              rtept.get('lat'), rtept.get('lon'),
+              rtept.findtext(self._get_qname('ele')))
+
+    def get_route_by_name(self, route):
+        if isinstance(route, basestring):
+            name = route
+            index = 0
+        else:
+            name, index = route
+
+        seen_index = 0
+        for rte in self._root.findall(self._get_qname('rte')):
+            rname = rte.findtext(self._get_qname('name'))
+            if rname == name:
+                if not seen_index == index:
+                    seen_index = seen_index + 1
+                else:
+                    return rte
+
+        return None
+
     @property
     def tracks(self):
         tag = self._get_qname('rte')
         return self._cache_parsed(tag, self._parse_track, self._tracks)
-    
+
     def _parse_track(self, element):
         pass
-    
+
     def _parse_type(self, element, type_def):
         attr_types, child_types = type_def
         attrs = {}
@@ -158,11 +219,11 @@ class GPX(object):
             else:
                 single.append(tag)
         elements = self._child_dict(element, single, multi)
-    
+
     @property
     def extensions(self):
         extensions_qname = self._get_qname('extensions')
-    
+
     def _cache_parsed(self, tag, parse_func, cache):
         i = -1
         for i in xrange(len(cache)):
@@ -177,31 +238,31 @@ class GPX(object):
                     cache[i] = item
                 if item is not None:
                     yield item
-    
+
     def _parse_decimal(self, value):
         match = re.match(self.DECIMAL_RE, value)
         if match:
             return float(match.group(1))
         else:
             raise ValueError("Invalid decimal value: %r" % (value,))
-    
+
     def _parse_degrees(self, value):
         value = self._parse_decimal(value)
         if 0 <= value <= 360:
             return value
         else:
             raise ValueError("Value out of range [0, 360]: %r" % (value,))
-    
+
     def _parse_dgps_station(self, value):
         value = int(value)
         if 0 <= value <= 1023:
             return value
         else:
             raise ValueError("Value out of range [0, 1023]: %r" % (value,))
-    
+
     def _parse_datetime(self, value):
-        return parse_iso6709(value)
-    
+        return parse_iso8601(value)
+
     def _parse_email(self, element):
         value = element.text
         if not value:
@@ -210,16 +271,25 @@ class GPX(object):
             if name and domain:
                 return '@'.join((name, domain))
         return value or None
-    
+
+    def _parse_link(self, element):
+        pass
+
+    def _parse_int(self, element):
+        return int(element.text)
+
+    def _parse_unsigned(self, element):
+        return int(element.text)
+
     def _parse_fix(self, value):
         if value in self.FIX_TYPES:
             return value
         else:
             raise ValueError("Value is not a valid fix type: %r" % (value,))
-    
+
     def _parse_string(self, element):
         return element.text
-    
+
     def _child_dict(self, element, single, multi):
         single = dict([(self._get_qname(tag), tag) for tag in single])
         multi = dict([(self._get_qname(tag), tag) for tag in multi])
@@ -237,6 +307,6 @@ class GPX(object):
                 if not limit and not multi:
                     break
         return d
-    
+
     def _get_qname(self, name):
         return "{%s}%s" % (self.GPX_NS, name)
