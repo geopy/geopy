@@ -33,6 +33,10 @@ class CommonDistanceCases:
         assert_almost_equal(destination.latitude, -90, 0)
         assert_almost_equal(destination.longitude, 0)
 
+    def test_should_recognize_equivalence_of_pos_and_neg_180_longitude(self):
+        distance = self.cls((0, 180), (0, -180)).kilometers
+        assert_almost_equal(distance, 0)
+
 
 class TestWhenComputingGreatCircleDistance(CommonDistanceCases):
     cls = GreatCircleDistance
