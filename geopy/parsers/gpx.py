@@ -12,7 +12,56 @@ class VersionError(Exception):
     pass
 
 class Waypoint(Point):
-    pass
+    '''
+    A `Waypoint` is a geopy `Point` with additional waypoint metadata as
+    defined by the GPX format specification.
+    '''
+
+    @classmethod
+    def from_xml_names(cls, attrs, children):
+        '''
+        Construct a new Waypoint from dictionaries of attribute and child
+        element names corresponding to GPX waypoint information, as parsed
+        by the `GPX` class.
+        '''
+        lat = attrs['lat']
+        lon = attrs['lon']
+        if 'ele' in children:
+            ele = children['ele']
+        else:
+            ele = None
+        w = cls(lat, lon, ele)
+        if 'time' in children:
+            w.timestamp = children['time']
+        if 'name' in children:
+            w.name = children['name']
+        if 'desc' in children:
+            w.description = children['desc']
+        if 'cmt' in children:
+            w.comment = children['cmt']
+        if 'src' in children:
+            w.source = children['src']
+        if 'sym' in children:
+            w.symbol = children['sym']
+        if 'type' in children:
+            w.classification = children['type']
+        if 'fix' in children:
+            w.fix = children['fix']
+        if 'sat' in children:
+            w.num_satellites = children['sat']
+        if 'ageofdgpsdata' in children:
+            w.age = children['ageofdgpsdata']
+        if 'dgpsid' in children:
+            w.dgpsid = children['dgpsid']
+        return w
+
+class _Attr(object):
+    '''
+    Value wrapper for allowing interfaces to access attribute values with
+    `obj.text`
+    '''
+    def __init__(self, value):
+        self.text = value
 
 class GPX(object):
     GPX_NS = "http://www.topografix.com/GPX/1/1"
@@ -35,7 +84,7 @@ class GPX(object):
         'copyright': 'copyright', 'link': ['link'], 'time': 'datetime',
         'keywords': 'string', 'bounds': 'bounds', 'extensions': 'extensions'
     })
-    WAYPOINT_TYPE = ({'lat': 'latitude', 'lon': 'longitude'}, {
+    WAYPOINT_TYPE = ({'lat': 'decimal', 'lon': 'decimal'}, {
         'ele': 'decimal', 'time': 'datetime', 'magvar': 'degrees',
         'geoidheight': 'decimal', 'name': 'string', 'cmt': 'string',
         'desc': 'string', 'src': 'string', 'link': ['link'], 'sym': 'string',
@@ -76,10 +125,11 @@ class GPX(object):
         self._waypoints = {}
         self._routes = {}
         self._tracks = {}
+
         self.type_handlers = {
             'string': lambda e: e.text,
             'uri': lambda e: e.text,
-            'datetime': self._parse_datetime,
+            'datetime': self._parse_datetime_element,
             'decimal': self._parse_decimal,
             'dgpsid': self._parse_dgps_station,
             'email': self._parse_email,
@@ -89,6 +139,8 @@ class GPX(object):
             'segment': self._parse_segment,
             'unsigned': self._parse_unsigned,
             'degrees': self._parse_degrees,
+            'fix': self._parse_fix,
+            'extensions': self._parse_noop,
         }
 
         if document is not None:
@@ -173,9 +225,8 @@ class GPX(object):
             waypoint_name = self._get_qname('rtept')
 
         for rtept in root.findall(waypoint_name):
-            yield Waypoint(
-              rtept.get('lat'), rtept.get('lon'),
-              rtept.findtext(self._get_qname('ele')))
+            attrs, children = self._parse_type(rtept, self.WAYPOINT_TYPE)
+            yield Waypoint.from_xml_names(attrs, children)
 
     def get_route_by_name(self, route):
         if isinstance(route, basestring):
@@ -210,15 +261,23 @@ class GPX(object):
         for attr, handler in attr_types.iteritems():
             value = element.get(attr)
             type_func = self.type_handlers[handler]
-            attrs[attr] = type_func(value)
-        single = []
-        multi = []
+            attrs[attr] = type_func(_Attr(value))
         for tag, handler in child_types.iteritems():
+            values = []
+            all = False
             if isinstance(handler, list):
-                multi.append(tag)
+                all = True
+                type_func = self.type_handlers[handler[0]]
             else:
-                single.append(tag)
-        elements = self._child_dict(element, single, multi)
+                type_func = self.type_handlers[handler]
+            for e in element.findall(self._get_qname(tag)):
+                values.append(type_func(e))
+            if len(values) > 0:
+                if all:
+                    children[tag] = values
+                else:
+                    children[tag] = values[-1]
+        return attrs, children
 
     @property
     def extensions(self):
@@ -239,22 +298,23 @@ class GPX(object):
                 if item is not None:
                     yield item
 
-    def _parse_decimal(self, value):
+    def _parse_decimal(self, element):
+        value = element.text
         match = re.match(self.DECIMAL_RE, value)
         if match:
             return float(match.group(1))
         else:
             raise ValueError("Invalid decimal value: %r" % (value,))
 
-    def _parse_degrees(self, value):
-        value = self._parse_decimal(value)
+    def _parse_degrees(self, element):
+        value = self._parse_decimal(element)
         if 0 <= value <= 360:
             return value
         else:
             raise ValueError("Value out of range [0, 360]: %r" % (value,))
 
-    def _parse_dgps_station(self, value):
-        value = int(value)
+    def _parse_dgps_station(self, element):
+        value = int(element.text)
         if 0 <= value <= 1023:
             return value
         else:
@@ -262,6 +322,9 @@ class GPX(object):
 
     def _parse_datetime(self, value):
         return parse_iso8601(value)
+
+    def _parse_datetime_element(self, element):
+        return self._parse_datetime(element.text)
 
     def _parse_email(self, element):
         value = element.text
@@ -281,7 +344,8 @@ class GPX(object):
     def _parse_unsigned(self, element):
         return int(element.text)
 
-    def _parse_fix(self, value):
+    def _parse_fix(self, element):
+        value = element.text
         if value in self.FIX_TYPES:
             return value
         else:
@@ -289,6 +353,9 @@ class GPX(object):
 
     def _parse_string(self, element):
         return element.text
+
+    def _parse_noop(self, element):
+        return element
 
     def _child_dict(self, element, single, multi):
         single = dict([(self._get_qname(tag), tag) for tag in single])

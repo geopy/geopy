@@ -3,6 +3,9 @@ import unittest, os, logging
 from geopy import Point
 from geopy.parsers import gpx
 
+from datetime import datetime
+from geopy.parsers.iso8601 import TimeZone
+
 log = logging.getLogger('geopy.parsers.gpx')
 
 TEST_FILE = os.path.join(
@@ -31,6 +34,10 @@ class GPX(object):
         second_top_level_waypoint = list(self.GPXi.waypoints)[1]
         self.failUnless(second_top_level_waypoint ==
                           Point(42.439227, -71.119689, 57.607200))
+        self.failUnless(second_top_level_waypoint.timestamp ==
+          datetime(2001, 6, 2, 3, 26, 55, tzinfo = TimeZone('UTC')))
+        self.failUnless(second_top_level_waypoint.name == '5067')
+        self.failUnless(second_top_level_waypoint.description == '5067')
 
 class TestInit(GPX, unittest.TestCase):
     def setUp(self):
