@@ -54,3 +54,9 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases):
     def test_should_not_converge_for_half_trip_around_equator(self):
         assert_raises(ValueError, self.cls, (0, 0), (0, 180))
 
+    def test_should_compute_destination_for_half_trip_around_equator(self):
+        distance = self.cls(EARTH_CIRCUMFERENCE / 2)
+        destination = distance.destination((0, 0), 0)
+        assert_almost_equal(destination.latitude, 0, 0)
+        assert_almost_equal(destination.longitude, -180, 0)
+
