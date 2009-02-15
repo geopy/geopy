@@ -1,3 +1,5 @@
+import logging
+
 from urllib import urlencode
 from urllib2 import urlopen
 import simplejson
@@ -63,7 +65,7 @@ class Google(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        print "Fetching %s..." % url
+        logging.getLogger().info("Fetching %s..." % url)
         page = urlopen(url)
         
         dispatch = getattr(self, 'parse_' + self.output_format)
