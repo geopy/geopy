@@ -1,12 +1,8 @@
 from geopy import Point
-from geopy.util import NULL_HANDLER
 from geopy.parsers.iso8601 import parse_iso8601
 
-import sys, re, logging
+import sys, re
 from xml.etree import ElementTree
-
-log = logging.getLogger(__name__)
-log.addHandler(NULL_HANDLER)
 
 class VersionError(Exception):
     pass

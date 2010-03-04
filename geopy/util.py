@@ -15,7 +15,8 @@ class NullHandler(logging.Handler):
     def emit(self, record):
         pass
 
-NULL_HANDLER = NullHandler()
+logger = logging.getLogger('geopy')
+logger.addHandler(NullHandler())
 
 def pairwise(seq):
     for i in range(0, len(seq) - 1):

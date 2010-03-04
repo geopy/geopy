@@ -24,8 +24,8 @@ import util
 try:
     from BeautifulSoup import BeautifulSoup
 except ImportError:
-    print "BeautifulSoup was not found. " \
-          "Geocoders assuming malformed markup will not work."
+    util.logger.warn("BeautifulSoup was not found. " \
+          "Geocoders assuming malformed markup will not work.")
 
 try:
     import simplejson
@@ -33,8 +33,8 @@ except ImportError:
     try:
         from django.utils import simplejson
     except ImportError:
-        print "simplejson was not found. " \
-              "Geocoders relying on JSON parsing will not work."
+        util.logger.warn("simplejson was not found. " \
+              "Geocoders relying on JSON parsing will not work.")
 
 
 class Geocoder(object):
@@ -120,7 +120,7 @@ class MediaWiki(WebGeocoder):
         return self.geocode_url(url)
 
     def geocode_url(self, url):
-        print "Fetching %s..." % url
+        util.logger.info("Fetching %s..." % url)
         page = urlopen(url)
         name, (latitude, longitude) = self.parse_xhtml(page)
         return (name, (latitude, longitude))        
@@ -197,13 +197,13 @@ class SemanticMediaWiki(MediaWiki):
         if tried is None:
             tried = set()
 
-        print "Fetching %s..." % url
+        util.logger.info("Fetching %s..." % url)
         page = urlopen(url)
         soup = BeautifulSoup(page)
         name, (latitude, longitude) = self.parse_xhtml(soup)
         if None in (name, latitude, longitude) or self.prefer_semantic:
             rdf_url = self.parse_rdf_link(soup)
-            print "Fetching %s..." % rdf_url
+            util.logger.info("Fetching %s..." % rdf_url)
             page = urlopen(rdf_url)
             
             things, thing = self.parse_rdf(page)
@@ -328,7 +328,7 @@ class Google(WebGeocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        print "Fetching %s..." % url
+        util.logger.info("Fetching %s..." % url)
         page = urlopen(url)
         
         dispatch = getattr(self, 'parse_' + self.output_format)
@@ -466,7 +466,7 @@ class Yahoo(WebGeocoder):
         return self.geocode_url(url, exactly_one)
     
     def geocode_url(self, url, exactly_one=True):
-        print "Fetching %s..." % url
+        util.logger.info("Fetching %s..." % url)
         page = urlopen(url)
         
         parse = getattr(self, 'parse_' + self.output_format)
@@ -650,7 +650,7 @@ class VirtualEarth(WebGeocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        print "Fetching %s..." % url
+        util.logger.info("Fetching %s..." % url)
         page = urlopen(url)
         return self.parse_javascript(page, exactly_one)
 
