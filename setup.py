@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(name='geopy',
-      version='0.93',
+      version='0.94',
       description='Python Geocoding Toolbox',
       author='Brian Beck',
       author_email='exogen@gmail.com',
-      url='http://exogen.case.edu/projects/geopy/',
+      url='http://www.geopy.org/',
       download_url='http://geopy.googlecode.com/svn/trunk/',
       packages=find_packages(),
       license='MIT',

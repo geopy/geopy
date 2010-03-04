@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: geopy
-Version: 0.93
+Version: 0.94.dev
 Summary: Python Geocoding Toolbox
 Home-page: http://exogen.case.edu/projects/geopy/
 Author: Brian Beck
