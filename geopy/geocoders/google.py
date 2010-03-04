@@ -1,6 +1,9 @@
 from urllib import urlencode
 from urllib2 import urlopen
-import simplejson
+try:
+    import json as simplejson
+except ImportError:
+    import simplejson
 
 import xml
 from xml.parsers.expat import ExpatError

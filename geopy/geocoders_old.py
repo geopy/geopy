@@ -28,14 +28,9 @@ except ImportError:
           "Geocoders assuming malformed markup will not work.")
 
 try:
-    import simplejson
+    import json as simplejson
 except ImportError:
-    try:
-        from django.utils import simplejson
-    except ImportError:
-        util.logger.warn("simplejson was not found. " \
-              "Geocoders relying on JSON parsing will not work.")
-
+    import simplejson
 
 class Geocoder(object):
     """Base class for all geocoders."""

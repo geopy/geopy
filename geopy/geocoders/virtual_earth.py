@@ -1,11 +1,14 @@
 import re
 from urllib2 import urlopen
 from urllib import urlencode
-import simplejson
 from geopy.geocoders.base import Geocoder
 from geopy.point import Point
 from geopy.location import Location
 from geopy import util
+try:
+    import json as simplejson
+except ImportError:
+    import simplejson
 
 class VirtualEarth(Geocoder):
     """Geocoder using Microsoft's Windows Live Local web service, powered by
