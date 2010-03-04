@@ -72,12 +72,12 @@ class SemanticMediaWiki(Geocoder):
         if attempted is None:
             attempted = set()
 
-        util.logger("Fetching %s..." % url)
+        util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
         soup = BeautifulSoup(page)
 
         rdf_url = self.parse_rdf_link(soup)
-        util.logger("Fetching %s..." % rdf_url)
+        util.logger.debug("Fetching %s..." % rdf_url)
         page = urlopen(rdf_url)
 
         things, thing = self.parse_rdf(page)

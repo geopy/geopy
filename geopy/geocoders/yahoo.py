@@ -24,7 +24,7 @@ class Yahoo(Geocoder):
         return self.geocode_url(url)
 
     def geocode_url(self, url):
-        util.logger("Fetching %s..." % url)
+        util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
         parse = getattr(self, 'parse_' + self.output_format)

@@ -63,7 +63,7 @@ class Google(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        util.logger.info("Fetching %s..." % url)
+        util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
         
         dispatch = getattr(self, 'parse_' + self.output_format)

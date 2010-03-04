@@ -35,7 +35,7 @@ class VirtualEarth(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        util.logger("Fetching %s..." % url)
+        util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
         return self.parse_javascript(page, exactly_one)
 
