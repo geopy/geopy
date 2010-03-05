@@ -125,7 +125,7 @@ class FindNestedDefListTest(GeoMicroformatFoundTest):
 def get_suite():
     """
     Returns a TestSuite containing all of the TestCases for microformats. If BeautifulSoup
-    isn’t installed, then tests against that library are skipped.
+    isn't installed, then tests against that library are skipped.
     """
     
     geofound_test_methods = [
