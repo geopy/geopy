@@ -2,7 +2,10 @@
 import unittest
 from geopy import format, Location, Point
 from geopy.parsers.html import GeoMicroformat
-
+try:
+    from BeautifulSoup import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
 
 class GeoMicroformatFound(object):
     def setUp(self):
@@ -20,17 +23,17 @@ class GeoMicroformatFound(object):
             self._location_test(locations[i])
 
     def test_one_soup(self):
-        from BeautifulSoup import BeautifulSoup
-        locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
-        self.failUnless(len(locations) == 1)
-        self._location_test(locations[0])
+        if BeautifulSoup:
+            locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
+            self.failUnless(len(locations) == 1)
+            self._location_test(locations[0])
 
     def test_multi_soup(self):
-        from BeautifulSoup import BeautifulSoup
-        locations = self.parser.find_all(BeautifulSoup(self.MARKUP * 3))
-        self.failUnless(len(locations) == 3)
-        for i in range(3):
-            self._location_test(locations[i])
+        if BeautifulSoup:
+            locations = self.parser.find_all(BeautifulSoup(self.MARKUP * 3))
+            self.failUnless(len(locations) == 3)
+            for i in range(3):
+                self._location_test(locations[i])
 
     def _location_test(self, location):
         self.failUnless(location.name == self.NAME)
@@ -45,9 +48,9 @@ class GeoMicroformatNotFound(object):
         self.failUnless(len(locations) == 0)
     
     def test_none_soup(self):
-        from BeautifulSoup import BeautifulSoup
-        locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
-        self.failUnless(len(locations) == 0)
+        if BeautifulSoup:
+            locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
+            self.failUnless(len(locations) == 0)
 
 class GeoMicroformatFoundTest(GeoMicroformatFound, unittest.TestCase):
     MARKUP = """
@@ -118,6 +121,35 @@ class FindNestedDefListTest(GeoMicroformatFoundTest):
     NAME = "Latitude 12%s20' 44\" N" \
            " Longitude 123%s27' 24\" W" % (format.DEGREE, format.DEGREE)
     POINT = Point(12.3456789, -123.456789)
+
+def get_suite():
+    """
+    Returns a TestSuite containing all of the TestCases for microformats. If BeautifulSoup
+    isn’t installed, then tests against that library are skipped.
+    """
+    
+    geofound_test_methods = [
+        'test_one_str',
+        'test_multi_str',
+    ]
+    geonotfound_test_methods = [
+        'test_none_str',
+    ]
+    if BeautifulSoup:
+        geofound_test_methods.extend(['test_one_soup','test_multi_soup',])
+        geonotfound_test_methods.append('test_none_soup')
+    
+    tests = []
+    tests.extend(map(GeoMicroformatFoundTest,geofound_test_methods))
+    tests.extend(map(FindAbbrLatLongTest,geofound_test_methods))
+    tests.extend(map(FindAbbrShorthandTest,geofound_test_methods))
+    tests.extend(map(NoShorthandFoundTest,geofound_test_methods))
+    tests.extend(map(FindNestedDefListTest,geofound_test_methods))
+    
+    tests.extend(map(GeoMicroformatNotFoundTest,geonotfound_test_methods))
+    tests.extend(map(NoShorthandNotFoundTest,geonotfound_test_methods))
+    
+    return unittest.TestSuite(tests)
 
 if __name__ == '__main__':
     unittest.main()

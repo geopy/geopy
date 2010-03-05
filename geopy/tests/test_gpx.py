@@ -39,13 +39,37 @@ class GPX(object):
         self.failUnless(second_top_level_waypoint.name == '5067')
         self.failUnless(second_top_level_waypoint.description == '5067')
 
-class TestInit(GPX, unittest.TestCase):
+class GPXInitTestCase(GPX, unittest.TestCase):
+    """ Tests GPX parser, when the parser is instantiated with a file object """
     def setUp(self):
-        f = open(TEST_FILE, 'r')
-        self.GPXi = gpx.GPX(f)
+        self.f = open(TEST_FILE, 'r')
+        self.GPXi = gpx.GPX(self.f)
 
-class TestParse(GPX, unittest.TestCase):
+    def tearDown(self):
+        self.f.close()
+
+class GPXOpenerTestCase(GPX, unittest.TestCase):
+    """ Tests GPX parser, when file is loaded via the .open() method """
     def setUp(self):
+        self.f = open(TEST_FILE, 'r')
         self.GPXi = gpx.GPX()
-        f = open(TEST_FILE, 'r')
-        self.GPXi.open(f)
+        self.GPXi.open(self.f)
+
+    def tearDown(self):
+        self.f.close()
+
+def get_suite():
+    test_methods = [
+        'test_version',
+        'test_creator',
+        'test_route_names',
+        'test_route_list',
+    ]
+    tests = []
+    tests.extend(map(GPXInitTestCase,test_methods))
+    tests.extend(map(GPXOpenerTestCase,test_methods))
+
+    return unittest.TestSuite(tests)
+
+if __name__ == '__main__':
+    unittest.main()
