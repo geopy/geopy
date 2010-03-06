@@ -132,11 +132,11 @@ class Point(object):
     
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         latitude = "%s %s" % (
-            format.angle(abs(self.latitude), deg_char, min_char, sec_char),
+            format.format_degrees(abs(self.latitude), symbols = {'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char}),
             self.latitude >= 0 and 'N' or 'S'
         )
         longitude = "%s %s" % (
-            format.angle(abs(self.longitude), deg_char, min_char, sec_char),
+            format.format_degrees(abs(self.longitude), symbols = {'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char}),
             self.longitude >= 0 and 'E' or 'W'
         )
         coordinates = [latitude, longitude]
