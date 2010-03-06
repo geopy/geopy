@@ -8,7 +8,7 @@ except ImportError:
 import xml
 from xml.parsers.expat import ExpatError
 
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder,GeocoderError,GeocoderResultError
 from geopy import Point, Location, util
 
 class Google(Geocoder):
@@ -84,6 +84,12 @@ class Google(Geocoder):
         else:
             places = doc.getElementsByTagName('Placemark')
 
+        if len(places) == 0:
+            # Got empty result. Parse out the status code and raise an error if necessary.
+            status = doc.getElementsByTagName("Status")
+            status_code = int(util.get_first_text(status[0], 'code'))
+            self.check_status_code(status_code)
+        
         if exactly_one and len(places) != 1:
             raise ValueError("Didn't find exactly one placemark! " \
                              "(Found %d.)" % len(places))
@@ -116,6 +122,12 @@ class Google(Geocoder):
             page = util.decode_page(page)
         json = simplejson.loads(page)
         places = json.get('Placemark', [])
+
+        if len(places) == 0:
+            # Got empty result. Parse out the status code and raise an error if necessary.
+            status = json.get("Status", [])
+            status_code = status["code"]
+            self.check_status_code(status_code)
 
         if exactly_one and len(places) != 1:
             raise ValueError("Didn't find exactly one placemark! " \
@@ -167,4 +179,27 @@ class Google(Geocoder):
         else:
             return (parse_marker(marker) for marker in markers)
 
+    def check_status_code(self,status_code):
+        if status_code == 400:
+            raise GeocoderResultError("Bad request (Server returned status 400)")
+        elif status_code == 500:
+            raise GeocoderResultError("Unkown error (Server returned status 500)")
+        elif status_code == 601:
+            raise GQueryError("An empty lookup was performed")
+        elif status_code == 602:
+            raise GQueryError("No corresponding geographic location could be found for the specified location, possibly because the address is relatively new, or because it may be incorrect.")
+        elif status_code == 603:
+            raise GQueryError("The geocode for the given location could be returned due to legal or contractual reasons")
+        elif status_code == 610:
+            raise GBadKeyError("The api_key is either invalid or does not match the domain for which it was given.")
+        elif status_code == 620:
+            raise GTooManyQueriesError("The given key has gone over the requests limit in the 24 hour period or has submitted too many requests in too short a period of time.")
 
+class GBadKeyError(GeocoderError):
+    pass
+
+class GQueryError(GeocoderResultError):
+    pass
+
+class GTooManyQueriesError(GeocoderResultError):
+    pass
