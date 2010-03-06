@@ -100,11 +100,11 @@ class Point(object):
         
         latitude = float(latitude or 0)
         if abs(latitude) > 90:
-            raise ValueError("Latitude out of range [-90, 90]: %r" % latitude)
-        
+            latitude = ((latitude + 90) % 180) - 90
+
         longitude = float(longitude or 0)
         if abs(longitude) > 180:
-            raise ValueError("Longitude out of range [-180, 180]: %r" % longitude)
+            longitude = ((longitude + 180) % 360) - 180
         
         altitude = float(altitude or 0)
         
