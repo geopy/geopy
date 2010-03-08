@@ -1,7 +1,15 @@
-0.94.dev
-======================
+0.94 - March 7, 2010
+====================
+ADDED: Partial test suite can now be run via "setup.py test"
+
 FIXED: Issue 5. Converted "print" statements to logger calls to
        allow compatibility with WSGI.
+
+FIXED: Issue 16. Google geocoder backend now throws more descriptive
+       exceptions on certain failure statuses.
+
+FIXED: Issue 18. Add simplejson to install_requires for setup. Use
+       native (Python 2.6+/3.0+) json module if available.
 
 FIXED: Issue 21 and Issue 25. Distance calculations for values beyond
        180/-180 and 90/-90 now wrap instead of raising an error.
@@ -9,11 +17,8 @@ FIXED: Issue 21 and Issue 25. Distance calculations for values beyond
 FIXED: Issue 22. Fixed string representation of Point objects so
        that they don't throw an exception.
 
-FIXED: Issue 18. Add simplejson to install_requires for setup. Use
-       native (Python 2.6+/3.0+) json module if available.
-
-FIXED: Issue 16. Google geocoder backend now throws more descriptive
-       exceptions on certain failure statuses.
+FIXED: Issue 23. Fixed GreatCircleDistance ValueErrors due to floating
+       point precision on extremely close points.
 
 Changes between 0.93 (October 8, 2006) and February 15, 2009
 ============================================================
