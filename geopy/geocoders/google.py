@@ -81,10 +81,11 @@ class Google(Geocoder):
             doc = xml.dom.minidom.parseString(page)
         except ExpatError:
             places = []
+            doc = None
         else:
             places = doc.getElementsByTagName('Placemark')
 
-        if len(places) == 0:
+        if len(places) == 0 and doc is not None:
             # Got empty result. Parse out the status code and raise an error if necessary.
             status = doc.getElementsByTagName("Status")
             status_code = int(util.get_first_text(status[0], 'code'))
