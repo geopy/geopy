@@ -25,10 +25,8 @@ class Google(Geocoder):
         is 'maps.google.com', but if you're geocoding address in the UK (for
         example), you may want to set it to 'maps.google.co.uk'.
 
-        ``resource`` is the HTTP resource to give the query parameter.
-        'maps/geo' is the HTTP geocoder and is a documented API resource.
-        'maps' is the actual Google Maps interface and its use for just
-        geocoding is undocumented. Anything else probably won't work.
+        ``resource`` (DEPRECATED) is ignored, but the parameter remains for compatibility
+        purposes.  The documented 'maps/geo' API is used regardless of this parameter.
 
         ``format_string`` is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
@@ -41,9 +39,13 @@ class Google(Geocoder):
         JavaScript, which could change. However, it currently returns the best
         results for restricted geocoder areas such as the UK.
         """
+        if resource != 'maps/geo':
+            from warnings import warn
+            warn('geopy.geocoders.google.GoogleGeocoder: The resource parameter is deprecated and now ignored. The documented "maps/geo" API will be used.',DeprecationWarning)
+
         self.api_key = api_key
         self.domain = domain
-        self.resource = resource
+        self.resource = 'maps/geo'
         self.format_string = format_string
         self.output_format = output_format
 
