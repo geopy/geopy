@@ -32,16 +32,16 @@ class Google(Geocoder):
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
         
-        ``output_format`` can be 'json', 'xml', 'kml', 'csv', or 'js' and will
+        ``output_format`` can be 'json', 'xml', 'kml', or 'csv' and will
         control the output format of Google's response. The default is 'kml'
-        since it is supported by both the 'maps' and 'maps/geo' resources. The
-        'js' format is the most likely to break since it parses Google's
-        JavaScript, which could change. However, it currently returns the best
-        results for restricted geocoder areas such as the UK.
+        since it is supported by both the 'maps' and 'maps/geo' resources.
         """
         if resource != 'maps/geo':
             from warnings import warn
             warn('geopy.geocoders.google.GoogleGeocoder: The resource parameter is deprecated and now ignored. The documented "maps/geo" API will be used.',DeprecationWarning)
+        
+        if output_format not in ('json','xml','kml','csv'):
+            raise ValueError('output_format must be one of: "json","xml","kml","csv"')
 
         self.api_key = api_key
         self.domain = domain
