@@ -21,9 +21,9 @@ class Google(Geocoder):
 
         ``api_key`` (REQUIRED) should be a valid Google Maps API key.
 
-        ``domain`` should be a the Google Maps domain to connect to. The default
+        ``domain`` should be the localized Google Maps domain to connect to. The default
         is 'maps.google.com', but if you're geocoding address in the UK (for
-        example), you may want to set it to 'maps.google.co.uk'.
+        example), you may want to set it to 'maps.google.co.uk' to properly bias results.
 
         ``resource`` (DEPRECATED) is ignored, but the parameter remains for compatibility
         purposes.  The documented 'maps/geo' API is used regardless of this parameter.
