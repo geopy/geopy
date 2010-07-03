@@ -1,9 +1,14 @@
 import xml.dom.minidom
-from BeautifulSoup import BeautifulSoup
 from geopy.geocoders.base import Geocoder
 from geopy.point import Point
 from geopy.location import Location
 from geopy import util
+
+try:
+    from BeautifulSoup import BeautifulSoup
+except ImportError:
+    util.logger.warn("BeautifulSoup was not found. " \
+          "The SemanticMediaWiki geocoder will not work.")
 
 try:
     set
