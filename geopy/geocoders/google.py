@@ -14,12 +14,13 @@ from geopy import Point, Location, util
 class Google(Geocoder):
     """Geocoder using the Google Maps API."""
     
-    def __init__(self, api_key, domain='maps.google.com',
+    def __init__(self, api_key=None, domain='maps.google.com',
                  resource='maps/geo', format_string='%s', output_format='kml'):
         """Initialize a customized Google geocoder with location-specific
         address information and your Google Maps API key.
 
-        ``api_key`` (REQUIRED) should be a valid Google Maps API key.
+        ``api_key`` should be a valid Google Maps API key. Required as per Google Geocoding API
+        V2 docs, but the API works without a key in practice.
 
         ``domain`` should be the localized Google Maps domain to connect to. The default
         is 'maps.google.com', but if you're geocoding address in the UK (for
