@@ -47,8 +47,8 @@ class Point(object):
     >>> p.altitude == p[2]
     True
     
-    When unpacking (or iterating), only latitude and longitude are included:
-    >>> latitude, longitude = p
+    When unpacking (or iterating), a (latitude, longitude, altitude) tuple is returned
+    >>> latitude, longitude, altitude = p
     
     """
     UTIL_PATTERNS = dict(
