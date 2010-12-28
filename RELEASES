@@ -1,3 +1,10 @@
+0.95 - TBD
+==========
+
+
+FIXED: Issue 40. Fixed "print" statement in bing backend. No more
+       print statements remain.
+
 0.94 - March 7, 2010
 ====================
 ADDED: Partial test suite can now be run via "setup.py test"
