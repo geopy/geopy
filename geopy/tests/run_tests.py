@@ -1,14 +1,27 @@
 #!/usr/bin/env python
 import unittest
 import sys
+from test_backends import get_suite as get_backend_suite
 from test_gpx import get_suite as get_gpx_suite
-from test_microformats import get_suite as get_microformat_suite
 
 def all_tests():
-    return unittest.TestSuite([
+    # Test if BeautifulSoup is installed, since the microformat
+    # parser relies on it.
+    try:
+        from BeautifulSoup import BeautifulSoup
+    except ImportError:
+        BeautifulSoup = None
+    
+    tests = [
+        get_backend_suite(),
         get_gpx_suite(),
-        get_microformat_suite(),
-    ])
+    ]
+
+    if BeautifulSoup:
+        from test_microformats import get_suite as get_microformat_suite
+        tests.append(get_microformat_suite())
+
+    return unittest.TestSuite(tests)
 
 if __name__ == '__main__':
     tests = all_tests()
