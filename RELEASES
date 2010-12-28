@@ -1,19 +1,21 @@
 0.95 - TBD
 ==========
-ADDED: Test suite includes geocoding tests for the Google, Bing, and
-       Yahoo geocoders.
+ADDED:   Test suite includes geocoding tests for the Google, Bing, and
+         Yahoo geocoders.
 
-FIXED: Bing geocoder now works properly. Updated to use the JSON return
-       method rather than XML. `output_format` has always been ignored
-       and is now deprecated.
+CHANGED: `output_format` is deprecated in backends that used it.
+
+FIXED:   Bing geocoder now works properly. Updated to use the JSON return
+         method rather than XML. `output_format` has always been ignored
+         and is now deprecated.
 
 CHANGED: Yahoo geocoder now uses the "old" tuple return format
          (address, (lat, lon)) rather than the undocumented Location()
          object, for API consistency. (Object return values with rich
          data will be implemented in a future release.)
 
-FIXED: Issue 40. Fixed "print" statement in Bing backend. No more
-       print statements remain.
+FIXED:   Issue 40. Fixed "print" statement in Bing backend. No more
+         print statements remain.
 
 0.94 - March 7, 2010
 ====================

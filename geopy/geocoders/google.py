@@ -15,7 +15,7 @@ class Google(Geocoder):
     """Geocoder using the Google Maps API."""
     
     def __init__(self, api_key=None, domain='maps.google.com',
-                 resource='maps/geo', format_string='%s', output_format='kml'):
+                 resource=None, format_string='%s', output_format=None):
         """Initialize a customized Google geocoder with location-specific
         address information and your Google Maps API key.
 
@@ -26,44 +26,52 @@ class Google(Geocoder):
         is 'maps.google.com', but if you're geocoding address in the UK (for
         example), you may want to set it to 'maps.google.co.uk' to properly bias results.
 
-        ``resource`` (DEPRECATED) is ignored, but the parameter remains for compatibility
-        purposes.  The documented 'maps/geo' API is used regardless of this parameter.
+        ``resource`` is DEPRECATED and ignored -- the parameter remains for compatibility
+        purposes.  The supported 'maps/geo' API is used regardless of this parameter.
 
         ``format_string`` is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
         
-        ``output_format`` can be 'json', 'xml', 'kml', or 'csv' and will
+        ``output_format`` (DEPRECATED) can be 'json', 'xml', 'kml', or 'csv' and will
         control the output format of Google's response. The default is 'kml'
         since it is supported by both the 'maps' and 'maps/geo' resources.
         """
-        if resource != 'maps/geo':
+        if resource != None:
             from warnings import warn
-            warn('geopy.geocoders.google.GoogleGeocoder: The resource parameter is deprecated and now ignored. The documented "maps/geo" API will be used.',DeprecationWarning)
-        
-        if output_format not in ('json','xml','kml','csv'):
-            raise ValueError('output_format must be one of: "json","xml","kml","csv"')
+            warn('geopy.geocoders.google.GoogleGeocoder: The `resource` parameter is deprecated '+
+                 'and now ignored. The Google-supported "maps/geo" API will be used.', DeprecationWarning)
+
+        if output_format != None:
+            from warnings import warn
+            warn('geopy.geocoders.google.GoogleGeocoder: The `output_format` parameter is deprecated '+
+                 'and now ignored. The Google-supported "maps/geo" API will be used.', DeprecationWarning)
 
         self.api_key = api_key
         self.domain = domain
-        self.resource = 'maps/geo'
         self.format_string = format_string
-        self.output_format = output_format
+        
+        if output_format:
+            if output_format not in ('json','xml','kml','csv'):
+                raise ValueError('if defined, `output_format` must be one of: "json","xml","kml","csv"')
+            else:
+                self.output_format = output_format
+        else:
+            self.output_format = "kml"
 
     @property
     def url(self):
         domain = self.domain.strip('/')
-        resource = self.resource.strip('/')
-        return "http://%(domain)s/%(resource)s?%%s" % locals()
+        return "http://%s/maps/geo?%%s" % domain
 
     def geocode(self, string, exactly_one=True):
         params = {'q': self.format_string % string,
                   'output': self.output_format.lower(),
                   }
-        if self.resource.rstrip('/').endswith('geo'):
-            # An API key is only required for the HTTP geocoder.
+        
+        if self.api_key:
             params['key'] = self.api_key
-
+        
         url = self.url % urlencode(params)
         return self.geocode_url(url, exactly_one)
 
@@ -160,7 +168,7 @@ class Google(Geocoder):
         LOCATION = r"[\s,]laddr:\s*'(?P<location>.*?)(?<!\\)',"
         ADDRESS = r"(?P<address>.*?)(?:(?: \(.*?@)|$)"
         MARKER = '.*?'.join([LATITUDE, LONGITUDE, LOCATION])
-        MARKERS = r"{markers: (?P<markers>\[.*?\]),\s*polylines:"            
+        MARKERS = r"{markers: (?P<markers>\[.*?\]),\s*polylines:"
 
         def parse_marker(marker):
             latitude, longitude, location = marker
