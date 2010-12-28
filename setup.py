@@ -9,8 +9,10 @@ try:
 except ImportError:
     install_requires.append('simplejson')
 
+version = __import__('geopy').get_version()
+
 setup(name='geopy',
-    version='0.94',
+    version=version,
     description='Python Geocoding Toolbox',
     author='Brian Beck',
     author_email='exogen@gmail.com',
