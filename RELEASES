@@ -1,6 +1,7 @@
 0.95 - TBD
 ==========
-
+ADDED: Test suite includes geocoding tests for the Google, Bing, and
+       Yahoo geocoders.
 
 FIXED: Issue 40. Fixed "print" statement in bing backend. No more
        print statements remain.
