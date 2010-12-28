@@ -40,7 +40,8 @@ def get_encoding(page, contents=None):
 
 def decode_page(page):
     contents = page.read()
-    encoding = get_encoding(page, contents) or sys.getdefaultencoding()
+    # HTTP 1.1 defines iso-8859-1 as the 'implied' encoding if none is given
+    encoding = get_encoding(page, contents) or 'iso-8859-1'
     return unicode(contents, encoding=encoding).encode('utf-8')
 
 def get_first_text(node, tag_names, strip=None):
