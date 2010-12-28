@@ -2,10 +2,7 @@
 import unittest
 from geopy import format, Location, Point
 from geopy.parsers.html import GeoMicroformat
-try:
-    from BeautifulSoup import BeautifulSoup
-except ImportError:
-    BeautifulSoup = None
+from BeautifulSoup import BeautifulSoup
 
 class GeoMicroformatFound(object):
     def setUp(self):
