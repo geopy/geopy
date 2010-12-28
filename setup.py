@@ -4,10 +4,18 @@ install_requires = []
 
 # Test if we have built-in JSON - Python 2.6+, 3.0+.
 # Older Python versions require simplejson.
+# Alternatively, if Django is installed, plug into the django
+# copy of simplejson.
 try:
     import json
 except ImportError:
-    install_requires.append('simplejson')
+    try:
+        import simplejson
+    except ImportError:
+        try:
+            from django.utils import simplejson
+        except:
+            install_requires.append('simplejson')
 
 version = __import__('geopy').get_version()
 

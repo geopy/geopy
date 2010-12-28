@@ -1,9 +1,12 @@
 from urllib import urlencode
 from urllib2 import urlopen
 try:
-    import json as simplejson
+    import json
 except ImportError:
-    import simplejson
+    try:
+        import simplejson as json
+    except ImportError:
+        from django.utils import simplejson as json
 
 import xml
 from xml.parsers.expat import ExpatError
@@ -131,12 +134,12 @@ class Google(Geocoder):
     def parse_json(self, page, exactly_one=True):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
-        json = simplejson.loads(page)
-        places = json.get('Placemark', [])
+        doc = json.loads(page)
+        places = doc.get('Placemark', [])
 
         if len(places) == 0:
             # Got empty result. Parse out the status code and raise an error if necessary.
-            status = json.get("Status", [])
+            status = doc.get("Status", [])
             status_code = status["code"]
             self.check_status_code(status_code)
 
