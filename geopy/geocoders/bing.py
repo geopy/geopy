@@ -3,6 +3,7 @@ from urllib import urlencode
 from urllib2 import urlopen
 
 from geopy.geocoders.base import Geocoder
+from geopy.util import logger
 
 class Bing(Geocoder):
     """Geocoder using the Bing Maps API."""
@@ -33,7 +34,7 @@ class Bing(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        print "Fetching %s..." % url
+        logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
         parse = getattr(self, 'parse_' + self.output_format)
