@@ -7,6 +7,11 @@ FIXED: Bing geocoder now works properly. Updated to use the JSON return
        method rather than XML. `output_format` has always been ignored
        and is now deprecated.
 
+CHANGED: Yahoo geocoder now uses the "old" tuple return format
+         (address, (lat, lon)) rather than the undocumented Location()
+         object, for API consistency. (Object return values with rich
+         data will be implemented in a future release.)
+
 FIXED: Issue 40. Fixed "print" statement in Bing backend. No more
        print statements remain.
 

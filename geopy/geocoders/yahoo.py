@@ -30,7 +30,7 @@ class Yahoo(Geocoder):
         parse = getattr(self, 'parse_' + self.output_format)
         return parse(page)
 
-    def parse_xml(self, page):
+    def parse_xml(self, page, exactly_one=True):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
 
@@ -47,18 +47,22 @@ class Yahoo(Geocoder):
             city_state = util.join_filter(", ", [city, state])
             place = util.join_filter(" ", [city_state, zip])
             location = util.join_filter(", ", [address, place, country])
-            latitude = util.get_first_text(result, 'Latitude') or None
-            longitude = util.get_first_text(result, 'Longitude') or None
-            if latitude and longitude:
-                point = Point(latitude, longitude)
-            else:
-                point = Non
-            return Location(location, point, {
-                'Address': address,
-                'City': city,
-                'State': state,
-                'Zip': zip,
-                'Country': country
-            })
+            latitude = float(util.get_first_text(result, 'Latitude')) or None
+            longitude = float(util.get_first_text(result, 'Longitude')) or None
+            #if latitude and longitude:
+            #    point = Point(latitude, longitude)
+            #else:
+            #    point = Non
+            #return Location(location, point, {
+            #    'Address': address,
+            #    'City': city,
+            #    'State': state,
+            #    'Zip': zip,
+            #    'Country': country
+            #})
+            return address, (latitude, longitude)
 
-        return [parse_result(result) for result in results]
+        if exactly_one:
+            return parse_result(results[0])
+        else:
+            return [parse_result(result) for result in results]
