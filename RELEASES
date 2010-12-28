@@ -3,7 +3,11 @@
 ADDED: Test suite includes geocoding tests for the Google, Bing, and
        Yahoo geocoders.
 
-FIXED: Issue 40. Fixed "print" statement in bing backend. No more
+FIXED: Bing geocoder now works properly. Updated to use the JSON return
+       method rather than XML. `output_format` has always been ignored
+       and is now deprecated.
+
+FIXED: Issue 40. Fixed "print" statement in Bing backend. No more
        print statements remain.
 
 0.94 - March 7, 2010

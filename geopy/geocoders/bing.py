@@ -1,14 +1,14 @@
-import xml.dom.minidom
+import json
 from urllib import urlencode
 from urllib2 import urlopen
 
 from geopy.geocoders.base import Geocoder
-from geopy.util import logger
+from geopy.util import logger, decode_page, join_filter
 
 class Bing(Geocoder):
     """Geocoder using the Bing Maps API."""
 
-    def __init__(self, api_key, format_string='%s', output_format='xml'):
+    def __init__(self, api_key, format_string='%s', output_format=None):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
@@ -18,16 +18,19 @@ class Bing(Geocoder):
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
 
-        ``output_format`` can currently only be 'xml'.
+        ``output_format`` (DEPRECATED) is ignored
         """
+        if output_format != None:
+            from warnings import warn
+            warn('geopy.geocoders.bing.Bing: The `output_format` parameter is deprecated '+
+                 'and ignored.', DeprecationWarning)
+        
         self.api_key = api_key
         self.format_string = format_string
-        self.output_format = output_format.lower()
         self.url = "http://dev.virtualearth.net/REST/v1/Locations?%s"
 
     def geocode(self, string, exactly_one=True):
-        params = {'addressLine': self.format_string % string,
-                  'o': self.output_format,
+        params = {'query': self.format_string % string,
                   'key': self.api_key
                   }
         url = self.url % urlencode(params)
@@ -37,36 +40,37 @@ class Bing(Geocoder):
         logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
-        parse = getattr(self, 'parse_' + self.output_format)
-        return parse(page, exactly_one)
+        return self.parse_json(page, exactly_one)
 
-    def parse_xml(self, page, exactly_one=True):
-        """Parse a location name, latitude, and longitude from an XML response.
-        """
+    def parse_json(self, page, exactly_one=True):
+        """Parse a location name, latitude, and longitude from an JSON response."""
         if not isinstance(page, basestring):
-            page = self._decode_page(page)
-        doc = xml.dom.minidom.parseString(page)
-        resources = doc.getElementsByTagName('Resources')
+            page = decode_page(page)
+        doc = json.loads(page)
+        resources = doc['resourceSets'][0]['resources']
 
         if exactly_one and len(resources) != 1:
             raise ValueError("Didn't find exactly one resource! " \
                              "(Found %d.)" % len(resources))
 
         def parse_resource(resource):
-            strip = ", \n"
-            address = self._get_first_text(resource, 'AddressLine', strip)
-            city = self._get_first_text(resource, 'Locality', strip)
-            state = self._get_first_text(resource, 'AdminDistrict', strip)
-            zip = self._get_first_text(resource, 'PostalCode', strip)
-            country = self._get_first_text(resource, 'CountryRegion', strip)
-            city_state = self._join_filter(", ", [city, state])
-            place = self._join_filter(" ", [city_state, zip])
-            location = self._join_filter(", ", [address, place, country])
-            latitude = self._get_first_text(resource, 'Latitude') or None
-            latitude = latitude and float(latitude)
-            longitude = self._get_first_text(resource, 'Longitude') or None
-            longitude = longitude and float(longitude)
-
+            stripchars = ", \n"
+            address = resource['address']['addressLine'].strip(stripchars)
+            city = resource['address']['locality'].strip(stripchars)
+            state = resource['address']['adminDistrict'].strip(stripchars)
+            zipcode = resource['address']['postalCode'].strip(stripchars)
+            country = resource['address']['countryRegion'].strip(stripchars)
+            
+            city_state = join_filter(", ", [city, state])
+            place = join_filter(" ", [city_state, zip])
+            location = join_filter(", ", [address, place, country])
+            
+            latitude = resource['point']['coordinates'][0] or None
+            longitude = resource['point']['coordinates'][1] or None
+            if latitude and longitude:
+                latitude = float(latitude)
+                longitude = float(longitude)
+            
             return (location, (latitude, longitude))
 
         if exactly_one:
