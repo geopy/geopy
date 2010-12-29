@@ -15,20 +15,19 @@ class Yahoo(Geocoder):
         self.format_string = format_string
         self.output_format = output_format.lower()
 
-    def geocode(self, string):
+    def geocode(self, string, exactly_one=True):
         params = {'location': self.format_string % string,
                   'output': self.output_format,
                   'appid': self.app_id
                  }
         url = self.BASE_URL % urlencode(params)
-        return self.geocode_url(url)
+        return self.geocode_url(url, exactly_one)
 
-    def geocode_url(self, url):
+    def geocode_url(self, url, exactly_one=True):
         util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
-        parse = getattr(self, 'parse_' + self.output_format)
-        return parse(page)
+        return self.parse_xml(page, exactly_one)
 
     def parse_xml(self, page, exactly_one=True):
         if not isinstance(page, basestring):
@@ -49,6 +48,8 @@ class Yahoo(Geocoder):
             location = util.join_filter(", ", [address, place, country])
             latitude = float(util.get_first_text(result, 'Latitude')) or None
             longitude = float(util.get_first_text(result, 'Longitude')) or None
+            
+            # TODO use Point/Location object API in 0.95
             #if latitude and longitude:
             #    point = Point(latitude, longitude)
             #else:
@@ -60,6 +61,7 @@ class Yahoo(Geocoder):
             #    'Zip': zip,
             #    'Country': country
             #})
+            
             return address, (latitude, longitude)
 
         if exactly_one:

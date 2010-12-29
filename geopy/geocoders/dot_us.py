@@ -6,7 +6,7 @@ from geopy.location import Location
 from geopy import util
 
 class GeocoderDotUS(Geocoder):
-    def __init__(self, username=None, password=None, format_string='%s'):
+    def __init__(self, username, password=None, format_string='%s'):
         super(GeocoderDotUS, self).__init__(format_string=format_string)
         
         if username and password is None:
@@ -31,7 +31,7 @@ class GeocoderDotUS(Geocoder):
     
     def geocode(self, string, **kwargs):
         locations = []
-        server = xmlrpclib.ServerProxy(self.url)
+        server = xmlrpclib.ServerProxy(self.get_url())
         results = server.geocode(self.format_string % string)
         for result in results:
             name = self._format_name(result)

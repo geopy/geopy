@@ -47,8 +47,7 @@ class Google(Geocoder):
 
         if output_format != None:
             from warnings import warn
-            warn('geopy.geocoders.google.GoogleGeocoder: The `output_format` parameter is deprecated '+
-                 'and now ignored. The Google-supported "maps/geo" API will be used.', DeprecationWarning)
+            warn('geopy.geocoders.google.GoogleGeocoder: The `output_format` parameter is deprecated.', DeprecationWarning)
 
         self.api_key = api_key
         self.domain = domain
@@ -123,7 +122,7 @@ class Google(Geocoder):
         if exactly_one:
             return parse_place(places[0])
         else:
-            return (parse_place(place) for place in places)
+            return [parse_place(place) for place in places]
 
     def parse_csv(self, page, exactly_one=True):
         raise NotImplementedError
@@ -142,6 +141,7 @@ class Google(Geocoder):
             status = doc.get("Status", [])
             status_code = status["code"]
             self.check_status_code(status_code)
+            return None
 
         if exactly_one and len(places) != 1:
             raise ValueError("Didn't find exactly one placemark! " \
@@ -155,7 +155,7 @@ class Google(Geocoder):
         if exactly_one:
             return parse_place(places[0])
         else:
-            return (parse_place(place) for place in places)
+            return [parse_place(place) for place in places]
 
     def parse_js(self, page, exactly_one=True):
         """This parses JavaScript returned by queries the actual Google Maps
@@ -191,7 +191,7 @@ class Google(Geocoder):
             marker = markers[0]
             return parse_marker(marker)
         else:
-            return (parse_marker(marker) for marker in markers)
+            return [parse_marker(marker) for marker in markers]
 
     def check_status_code(self,status_code):
         if status_code == 400:

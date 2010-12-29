@@ -62,11 +62,13 @@ class Bing(Geocoder):
 
         def parse_resource(resource):
             stripchars = ", \n"
-            address = resource['address']['addressLine'].strip(stripchars)
-            city = resource['address']['locality'].strip(stripchars)
-            state = resource['address']['adminDistrict'].strip(stripchars)
-            zipcode = resource['address']['postalCode'].strip(stripchars)
-            country = resource['address']['countryRegion'].strip(stripchars)
+            a = resource['address']
+            
+            address = a.get('addressLine', '').strip(stripchars)
+            city = a.get('locality', '').strip(stripchars)
+            state = a.get('adminDistrict', '').strip(stripchars)
+            zipcode = a.get('postalCode', '').strip(stripchars)
+            country = a.get('countryRegion', '').strip(stripchars)
             
             city_state = join_filter(", ", [city, state])
             place = join_filter(" ", [city_state, zip])
@@ -83,4 +85,4 @@ class Bing(Geocoder):
         if exactly_one:
             return parse_resource(resources[0])
         else:
-            return (parse_resource(resource) for resource in resources)
+            return [parse_resource(resource) for resource in resources]
