@@ -36,9 +36,9 @@ class Google(Geocoder):
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
         
-        ``output_format`` (DEPRECATED) can be 'json', 'xml', 'kml', or 'csv' and will
-        control the output format of Google's response. The default is 'kml'
-        since it is supported by both the 'maps' and 'maps/geo' resources.
+        ``output_format`` (DEPRECATED) can be 'json', 'xml', or 'kml' and will
+        control the output format of Google's response. The default is 'json'. 'kml' is
+        an alias for 'xml'.
         """
         if resource != None:
             from warnings import warn
@@ -54,12 +54,15 @@ class Google(Geocoder):
         self.format_string = format_string
         
         if output_format:
-            if output_format not in ('json','xml','kml','csv'):
-                raise ValueError('if defined, `output_format` must be one of: "json","xml","kml","csv"')
+            if output_format not in ('json','xml','kml'):
+                raise ValueError('if defined, `output_format` must be one of: "json","xml","kml"')
             else:
-                self.output_format = output_format
+                if output_format == "kml":
+                    self.output_format = "xml"
+                else:
+                    self.output_format = output_format
         else:
-            self.output_format = "kml"
+            self.output_format = "xml"
 
     @property
     def url(self):
@@ -124,12 +127,6 @@ class Google(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    def parse_csv(self, page, exactly_one=True):
-        raise NotImplementedError
-
-    def parse_kml(self, page, exactly_one=True):
-        return self.parse_xml(page, exactly_one)
-
     def parse_json(self, page, exactly_one=True):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
@@ -156,42 +153,6 @@ class Google(Geocoder):
             return parse_place(places[0])
         else:
             return [parse_place(place) for place in places]
-
-    def parse_js(self, page, exactly_one=True):
-        """This parses JavaScript returned by queries the actual Google Maps
-        interface and could thus break easily. However, this is desirable if
-        the HTTP geocoder doesn't work for addresses in your country (the
-        UK, for example).
-        """
-        if not isinstance(page, basestring):
-            page = util.decode_page(page)
-
-        LATITUDE = r"[\s,]lat:\s*(?P<latitude>-?\d+\.\d+)"
-        LONGITUDE = r"[\s,]lng:\s*(?P<longitude>-?\d+\.\d+)"
-        LOCATION = r"[\s,]laddr:\s*'(?P<location>.*?)(?<!\\)',"
-        ADDRESS = r"(?P<address>.*?)(?:(?: \(.*?@)|$)"
-        MARKER = '.*?'.join([LATITUDE, LONGITUDE, LOCATION])
-        MARKERS = r"{markers: (?P<markers>\[.*?\]),\s*polylines:"
-
-        def parse_marker(marker):
-            latitude, longitude, location = marker
-            location = re.match(ADDRESS, location).group('address')
-            latitude, longitude = float(latitude), float(longitude)
-            return (location, (latitude, longitude))
-
-        match = re.search(MARKERS, page)
-        markers = match and match.group('markers') or ''
-        markers = re.findall(MARKER, markers)
-       
-        if exactly_one:
-            if len(markers) != 1:
-                raise ValueError("Didn't find exactly one marker! " \
-                                 "(Found %d.)" % len(markers))
-            
-            marker = markers[0]
-            return parse_marker(marker)
-        else:
-            return [parse_marker(marker) for marker in markers]
 
     def check_status_code(self,status_code):
         if status_code == 400:
