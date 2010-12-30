@@ -10,31 +10,31 @@ class GeoMicroformatFound(object):
     
     def test_one_str(self):
         locations = self.parser.find_all(self.MARKUP)
-        self.failUnless(len(locations) == 1)
+        self.assertTrue(len(locations) == 1)
         self._location_test(locations[0])
 
     def test_multi_str(self):
         locations = self.parser.find_all(self.MARKUP * 3)
-        self.failUnless(len(locations) == 3)
+        self.assertTrue(len(locations) == 3)
         for i in range(3):
             self._location_test(locations[i])
 
     def test_one_soup(self):
         if BeautifulSoup:
             locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
-            self.failUnless(len(locations) == 1)
+            self.assertTrue(len(locations) == 1)
             self._location_test(locations[0])
 
     def test_multi_soup(self):
         if BeautifulSoup:
             locations = self.parser.find_all(BeautifulSoup(self.MARKUP * 3))
-            self.failUnless(len(locations) == 3)
+            self.assertTrue(len(locations) == 3)
             for i in range(3):
                 self._location_test(locations[i])
 
     def _location_test(self, location):
-        self.failUnless(location.name == self.NAME)
-        self.failUnless(location.point == self.POINT)
+        self.assertTrue(location.name == self.NAME)
+        self.assertTrue(location.point == self.POINT)
 
 class GeoMicroformatNotFound(object):
     def setUp(self):
@@ -42,12 +42,12 @@ class GeoMicroformatNotFound(object):
     
     def test_none_str(self):
         locations = self.parser.find_all(self.MARKUP)
-        self.failUnless(len(locations) == 0)
+        self.assertTrue(len(locations) == 0)
     
     def test_none_soup(self):
         if BeautifulSoup:
             locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
-            self.failUnless(len(locations) == 0)
+            self.assertTrue(len(locations) == 0)
 
 class GeoMicroformatFoundTest(GeoMicroformatFound, unittest.TestCase):
     MARKUP = """

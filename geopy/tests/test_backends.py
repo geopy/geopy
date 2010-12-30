@@ -12,13 +12,13 @@ def _basic_address_test(self):
     try:
         clean_address, latlon = self.geocoder.geocode(address)
     except URLError, e:
-        if "timed out" in e.reason:
+        if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
             raise
     
-    self.failUnlessAlmostEqual(latlon[0], 47.658, delta=.002)
-    self.failUnlessAlmostEqual(latlon[1], -117.426, delta=.002)
+    self.assertAlmostEqual(latlon[0], 47.658, delta=.002)
+    self.assertAlmostEqual(latlon[1], -117.426, delta=.002)
     
 def _partial_address_test(self):
     address = '435 north michigan, chicago 60611'
@@ -26,13 +26,13 @@ def _partial_address_test(self):
     try:
         clean_address, latlon = self.geocoder.geocode(address)
     except URLError, e:
-        if "timed out" in e.reason:
+        if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
             raise
     
-    self.failUnlessAlmostEqual(latlon[0], 41.890, delta=.002)
-    self.failUnlessAlmostEqual(latlon[1], -87.624, delta=.002)
+    self.assertAlmostEqual(latlon[0], 41.890, delta=.002)
+    self.assertAlmostEqual(latlon[1], -87.624, delta=.002)
 
 def _intersection_test(self):
     address = 'e. 161st st & river ave, new york, ny'
@@ -40,13 +40,13 @@ def _intersection_test(self):
     try:
         clean_address, latlon = self.geocoder.geocode(address)
     except URLError, e:
-        if "timed out" in e.reason:
+        if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
             raise
     
-    self.failUnlessAlmostEqual(latlon[0], 40.828, delta=.002)
-    self.failUnlessAlmostEqual(latlon[1], -73.926, delta=.002)
+    self.assertAlmostEqual(latlon[0], 40.828, delta=.002)
+    self.assertAlmostEqual(latlon[1], -73.926, delta=.002)
 
 def _placename_test(self):
     address = 'Mount St. Helens'
@@ -56,7 +56,7 @@ def _placename_test(self):
         # allow multiple results to come in. We'll check the top one.
         places = self.geocoder.geocode(address, exactly_one=False)
     except URLError, e:
-        if "timed out" in e.reason:
+        if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
             raise
@@ -65,8 +65,8 @@ def _placename_test(self):
     clean_address, latlon = place
     
     # And since this is a pretty fuzzy search, we'll only test to .01
-    self.failUnlessAlmostEqual(latlon[0], 46.1912, delta=.01)
-    self.failUnlessAlmostEqual(latlon[1], -122.1944, delta=.01)
+    self.assertAlmostEqual(latlon[0], 46.1912, delta=.01)
+    self.assertAlmostEqual(latlon[1], -122.1944, delta=.01)
     
 # ==========
 # Define the test cases that actually perform the import and instantiation step
@@ -98,9 +98,8 @@ class GeoNamesTestCase(unittest.TestCase):
     
     test_placename = _placename_test
 
-BASIC_TESTCASES = [GoogleTestCase, BingTestCase, YahooTestCase]
+BASIC_TESTCASES = [GoogleTestCase, BingTestCase, DotUSTestCase, YahooTestCase]
 
-# http://geocoder.us/ requires a paid account
 # geonames does not actually test against addresses (just place names)
 #TESTCASES = [GoogleTestCase, BingTestCase, YahooTestCase, DotUSTestCase, GeoNamesTestCase]
 
