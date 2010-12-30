@@ -70,6 +70,18 @@ class Distance(object):
     
     def measure(self, a, b):
         raise NotImplementedError
+
+    def __repr__(self):
+        return 'Distance(%s)' % self.kilometers
+    
+    def __str__(self):
+        return '%s km' % self.__kilometers
+    
+    def __cmp__(self, other):
+        if isinstance(other, Distance):
+            return cmp(self.kilometers, other.kilometers)
+        else:
+            return cmp(self.kilometers, other)
     
     @property
     def kilometers(self):

@@ -24,6 +24,11 @@ FIXED:   Issue 39. In addition to checking for system `json` and `simplejson`,
          geopy now looks for a system-installed `django` (which bundles a
          copy of simplejson).
 
+FIXED:   Issue 45. Implement __cmp__ on Distance so that distance objects may
+         be compared against one another.
+
+CHANGED: Added __repr__ and __str__ to Distance
+
 0.94 - March 7, 2010
 ====================
 ADDED: Partial test suite can now be run via "setup.py test"
