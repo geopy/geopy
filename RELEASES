@@ -1,13 +1,16 @@
 0.94.1 - January 2011 (TBD)
 ==========
-ADDED:   Test suite includes geocoding tests for the Google, Bing, and
-         Yahoo geocoders.
+ADDED:   Test suite includes geocoding tests for the Google, Bing, Yahoo,
+         GeocoderDotUS, and GeoNames geocoders.
 
 CHANGED: `output_format` is deprecated in backends that used it.
 
 FIXED:   Bing geocoder now works properly. Updated to use the JSON return
          method rather than XML. `output_format` has always been ignored
          and is now deprecated.
+
+FIXED:   GeocoderDotUS now works properly. Updated to use more compact CSV
+         return method rather than XMLRPC.
 
 CHANGED: Yahoo geocoder now uses the "old" tuple return format
          (address, (lat, lon)) rather than the undocumented Location()
@@ -45,4 +48,4 @@ FIXED: Issue 23. Fixed GreatCircleDistance ValueErrors due to floating
 
 Changes between 0.93 (October 8, 2006) and February 15, 2009
 ============================================================
-See http://github.com/mtigas/geopy/compare/0451a051...master
+See https://github.com/mtigas/geopy/compare/0451a051...ffebd5f3
