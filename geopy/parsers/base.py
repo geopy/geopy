@@ -8,3 +8,4 @@ class Parser(object):
 
     def find_all(self, document):
         return list(self.find(document))
+
