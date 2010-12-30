@@ -1,8 +1,7 @@
 import xml.dom.minidom
 from geopy import util
-from geopy import Point, Location
 from urllib import urlencode
-from urllib2 import urlopen, HTTPError
+from urllib2 import urlopen
 from geopy.geocoders.base import Geocoder
 
 
