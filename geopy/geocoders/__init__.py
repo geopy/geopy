@@ -5,3 +5,4 @@ from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.wiki_gis import MediaWiki
 from geopy.geocoders.wiki_semantic import SemanticMediaWiki
 from geopy.geocoders.yahoo import Yahoo
+from geopy.geocoders.openmapquest import OpenMapQuest

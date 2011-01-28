@@ -91,11 +91,21 @@ class DotUSTestCase(unittest.TestCase):
         from geopy.geocoders.dot_us import GeocoderDotUS
         self.geocoder = GeocoderDotUS()
 
+class OpenMapQuestTestCase(unittest.TestCase):
+    def setUp(self):
+        from geopy.geocoders.openmapquest import OpenMapQuest
+        self.geocoder = OpenMapQuest()
+    
+    # Does not do fuzzy address search.
+    test_basic_address = _basic_address_test
+    test_placename = _placename_test
+
 class GeoNamesTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.geonames import GeoNames
         self.geocoder = GeoNames()
     
+    # Does not do any address searching.
     test_placename = _placename_test
 
 BASIC_TESTCASES = [GoogleTestCase, BingTestCase, DotUSTestCase, YahooTestCase]
@@ -126,6 +136,8 @@ def get_suite():
     for tc in BASIC_TESTCASES:
         tests.extend(map(tc,test_methods))
     
+    tests.append(OpenMapQuestTestCase('test_basic_address'))
+    tests.append(OpenMapQuestTestCase('test_placename'))
     tests.append(GeoNamesTestCase('test_placename'))
     
     return unittest.TestSuite(tests)
