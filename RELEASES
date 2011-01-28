@@ -29,6 +29,9 @@ FIXED:   Issue 45. Implement __cmp__ on Distance so that distance objects may
 
 CHANGED: Added __repr__ and __str__ to Distance
 
+ADDED:   Issue 46. Geocoder backend for MapQuest's OpenMapQuest API, contributed
+         by Shashwat Anand.
+
 0.94 - March 7, 2010
 ====================
 ADDED: Partial test suite can now be run via "setup.py test"
