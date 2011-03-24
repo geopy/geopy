@@ -1,4 +1,4 @@
-0.94.1 - January 2011 (TBD)
+0.94.1 - March 24, 2011
 ==========
 ADDED:   Test suite includes geocoding tests for the Google, Bing, Yahoo,
          GeocoderDotUS, and GeoNames geocoders.

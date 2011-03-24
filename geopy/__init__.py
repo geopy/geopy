@@ -2,7 +2,7 @@ from geopy.point import Point
 from geopy.location import Location
 from geopy import geocoders
 
-VERSION = (0, 94, 1, 'pre')
+VERSION = (0, 94, 1)
 
 def get_version():
     version = '%s.%s' % (VERSION[0], VERSION[1])
