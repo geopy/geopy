@@ -1,3 +1,4 @@
+from sys import version_info
 import re
 import logging
 import htmlentitydefs
@@ -26,11 +27,13 @@ def join_filter(sep, seq, pred=bool):
     return sep.join([unicode(i) for i in seq if pred(i)])
  
 def get_encoding(page, contents=None):
-    plist = page.headers.getplist()
-    if plist:
-        key, value = plist[-1].split('=')
-        if key.lower() == 'charset':
-            return value
+    # TODO: clean up Py3k support
+    if version_info < (3, 0):
+        charset = page.headers.getparam("charset") or None
+    else:
+        charset = page.headers.get_param("charset") or None
+    if charset:
+        return charset
 
     if contents:
         try:
@@ -42,7 +45,11 @@ def decode_page(page):
     contents = page.read()
     # HTTP 1.1 defines iso-8859-1 as the 'implied' encoding if none is given
     encoding = get_encoding(page, contents) or 'iso-8859-1'
-    return unicode(contents, encoding=encoding).encode('utf-8')
+    # TODO: clean up Py3k support
+    if version_info < (3, 0):
+        return unicode(contents, encoding=encoding).encode('utf-8')
+    else:
+        return str(contents, encoding=encoding)
 
 def get_first_text(node, tag_names, strip=None):
     if isinstance(tag_names, basestring):
