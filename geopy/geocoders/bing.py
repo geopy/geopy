@@ -71,7 +71,7 @@ class Bing(Geocoder):
             country = a.get('countryRegion', '').strip(stripchars)
             
             city_state = join_filter(", ", [city, state])
-            place = join_filter(" ", [city_state, zip])
+            place = join_filter(" ", [city_state, zipcode])
             location = join_filter(", ", [address, place, country])
             
             latitude = resource['point']['coordinates'][0] or None
