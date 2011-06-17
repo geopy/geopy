@@ -139,8 +139,7 @@ class Google(Geocoder):
             status_code = status["code"]
             self.check_status_code(status_code)
             return None
-
-        if exactly_one and len(places) != 1:
+        elif exactly_one and len(places) != 1:
             raise ValueError("Didn't find exactly one placemark! " \
                              "(Found %d.)" % len(places))
 
