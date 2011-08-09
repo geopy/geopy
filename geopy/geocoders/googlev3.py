@@ -4,8 +4,6 @@ import hashlib
 import hmac
 from urllib import urlencode
 from urllib2 import urlopen
-from xml import dom
-from xml.parsers.expat import ExpatError
 
 try:
     import json
@@ -23,9 +21,8 @@ from geopy import util
 class GoogleV3(Geocoder):
     '''Geocoder using the Google Maps v3 API.'''
     
-    def __init__(self, domain='maps.googleapis.com', format_string='%s',
-                 output_format='json', protocol='http', client_id=None,
-                 secret_key=None):
+    def __init__(self, domain='maps.googleapis.com', protocol='http',
+                 client_id=None, secret_key=None):
         '''Initialize a customized Google geocoder.
 
         API authentication is only required for Google Maps Premier customers.
@@ -34,12 +31,6 @@ class GoogleV3(Geocoder):
         is 'maps.google.com', but if you're geocoding address in the UK (for
         example), you may want to set it to 'maps.google.co.uk' to properly bias results.
 
-        ``format_string`` is a string containing '%s' where the string to
-        geocode should be interpolated before querying the geocoder.
-        For example: '%s, Mountain View, CA'. The default is just '%s'.
-        
-        ``output_format`` can be 'json' or 'xml' The default is 'json'.
-        
         ``protocol`` http or https.
         
         ``client_id`` Premier account client id.
@@ -50,17 +41,14 @@ class GoogleV3(Geocoder):
 
         if protocol not in ('http', 'https'):
             raise ValueError, 'Supported protocols are http and https.'
-        if output_format not in ('json', 'xml'):
-            raise ValueError, 'Supported output_formats are json and xml.'
         if client_id and not secret_key:
             raise ValueError, 'Must provide secret_key with client_id.'
         if secret_key and not client_id:
             raise ValueError, 'Must provide client_id with secret_key.'
 
         self.domain = domain.strip('/')
-        self.format_string = format_string
         self.protocol = protocol
-        self.format = output_format
+        self.doc = {}
 
         if client_id and secret_key:
             self.client_id = client_id
@@ -73,10 +61,10 @@ class GoogleV3(Geocoder):
         '''Returns a Premier account signed url.'''
         params['client'] = self.client_id
         url_params = {'protocol': self.protocol, 'domain': self.domain,
-                      'format': self.format, 'params': urlencode(params)}
+                      'params': urlencode(params)}
         secret = base64.urlsafe_b64decode(self.secret_key)
         url_params['url_part'] = (
-            '/maps/api/geocode/%(format)s?%(params)s' % url_params)
+            '/maps/api/geocode/json?%(params)s' % url_params)
         signature = hmac.new(secret, url_params['url_part'], hashlib.sha1)
         url_params['signature'] = base64.urlsafe_b64encode(signature.digest())
 
@@ -85,21 +73,15 @@ class GoogleV3(Geocoder):
 
     def get_url(self, params):
         '''Returns a standard geocoding api url.'''
-        return 'http://%(domain)s/maps/api/geocode/%(format)s?%(params)s' % (
-            {'domain': self.domain, 'format': self.format,
-             'params': urlencode(params)})
+        return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
+            {'domain': self.domain, 'params': urlencode(params)})
     
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
         util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
-        if self.format == 'xml':
-            dispatch = self.parse_xml
-        elif self.format == 'json':
-            dispatch = self.parse_json
-
-        return dispatch(page, exactly_one)
+        return self.parse_json(page, exactly_one)
 
     def geocode(self, address, bounds=None, region=None,
                 language=None, sensor=False, exactly_one=True):
@@ -173,39 +155,6 @@ class GoogleV3(Geocoder):
 
         return self.geocode_url(url, exactly_one)
 
-    def parse_xml(self, page, exactly_one=True):
-        '''Returns location, (latitude, longitude) from xml feed.'''
-        if not isinstance(page, basestring):
-            page = util.decode_page(page)
-        try:
-            self.doc = dom.minidom.parseString(page)
-        except ExpatError:
-            places = []
-            self.doc = None
-        else:
-            places = self.doc.getElementsByTagName('result')
-    
-        if len(places) == 0 and self.doc is not None:
-            # Got empty result.
-            status = self.doc.getElementsByTagName("status")
-            check_status(status)
-        if exactly_one and len(places) != 1:
-            raise ValueError(
-                "Didn't find exactly one placemark! (Found %d)" % len(places))
-    
-        def parse_place(place):
-            '''Get the location, lat and lng from a single place xml.'''
-            location = util.get_first_text(place, ['formatted_address'])
-            points = place.getElementsByTagName('location')[0]
-            latitude = float(util.get_first_text(points, 'lat'))
-            longitude = float(util.get_first_text(points, 'lng'))
-            return (location, (latitude, longitude))
-    
-        if exactly_one:
-            return parse_place(places[0])
-        else:
-            return [parse_place(place) for place in places]
-    
     def parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
         if not isinstance(page, basestring):
