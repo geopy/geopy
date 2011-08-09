@@ -1,4 +1,11 @@
-'''Google Maps V3 geocoder.'''
+'''Google Maps V3 geocoder.
+
+Largely adapted from the existing v2 geocoder with modifications made where
+possible to support the v3 api as well as to clean up the class without
+breaking its compatibility or diverging its api too far from the rest of the
+geocoder classes.
+'''
+
 import base64
 import hashlib
 import hmac
