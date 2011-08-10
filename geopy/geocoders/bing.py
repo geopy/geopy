@@ -36,18 +36,33 @@ class Bing(Geocoder):
         self.format_string = format_string
         self.url = "http://dev.virtualearth.net/REST/v1/Locations?%s"
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, raw = False):
         params = {'query': self.format_string % string,
                   'key': self.api_key
                   }
         url = self.url % urlencode(params)
-        return self.geocode_url(url, exactly_one)
+        return self.geocode_url(url, exactly_one, raw)
 
-    def geocode_url(self, url, exactly_one=True):
+    def geocode_url(self, url, exactly_one=True, raw=False):
         logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
-        return self.parse_json(page, exactly_one)
+        return self.parse_raw(page, exactly_one) if raw else self.parse_json(page, exactly_one)
+
+    def parse_raw(self, page, exactly_one=True):
+        if not isinstance(page, basestring):
+            page = decode_page(page)
+        doc = json.loads(page)
+        resources = doc['resourceSets'][0]['resources']
+
+        if exactly_one and len(resources) != 1:
+            raise ValueError("Didn't find exactly one resource! " \
+                             "(Found %d.)" % len(resources))
+
+        if exactly_one:
+            return resources[0]
+        else:
+            return resources
 
     def parse_json(self, page, exactly_one=True):
         """Parse a location name, latitude, and longitude from an JSON response."""

@@ -69,22 +69,43 @@ class Google(Geocoder):
         domain = self.domain.strip('/')
         return "http://%s/maps/geo?%%s" % domain
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, raw=False):
         params = {'q': self.format_string % string,
-                  'output': self.output_format.lower(),
+                  'output': 'json' if raw else self.output_format.lower(),
                   }
         
         if self.api_key:
             params['key'] = self.api_key
         
         url = self.url % urlencode(params)
-        return self.geocode_url(url, exactly_one)
+        return self.geocode_url(url, exactly_one, raw)
 
-    def geocode_url(self, url, exactly_one=True):
+    def parse_raw(self, page, exactly_one=True):
+        if not isinstance(page, basestring):
+            page = util.decode_page(page)
+        doc = json.loads(page)
+        places = doc.get('Placemark', [])
+
+        if len(places) == 0:
+            # Got empty result. Parse out the status code and raise an error if necessary.
+            status = doc.get("Status", [])
+            status_code = status["code"]
+            self.check_status_code(status_code)
+            return None
+        elif exactly_one and len(places) != 1:
+            raise ValueError("Didn't find exactly one placemark! " \
+                             "(Found %d.)" % len(places))
+
+        if exactly_one:
+            return places[0]
+        else:
+            return places
+
+    def geocode_url(self, url, exactly_one=True, raw=False):
         util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
         
-        dispatch = getattr(self, 'parse_' + self.output_format)
+        dispatch = self.parse_raw if raw else getattr(self, 'parse_' + self.output_format)
         return dispatch(page, exactly_one)
 
     def parse_xml(self, page, exactly_one=True):
