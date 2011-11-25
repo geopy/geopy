@@ -22,16 +22,17 @@ version = __import__('geopy').get_version()
 setup(name='geopy',
     version=version,
     description='Python Geocoding Toolbox',
-    author='Mike Tigas', # update this as needed
-    author_email='mike.tigas@gmail.com', # update this as needed
     url='http://www.geopy.org/',
+    author='GeoPy Project / Mike Tigas',
+    author_email='mike@tig.as', # subject to change
+    url='http://code.google.com/p/geopy/',
     download_url='http://code.google.com/p/geopy/downloads/list',
     packages=find_packages(),
     install_requires=install_requires,
     test_suite = "geopy.tests.run_tests.all_tests",
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',
-    classifiers=["Development Status :: 3 - Alpha",
+    classifiers=["Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
