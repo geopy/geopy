@@ -8,9 +8,6 @@ except ImportError:
     except ImportError:
         from django.utils import simplejson as json
 
-import xml
-from xml.parsers.expat import ExpatError
-
 from geopy.geocoders.base import Geocoder,GeocoderError,GeocoderResultError
 from geopy import Point, Location, util
 
@@ -18,7 +15,7 @@ class Google(Geocoder):
     """Geocoder using the Google Maps API."""
     
     def __init__(self, api_key=None, domain='maps.google.com',
-                 resource=None, format_string='%s', output_format=None):
+                 format_string='%s'):
         """Initialize a customized Google geocoder with location-specific
         address information and your Google Maps API key.
 
@@ -29,40 +26,14 @@ class Google(Geocoder):
         is 'maps.google.com', but if you're geocoding address in the UK (for
         example), you may want to set it to 'maps.google.co.uk' to properly bias results.
 
-        ``resource`` is DEPRECATED and ignored -- the parameter remains for compatibility
-        purposes.  The supported 'maps/geo' API is used regardless of this parameter.
-
         ``format_string`` is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
-        
-        ``output_format`` (DEPRECATED) can be 'json', 'xml', or 'kml' and will
-        control the output format of Google's response. The default is 'json'. 'kml' is
-        an alias for 'xml'.
         """
-        if resource != None:
-            from warnings import warn
-            warn('geopy.geocoders.google.GoogleGeocoder: The `resource` parameter is deprecated '+
-                 'and now ignored. The Google-supported "maps/geo" API will be used.', DeprecationWarning)
-
-        if output_format != None:
-            from warnings import warn
-            warn('geopy.geocoders.google.GoogleGeocoder: The `output_format` parameter is deprecated.', DeprecationWarning)
-
         self.api_key = api_key
         self.domain = domain
         self.format_string = format_string
-        
-        if output_format:
-            if output_format not in ('json','xml','kml'):
-                raise ValueError('if defined, `output_format` must be one of: "json","xml","kml"')
-            else:
-                if output_format == "kml":
-                    self.output_format = "xml"
-                else:
-                    self.output_format = output_format
-        else:
-            self.output_format = "xml"
+        self.output_format = "json"
 
     @property
     def url(self):
@@ -87,29 +58,6 @@ class Google(Geocoder):
         dispatch = getattr(self, 'parse_' + self.output_format)
         return dispatch(page, exactly_one)
 
-    def parse_xml(self, page, exactly_one=True):
-        """Parse a location name, latitude, and longitude from an XML response.
-        """
-        if not isinstance(page, basestring):
-            page = util.decode_page(page)
-        try:
-            doc = xml.dom.minidom.parseString(page)
-        except ExpatError:
-            places = []
-            doc = None
-        else:
-            places = doc.getElementsByTagName('Placemark')
-
-        if len(places) == 0 and doc is not None:
-            # Got empty result. Parse out the status code and raise an error if necessary.
-            status = doc.getElementsByTagName("Status")
-            status_code = int(util.get_first_text(status[0], 'code'))
-            self.check_status_code(status_code)
-        
-        if exactly_one and len(places) != 1:
-            raise ValueError("Didn't find exactly one placemark! " \
-                             "(Found %d.)" % len(places))
-        
         def parse_place(place):
             location = util.get_first_text(place, ['address', 'name']) or None
             points = place.getElementsByTagName('Point')
