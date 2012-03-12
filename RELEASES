@@ -1,3 +1,11 @@
+0.94.2 - March 12, 2012
+==========
+ADDED:   MANIFEST.in so that LICENSE file gets included in dist packages
+         (per req by Debian Python Module Team)
+
+UPDATED: Yahoo geocoder uses new PlaceFinder API instead of outdated MapsService
+         V1 API.
+
 0.94.1 - March 24, 2011
 ==========
 ADDED:   Test suite includes geocoding tests for the Google, Bing, Yahoo,
