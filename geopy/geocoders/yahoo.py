@@ -29,20 +29,23 @@ class Yahoo(Geocoder):
             warn('geopy.geocoders.yahoo.Yahoo: The `output_format` parameter is deprecated '+
                  'and now ignored. JSON will be used internally.', DeprecationWarning)
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, flags='J', exactly_one=True, raw_result=False):
         params = {'location': self.format_string % string,
                   'appid': self.app_id,
-                  'flags': 'J'
+                  'flags': flags
                  }
         url = self.BASE_URL % urlencode(params)
         util.logger.debug("Fetching %s..." % url)
-        return self.geocode_url(url, exactly_one)
+        return self.geocode_url(url, exactly_one, raw_result)
 
-    def geocode_url(self, url, exactly_one=True):
-        page = urlopen(url)
-        return self.parse_json(page, exactly_one)
+    def geocode_raw(self, string, flags='J', exactly_one=False, raw_result=True):
+        return self.geocode(string, flags, exactly_one, raw_result)
     
-    def parse_json(self, page, exactly_one=True):
+    def geocode_url(self, url, exactly_one=True, raw_result=False):
+        page = urlopen(url)
+        return self.parse_json(page, exactly_one, raw_result)
+    
+    def parse_json(self, page, exactly_one=True, raw_result=False):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
         doc = json.loads(page)
@@ -67,7 +70,10 @@ class Yahoo(Geocoder):
             #else:
             #    point = None
             return (location, (float(lat), float(lng)))
-    
+        
+        if raw_result:
+            return results
+        
         if exactly_one:
             return parse_result(results[0])
         else:
