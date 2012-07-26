@@ -12,9 +12,12 @@ class LiveAddress(Geocoder):
     More information regarding the LiveAddress API can be found here:
     http://smartystreets.com/products/liveaddress-api
 
-    ``auth_token`` should be a valid authentication token. This token must
-    correspond with an active LiveAddress subscription (see the following page
-    to administer your subscriptions: https://smartystreets.com/account).
+    ``auth_token`` should be a valid authentication token.  Tokens can be
+    administered from here: https://smartystreets.com/account/keys/secret
+
+    The token you use must correspond with an active LiveAddress subscription
+    Subscriptions can be administered here:
+    https://smartystreets.com/account/subscription
 
     ``candidates`` is an integer between 1 and 10 indicating the max number of
     candidate addresses to return if a valid address could be found.
