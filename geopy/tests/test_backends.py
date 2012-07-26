@@ -108,6 +108,16 @@ class GeoNamesTestCase(unittest.TestCase):
     # Does not do any address searching.
     test_placename = _placename_test
 
+class LiveAddressTestCase(unittest.TestCase):
+    def setUp(self):
+        from geopy.geocoders.smartystreets import LiveAddress
+        self.geocoder = LiveAddress('ENTER_A_VALID_AUTHENTICATION_TOKEN_HERE')
+
+    # Does not do any placename or intersection searching.
+    test_basic_address = _basic_address_test
+    test_partial_address = _partial_address_test
+
+
 BASIC_TESTCASES = [GoogleTestCase, BingTestCase, DotUSTestCase, YahooTestCase]
 
 # geonames does not actually test against addresses (just place names)
@@ -139,7 +149,9 @@ def get_suite():
     tests.append(OpenMapQuestTestCase('test_basic_address'))
     tests.append(OpenMapQuestTestCase('test_placename'))
     tests.append(GeoNamesTestCase('test_placename'))
-    
+    tests.append(LiveAddressTestCase('test_basic_address'))
+    tests.append(LiveAddressTestCase('test_partial_address'))
+
     return unittest.TestSuite(tests)
 
 if __name__ == '__main__':
