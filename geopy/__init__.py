@@ -2,12 +2,7 @@ from geopy.point import Point
 from geopy.location import Location
 from geopy import geocoders
 
-VERSION = (0, 95, 0, "pre")
-
 def get_version():
-    version = '%s.%s' % (VERSION[0], VERSION[1])
-    if VERSION[2]:
-        version = '%s.%s' % (version, VERSION[2])
-    if VERSION[3:]:
-        version = '%s.%s' % (version, VERSION[3])
-    return version
+    import os
+    f = os.path.join(os.path.dirname(__file__), 'version.txt')
+    return open(f).read().strip()
