@@ -11,7 +11,7 @@ def _basic_address_test(self):
     
     try:
         clean_address, latlon = self.geocoder.geocode(address)
-    except URLError, e:
+    except URLError as e:
         if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
@@ -25,7 +25,7 @@ def _partial_address_test(self):
     
     try:
         clean_address, latlon = self.geocoder.geocode(address)
-    except URLError, e:
+    except URLError as e:
         if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
@@ -39,7 +39,7 @@ def _intersection_test(self):
     
     try:
         clean_address, latlon = self.geocoder.geocode(address)
-    except URLError, e:
+    except URLError as e:
         if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
@@ -55,7 +55,7 @@ def _placename_test(self):
         # Since a place name search is significantly less accurate,
         # allow multiple results to come in. We'll check the top one.
         places = self.geocoder.geocode(address, exactly_one=False)
-    except URLError, e:
+    except URLError as e:
         if "timed out" in str(e).lower():
             raise unittest.SkipTest('geocoder service timed out')
         else:
