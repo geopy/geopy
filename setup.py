@@ -1,4 +1,6 @@
+import os
 from setuptools import setup, find_packages
+from pkg_resources import resource_string
 
 install_requires = []
 
@@ -17,7 +19,8 @@ except ImportError:
         except:
             install_requires.append('simplejson')
 
-version = __import__('geopy').get_version()
+version_file = os.path.join(os.path.dirname(__file__), 'geopy', 'version.txt')
+version = open(version_file).read().strip()
 
 setup(name='geopy',
     version=version,
@@ -39,6 +42,9 @@ setup(name='geopy',
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Topic :: Scientific/Engineering :: GIS",
-        "Topic :: Software Development :: Libraries :: Python Modules"
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
     ],
+    use_2to3=True,
 )
