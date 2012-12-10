@@ -19,13 +19,13 @@ except ImportError:
         except:
             install_requires.append('simplejson')
 
-version_file = os.path.join(os.path.dirname(__file__), 'geopy', 'version.txt')
-version = open(version_file).read().strip()
+# note: not automated since py3k cannot import geopy.get_version at
+# install-time (since 2to3 has not yet run)
+version = "0.95.pre"
 
 setup(name='geopy',
     version=version,
     description='Python Geocoding Toolbox',
-    url='http://www.geopy.org/',
     author='GeoPy Project / Mike Tigas',
     author_email='mike@tig.as', # subject to change
     url='http://code.google.com/p/geopy/',
