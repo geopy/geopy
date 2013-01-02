@@ -15,7 +15,7 @@ class Google(Geocoder):
     """Geocoder using the Google Maps API."""
     
     def __init__(self, api_key=None, domain='maps.google.com',
-                 format_string='%s'):
+                 format_string='%s', optional_query_params={}):
         """Initialize a customized Google geocoder with location-specific
         address information and your Google Maps API key.
 
@@ -29,11 +29,17 @@ class Google(Geocoder):
         ``format_string`` is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
+
+        ``optional_query_params`` Google allows optional params that can be sent with the query string
+        bounds, language, region, components
+        provide a dictionary ex. {'language':'en'}
+        https://developers.google.com/maps/documentation/geocoding/#GeocodingRequests
         """
         self.api_key = api_key
         self.domain = domain
         self.format_string = format_string
         self.output_format = "json"
+        self.optional_query_params = optional_query_params
 
     @property
     def url(self):
@@ -44,6 +50,7 @@ class Google(Geocoder):
         params = {'q': self.format_string % string,
                   'output': self.output_format.lower(),
                   }
+        params.update(self.optional_query_params)
         
         if self.api_key:
             params['key'] = self.api_key
