@@ -58,23 +58,6 @@ class Google(Geocoder):
         dispatch = getattr(self, 'parse_' + self.output_format)
         return dispatch(page, exactly_one)
 
-        def parse_place(place):
-            location = util.get_first_text(place, ['address', 'name']) or None
-            points = place.getElementsByTagName('Point')
-            point = points and points[0] or None
-            coords = util.get_first_text(point, 'coordinates') or None
-            if coords:
-                longitude, latitude = [float(f) for f in coords.split(',')[:2]]
-            else:
-                latitude = longitude = None
-                _, (latitude, longitude) = self.geocode(location)
-            return (location, (latitude, longitude))
-        
-        if exactly_one:
-            return parse_place(places[0])
-        else:
-            return [parse_place(place) for place in places]
-
     def parse_json(self, page, exactly_one=True):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
