@@ -76,6 +76,11 @@ class GoogleTestCase(unittest.TestCase):
         from geopy.geocoders.google import Google
         self.geocoder = Google()
 
+class GoogleV3TestCase(unittest.TestCase):
+    def setUp(self):
+        from geopy.geocoders.googlev3 import GoogleV3
+        self.geocoder = GoogleV3()
+
 class BingTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.bing import Bing
@@ -117,7 +122,7 @@ class GeoNamesTestCase(unittest.TestCase):
     # Does not do any address searching.
     test_placename = _placename_test
 
-BASIC_TESTCASES = [GoogleTestCase, BingTestCase, DotUSTestCase, YahooTestCase]
+BASIC_TESTCASES = [GoogleTestCase, GoogleV3TestCase, BingTestCase, DotUSTestCase, YahooTestCase]
 
 # geonames does not actually test against addresses (just place names)
 #TESTCASES = [GoogleTestCase, BingTestCase, YahooTestCase, DotUSTestCase, GeoNamesTestCase]
