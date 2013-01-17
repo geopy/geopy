@@ -64,9 +64,9 @@ def _placename_test(self):
     place = places[0]
     clean_address, latlon = place
     
-    # And since this is a pretty fuzzy search, we'll only test to .01
-    self.assertAlmostEqual(latlon[0], 46.1912, delta=.01)
-    self.assertAlmostEqual(latlon[1], -122.1944, delta=.01)
+    # And since this is a pretty fuzzy search, we'll only test to .02
+    self.assertAlmostEqual(latlon[0], 46.1912, delta=.02)
+    self.assertAlmostEqual(latlon[1], -122.1944, delta=.02)
     
 # ==========
 # Define the test cases that actually perform the import and instantiation step
@@ -95,6 +95,15 @@ class OpenMapQuestTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.openmapquest import OpenMapQuest
         self.geocoder = OpenMapQuest()
+    
+    # Does not do fuzzy address search.
+    test_basic_address = _basic_address_test
+    test_placename = _placename_test
+
+class MapQuestTestCase(unittest.TestCase):
+    def setUp(self):
+        from geopy.geocoders.mapquest import MapQuest
+        self.geocoder = MapQuest('Dmjtd%7Clu612007nq%2C20%3Do5-50zah')
     
     # Does not do fuzzy address search.
     test_basic_address = _basic_address_test
@@ -138,6 +147,8 @@ def get_suite():
     
     tests.append(OpenMapQuestTestCase('test_basic_address'))
     tests.append(OpenMapQuestTestCase('test_placename'))
+    tests.append(MapQuestTestCase('test_basic_address'))
+    tests.append(MapQuestTestCase('test_placename'))
     tests.append(GeoNamesTestCase('test_placename'))
     
     return unittest.TestSuite(tests)
