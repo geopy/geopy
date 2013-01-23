@@ -62,7 +62,7 @@ class GoogleTimezone(GoogleV3):
         '''
 
         params = {
-            'location': str(latitude) + ',' + str(longitude)
+            'location': str(latitude) + ',' + str(longitude),
             'sensor': str(sensor).lower()
         }
 
