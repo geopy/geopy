@@ -10,7 +10,7 @@ from urllib import urlencode
 from urllib2 import urlopen
 
 from geopy.geocoders.base import Geocoder,GeocoderError,GeocoderResultError
-from geopy.util import logger, decode_page, join_filter
+from geopy import util
 
 class GooglePlaces(Geocoder):
     """Geocoder using the Google Places API."""
@@ -19,17 +19,21 @@ class GooglePlaces(Geocoder):
         """Initialize a customized Google Places geocoder with location-specific
         address information and your Google Places API key.
 
-        ``api_key`` should be a valid Google Places API key.
+        ``api_key`` should be a valid Google Places API key. (REQUIRED)
 
         ``format_string`` is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
 
-        ``output_format`` (DEPRECATED) is ignored
+        ``output_format`` is set to json by default. Acceptable values are 
+        'json' and 'xml'. (REQUIRED)
+        
+        ``sensor`` is set to 'false' by default and cannot (should not?) 
+        be overriden, ideally. (REQUIRED)
         """
         if output_format:
             if output_format not in ('json','xml'):
-                raise ValueError('if defined, `output_format` must be one of: "json","xml","kml"')
+                raise ValueError('if defined, `output_format` must be one of: "json","xml"')
             else:
                 self.output_format = output_format
         else:
@@ -37,12 +41,11 @@ class GooglePlaces(Geocoder):
         
         self.api_key = api_key
         self.format_string = format_string
-        self.url = "https://maps.googleapis.com/maps/api/place/textsearch/%s?%s"% self.output_format.lower()
-        self.url = ""
+        self.url = "https://maps.googleapis.com/maps/api/place/textsearch/%s?%%s" % self.output_format.lower()
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, sensor=False, exactly_one=True):
         params = {'query': self.format_string % string,
-                  'sensor': 'true',
+                  'sensor': str(sensor).lower(),
                   }
         
         if self.api_key:
@@ -82,12 +85,13 @@ class GooglePlaces(Geocoder):
                              "(Found %d.)" % len(places))
         
         def parse_place(place):
-            location = util.get_first_text(place, ['name', 'location_address']) or None
+            location = util.get_first_text(place, ['name', 'formatted_address']) or None
             points = place.getElementsByTagName('geometry')
             point = points and points[0] or None
             coords = util.get_first_text(point, 'location') or None
             if coords:
-                longitude, latitude = [util.get_first_text(coords, 'lat'), util.get_first_text(point, 'lng')]
+                latitude = util.get_first_text(coords, 'lat')]
+                longitude = [util.get_first_text(coords, 'lng')
             else:
                 latitude = longitude = None
                 _, (latitude, longitude) = self.geocode(location)
@@ -116,7 +120,8 @@ class GooglePlaces(Geocoder):
 
         def parse_place(place):
             location = place.get('formatted_address')
-            longitude, latitude = [place['geometry']['location']['lat'], place['geometry']['location']['lng']]
+            latitude = place['geometry']['location']['lat']
+            longitude = place['geometry']['location']['lng']
             return (location, (latitude, longitude))
         
         if exactly_one:

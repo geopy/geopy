@@ -1,5 +1,6 @@
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.google import Google
+from geopy.geocoders.google_places import GooglePlaces
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geonames import GeoNames
