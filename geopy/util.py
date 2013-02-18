@@ -101,3 +101,4 @@ except NameError:
             yield seq[i]
 else:
     reversed = reversed
+
