@@ -90,8 +90,8 @@ class GooglePlaces(Geocoder):
             point = points and points[0] or None
             coords = util.get_first_text(point, 'location') or None
             if coords:
-                latitude = util.get_first_text(coords, 'lat')]
-                longitude = [util.get_first_text(coords, 'lng')
+                latitude = util.get_first_text(coords, 'lat')
+                longitude = util.get_first_text(coords, 'lng')
             else:
                 latitude = longitude = None
                 _, (latitude, longitude) = self.geocode(location)
