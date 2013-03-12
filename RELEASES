@@ -1,5 +1,11 @@
-0.95 - TBD
+0.95 - March 12, 2013
 ==========
+ADDED:   Google Geocoding API V3 support. Contributed by Jordan Bouvier
+         (jbouvier). "google.Google()" should be replaced by
+         "googlev3.GoogleV3()", with no `api_key`.
+
+         Please see http://goo.gl/somDT for valid arguments.
+
 UPDATED: setup.py updated to now automatically support Python 3+ (via 2to3
          auto-compile option). Contributed by Feanil Patel.
 
