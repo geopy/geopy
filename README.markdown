@@ -1,4 +1,4 @@
-## geopy
+# geopy
 
 © GeoPy Project and individual contributors,
 [MIT License](https://github.com/geopy/geopy/blob/master/LICENSE)
@@ -8,13 +8,6 @@ geopy is a Python client for several popular geocoding web services.
 geopy makes it easy for Python developers to locate the coordinates of
 addresses, cities, countries, and landmarks across the globe using third-party
 geocoders and other data sources.
-
-### Notes
-
-* Having `geopy.geocoders.google.GBadKeyError` issues with Google geocoder?
-  [You can fix that by updating GeoPy and updating your code.](https://github.com/geopy/geopy/tree/master/docs/google_v3_upgrade.md)
-
-### Getting Started
 
 geopy includes geocoder classes for the [Google Geocoding API (V3)][google_v3],
 the [Yahoo! geocoder][yahoo], [geocoder.us][geocoderus], [Bing Maps API][bing],
@@ -27,7 +20,22 @@ and several more Geocoder API services. The various geocoder classes are located
 [geocoderus]: http://geocoder.us/
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
-#### Basic Geocoding
+## Notes
+
+* Having `geopy.geocoders.google.GBadKeyError` issues with Google geocoder?
+  [You can fix that by updating GeoPy and updating your code.](https://github.com/geopy/geopy/tree/master/docs/google_v3_upgrade.md)
+
+## Installation
+
+Using [pip](http://www.pip-installer.org/en/latest/):
+
+    pip install geopy
+
+Or, manually: [Download the tarball from PyPI](https://pypi.python.org/pypi/geopy), unzip, and execute this in the same directory:
+
+    python setup.py install
+
+## Basic Geocoding
 
 **Examples**
 
