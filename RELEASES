@@ -1,3 +1,15 @@
+0.95.1 - March 22, 2013
+==========
+FIXED:   Fix #12, where `DeprecationWarning` was showing for GoogleV2 even if
+         it wasn't being used (due to `geopy.geocoders` importing it).
+         Contributed by Dave Arter.
+
+CHANGED: `GoogleV3.geocode` "address" kwarg renamed to "string" to match
+         `Google.geocode` to make updating easier.
+
+FIXED:   Geocoders now properly handle Unicode objects as input (previously
+         would fail on non-ASCII characters due to wanting UTF-8 strings).
+
 0.95 - March 12, 2013
 ==========
 ADDED:   Google Geocoding API V3 support. Contributed by Jordan Bouvier

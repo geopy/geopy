@@ -75,7 +75,7 @@ Note that `GoogleV3()` does not accept `api_key` as the previous version does. S
 
 The following are the new arguments to `geocode()`, generally matching [the Google V3 API specification][geocode_spec]:
 
-* `address`: the address you wish to geocode. (**BUG**: Note that if you are using a kwarg, this is named `string` in the older `Google()` implementation and in other geocoder backends. This will be fixed in a future version (and both names will work).)
+* `string`: the address you wish to geocode.
 * `sensor`: indicates whether request comes from a device with a location sensor. (Required by API, geopy defaults to False.)
 * `bounds` (optional): a bounding box of `lat,lng|lat,lng` (southwest_point, northwest_point) points for [viewport biasing][viewport_bias] (see link for more info).
 * `region` (optional): a ccTLD two-character code for [region biasing][region_bias] (see link for more info). This replaces the `Google(domain="maps.google.co.uk")` option when setting up the geocoder class.
