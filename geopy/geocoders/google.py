@@ -12,13 +12,6 @@ from geopy.geocoders.base import Geocoder,GeocoderError,GeocoderResultError
 from geopy import Point, Location, util
 
 from warnings import warn
-warn('geopy.geocoders.google: The `geocoders.google.Google` geocoder uses the '+
-    'older "V2" API and is deprecated and may be broken at any time. A '+
-    'geocoder utilizing the "V3" API is available at '+
-    '`geocoders.googlev3.GoogleV3` and will become the default in a future '+
-    'version. See RELEASES file and http://goo.gl/somDT for usage information.',
-    DeprecationWarning
-)
 
 class Google(Geocoder):
     """Geocoder using the Google Maps API."""
@@ -39,7 +32,15 @@ class Google(Geocoder):
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
         """
-
+        
+        warn('geopy.geocoders.google: The `geocoders.google.Google` geocoder uses the '+
+            'older "V2" API and is deprecated and may be broken at any time. A '+
+            'geocoder utilizing the "V3" API is available at '+
+            '`geocoders.googlev3.GoogleV3` and will become the default in a future '+
+            'version. See RELEASES file and http://goo.gl/somDT for usage information.',
+            DeprecationWarning
+        )
+        
         if not api_key:
             raise ValueError(
                 "The `geocoders.google.Google` (V2) API now requires the "+
