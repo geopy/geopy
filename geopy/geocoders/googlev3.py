@@ -90,11 +90,11 @@ class GoogleV3(Geocoder):
 
         return self.parse_json(page, exactly_one)
 
-    def geocode(self, address, bounds=None, region=None,
+    def geocode(self, string, bounds=None, region=None,
                 language=None, sensor=False, exactly_one=True):
         '''Geocode an address.
 
-        ``address`` (required) The address that you want to geocode.
+        ``string`` (required) The address that you want to geocode.
 
         ``bounds`` (optional) The bounding box of the viewport within which
         to bias geocode results more prominently.
@@ -112,9 +112,11 @@ class GoogleV3(Geocoder):
         comes from a device with a location sensor.
         This value must be either True or False.
         '''
+        if isinstance(string, unicode):
+            string = string.encode('utf-8')
 
         params = {
-            'address': self.format_string % address,
+            'address': self.format_string % string,
             'sensor': str(sensor).lower()
         }
 

@@ -30,6 +30,8 @@ class Yahoo(Geocoder):
                  'and now ignored. JSON will be used internally.', DeprecationWarning)
 
     def geocode(self, string, exactly_one=True):
+        if isinstance(string, unicode):
+            string = string.encode('utf-8')
         params = {'location': self.format_string % string,
                   'appid': self.app_id,
                   'flags': 'J'

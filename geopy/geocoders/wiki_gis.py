@@ -31,6 +31,8 @@ class MediaWiki(Geocoder):
         return string.replace(' ', '_')
 
     def geocode(self, string):
+        if isinstance(string, unicode):
+            string = string.encode('utf-8')
         wiki_string = self.transform_string(string)
         url = self.format_url % wiki_string
         return self.geocode_url(url)

@@ -29,6 +29,8 @@ class GeocoderDotUS(Geocoder):
         return 'http://%sgeocoder.us/%s' % (auth, resource)
     
     def geocode(self, query, exactly_one=True):
+        if isinstance(query, unicode):
+            query = query.encode('utf-8')
         query_str = self.format_string % query
         
         page = urlopen("%s?%s" % (

@@ -23,6 +23,8 @@ class MapQuest(Geocoder):
         self.url = "http://www.mapquestapi.com/geocoding/v1/address"
 
     def geocode(self, location, exactly_one=True):
+        if isinstance(location, unicode):
+            location = location.encode('utf-8')
         params = {'location' : location}
         data = urlencode(params)
         page = urlopen(self.url + '?key=' + self.api_key + '&' + data).read()
