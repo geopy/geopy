@@ -1,4 +1,4 @@
-# Upgrading to GeoPy 0.95 & Google Maps API V3
+# Upgrading to GeoPy 0.95+ & Google Maps API V3
 
 As of March 2013, it appears that the [Google Maps Geocoding API V2][v2] no longer works in nearly all cases (despite [a Google notice][dep_note] that the sunset period for the V2 API would be extended through to September).
 
@@ -26,17 +26,17 @@ geopy.geocoders.google.GBadKeyError: The api_key is either invalid or does not m
 
 The following steps should allow you to continue using GeoPy under Google's newest API version:
 
-## Step 1: Upgrade to GeoPy 0.95
+## Step 1: Upgrade to GeoPy 0.95+
 
 Update your copy of geopy:
 
 If you are using pip (which you should):
 
-    pip install -U geopy==0.95
+    pip install -U "geopy>=0.95"
     
 If you are using a manually-installed geopy, you may download the package from PyPI:
 
-* https://pypi.python.org/pypi/geopy/0.95
+* https://pypi.python.org/pypi/geopy/
 
 Unzip and run `python setup.py install` as usual.
 
@@ -89,4 +89,4 @@ The following are the new arguments to `geocode()`, generally matching [the Goog
 
 ## Status
 
-Within the next few weeks a new update will be released, at which point imports for `Google()` will wrap a `GoogleV3()` object instead.
+Eventually a new update will be released, at which point imports for `Google()` will wrap a `GoogleV3()` object instead.
