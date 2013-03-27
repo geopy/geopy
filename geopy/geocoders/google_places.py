@@ -41,10 +41,13 @@ class GooglePlaces(Geocoder):
         
         self.api_key = api_key
         self.format_string = format_string
-        self.url = "https://maps.googleapis.com/maps/api/place/textsearch/%s?%%s" % self.output_format.lower()
+        self.url = "https://maps.googleapis.com/maps/api/place/nearbysearch/%s?%%s" % self.output_format.lower()
 
-    def geocode(self, string, sensor=False, exactly_one=True):
-        params = {'query': self.format_string % string,
+    def geocode(self, string, ll, sensor=False, exactly_one=True):
+        params = {'keyword': self.format_string % string,
+                  'location': ll,
+                  'radius': 25000,
+                  'types': "food|restaurant|cafe",
                   'sensor': str(sensor).lower(),
                   }
         
@@ -119,7 +122,7 @@ class GooglePlaces(Geocoder):
                              "(Found %d.)" % len(places))
 
         def parse_place(place):
-            location = place.get('formatted_address')
+            location = place.get('vicinity')
             latitude = place['geometry']['location']['lat']
             longitude = place['geometry']['location']['lng']
             return (location, (latitude, longitude))
