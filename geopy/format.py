@@ -30,7 +30,7 @@ XML_SYMBOLS = {'deg': XML_DECIMAL_DEGREE, 'arcmin': XML_DECIMAL_PRIME, 'arcsec':
 ABBR_SYMBOLS = {'deg': ABBR_DEGREE, 'arcmin': ABBR_ARCMIN, 'arcsec': ABBR_ARCSEC}
 
 def format_degrees(degrees, format=DEGREES_FORMAT, symbols=ASCII_SYMBOLS):
-    arcminutes = units.arcminutes(degrees=degrees - int(degrees))
+    arcminutes = round(units.arcminutes(degrees=degrees - int(degrees)))
     arcseconds = units.arcseconds(arcminutes=arcminutes - int(arcminutes))
     format_dict = dict(
         symbols,
