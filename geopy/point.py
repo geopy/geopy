@@ -1,3 +1,4 @@
+# encoding: utf-8
 import re
 from itertools import islice
 from geopy import util, units, format
@@ -56,26 +57,28 @@ class Point(object):
         DEGREE=format.DEGREE,
         PRIME=format.PRIME,
         DOUBLE_PRIME=format.DOUBLE_PRIME,
-        SEP=r'\s*[,;\s]\s*'
+        SEP=r'\s*[,;/\s]\s*'
     )
     POINT_PATTERN = re.compile(r"""
-        \s*
+        .*?
         (?P<latitude>
-          (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)s ][ ]*
+          (?P<latitude_direction_front>[NS])?[ ]*
+          (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
             (?:(?P<latitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
             (?:(?P<latitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
-            )?(?P<latitude_direction>[NS])?)
+            )?(?P<latitude_direction_back>[NS])?)
         %(SEP)s
         (?P<longitude>
-          (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)s\s][ ]*
+          (?P<longitude_direction_front>[EW])?[ ]*
+          (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
           (?:(?P<longitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
           (?:(?P<longitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
-          )?(?P<longitude_direction>[EW])?)(?:
+          )?(?P<longitude_direction_back>[EW])?)(?:
         %(SEP)s
           (?P<altitude>
             (?P<altitude_distance>-?%(FLOAT)s)[ ]*
             (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
-        \s*$
+        .*?$
     """ % UTIL_PATTERNS, re.X)
     
     def __new__(cls, latitude=None, longitude=None, altitude=None):
@@ -254,21 +257,37 @@ class Point(object):
             -41.5 S;81.0 E
             23 26m 22s N 23 27m 30s E
             23 26' 22" N 23 27' 30" E
+            UT: N 39°20' 0'' / W 74°35' 0''
         
         """
+        print string
+        string = re.sub(r"''", r'"', string)
+        print string
         match = re.match(cls.POINT_PATTERN, string)
         if match:
+            latitude_direction = None
+            if match.group("latitude_direction_front"):
+                latitude_direction = match.group("latitude_direction_front")
+            elif match.group("latitude_direction_back"):
+                latitude_direction = match.group("latitude_direction_back")
+                
+            longitude_direction = None
+            if match.group("longitude_direction_front"):
+                longitude_direction = match.group("longitude_direction_front")
+            elif match.group("longitude_direction_back"):
+                longitude_direction = match.group("longitude_direction_back")
+            
             latitude = cls.parse_degrees(
                 match.group('latitude_degrees'),
                 match.group('latitude_arcminutes'),
                 match.group('latitude_arcseconds'),
-                match.group('latitude_direction')
+                latitude_direction
             )
             longitude = cls.parse_degrees(
                 match.group('longitude_degrees'),
                 match.group('longitude_arcminutes'),
                 match.group('longitude_arcseconds'),
-                match.group('longitude_direction'),
+                longitude_direction
             )
             altitude = cls.parse_altitude(
                 match.group('altitude_distance'),
@@ -298,3 +317,11 @@ class Point(object):
         
         """
         return cls(point.latitude, point.longitude, point.altitude)
+
+
+if __name__ == "__main__":
+    t = Point(u"UT: N 39°20' 0'' / W 74°35' 0''")
+    print t.latitude, t.longitude
+    t = Point(u"19.387092,-99.165697")
+    print t.latitude, t.longitude
+    
