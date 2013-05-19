@@ -34,15 +34,25 @@ class Bing(Geocoder):
         
         self.api_key = api_key
         self.format_string = format_string
-        self.url = "http://dev.virtualearth.net/REST/v1/Locations?%s"
+        self.url = "http://dev.virtualearth.net/REST/v1/Locations"
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, user_location=None):
+        """Geocode an address.
+
+        ``user_location`` should be an instance of geopy.Point. user_location
+        position prioritizes results that are closer to this location.
+        """
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {'query': self.format_string % string,
                   'key': self.api_key
                   }
-        url = self.url % urlencode(params)
+
+        if user_location:
+            params['userLocation'] = "%s,%s" % (
+                user_location.latitude, user_location.longitude)
+
+        url = "%s?%s" % (self.url, urlencode(params))
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
