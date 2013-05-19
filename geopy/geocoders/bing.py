@@ -55,6 +55,18 @@ class Bing(Geocoder):
         url = "%s?%s" % (self.url, urlencode(params))
         return self.geocode_url(url, exactly_one)
 
+    def reverse(self, point, exactly_one=True):
+        """Reverse geocode a point.
+
+        ``point`` should be an instance of geopy.Point.
+        """
+        params = {'key': self.api_key}
+
+        url = "%s/%s,%s?%s" % (
+            self.url, point.latitude, point.longitude, urlencode(params))
+
+        return self.geocode_url(url, exactly_one=exactly_one)
+
     def geocode_url(self, url, exactly_one=True):
         logger.debug("Fetching %s..." % url)
         page = urlopen(url)
