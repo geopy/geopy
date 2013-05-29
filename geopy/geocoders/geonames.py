@@ -14,7 +14,7 @@ except ImportError:
 from geopy.geocoders.base import Geocoder
 
 class GeoNames(Geocoder):
-    def __init__(self, format_string=None, output_format=None, country_bias=None):
+    def __init__(self, format_string=None, output_format=None, country_bias=None, username=None):
         if format_string != None:
             from warnings import warn
             warn('geopy.geocoders.geonames.GeoNames: The `format_string` parameter is deprecated.'+
@@ -23,15 +23,21 @@ class GeoNames(Geocoder):
             from warnings import warn
             warn('geopy.geocoders.geonames.GeoNames: The `output_format` parameter is deprecated '+
                  'and now ignored.', DeprecationWarning)
-        
+        if username == None:
+            raise ValueError('No username given, required for api access.  If you do not have a '+
+                'GeoNames username, sign up here: http://www.geonames.org/login')
+        else:
+            self.username = username 
+
         self.country_bias = country_bias
-        self.url = "http://ws.geonames.org/searchJSON?%s"
+        self.url = "http://api.geonames.org/searchJSON?%s"
     
     def geocode(self, string, exactly_one=True):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {
-            'q': string
+            'q': string,
+            'username': self.username
         }
         if self.country_bias:
             params['countryBias'] = self.country_bias
