@@ -27,7 +27,7 @@ from geopy import util
 
 class GoogleV3(Geocoder):
     '''Geocoder using the Google Maps v3 API.'''
-    
+
     def __init__(self, domain='maps.googleapis.com', protocol='http',
                  client_id=None, secret_key=None):
         '''Initialize a customized Google geocoder.
@@ -39,9 +39,9 @@ class GoogleV3(Geocoder):
         example), you may want to set it to 'maps.google.co.uk' to properly bias results.
 
         ``protocol`` http or https.
-        
+
         ``client_id`` Premier account client id.
-        
+
         ``secret_key`` Premier account secret key.
         '''
         super(GoogleV3, self).__init__()
@@ -82,7 +82,7 @@ class GoogleV3(Geocoder):
         '''Returns a standard geocoding api url.'''
         return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
             {'domain': self.domain, 'params': urlencode(params)})
-    
+
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
         util.logger.debug("Fetching %s..." % url)
@@ -138,7 +138,7 @@ class GoogleV3(Geocoder):
         '''Reverse geocode a point.
         ``point`` (required) The textual latitude/longitude value for which
         you wish to obtain the closest, human-readable address
-        
+
         ``language`` (optional) The language in which to return results.
         See the supported list of domain languages. Note that we often update
         supported languages so this list may not be exhaustive. If language is
@@ -150,7 +150,7 @@ class GoogleV3(Geocoder):
         This value must be either True or False.
         '''
         params = {
-            'latlng': point,
+            'latlng': "%s,%s" % point,
             'sensor': str(sensor).lower()
         }
 
@@ -162,6 +162,13 @@ class GoogleV3(Geocoder):
         else:
             url = self.get_signed_url(params)
 
+        ## Use pdb for debugging
+        #import pdb
+        #from PyQt4.QtCore import *
+        ## These lines allow you to set a breakpoint in the app
+        #pyqtRemoveInputHook()
+        #pdb.set_trace()
+
         return self.geocode_url(url, exactly_one)
 
     def parse_json(self, page, exactly_one=True):
@@ -170,21 +177,21 @@ class GoogleV3(Geocoder):
             page = util.decode_page(page)
         self.doc = json.loads(page)
         places = self.doc.get('results', [])
-    
+
         if not places:
             check_status(self.doc.get('status'))
             return None
         elif exactly_one and len(places) != 1:
             raise ValueError(
                 "Didn't find exactly one placemark! (Found %d)" % len(places))
-    
+
         def parse_place(place):
             '''Get the location, lat, lng from a single json place.'''
             location = place.get('formatted_address')
             latitude = place['geometry']['location']['lat']
             longitude = place['geometry']['location']['lng']
             return (location, (latitude, longitude))
-        
+
         if exactly_one:
             return parse_place(places[0])
         else:
