@@ -6,6 +6,7 @@ breaking its compatibility or diverging its api too far from the rest of the
 geocoder classes.
 '''
 
+import sys
 import base64
 import hashlib
 import hmac
@@ -112,7 +113,7 @@ class GoogleV3(Geocoder):
         comes from a device with a location sensor.
         This value must be either True or False.
         '''
-        if isinstance(string, unicode):
+        if isinstance(string, unicode) and sys.version_info.major < 3:
             string = string.encode('utf-8')
 
         params = {
