@@ -47,12 +47,12 @@ Using the GoogleV3 geocoder:
     >>> print "%s: %.5f, %.5f" % (place, lat, lng)
     10900 Euclid Ave, Cleveland, OH 44106, USA: 41.50489, -81.61027
 
-Using the Yahoo! geocoder ([requires an Application ID](http://developer.yahoo.com/faq/index.html#appid)):
+Using the Yahoo! BOSS Geo PlaceFinder ([requires a consumer key and secret](http://developer.yahoo.com/boss/geo/)):
 
     >>> from geopy import geocoders
-    >>> y = geocoders.Yahoo('YOUR_APP_ID_HERE')
-    >>> place, (lat, lng) = y.geocode("Thames Street, Newport, RI")
+    >>> y = geocoders.YahooPlaceFinder('YOUR_CONSUMER_KEY', 'YOUR_CONSUMER_SECRET')
+    >>> place, (lat, lng) = y.geocode_one("Thames Street, Newport, RI")
     >>> print "%s: %.5f, %.5f" % (place, lat, lng)
-    [241-251] THAMES ST, NEWPORT, RI 02840, US: 41.48696, -71.31490
+    Thames St, Newport, RI 02840, United States: 41.48327, -71.31461
 
 More documentation and examples can be found on the [old Google Code documentation site](http://code.google.com/p/geopy/w/list).
