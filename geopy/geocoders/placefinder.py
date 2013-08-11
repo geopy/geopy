@@ -5,11 +5,14 @@
 from __future__ import absolute_import, division
 from __future__ import print_function, unicode_literals
 
-import httplib2
 import json
-import oauth2
+try:
+    import oauth2
+except ImportError:
+    oauth2 = None
 import time
 import urllib
+import urllib2
 
 from geopy.geocoders.base import Geocoder, GeocoderError, GeocoderResultError
 
@@ -31,6 +34,8 @@ class YahooPlaceFinder(Geocoder):
         sets consumer key and secret
 
         """
+        if oauth2 is None:
+            raise ImportError(u'No module named oauth2')
 
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -95,17 +100,19 @@ class YahooPlaceFinder(Geocoder):
         """
 
         try:
-            response, content = httplib2.Http().request(
+            urllib_req = urllib2.Request(
                 request.url,
-                headers=request.to_header(realm='yahooapis.com'),
-            )
-        except httplib2.HttpLib2Error:
-            response, content = None, None
+                None,
+                request.to_header(realm='yahooapis.com'))
+            conn = urllib2.urlopen(urllib_req)
+            content = conn.read()
+        except urllib2.URLError:
+            conn, content = None, None
 
-        if not response or response['status'] != '200':
+        if not conn or conn.getcode() != 200:
             raise GeocoderError(
                 'PlaceFinder service returned status code %s.' % (
-                    response['status'] if response else None,
+                    conn.getcode() if conn else None,
                 )
             )
 
@@ -171,31 +178,6 @@ class YahooPlaceFinder(Geocoder):
             ]
 
         return results
-
-    def geocode_first(self, *args, **kwargs):
-
-        """
-        returns the first geocode result if there are any
-
-        """
-
-        return self.geocode(*args, **kwargs)[0]
-
-    def geocode_one(self, *args, **kwargs):
-
-        """
-        returns the matching geocode result if it is unambiguous
-
-        """
-
-        results = self.geocode(*args, **kwargs)
-
-        if len(results) != 1:
-            raise GeocoderResultError(
-                'Geocoder returned more than one result!'
-            )
-
-        return results[0]
 
     def reverse(self, point):
 
