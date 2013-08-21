@@ -108,14 +108,13 @@ class YahooPlaceFinder(Geocoder):
             )
             response = urllib2.urlopen(urllib_req)
             content = response.read()
-        except urllib2.URLError:
-            response, content = None, None
-
-        if not response or response.getcode() != 200:
+        except urllib2.HTTPError as e:
             raise GeocoderError(
-                'PlaceFinder service returned status code %s.' % (
-                    response.getcode() if response else None,
-                )
+                'PlaceFinder service returned status code %s.' % e.code,
+            )
+        except urllib2.URLError as e:
+            raise GeocoderError(
+                'PlaceFinder service exception %s.' % e.reason,
             )
 
         return content
