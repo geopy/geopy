@@ -14,7 +14,7 @@ import time
 import urllib
 import urllib2
 
-from geopy.geocoders.base import Geocoder, GeocoderError, GeocoderResultError
+from geopy.geocoders.base import Geocoder, GeocoderError
 
 
 # *****************************************************************************
@@ -34,8 +34,9 @@ class YahooPlaceFinder(Geocoder):
         sets consumer key and secret
 
         """
+
         if oauth2 is None:
-            raise ImportError(u'No module named oauth2')
+            raise ImportError('No module named oauth2')
 
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -103,16 +104,17 @@ class YahooPlaceFinder(Geocoder):
             urllib_req = urllib2.Request(
                 request.url,
                 None,
-                request.to_header(realm='yahooapis.com'))
-            conn = urllib2.urlopen(urllib_req)
-            content = conn.read()
+                request.to_header(realm='yahooapis.com'),
+            )
+            response = urllib2.urlopen(urllib_req)
+            content = response.read()
         except urllib2.URLError:
-            conn, content = None, None
+            response, content = None, None
 
-        if not conn or conn.getcode() != 200:
+        if not response or response.getcode() != 200:
             raise GeocoderError(
                 'PlaceFinder service returned status code %s.' % (
-                    conn.getcode() if conn else None,
+                    response.getcode() if response else None,
                 )
             )
 
@@ -167,9 +169,6 @@ class YahooPlaceFinder(Geocoder):
             min_quality,
             valid_country_codes,
         )
-
-        if not results:
-            raise GeocoderResultError('Geocoder returned no results!')
 
         if not raw:
             results = [
