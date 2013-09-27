@@ -27,7 +27,7 @@ class GeoNames(Geocoder):
         self.country_bias = country_bias
         self.url = "http://ws.geonames.org/searchJSON?%s"
     
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, timeout=None):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {
@@ -37,10 +37,10 @@ class GeoNames(Geocoder):
             params['countryBias'] = self.country_bias
         
         url = self.url % urlencode(params)
-        return self.geocode_url(url, exactly_one)
+        return self.geocode_url(url, exactly_one, timeout)
     
-    def geocode_url(self, url, exactly_one=True):
-        page = urlopen(url)
+    def geocode_url(self, url, exactly_one=True, timeout=None):
+        page = urlopen(url, timeout=timeout)
         return self.parse_json(page, exactly_one)
     
     def parse_json(self, page, exactly_one):

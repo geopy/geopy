@@ -30,16 +30,16 @@ class MediaWiki(Geocoder):
         """Do the WikiMedia dance: replace spaces with underscores."""
         return string.replace(' ', '_')
 
-    def geocode(self, string):
+    def geocode(self, string, timeout=None):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         wiki_string = self.transform_string(string)
         url = self.format_url % wiki_string
-        return self.geocode_url(url)
+        return self.geocode_url(url, timeout=timeout)
 
-    def geocode_url(self, url):
+    def geocode_url(self, url, timeout=None):
         util.logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
+        page = urlopen(url, timeout=timeout)
         name, (latitude, longitude) = self.parse_xhtml(page)
         return (name, (latitude, longitude))        
 

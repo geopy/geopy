@@ -3,6 +3,7 @@ from geopy.geocoders.base import Geocoder
 from geopy.point import Point
 from geopy.location import Location
 from geopy import util
+from urllib2 import urlopen
 
 try:
     from BeautifulSoup import BeautifulSoup
@@ -73,17 +74,17 @@ class SemanticMediaWiki(Geocoder):
     def get_thing_label(self, thing):
         return util.get_first_text(thing, 'rdfs:label')
     
-    def geocode_url(self, url, attempted=None):
+    def geocode_url(self, url, attempted=None, timeout=None):
         if attempted is None:
             attempted = set()
 
         util.logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
+        page = urlopen(url, timeout=timeout)
         soup = BeautifulSoup(page)
 
         rdf_url = self.parse_rdf_link(soup)
         util.logger.debug("Fetching %s..." % rdf_url)
-        page = urlopen(rdf_url)
+        page = urlopen(rdf_url, timeout=timeout)
 
         things, thing = self.parse_rdf(page)
         name = self.get_label(thing)

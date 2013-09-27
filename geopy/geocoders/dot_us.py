@@ -28,15 +28,15 @@ class GeocoderDotUS(Geocoder):
         
         return 'http://%sgeocoder.us/%s' % (auth, resource)
     
-    def geocode(self, query, exactly_one=True):
+    def geocode(self, query, exactly_one=True, timeout=None):
         if isinstance(query, unicode):
             query = query.encode('utf-8')
         query_str = self.format_string % query
         
         page = urlopen("%s?%s" % (
             self.get_url(),
-            urlencode({'address':query_str})
-        ))
+            urlencode({'address': query_str})),
+                       timeout=timeout)
         
         reader = csv.reader(page)
         

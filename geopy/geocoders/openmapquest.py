@@ -29,14 +29,14 @@ class OpenMapQuest(Geocoder):
         self.format_string = format_string
         self.url = "http://open.mapquestapi.com/nominatim/v1/search?format=json&%s"
     
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, timeout=None):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {'q': self.format_string % string}
         url = self.url % urlencode(params)
         
         logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
+        page = urlopen(url, timeout=timeout)
         
         return self.parse_json(page, exactly_one)
     

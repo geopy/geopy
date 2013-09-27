@@ -22,12 +22,13 @@ class MapQuest(Geocoder):
         self.format_string = format_string
         self.url = "http://www.mapquestapi.com/geocoding/v1/address"
 
-    def geocode(self, location, exactly_one=True):
+    def geocode(self, location, exactly_one=True, timeout=None):
         if isinstance(location, unicode):
             location = location.encode('utf-8')
         params = {'location' : location}
         data = urlencode(params)
-        page = urlopen(self.url + '?key=' + self.api_key + '&' + data).read()
+        page = urlopen(self.url + '?key=' + self.api_key + '&' + data,
+                       timeout=timeout).read()
         return self.parse_json(page, exactly_one)
 
     def parse_json(self, page, exactly_one=True):

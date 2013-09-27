@@ -67,7 +67,7 @@ class Google(Geocoder):
         domain = self.domain.strip('/')
         return "http://%s/maps/geo?%%s" % domain
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, timeout=None):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {'q': self.format_string % string,
@@ -77,11 +77,11 @@ class Google(Geocoder):
                   }
         
         url = self.url % urlencode(params)
-        return self.geocode_url(url, exactly_one)
+        return self.geocode_url(url, exactly_one, timeout)
 
-    def geocode_url(self, url, exactly_one=True):
+    def geocode_url(self, url, exactly_one=True, timeout=None):
         util.logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
+        page = urlopen(url, timeout=timeout)
         
         dispatch = getattr(self, 'parse_' + self.output_format)
         return dispatch(page, exactly_one)
