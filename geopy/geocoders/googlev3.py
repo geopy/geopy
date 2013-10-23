@@ -83,15 +83,16 @@ class GoogleV3(Geocoder):
         return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
             {'domain': self.domain, 'params': urlencode(params)})
     
-    def geocode_url(self, url, exactly_one=True):
+    def geocode_url(self, url, exactly_one=True, timeout=None):
         '''Fetches the url and returns the result.'''
         util.logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
+        page = urlopen(url, timeout=timeout)
 
         return self.parse_json(page, exactly_one)
 
     def geocode(self, string, bounds=None, region=None,
-                language=None, sensor=False, exactly_one=True):
+                language=None, sensor=False, exactly_one=True,
+                timeout=None):
         '''Geocode an address.
 
         ``string`` (required) The address that you want to geocode.
@@ -111,6 +112,9 @@ class GoogleV3(Geocoder):
         ``sensor`` (required) Indicates whether or not the geocoding request
         comes from a device with a location sensor.
         This value must be either True or False.
+
+        ``timeout`` (optional) Interrupts the connection to the server after
+        timeout seconds (None to ignore).
         '''
         if isinstance(string, unicode):
             string = string.encode('utf-8')

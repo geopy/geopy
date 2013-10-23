@@ -36,18 +36,18 @@ class Bing(Geocoder):
         self.format_string = format_string
         self.url = "http://dev.virtualearth.net/REST/v1/Locations?%s"
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True, timeout=None):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {'query': self.format_string % string,
                   'key': self.api_key
                   }
         url = self.url % urlencode(params)
-        return self.geocode_url(url, exactly_one)
+        return self.geocode_url(url, exactly_one, timeout)
 
-    def geocode_url(self, url, exactly_one=True):
+    def geocode_url(self, url, exactly_one=True, timeout=None):
         logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
+        page = urlopen(url, timeout=timeout)
 
         return self.parse_json(page, exactly_one)
 
