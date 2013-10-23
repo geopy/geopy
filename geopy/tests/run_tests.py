@@ -11,7 +11,7 @@ def all_tests():
         from BeautifulSoup import BeautifulSoup
     except ImportError:
         BeautifulSoup = None
-    
+
     tests = [
         get_backend_suite(),
         get_gpx_suite(),

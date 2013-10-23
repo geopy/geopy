@@ -1,10 +1,11 @@
+"""
+:class:`.LiveAddress` geocoder.
+"""
+
 import json
 import urllib
 import urllib2
 from geopy.geocoders.base import Geocoder
-
-
-LOCATION = 'https://api.qualifiedaddress.com/street-address/'
 
 
 class LiveAddress(Geocoder):
@@ -23,9 +24,10 @@ class LiveAddress(Geocoder):
     candidate addresses to return if a valid address could be found.
     """
     def __init__(self, auth_token, candidates=1):
+        super(LiveAddress, self).__init__()
         self.auth_token = auth_token
         self.candidates = candidates if 1 <= candidates <= 10 else 10
-        super(LiveAddress, self).__init__()
+        self.url = 'https://api.qualifiedaddress.com/street-address/'
 
     def geocode(self, location):
         url = self._compose_url(location)
@@ -39,7 +41,7 @@ class LiveAddress(Geocoder):
             'street': location,
             'candidates': self.candidates
         }
-        return LOCATION + '?' + urllib.urlencode(query)
+        return '?'.join((self.url, urllib.urlencode(query)))
 
     def _execute_request(self, url):
         try:
@@ -65,6 +67,9 @@ class LiveAddress(Geocoder):
 
 
 class LiveAddressError(Exception):
+    """
+    TODO generalize.
+    """
     def __init__(self, http_status, message):
         self.http_status = http_status
-        super(Exception, self).__init__(message)
+        super(LiveAddressError, self).__init__(message)

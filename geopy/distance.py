@@ -29,16 +29,16 @@ class Distance(object):
         kilometers = kwargs.pop('kilometers', 0)
         if len(args) == 1:
             # if we only get one argument we assume
-            # it's a known distance instead of 
+            # it's a known distance instead of
             # calculating it first
             kilometers += args[0]
         elif len(args) > 1:
             for a, b in util.pairwise(args):
                 kilometers += self.measure(a, b)
-       
+
         kilometers += units.kilometers(**kwargs)
         self.__kilometers = kilometers
-    
+
     def __add__(self, other):
         if isinstance(other, Distance):
             return self.__class__(self.kilometers + other.kilometers)
@@ -46,67 +46,67 @@ class Distance(object):
             raise TypeError(
                 "Distance instance must be added with Distance instance."
             )
-    
+
     def __neg__(self):
         return self.__class__(-self.kilometers)
-    
+
     def __sub__(self, other):
         return self + -other
-    
+
     def __mul__(self, other):
         return self.__class__(self.kilometers * other)
-    
+
     def __div__(self, other):
         if isinstance(other, Distance):
             return self.kilometers / other.kilometers
         else:
             return self.__class__(self.kilometers / other)
-    
+
     def __abs__(self):
         return self.__class__(abs(self.kilometers))
-    
+
     def __nonzero__(self):
         return bool(self.kilometers)
-    
+
     def measure(self, a, b):
         raise NotImplementedError
 
     def __repr__(self):
         return 'Distance(%s)' % self.kilometers
-    
+
     def __str__(self):
         return '%s km' % self.__kilometers
-    
+
     def __cmp__(self, other):
         if isinstance(other, Distance):
             return cmp(self.kilometers, other.kilometers)
         else:
             return cmp(self.kilometers, other)
-    
+
     @property
     def kilometers(self):
         return self.__kilometers
-    
+
     @property
     def km(self):
         return self.kilometers
-    
+
     @property
     def meters(self):
         return units.meters(kilometers=self.kilometers)
-    
+
     @property
     def m(self):
         return self.meters
-    
+
     @property
     def miles(self):
         return units.miles(kilometers=self.kilometers)
-    
+
     @property
     def mi(self):
         return self.miles
-    
+
     @property
     def feet(self):
         return units.feet(kilometers=self.kilometers)
@@ -114,7 +114,7 @@ class Distance(object):
     @property
     def ft(self):
         return self.feet
-    
+
     @property
     def nautical(self):
         return units.nautical(kilometers=self.kilometers)
@@ -130,32 +130,32 @@ class GreatCircleDistance(Distance):
     geodesic points. This formula can be written many different ways,
     including just the use of the spherical law of cosines or the haversine
     formula.
-    
+
     The class attribute `RADIUS` indicates which radius of the earth to use,
     in kilometers. The default is to use the module constant `EARTH_RADIUS`,
     which uses the average great-circle radius.
-    
+
     """
-    
+
     RADIUS = EARTH_RADIUS
-    
+
     def measure(self, a, b):
         a, b = Point(a), Point(b)
 
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
-        
+
         sin_lat1, cos_lat1 = sin(lat1), cos(lat1)
         sin_lat2, cos_lat2 = sin(lat2), cos(lat2)
-        
+
         delta_lng = lng2 - lng1
         cos_delta_lng, sin_delta_lng = cos(delta_lng), sin(delta_lng)
-        
+
         central_angle = acos(
             # We're correcting from floating point rounding errors on very-near and exact points here
             min(1.0, sin_lat1 * sin_lat2 +
                      cos_lat1 * cos_lat2 * cos_delta_lng))
-        
+
         # From http://en.wikipedia.org/wiki/Great_circle_distance:
         #   Historically, the use of this formula was simplified by the
         #   availability of tables for the haversine function. Although this
@@ -163,12 +163,12 @@ class GreatCircleDistance(Distance):
         #   rounding errors for the special (and somewhat unusual) case of
         #   antipodal points (on opposite ends of the sphere). A more
         #   complicated formula that is accurate for all distances is: (below)
-        
+
         d = atan2(sqrt((cos_lat2 * sin_delta_lng) ** 2 +
                        (cos_lat1 * sin_lat2 -
                         sin_lat1 * cos_lat2 * cos_delta_lng) ** 2),
                   sin_lat1 * sin_lat2 + cos_lat1 * cos_lat2 * cos_delta_lng)
-        
+
         return self.RADIUS * d
 
     def destination(self, point, bearing, distance=None):
@@ -209,11 +209,11 @@ class VincentyDistance(Distance):
     Otherwise, it should be a tuple with those values. The most globally
     accurate model is WGS-84. See the comments above the `ELLIPSOIDS`
     dictionary for more information.
-    
+
     """
 
     ELLIPSOID = 'WGS-84'
-    
+
     def measure(self, a, b):
         a, b = Point(a), Point(b)
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
@@ -320,13 +320,13 @@ class VincentyDistance(Distance):
             distance = self
         if isinstance(distance, Distance):
             distance = distance.kilometers
-        
+
         ellipsoid = self.ELLIPSOID
         if isinstance(ellipsoid, basestring):
             ellipsoid = ELLIPSOIDS[ellipsoid]
 
         major, minor, f = ellipsoid
-        
+
         tan_reduced1 = (1 - f) * tan(lat1)
         cos_reduced1 = 1 / sqrt(1 + tan_reduced1 ** 2)
         sin_reduced1 = tan_reduced1 * cos_reduced1
@@ -335,12 +335,12 @@ class VincentyDistance(Distance):
         sin_alpha = cos_reduced1 * sin_bearing
         cos_sq_alpha = 1 - sin_alpha ** 2
         u_sq = cos_sq_alpha * (major ** 2 - minor ** 2) / minor ** 2
-        
+
         A = 1 + u_sq / 16384. * (
             4096 + u_sq * (-768 + u_sq * (320 - 175 * u_sq))
         )
         B = u_sq / 1024. * (256 + u_sq * (-128 + u_sq * (74 - 47 * u_sq)))
-        
+
         sigma = distance / (minor * A)
         sigma_prime = 2 * pi
 
@@ -395,7 +395,7 @@ class VincentyDistance(Distance):
         )
 
         lng2 = lng1 + delta_lng
-        
+
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
 

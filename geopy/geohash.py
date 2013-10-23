@@ -13,8 +13,7 @@ class Geohash(object):
         point = Point(*args, **kwargs)
         lat_min, latitude, lat_max = -90, 0, 90
         long_min, longitude, long_max = -180, 0, 180
-        string = ''
-        bytes = []
+        buf = []
         odd_bit = False
         for i in xrange(precision):
             byte = 0
@@ -34,8 +33,8 @@ class Geohash(object):
                         long_max = longitude
                     longitude = (long_min + long_max) / 2.
                 odd_bit = not odd_bit
-            bytes.append(byte) 
-        return ''.join([self.ENCODE_MAP[byte] for byte in bytes])
+            buf.append(byte)
+        return ''.join([self.ENCODE_MAP[byte] for byte in buf])
 
     def decode(self, string):
         lat_min, latitude, lat_max = -90, 0, 90
@@ -45,7 +44,9 @@ class Geohash(object):
             try:
                 byte = self.DECODE_MAP[char]
             except KeyError:
-                raise ValueError("Invalid hash: unexpected character %r." % (c,))
+                raise ValueError(
+                    "Invalid hash: unexpected character %r." % (char,)
+                )
             else:
                 for bit in (16, 8, 4, 2, 1):
                     if odd_bit:

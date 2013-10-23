@@ -8,17 +8,17 @@ FLOAT_RE = re.compile(r'([+-]?\d*\.?\d+)$')
 
 class ICBMMetaTag(Parser):
     META_NAME = 'ICBM'
-    
+
     def __init__(self, ignore_invalid=True):
         self.ignore_invalid = ignore_invalid
-    
+
     def find(self, document):
         strainer = SoupStrainer('meta', attrs={'name': self.META_NAME})
         if not isinstance(document, BeautifulSoup):
             elements = BeautifulSoup(document, parseOnlyThese=strainer)
         else:
             elements = document.findAll(strainer)
-        
+
         for element in elements:
             lat_long = element.get('content')
             if lat_long or not self.ignore_invalid:
@@ -33,17 +33,17 @@ class ICBMMetaTag(Parser):
 
 class GeoMetaTag(Parser):
     META_NAME = re.compile(r'geo\.(\w+)')
-    
+
     def __init__(self, ignore_invalid=True):
         self.ignore_invalid = ignore_invalid
-    
+
     def find(self, document):
         strainer = SoupStrainer('meta', attrs={'name': self.META_NAME})
         if not isinstance(document, BeautifulSoup):
             elements = BeautifulSoup(document, parseOnlyThese=strainer)
         else:
             elements = document.findAll(strainer)
-        
+
         attrs = {}
         for element in elements:
             meta_name = element['name']
@@ -55,11 +55,11 @@ class GeoMetaTag(Parser):
                     yield location
                 attrs.clear()
             attrs[attr_name] = value and unescape(value)
-        
+
         location = self._get_location(attrs)
         if location is not None:
             yield location
-    
+
     def _get_location(self, attrs):
         position = attrs.pop('position')
         name = attrs.pop('placename')
@@ -80,20 +80,20 @@ class GeoMicroformat(Parser):
     LONGITUDE_CLASS = re.compile(r'\s*longitude\s*')
     VALUE_CLASS = re.compile(r'\s*value\s*')
     SEP = re.compile(r'\s*;\s*')
-    
+
     def __init__(self, ignore_invalid=True, shorthand=True, abbr_title=True, value_excerpting=True):
         self.ignore_invalid = ignore_invalid
         self.shorthand = shorthand
         self.abbr_title = abbr_title
         self.value_excerpting = value_excerpting
-    
+
     def find(self, document):
         strainer = SoupStrainer(attrs={'class': self.GEO_CLASS})
         if not isinstance(document, BeautifulSoup):
             elements = BeautifulSoup(document, parseOnlyThese=strainer)
         else:
             elements = document.findAll(strainer)
-        
+
         for element in elements:
             preformatted = element.name == 'pre'
             lat_element = element.find(attrs={'class': self.LATITUDE_CLASS})
@@ -116,7 +116,7 @@ class GeoMicroformat(Parser):
                     text = unescape(self._get_text(element).strip())
                     name = re.sub('\s+', ' ', text)
                     yield Location(name, (latitude, longitude))
-    
+
     def _get_text(self, element, preformatted=False):
         if isinstance(element, basestring):
             if not preformatted:
@@ -128,7 +128,7 @@ class GeoMicroformat(Parser):
         else:
             pre = preformatted or element.name == 'pre'
             return "".join([self._get_text(node, pre) for node in element])
-    
+
     def _get_value(self, element, preformatted=False):
         if self.value_excerpting:
             value_nodes = element.findAll(attrs={'class': self.VALUE_CLASS})

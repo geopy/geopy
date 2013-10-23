@@ -19,13 +19,23 @@ class NullHandler(logging.Handler):
 logger = logging.getLogger('geopy')
 logger.addHandler(NullHandler())
 
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        from django.utils import simplejson as json
+
+assert json is not None
+
 def pairwise(seq):
     for i in range(0, len(seq) - 1):
         yield (seq[i], seq[i + 1])
 
 def join_filter(sep, seq, pred=bool):
     return sep.join([unicode(i) for i in seq if pred(i)])
- 
+
 def get_encoding(page, contents=None):
     # TODO: clean up Py3k support
     if version_info < (3, 0):
@@ -69,7 +79,7 @@ def join_filter(sep, seq, pred=bool):
 def unescape(text):
     """
     Removes HTML or XML character references and entities from a text string.
-    
+
     """
     def fixup(m):
         text = m.group(0)

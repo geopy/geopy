@@ -1,6 +1,6 @@
-# *****************************************************************************
-# geopy/geocoders/placefinder.py
-# *****************************************************************************
+"""
+:class:`.YahooPlaceFinder` geocoder.
+"""
 
 from __future__ import absolute_import, division
 from __future__ import print_function, unicode_literals
@@ -9,17 +9,13 @@ import json
 try:
     import oauth2
 except ImportError:
-    oauth2 = None
+    oauth2 = None # pylint: disable=C0103
 import time
 import urllib
 import urllib2
 
 from geopy.geocoders.base import Geocoder, GeocoderError
 
-
-# *****************************************************************************
-# YahooPlaceFinder
-# *****************************************************************************
 
 class YahooPlaceFinder(Geocoder):
 
@@ -29,15 +25,12 @@ class YahooPlaceFinder(Geocoder):
     """
 
     def __init__(self, consumer_key, consumer_secret):
-
         """
-        sets consumer key and secret
-
+        Sets consumer key and secret.
         """
-
+        super(YahooPlaceFinder, self).__init__()
         if oauth2 is None:
             raise ImportError('No module named oauth2')
-
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
@@ -71,11 +64,9 @@ class YahooPlaceFinder(Geocoder):
         return request
 
     def _filtered_results(self, results, min_quality, valid_country_codes):
-
         """
-        returns only the results that meet the minimum quality threshold
-        and are located in expected countries
-
+        Returns only the results that meet the minimum quality threshold
+        and are located in expected countries.
         """
 
         results = [
@@ -94,10 +85,8 @@ class YahooPlaceFinder(Geocoder):
         return results
 
     def _get_response(self, request):
-
         """
-        returns the result of a PlaceFinder API call
-
+        Returns the result of a PlaceFinder API call.
         """
 
         try:
@@ -108,22 +97,20 @@ class YahooPlaceFinder(Geocoder):
             )
             response = urllib2.urlopen(urllib_req)
             content = response.read()
-        except urllib2.HTTPError as e:
+        except urllib2.HTTPError as exc:
             raise GeocoderError(
-                'PlaceFinder service returned status code %s.' % e.code,
+                'PlaceFinder service returned status code %s.' % exc.code,
             )
-        except urllib2.URLError as e:
+        except urllib2.URLError as exc:
             raise GeocoderError(
-                'PlaceFinder service exception %s.' % e.reason,
+                'PlaceFinder service exception %s.' % exc.reason,
             )
 
         return content
 
     def _parse_response(self, response):
-
         """
-        returns the parsed result of a PlaceFinder API call
-
+        Returns the parsed result of a PlaceFinder API call.
         """
 
         try:
@@ -153,10 +140,8 @@ class YahooPlaceFinder(Geocoder):
 
     def geocode(self, location, min_quality=0,
                 raw=False, reverse=False, valid_country_codes=None):
-
         """
-        returns a geocoded location using Yahoo's PlaceFinder API
-
+        Returns a geocoded location using Yahoo's PlaceFinder API.
         """
 
         request = self._build_request(location, reverse=reverse)
@@ -177,20 +162,18 @@ class YahooPlaceFinder(Geocoder):
 
         return results
 
-    def reverse(self, point):
-
+    def reverse(self, inp):
         """
-        returns a reverse geocoded location using Yahoo's PlaceFinder API
-
+        Returns a reverse geocoded location using Yahoo's PlaceFinder API.
         """
-
+        # TODO
+        point = None
         try:
-            point = (point.lat, point.lon)
+            point = (inp.lat, inp.lon)
         except AttributeError:
             pass
-
         try:
-            point = (point.latitude, point.longitude)
+            point = (inp.latitude, inp.longitude)
         except AttributeError:
             pass
 

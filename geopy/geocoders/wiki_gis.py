@@ -1,10 +1,16 @@
-from urllib import urlencode
-from urllib2 import urlopen
-import xml
-from xml.parsers.expat import ExpatError
+"""
+:class:`.MediaWiki` geocoder.
+"""
 
-from geopy.geocoders.base import Geocoder,GeocoderError,GeocoderResultError
-from geopy import Point, Location, util
+from urllib2 import urlopen
+
+from geopy.geocoders.base import Geocoder
+from geopy.util import logger, parse_geo
+
+try:
+    from BeautifulSoup import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None # pylint: disable=C0103
 
 class MediaWiki(Geocoder):
     def __init__(self, format_url, transform_string=None):
@@ -20,6 +26,12 @@ class MediaWiki(Geocoder):
         used. It is recommended that you consider this argument keyword-only,
         since subclasses will likely place it last.
         """
+        if not BeautifulSoup:
+            raise ImportError(
+                "BeautifulSoup was not found. Please install BeautifulSoup "
+                "in order to use the MediaWiki Geocoder."
+            )
+        super(MediaWiki, self).__init__()
         self.format_url = format_url
 
         if callable(transform_string):
@@ -38,10 +50,10 @@ class MediaWiki(Geocoder):
         return self.geocode_url(url)
 
     def geocode_url(self, url):
-        util.logger.debug("Fetching %s..." % url)
+        logger.debug("Fetching %s..." % url)
         page = urlopen(url)
         name, (latitude, longitude) = self.parse_xhtml(page)
-        return (name, (latitude, longitude))        
+        return (name, (latitude, longitude))
 
     def parse_xhtml(self, page):
         soup = isinstance(page, BeautifulSoup) and page or BeautifulSoup(page)
@@ -52,7 +64,8 @@ class MediaWiki(Geocoder):
         meta = soup.head.find('meta', {'name': 'geo.position'})
         if meta:
             position = meta['content']
-            latitude, longitude = util.parse_geo(position)
+            # no parse_geo? TODO
+            latitude, longitude = parse_geo(position)
             if latitude == 0 or longitude == 0:
                 latitude = longitude = None
         else:

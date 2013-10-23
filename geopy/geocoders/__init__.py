@@ -1,3 +1,7 @@
+"""
+Public usage of from geopy.geocoders import ...
+"""
+
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.google import Google
 from geopy.geocoders.googlev3 import GoogleV3

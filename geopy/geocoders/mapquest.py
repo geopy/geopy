@@ -1,25 +1,23 @@
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        from django.utils import simplejson as json
+"""
+:class:`.MapQuest` geocoder.
+"""
+
+from geopy.util import json
 
 from urllib import urlencode
 from urllib2 import urlopen
 from geopy.geocoders.base import Geocoder
-from geopy.util import logger, decode_page, join_filter
-from geopy import util
+from geopy.util import decode_page, join_filter
+
 
 class MapQuest(Geocoder):
 
-    def __init__(self, api_key='', format_string='%s'):
+    def __init__(self, api_key=None, format_string=None):
         """Initialize a MapQuest geocoder with address information and
            MapQuest API key.
         """
-        self.api_key = api_key
-        self.format_string = format_string
+        super(MapQuest, self).__init__(format_string)
+        self.api_key = api_key or ''
         self.url = "http://www.mapquestapi.com/geocoding/v1/address"
 
     def geocode(self, location, exactly_one=True):
@@ -54,7 +52,7 @@ class MapQuest(Geocoder):
             latLng = resource['latLng']
             latitude, longitude = latLng.get('lat'), latLng.get('lng')
 
-            location = join_filter(", ", [city, county, state,country])
+            location = join_filter(", ", [city, county, state, country])
             if latitude and longitude:
                 latitude = float(latitude)
                 longitude = float(longitude)
@@ -67,6 +65,7 @@ class MapQuest(Geocoder):
             return [parse_resource(resource) for resource in resources]
 
 if __name__ == "__main__":
+    # TODO test
     mq = MapQuest("Dmjtd%7Clu612007nq%2C20%3Do5-50zah")
     print mq.geocode('Mount St. Helens')
     mq = MapQuest("hDmjtd%7Clu612007nq%2C20%3Do5-50zah")

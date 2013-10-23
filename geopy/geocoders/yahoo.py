@@ -1,29 +1,24 @@
 """
-Wrapper to the Yahoo's new PlaceFinder API. (doc says that the API RELEASE 1.0 (22 JUNE 2010))
+Wrapper to the Yahoo's new PlaceFinder API. (doc says that the API RELEASE
+1.0 (22 JUNE 2010))
 """
-import xml.dom.minidom
+
 from geopy import util
-from geopy import Point
 from urllib import urlencode
 from urllib2 import urlopen
 from geopy.geocoders.base import Geocoder
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        from django.utils import simplejson as json
+from geopy.util import json
 
 
 class Yahoo(Geocoder):
 
     BASE_URL = "http://where.yahooapis.com/geocode?%s"
 
-    def __init__(self, app_id, format_string='%s', output_format=None):
+    def __init__(self, app_id, format_string=None, output_format=None):
+        super(Yahoo, self).__init__(format_string)
         self.app_id = app_id
         self.format_string = format_string
-        
+
         if output_format != None:
             from warnings import warn
             warn('geopy.geocoders.yahoo.Yahoo: The `output_format` parameter is deprecated '+
@@ -43,7 +38,7 @@ class Yahoo(Geocoder):
     def geocode_url(self, url, exactly_one=True):
         page = urlopen(url)
         return self.parse_json(page, exactly_one)
-    
+
     def parse_json(self, page, exactly_one=True):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
@@ -69,7 +64,7 @@ class Yahoo(Geocoder):
             #else:
             #    point = None
             return (location, (float(lat), float(lng)))
-    
+
         if exactly_one:
             return parse_result(results[0])
         else:

@@ -10,16 +10,16 @@ from geopy.geocoders.base import Geocoder
 ### UNIT TEST(S) to test Proxy in Geocoder base class ###
 ###
 ### Solution requires that proxy_server.py is run to start simple proxy
-### daemon proxy PID is located in /var/run/proxy_server.pid and can be 
+### daemon proxy PID is located in /var/run/proxy_server.pid and can be
 ### stoped using the command `kill -9 $(cat /var/run/proxy_server.pid)`
 
 
 class ProxyTestCase(unittest.TestCase):
     def setUp(self):
-       
+
         # Backup environ settings
         self.orig_http_proxy = os.environ['http_proxy'] if os.environ.has_key('http_proxy') else None
-        
+
         # Get HTTP for comparison before proxy test
         base_http = urllib2.urlopen('http://www.blankwebsite.com/')
         base_html = base_http.read()

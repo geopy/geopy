@@ -7,7 +7,7 @@ from BeautifulSoup import BeautifulSoup
 class GeoMicroformatFound(object):
     def setUp(self):
         self.parser = GeoMicroformat()
-    
+
     def test_one_str(self):
         locations = self.parser.find_all(self.MARKUP)
         self.assertTrue(len(locations) == 1)
@@ -39,11 +39,11 @@ class GeoMicroformatFound(object):
 class GeoMicroformatNotFound(object):
     def setUp(self):
         self.parser = GeoMicroformat()
-    
+
     def test_none_str(self):
         locations = self.parser.find_all(self.MARKUP)
         self.assertTrue(len(locations) == 0)
-    
+
     def test_none_soup(self):
         if BeautifulSoup:
             locations = self.parser.find_all(BeautifulSoup(self.MARKUP))
@@ -85,13 +85,13 @@ class FindAbbrShorthandTest(GeoMicroformatFoundTest):
 class NoShorthandNotFoundTest(GeoMicroformatNotFoundTest):
     def setUp(self):
         self.parser = GeoMicroformat(shorthand=False)
-    
+
     MARKUP = """<span class="geo">41.4924;-81.7239</span>"""
 
 class NoShorthandFoundTest(GeoMicroformatFoundTest):
     def setUp(self):
         self.parser = GeoMicroformat(shorthand=False)
-    
+
     MARKUP = """
     <span class="geo">41.4924;-81.7239</span>
     <span class="geo">
@@ -124,7 +124,7 @@ def get_suite():
     Returns a TestSuite containing all of the TestCases for microformats. If BeautifulSoup
     isn't installed, then tests against that library are skipped.
     """
-    
+
     geofound_test_methods = [
         'test_one_str',
         'test_multi_str',
@@ -135,17 +135,17 @@ def get_suite():
     if BeautifulSoup:
         geofound_test_methods.extend(['test_one_soup','test_multi_soup',])
         geonotfound_test_methods.append('test_none_soup')
-    
+
     tests = []
     tests.extend(map(GeoMicroformatFoundTest,geofound_test_methods))
     tests.extend(map(FindAbbrLatLongTest,geofound_test_methods))
     tests.extend(map(FindAbbrShorthandTest,geofound_test_methods))
     tests.extend(map(NoShorthandFoundTest,geofound_test_methods))
     tests.extend(map(FindNestedDefListTest,geofound_test_methods))
-    
+
     tests.extend(map(GeoMicroformatNotFoundTest,geonotfound_test_methods))
     tests.extend(map(NoShorthandNotFoundTest,geonotfound_test_methods))
-    
+
     return unittest.TestSuite(tests)
 
 if __name__ == '__main__':

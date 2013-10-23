@@ -1,37 +1,31 @@
-'''Google Maps V3 geocoder.
+"""
+:class:`.GoogleV3` is the Google Maps V3 geocoder.
 
 Largely adapted from the existing v2 geocoder with modifications made where
 possible to support the v3 api as well as to clean up the class without
 breaking its compatibility or diverging its api too far from the rest of the
 geocoder classes.
-'''
+"""
 
-import sys
 import base64
 import hashlib
 import hmac
 from urllib import urlencode
 from urllib2 import urlopen
 
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        from django.utils import simplejson as json
+from geopy.util import json
 
 from geopy.geocoders.base import Geocoder, GeocoderResultError
 from geopy import util
 
 
-
 class GoogleV3(Geocoder):
     '''Geocoder using the Google Maps v3 API.'''
-    
+
     def __init__(self, domain='maps.googleapis.com', protocol='http',
                  client_id=None, secret_key=None):
-        '''Initialize a customized Google geocoder.
+        """
+        Initialize a customized Google geocoder.
 
         API authentication is only required for Google Maps Premier customers.
 
@@ -40,11 +34,11 @@ class GoogleV3(Geocoder):
         example), you may want to set it to 'maps.google.co.uk' to properly bias results.
 
         ``protocol`` http or https.
-        
+
         ``client_id`` Premier account client id.
-        
+
         ``secret_key`` Premier account secret key.
-        '''
+        """
         super(GoogleV3, self).__init__()
 
         if protocol not in ('http', 'https'):
@@ -83,18 +77,13 @@ class GoogleV3(Geocoder):
         '''Returns a standard geocoding api url.'''
         return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
             {'domain': self.domain, 'params': urlencode(params)})
-    
+
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
         util.logger.debug("Fetching %s..." % url)
         page = urlopen(url)
 
         return self.parse_json(page, exactly_one)
-
-    def geocode_first(self, location, **kwargs):
-        ''' Tell the geocoder explicitly to allow more than one result '''
-        kwargs['exactly_one'] = False
-        return super(GoogleV3, self).geocode_first(location, **kwargs)
 
     def geocode(self, string, bounds=None, region=None,
                 language=None, sensor=False, exactly_one=True):
@@ -118,7 +107,7 @@ class GoogleV3(Geocoder):
         comes from a device with a location sensor.
         This value must be either True or False.
         '''
-        if isinstance(string, unicode) and sys.version_info.major < 3:
+        if isinstance(string, unicode):
             string = string.encode('utf-8')
 
         params = {
@@ -144,7 +133,7 @@ class GoogleV3(Geocoder):
         '''Reverse geocode a point.
         ``point`` (required) The textual latitude/longitude value for which
         you wish to obtain the closest, human-readable address
-        
+
         ``language`` (optional) The language in which to return results.
         See the supported list of domain languages. Note that we often update
         supported languages so this list may not be exhaustive. If language is
@@ -176,21 +165,21 @@ class GoogleV3(Geocoder):
             page = util.decode_page(page)
         self.doc = json.loads(page)
         places = self.doc.get('results', [])
-    
+
         if not places:
             check_status(self.doc.get('status'))
             return None
         elif exactly_one and len(places) != 1:
             raise ValueError(
                 "Didn't find exactly one placemark! (Found %d)" % len(places))
-    
+
         def parse_place(place):
             '''Get the location, lat, lng from a single json place.'''
             location = place.get('formatted_address')
             latitude = place['geometry']['location']['lat']
             longitude = place['geometry']['location']['lng']
             return (location, (latitude, longitude))
-        
+
         if exactly_one:
             return parse_place(places[0])
         else:
