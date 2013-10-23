@@ -164,7 +164,7 @@ class GPX(object):
 
     @property
     def version(self):
-        if not hasattr(self, '_version'):
+        if not getattr(self, '_version'):
             version = self._root.get('version')
             if version == self.VERSION:
                 self._version = version
@@ -174,7 +174,7 @@ class GPX(object):
 
     @property
     def creator(self):
-        if not hasattr(self, '_creator'):
+        if not getattr(self, '_creator'):
             self._creator = self._root.get('creator')
         return self._creator
 
