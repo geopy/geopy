@@ -25,9 +25,9 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     ``candidates`` is an integer between 1 and 10 indicating the max number of
     candidate addresses to return if a valid address could be found.
     """
-    def __init__(self, auth_token, candidates=1):
+    def __init__(self, auth_id, auth_token, candidates=1):
         super(LiveAddress, self).__init__()
-        #self.auth_id = auth_id
+        self.auth_id = auth_id
         self.auth_token = auth_token
         self.candidates = candidates if 1 <= candidates <= 10 else 10
         self.url = 'https://api.qualifiedaddress.com/street-address'
@@ -43,7 +43,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         Generate API URL.
         """
         query = {
-            #'auth-id': self.auth_id,
+            'auth-id': self.auth_id,
             'auth-token': self.auth_token,
             'street': location,
             'candidates': self.candidates

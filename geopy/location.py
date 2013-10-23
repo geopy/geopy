@@ -17,7 +17,7 @@ class Location(object): # pylint: disable=R0903
         """Backwards compatibility with geopy 0.93 tuples."""
         return (self.name, self.point)[index]
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return "Location(%r, %r)" % (self.name, self.point)
 
     def __iter__(self):
@@ -29,6 +29,6 @@ class Location(object): # pylint: disable=R0903
     def __ne__(self, other):
         return (self.name, self.point) != (other.name, other.point)
 
-    def __len__(self):
+    def __len__(self): # pragma: no cover
         raise NotImplementedError()
 

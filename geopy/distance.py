@@ -71,10 +71,10 @@ class Distance(object):
     def measure(self, a, b):
         raise NotImplementedError
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return 'Distance(%s)' % self.kilometers
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return '%s km' % self.__kilometers
 
     def __cmp__(self, other):

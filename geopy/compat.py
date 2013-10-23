@@ -4,7 +4,7 @@ Compatibility...
 
 try:
     import json
-except ImportError:
+except ImportError: # pragma: no cover
     try:
         import simplejson as json # pylint: disable=F0401
     except ImportError:
@@ -14,7 +14,7 @@ assert json is not None
 
 try:
     from BeautifulSoup import BeautifulSoup # pylint: disable=W0611,F0401
-except ImportError:
+except ImportError: # pragma: no cover
     class BeautifulSoup(object): # pylint: disable=R0903
         """
         Raise import error.
