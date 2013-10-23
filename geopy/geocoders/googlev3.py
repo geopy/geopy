@@ -90,6 +90,11 @@ class GoogleV3(Geocoder):
 
         return self.parse_json(page, exactly_one)
 
+    def geocode_first(self, location, **kwargs):
+        ''' Tell the geocoder explicitly to allow more than one result '''
+        kwargs['exactly_one'] = False
+        return super(GoogleV3, self).geocode_first(location, **kwargs)
+
     def geocode(self, string, bounds=None, region=None,
                 language=None, sensor=False, exactly_one=True):
         '''Geocode an address.

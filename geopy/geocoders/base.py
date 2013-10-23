@@ -31,8 +31,8 @@ class Geocoder(object):
         else:
             raise GeocoderResultError("Geocoder returned no results!")
 
-    def geocode_first(self, location):
-        results = self.geocode(location)
+    def geocode_first(self, location, **kwargs):
+        results = self.geocode(location, **kwargs)
         for result in results:
             return result
         return None
