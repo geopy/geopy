@@ -8,7 +8,6 @@ from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.wiki_gis import MediaWiki
 from geopy.geocoders.wiki_semantic import SemanticMediaWiki
-from geopy.geocoders.yahoo import Yahoo
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.mapquest import MapQuest
