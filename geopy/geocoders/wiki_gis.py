@@ -50,7 +50,7 @@ class MediaWiki(Geocoder):
         return self.geocode_url(url)
 
     def geocode_url(self, url):
-        logger.debug("Fetching %s..." % url)
+        logger.debug("Fetching %s...", url)
         page = urlopen(url)
         name, (latitude, longitude) = self.parse_xhtml(page)
         return (name, (latitude, longitude))

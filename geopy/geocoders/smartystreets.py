@@ -36,6 +36,9 @@ class LiveAddress(Geocoder):
         return self._parse_json(response)
 
     def _compose_url(self, location):
+        """
+        Generate API URL.
+        """
         query = {
             'auth-token': self.auth_token,
             'street': location,
@@ -43,20 +46,31 @@ class LiveAddress(Geocoder):
         }
         return '?'.join((self.url, urllib.urlencode(query)))
 
-    def _execute_request(self, url):
+    @staticmethod
+    def _execute_request(url):
+        """
+        Call API.
+        """
         try:
             return urllib2.urlopen(url)
         except urllib2.HTTPError as error:
             raise LiveAddressError(error.getcode(), error.message or error.msg)
 
     def _parse_json(self, response):
+        """
+        Parse responses as JSON objects.
+        """
         candidates = json.loads(response)
         if len(candidates) > 1:
             return [self._format_structured_address(c) for c in candidates]
 
         return self._format_structured_address(candidates[0])
 
-    def _format_structured_address(self, address):
+    @staticmethod
+    def _format_structured_address(address):
+        """
+        Pretty-print address and return lat, lon tuple.
+        """
         formatted = '{0}, {1}'.format(
             address['delivery_line_1'],
             address['last_line'])

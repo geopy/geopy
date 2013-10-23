@@ -165,7 +165,7 @@ class Point(object):
         return ", ".join(coordinates)
 
     def format_altitude(self, unit='km'):
-        return format.distance(self.altitude, unit)
+        return format.format_distance(self.altitude, unit)
 
     def __str__(self):
         return self.format()

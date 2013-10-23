@@ -35,7 +35,7 @@ class OpenMapQuest(Geocoder):
         params = {'q': self.format_string % string}
         url = self.url % urlencode(params)
 
-        logger.debug("Fetching %s..." % url)
+        logger.debug("Fetching %s...", url)
         page = urlopen(url)
 
         return self.parse_json(page, exactly_one)

@@ -20,8 +20,8 @@ class Google(Geocoder):
         """Initialize a customized Google geocoder with location-specific
         address information and your Google Maps API key.
 
-        ``api_key`` should be a valid Google Maps API key. Required as per Google Geocoding API
-        V2 docs, but the API works without a key in practice.
+        ``api_key`` should be a valid Google Maps API key. Required as per
+        Google Geocoding API V2 docs.
 
         ``domain`` should be the localized Google Maps domain to connect to. The default
         is 'maps.google.com', but if you're geocoding address in the UK (for
@@ -82,7 +82,7 @@ class Google(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        logger.debug("Fetching %s..." % url)
+        logger.debug("Fetching %s...", url)
         page = urlopen(url)
 
         dispatch = getattr(self, 'parse_' + self.output_format)
@@ -115,7 +115,11 @@ class Google(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    def check_status_code(self, status_code):
+    @staticmethod
+    def check_status_code(status_code):
+        """
+        Raise exceptions on bad status codes.
+        """
         if status_code == 400:
             raise GeocoderResultError(
                 "Bad request (Server returned status 400)"

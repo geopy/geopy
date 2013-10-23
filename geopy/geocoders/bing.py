@@ -35,7 +35,7 @@ class Bing(Geocoder):
         self.api_key = api_key
         self.url = "http://dev.virtualearth.net/REST/v1/Locations"
 
-    def geocode(self, string, exactly_one=True, user_location=None):
+    def geocode(self, string, exactly_one=True, user_location=None): # pylint: disable=W0221
         """Geocode an address.
 
         ``user_location`` should be an instance of geopy.Point. user_location
@@ -67,13 +67,16 @@ class Bing(Geocoder):
         return self.geocode_url(url, exactly_one=exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        logger.debug("Fetching %s..." % url)
+        logger.debug("Fetching %s...", url)
         page = urlopen(url)
 
         return self.parse_json(page, exactly_one)
 
-    def parse_json(self, page, exactly_one=True):
-        """Parse a location name, latitude, and longitude from an JSON response."""
+    @staticmethod
+    def parse_json(page, exactly_one=True):
+        """
+        Parse a location name, latitude, and longitude from an JSON response.
+        """
         if not isinstance(page, basestring):
             page = decode_page(page)
         doc = json.loads(page)
@@ -85,13 +88,13 @@ class Bing(Geocoder):
 
         def parse_resource(resource):
             stripchars = ", \n"
-            a = resource['address']
+            addr = resource['address']
 
-            address = a.get('addressLine', '').strip(stripchars)
-            city = a.get('locality', '').strip(stripchars)
-            state = a.get('adminDistrict', '').strip(stripchars)
-            zipcode = a.get('postalCode', '').strip(stripchars)
-            country = a.get('countryRegion', '').strip(stripchars)
+            address = addr.get('addressLine', '').strip(stripchars)
+            city = addr.get('locality', '').strip(stripchars)
+            state = addr.get('adminDistrict', '').strip(stripchars)
+            zipcode = addr.get('postalCode', '').strip(stripchars)
+            country = addr.get('countryRegion', '').strip(stripchars)
 
             city_state = join_filter(", ", [city, state])
             place = join_filter(" ", [city_state, zipcode])

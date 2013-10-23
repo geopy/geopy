@@ -152,7 +152,8 @@ class GreatCircleDistance(Distance):
         cos_delta_lng, sin_delta_lng = cos(delta_lng), sin(delta_lng)
 
         central_angle = acos(
-            # We're correcting from floating point rounding errors on very-near and exact points here
+            # We're correcting from floating point rounding errors
+            # on very-near and exact points here
             min(1.0, sin_lat1 * sin_lat2 +
                      cos_lat1 * cos_lat2 * cos_delta_lng))
 

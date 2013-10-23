@@ -12,7 +12,15 @@ from warnings import warn
 from geopy.geocoders.base import Geocoder
 
 
-class GeoNames(Geocoder):
+class GeoNames(Geocoder): # pylint: disable=W0223
+    """
+    GeoNames geocoder, documentation at:
+        http://www.geonames.org/export/free-geocoding.html
+
+    Reverse geocoding also available, but not yet implemented. Documentation at:
+        http://www.geonames.org/maps/us-reverse-geocoder.html
+    """
+
     def __init__(self, format_string=None, output_format=None,
                         country_bias=None, username=None):
         super(GeoNames, self).__init__(format_string)
@@ -37,8 +45,8 @@ class GeoNames(Geocoder):
         self.country_bias = country_bias
         self.url = "http://api.geonames.org/searchJSON?%s"
 
-    def geocode(self, string, exactly_one=True):
-        if isinstance(string, unicode):
+    def geocode(self, string, exactly_one=True): # pylint: disable=W0221
+        if isinstance(string, unicode): # TODO py3k
             string = string.encode('utf-8')
         params = {
             'q': string,
@@ -54,7 +62,11 @@ class GeoNames(Geocoder):
         page = urlopen(url)
         return self.parse_json(page, exactly_one)
 
+
     def parse_json(self, page, exactly_one):
+        """
+        Parse JSON response body.
+        """
         if not isinstance(page, basestring):
             page = util.decode_page(page)
 
@@ -81,9 +93,9 @@ class GeoNames(Geocoder):
             state = place.get('adminCode1', None)
             country = place.get('countryCode', None)
 
-            location = ', '.join(filter(lambda x: bool(x),
-                [placename, state, country]
-            ))
+            location = ', '.join(
+                [x for x in [placename, state, country] if x]
+            )
 
             return (location, (latitude, longitude))
 

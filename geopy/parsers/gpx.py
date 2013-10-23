@@ -1,7 +1,11 @@
+"""
+:class:`.GPX` parser.
+"""
+
 from geopy import Point
 from geopy.parsers.iso8601 import parse_iso8601
 
-import sys, re
+import re
 from xml.etree import ElementTree
 
 class VersionError(Exception):
@@ -26,32 +30,32 @@ class Waypoint(Point):
             ele = children['ele']
         else:
             ele = None
-        w = cls(lat, lon, ele)
+        waypoint = cls(lat, lon, ele)
         if 'time' in children:
-            w.timestamp = children['time']
+            waypoint.timestamp = children['time']
         if 'name' in children:
-            w.name = children['name']
+            waypoint.name = children['name']
         if 'desc' in children:
-            w.description = children['desc']
+            waypoint.description = children['desc']
         if 'cmt' in children:
-            w.comment = children['cmt']
+            waypoint.comment = children['cmt']
         if 'src' in children:
-            w.source = children['src']
+            waypoint.source = children['src']
         if 'sym' in children:
-            w.symbol = children['sym']
+            waypoint.symbol = children['sym']
         if 'type' in children:
-            w.classification = children['type']
+            waypoint.classification = children['type']
         if 'fix' in children:
-            w.fix = children['fix']
+            waypoint.fix = children['fix']
         if 'sat' in children:
-            w.num_satellites = children['sat']
+            waypoint.num_satellites = children['sat']
         if 'ageofdgpsdata' in children:
-            w.age = children['ageofdgpsdata']
+            waypoint.age = children['ageofdgpsdata']
         if 'dgpsid' in children:
-            w.dgpsid = children['dgpsid']
-        return w
+            waypoint.dgpsid = children['dgpsid']
+        return waypoint
 
-class _Attr(object):
+class _Attr(object): # pylint: disable=R0903
     '''
     Value wrapper for allowing interfaces to access attribute values with
     `obj.text`
@@ -60,6 +64,10 @@ class _Attr(object):
         self.text = value
 
 class GPX(object):
+    """
+    TODO docs.
+    """
+
     GPX_NS = "http://www.topografix.com/GPX/1/1"
     FILE_EXT = '.gpx'
     MIME_TYPE = 'application/gpx+xml'
@@ -122,6 +130,10 @@ class GPX(object):
         self._routes = {}
         self._tracks = {}
 
+        self._root = None
+        self._version = None
+        self._creator = None
+
         self.type_handlers = {
             'string': lambda e: e.text,
             'uri': lambda e: e.text,
@@ -147,8 +159,8 @@ class GPX(object):
             string_or_file = ElementTree.fromstring(string_or_file)
         elif not ElementTree.iselement(string_or_file):
             string_or_file = ElementTree.parse(string_or_file)
-        if string_or_file.getroot().tag == self._get_qname('gpx'):
-            self._root = string_or_file.getroot()
+        if string_or_file.getroot().tag == self._get_qname('gpx'): # pylint: disable=E1103
+            self._root = string_or_file.getroot() # pylint: disable=E1103
 
     @property
     def version(self):
@@ -193,7 +205,7 @@ class GPX(object):
         point = Point(element.get('lat'), element.get('lon'))
 
     def _parse_segment(self, element):
-        pass
+        raise NotImplementedError()
 
     @property
     def routes(self):
@@ -201,7 +213,7 @@ class GPX(object):
         return self._cache_parsed(tag, self._parse_route, self._routes)
 
     def _parse_route(self, element):
-        pass
+        raise NotImplementedError()
 
     @property
     def route_names(self):
@@ -281,7 +293,7 @@ class GPX(object):
 
     def _cache_parsed(self, tag, parse_func, cache):
         i = -1
-        for i in xrange(len(cache)):
+        for i in range(len(cache)):
             item = cache[i]
             if item is not None:
                 yield item

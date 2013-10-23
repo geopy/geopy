@@ -1,3 +1,7 @@
+"""
+Utils.
+"""
+
 from sys import version_info
 import re
 import logging
@@ -13,36 +17,49 @@ else:
     NUMBER_TYPES = (int, long, float, Decimal)
 
 class NullHandler(logging.Handler):
+    """
+    No output.
+    """
+
     def emit(self, record):
         pass
 
-logger = logging.getLogger('geopy')
+logger = logging.getLogger('geopy') # pylint: disable=C0103
 logger.addHandler(NullHandler())
 
 try:
     import json
 except ImportError:
     try:
-        import simplejson as json
+        import simplejson as json # pylint: disable=F0401
     except ImportError:
-        from django.utils import simplejson as json
+        from django.utils import simplejson as json # pylint: disable=F0401
 
 assert json is not None
 
-def parse_geo(val):
+def parse_geo(val): # pylint: disable=W0613
     """
     Undefined func called in MediaWiki and SemanticMediaWiki geocoders.
     """
     raise NotImplementedError()
 
 def pairwise(seq):
+    """
+    TODO docs.
+    """
     for i in range(0, len(seq) - 1):
         yield (seq[i], seq[i + 1])
 
 def join_filter(sep, seq, pred=bool):
+    """
+    TODO docs.
+    """
     return sep.join([unicode(i) for i in seq if pred(i)])
 
 def get_encoding(page, contents=None):
+    """
+    TODO docs.
+    """
     # TODO: clean up Py3k support
     if version_info < (3, 0):
         charset = page.headers.getparam("charset") or None
@@ -58,6 +75,9 @@ def get_encoding(page, contents=None):
             pass
 
 def decode_page(page):
+    """
+    TODO docs.
+    """
     contents = page.read()
     # HTTP 1.1 defines iso-8859-1 as the 'implied' encoding if none is given
     encoding = get_encoding(page, contents) or 'iso-8859-1'
@@ -68,8 +88,11 @@ def decode_page(page):
         return str(contents, encoding=encoding)
 
 def get_first_text(node, tag_names, strip=None):
+    """
+    TODO docs.
+    """
     if isinstance(tag_names, basestring):
-            tag_names = [tag_names]
+        tag_names = [tag_names]
     if node:
         while tag_names:
             nodes = node.getElementsByTagName(tag_names.pop(0))
@@ -80,10 +103,13 @@ def get_first_text(node, tag_names, strip=None):
 def unescape(text):
     """
     Removes HTML or XML character references and entities from a text string.
-
     """
-    def fixup(m):
-        text = m.group(0)
+
+    def fixup(val):
+        """
+        Callable for re.sub below.
+        """
+        text = val.group(0)
         if text[:2] == "&#":
             # character reference
             try:
@@ -100,12 +126,16 @@ def unescape(text):
             except KeyError:
                 pass
         return text # leave as is
-    return re.sub("&#?\w+;", fixup, text)
+
+    return re.sub(r"&#?\w+;", fixup, text)
 
 try:
     reversed
 except NameError:
-    def reversed(seq):
+    def reversed(seq): # pylint: disable=W0622
+        """
+        Compat for builtin... not sure which Py version this allows. todo.
+        """
         i = len(seq)
         while i > 0:
             i -= 1

@@ -15,7 +15,7 @@ class Geohash(object):
         long_min, longitude, long_max = -180, 0, 180
         buf = []
         odd_bit = False
-        for i in xrange(precision):
+        for _ in range(precision):
             byte = 0
             for bit in (16, 8, 4, 2, 1):
                 if odd_bit:

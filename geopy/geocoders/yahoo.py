@@ -12,17 +12,17 @@ from geopy.util import json
 
 class Yahoo(Geocoder):
 
-    BASE_URL = "http://where.yahooapis.com/geocode?%s"
-
     def __init__(self, app_id, format_string=None, output_format=None):
         super(Yahoo, self).__init__(format_string)
         self.app_id = app_id
         self.format_string = format_string
+        self.url = "http://where.yahooapis.com/geocode?%s"
 
         if output_format != None:
             from warnings import warn
-            warn('geopy.geocoders.yahoo.Yahoo: The `output_format` parameter is deprecated '+
-                 'and now ignored. JSON will be used internally.', DeprecationWarning)
+            warn('geopy.geocoders.yahoo.Yahoo: The `output_format`'
+                    'parameter is deprecated and now ignored. JSON will be '
+                    'used internally.', DeprecationWarning)
 
     def geocode(self, string, exactly_one=True):
         if isinstance(string, unicode):
@@ -31,8 +31,8 @@ class Yahoo(Geocoder):
                   'appid': self.app_id,
                   'flags': 'J'
                  }
-        url = self.BASE_URL % urlencode(params)
-        util.logger.debug("Fetching %s..." % url)
+        url = self.url % urlencode(params)
+        util.logger.debug("Fetching %s...", url)
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
@@ -60,7 +60,7 @@ class Yahoo(Geocoder):
             city = place.get('city')
             state = place.get('state')
             country = place.get('country')
-            location = util.join_filter(", ", [address, city, country])
+            location = util.join_filter(", ", [address, city, state, country])
             lat, lng = place.get('latitude'), place.get('longitude')
             #if lat and lng:
             #    point = Point(floatlat, lng)
@@ -80,5 +80,5 @@ class Yahoo(Geocoder):
                   'appid': self.app_id,
                   'flags': 'J'
                  }
-        url = self.BASE_URL % urlencode(params)
+        url = self.url % urlencode(params)
         return self.geocode_url(url, exactly_one)

@@ -81,7 +81,8 @@ class GeoMicroformat(Parser):
     VALUE_CLASS = re.compile(r'\s*value\s*')
     SEP = re.compile(r'\s*;\s*')
 
-    def __init__(self, ignore_invalid=True, shorthand=True, abbr_title=True, value_excerpting=True):
+    def __init__(self, ignore_invalid=True, shorthand=True,
+                        abbr_title=True, value_excerpting=True):
         self.ignore_invalid = ignore_invalid
         self.shorthand = shorthand
         self.abbr_title = abbr_title

@@ -1,6 +1,10 @@
+"""
+TODO docs.
+"""
+
 from geopy.point import Point
 
-class Location(object):
+class Location(object): # pylint: disable=R0903
     def __init__(self, name="", point=None, attributes=None, **kwargs):
         self.name = name
         if point is not None:
@@ -24,4 +28,7 @@ class Location(object):
 
     def __ne__(self, other):
         return (self.name, self.point) != (other.name, other.point)
+
+    def __len__(self):
+        raise NotImplementedError()
 

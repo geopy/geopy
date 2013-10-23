@@ -89,7 +89,7 @@ class SemanticMediaWiki(Geocoder):
         if attempted is None:
             attempted = set()
 
-        util.logger.debug("Fetching %s..." % url)
+        util.logger.debug("Fetching %s...", url)
         page = urlopen(url)
         soup = BeautifulSoup(page)
 
