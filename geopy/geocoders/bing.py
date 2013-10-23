@@ -55,7 +55,8 @@ class Bing(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def reverse(self, point, exactly_one=True): # pylint: disable=W0221
-        """Reverse geocode a point.
+        """
+        Reverse geocode a point.
 
         ``point`` should be an instance of :class:`geopy.point.Point`.
         """
@@ -82,10 +83,6 @@ class Bing(Geocoder):
             page = decode_page(page)
         doc = json.loads(page)
         resources = doc['resourceSets'][0]['resources']
-
-        if exactly_one and len(resources) != 1:
-            raise ValueError("Didn't find exactly one resource! " \
-                             "(Found %d.)" % len(resources))
 
         def parse_resource(resource):
             """

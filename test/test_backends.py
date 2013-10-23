@@ -32,6 +32,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
     delta_placename = 0.02
 
     def test_basic_address(self):
+        if self.geocoder.__class__.__name__ in ('GeocoderDotUS', 'GeoNames', ):
+            raise unittest.SkipTest("%s is known to not have results for this query" % \
+                self.geocoder.__class__.__name__
+            )
         address = '999 W. Riverside Ave., Spokane, WA 99201'
 
         try:
@@ -49,6 +53,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
 
     def test_partial_address(self):
+        if self.geocoder.__class__.__name__ in ('GeocoderDotUS', 'GeoNames', ):
+            raise unittest.SkipTest("%s is known to not have results for this query" % \
+                self.geocoder.__class__.__name__
+            )
         address = '435 north michigan, chicago 60611'
 
         try:
@@ -67,6 +75,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
     def test_intersection(self):
+        if self.geocoder.__class__.__name__ in ('OpenMapQuest', 'GeoNames', ):
+            raise unittest.SkipTest("%s is known to not have results for this query" % \
+                self.geocoder.__class__.__name__
+            )
         address = 'e. 161st st & river ave, new york, ny'
 
         try:
@@ -85,6 +97,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -73.926, delta=self.delta_exact)
 
     def test_placename(self):
+        if self.geocoder.__class__.__name__ in ('GeocoderDotUS', ):
+            raise unittest.SkipTest("%s is known to not have results for this query" % \
+                self.geocoder.__class__.__name__
+            )
         address = 'Mount St. Helens'
 
         try:
@@ -116,7 +132,7 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     env['BING_KEY'] is not None,
     "No BING_KEY env variable set"
 )
-class BingTestCase(unittest.TestCase):
+class BingTestCase(_BackendTestCase):
     def setUp(self):
         from geopy.geocoders.bing import Bing
         self.geocoder = Bing(
@@ -125,7 +141,7 @@ class BingTestCase(unittest.TestCase):
         )
 
 
-class DotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
+class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
         from geopy.geocoders.dot_us import GeocoderDotUS
         self.geocoder = GeocoderDotUS()
