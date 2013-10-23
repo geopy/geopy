@@ -18,6 +18,11 @@ ADDED:  Bing geocoder supports `user_location` (`Point`) parameter. Bing will
         prefer results near the coordinates of `user_location`. Contributed by
         Ryan Nagle.
 
+FIXED:  `GoogleV3.geocode_first()` no longer throws exception on multiple
+        results. Contributed by migajek.
+
+FIXED:  Unnecessary coercing to UTF-8 on Py3k. Contributed by akanouras.
+
 FIXED: `format_degrees` now rounds minutes properly. Contributed by avdd.
 
 FIXED:  No longer warn if the optional dependency `BeautifulSoup` is
