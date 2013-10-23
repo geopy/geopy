@@ -6,7 +6,7 @@ else:
     from xml.etree import ElementTree
 
 from geopy import Point, Location
-from geopy.parsers import Parser
+from geopy.parsers.base import Parser
 from geopy.util import reversed # pylint: disable=W0622
 
 class GeoVocabulary(Parser):

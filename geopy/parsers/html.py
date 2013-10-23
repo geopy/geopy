@@ -1,7 +1,7 @@
 import re
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 from geopy import Point, Location
-from geopy.parsers import Parser
+from geopy.parsers.base import Parser
 from geopy.util import unescape
 
 FLOAT_RE = re.compile(r'([+-]?\d*\.?\d+)$')
