@@ -29,6 +29,12 @@ except ImportError:
 
 assert json is not None
 
+def parse_geo(val):
+    """
+    Undefined func called in MediaWiki and SemanticMediaWiki geocoders.
+    """
+    raise NotImplementedError()
+
 def pairwise(seq):
     for i in range(0, len(seq) - 1):
         yield (seq[i], seq[i + 1])
