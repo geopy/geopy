@@ -145,7 +145,7 @@ class GoogleV3(Geocoder):
         This value must be either True or False.
         '''
         params = {
-            'latlng': point,
+            'latlng': "%s,%s" % point,
             'sensor': str(sensor).lower()
         }
 
@@ -156,6 +156,13 @@ class GoogleV3(Geocoder):
             url = self.get_url(params)
         else:
             url = self.get_signed_url(params)
+
+        ## Use pdb for debugging
+        #import pdb
+        #from PyQt4.QtCore import *
+        ## These lines allow you to set a breakpoint in the app
+        #pyqtRemoveInputHook()
+        #pdb.set_trace()
 
         return self.geocode_url(url, exactly_one)
 
