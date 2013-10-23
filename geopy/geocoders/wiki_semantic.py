@@ -7,8 +7,7 @@ from geopy import util
 try:
     from BeautifulSoup import BeautifulSoup
 except ImportError:
-    util.logger.warn("BeautifulSoup was not found. " \
-          "The SemanticMediaWiki geocoder will not work.")
+    BeautifulSoup = None
 
 try:
     set
@@ -18,6 +17,11 @@ except NameError:
 class SemanticMediaWiki(Geocoder):
     def __init__(self, format_url, attributes=None, relations=None,
                  prefer_semantic=False, transform_string=None):
+        if not BeautifulSoup:
+            raise ImportError(
+                "BeautifulSoup was not found. Please install BeautifulSoup "
+                "in order to use the SemanticMediaWiki Geocoder."
+            )
         self.format_url = format_url
         self.attributes = attributes
         self.relations = relations
