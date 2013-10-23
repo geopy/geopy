@@ -9,7 +9,7 @@ import socket
 socket.setdefaulttimeout(3.0)
 
 env = {
-    'BING_KEY': os.environ.get('BING_KEY', None),
+    'BING_KEY': os.environ.get('BING_KEY', 'AjneXRt2fFPq3tE_xbBvnvvPJmIjTVFv2_UPfBZX5kKyOXHa2CT1NOi5EYhUk-4P'),
     'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', 'Dmjtd%7Clu612007nq%2C20%3Do5-50zah'),
     'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
     'LIVESTREETS_AUTH_ID': os.environ.get('LIVESTREETS_AUTH_ID', None),

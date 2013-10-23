@@ -26,8 +26,6 @@ class Bing(Geocoder):
         ``format_string`` is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
-
-        ``output_format`` (DEPRECATED) is ignored
         """
         super(Bing, self).__init__(format_string)
         self.api_key = api_key
@@ -50,6 +48,8 @@ class Bing(Geocoder):
             params['userLocation'] = ",".join(
                 (user_location.latitude, user_location.longitude)
             )
+        if exactly_one is True:
+            params['maxResults'] = 1
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

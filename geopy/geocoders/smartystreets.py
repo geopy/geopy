@@ -27,11 +27,14 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     ``candidates`` is an integer between 1 and 10 indicating the max number of
     candidate addresses to return if a valid address could be found.
     """
-    def __init__(self, auth_id, auth_token, candidates=1):
+    def __init__(self, auth_id, auth_token, candidates=None):
         super(LiveAddress, self).__init__()
         self.auth_id = auth_id
         self.auth_token = auth_token
-        self.candidates = candidates if 1 <= candidates <= 10 else 10
+        if candidates:
+            if not (1 <= candidates <= 10):
+                raise ValueError('candidates must be between 1 and 10')
+        self.candidates = candidates or 1
         self.url = 'https://api.qualifiedaddress.com/street-address'
 
     def geocode(self, location):
