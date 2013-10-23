@@ -1,8 +1,6 @@
 .PHONY: lint
 .PHONY: test
-.PHONY: doc
-.PHONY: dist
-.PHONY: release
+.PHONY: clean
 
 develop:
 	virtualenv .venv --distribute
@@ -13,3 +11,6 @@ lint:
 
 test:
 	nosetests --verbose --with-cover --cover-erase --cover-package=geopy
+
+clean:
+	find . -name "*.pyc" -print0 | xargs -0 rm -rf
