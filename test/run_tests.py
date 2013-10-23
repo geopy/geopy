@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import unittest
 import sys
-from geopy.tests.test_backends import get_suite as get_backend_suite
-from geopy.tests.test_gpx import get_suite as get_gpx_suite
+from test.test_backends import get_suite as get_backend_suite
+from test.test_gpx import get_suite as get_gpx_suite
 
 def all_tests():
     # Test if BeautifulSoup is installed, since the microformat
