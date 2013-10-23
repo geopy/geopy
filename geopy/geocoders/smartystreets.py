@@ -8,8 +8,9 @@ import urllib2
 from geopy.geocoders.base import Geocoder
 
 
-class LiveAddress(Geocoder):
-    """Initialize a customized LiveAddress geocoder provided by SmartyStreets.
+class LiveAddress(Geocoder): # pylint: disable=W0223
+    """
+    Initialize a customized LiveAddress geocoder provided by SmartyStreets.
     More information regarding the LiveAddress API can be found here:
     http://smartystreets.com/products/liveaddress-api
 

@@ -31,10 +31,11 @@ class SemanticMediaWiki(Geocoder):
         self.attributes = attributes
         self.relations = relations
         self.prefer_semantic = prefer_semantic
-        self.transform_string = transform_string
+        if transform_string:
+            self._transform_string = transform_string
 
     def get_url(self, string):
-        return self.format_url % self.transform_string(string)
+        return self.format_url % self._transform_string(string)
 
     def get_label(self, thing):
         raise NotImplementedError()
@@ -46,6 +47,7 @@ class SemanticMediaWiki(Geocoder):
         return link and link['href'] or None
 
     def parse_rdf(self, data):
+        # TODO cleanup
         dom = xml.dom.minidom.parseString(data)
         thing_map = {}
         things = dom.getElementsByTagName('smw:Thing')
@@ -57,7 +59,8 @@ class SemanticMediaWiki(Geocoder):
 
         return (things, thing)
 
-    def transform_semantic(self, string):
+    @staticmethod
+    def _transform_string(string): # pylint: disable=E0202
         """Normalize semantic attribute and relation names by replacing spaces
         with underscores and capitalizing the result."""
         return string.replace(' ', '_').capitalize()
@@ -67,7 +70,7 @@ class SemanticMediaWiki(Geocoder):
             relations = self.relations
 
         for relation in relations:
-            relation = self.transform_semantic(relation)
+            relation = self._transform_string(relation)
             for node in thing.getElementsByTagName('relation:' + relation):
                 resource = node.attributes['rdf:resource'].value
                 yield (relation, resource)
@@ -77,7 +80,7 @@ class SemanticMediaWiki(Geocoder):
             attributes = self.attributes
 
         for attribute in attributes:
-            attribute = self.transform_semantic(attribute)
+            attribute = self._transform_string(attribute)
             for node in thing.getElementsByTagName('attribute:' + attribute):
                 value = node.firstChild.nodeValue.strip()
                 yield (attribute, value)

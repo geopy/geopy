@@ -21,7 +21,8 @@ from geopy import util
 
 class GoogleV3(Geocoder):
     """
-    Geocoder using the Google Maps v3 API.
+    Geocoder using the Google Maps v3 API. Documentation at:
+        https://developers.google.com/maps/documentation/geocoding/
     """
 
     def __init__(self, domain='maps.googleapis.com', protocol='http',

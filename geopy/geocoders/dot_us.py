@@ -10,7 +10,12 @@ from geopy import util
 import csv
 
 
-class GeocoderDotUS(Geocoder):
+class GeocoderDotUS(Geocoder): # pylint: disable=W0223
+    """
+    GeoCoderDotUS geocoder, documentation at:
+        http://geocoder.us/
+    """
+
     def __init__(self, username=None, password=None, format_string=None):
         super(GeocoderDotUS, self).__init__(format_string)
         if username and (password is None):

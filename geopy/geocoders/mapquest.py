@@ -10,11 +10,16 @@ from geopy.geocoders.base import Geocoder
 from geopy.util import decode_page, join_filter
 
 
-class MapQuest(Geocoder):
+class MapQuest(Geocoder): # pylint: disable=W0223
+    """
+    MapQuest geocoder, documentation at:
+        http://www.mapquestapi.com/geocoding/
+    """
 
     def __init__(self, api_key=None, format_string=None):
-        """Initialize a MapQuest geocoder with address information and
-           MapQuest API key.
+        """
+        Initialize a MapQuest geocoder with address information and
+        MapQuest API key.
         """
         super(MapQuest, self).__init__(format_string)
         self.api_key = api_key or ''

@@ -12,7 +12,11 @@ try:
 except ImportError:
     BeautifulSoup = None # pylint: disable=C0103
 
-class MediaWiki(Geocoder):
+class MediaWiki(Geocoder): # pylint: disable=W0223
+    """
+    MediaWiki geocoder. No idea on documentation.
+    """
+
     def __init__(self, format_url, transform_string=None):
         """Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
@@ -20,11 +24,10 @@ class MediaWiki(Geocoder):
         ``format_url`` is a URL string containing '%s' where the page name to
         request will be interpolated. For example: 'http://www.wiki.com/wiki/%s'
 
-        ``transform_string`` is a callable that will make appropriate
+        ``_transform_string`` is a callable that will make appropriate
         replacements to the input string before requesting the page. If None is
-        given, the default transform_string which replaces ' ' with '_' will be
-        used. It is recommended that you consider this argument keyword-only,
-        since subclasses will likely place it last.
+        given, the default _transform_string which replaces ' ' with '_' will be
+        used.
         """
         if not BeautifulSoup:
             raise ImportError(
@@ -34,18 +37,18 @@ class MediaWiki(Geocoder):
         super(MediaWiki, self).__init__()
         self.format_url = format_url
 
-        if callable(transform_string):
-            self.transform_string = transform_string
+        if transform_string:
+            self._transform_string = transform_string
 
-    @classmethod
-    def transform_string(cls, string):
+    @staticmethod
+    def _transform_string(string): # pylint: disable=E0202
         """Do the WikiMedia dance: replace spaces with underscores."""
         return string.replace(' ', '_')
 
     def geocode(self, string):
         if isinstance(string, unicode):
             string = string.encode('utf-8')
-        wiki_string = self.transform_string(string)
+        wiki_string = self._transform_string(string)
         url = self.format_url % wiki_string
         return self.geocode_url(url)
 

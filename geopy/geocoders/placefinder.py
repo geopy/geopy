@@ -18,10 +18,9 @@ from geopy.geocoders.base import Geocoder, GeocoderError
 
 
 class YahooPlaceFinder(Geocoder):
-
     """
-    a Geocoder that utilizes the Yahoo! BOSS PlaceFinder API
-
+    Geocoder that utilizes the Yahoo! BOSS PlaceFinder API. Documentation at:
+        http://developer.yahoo.com/boss/geo/docs/
     """
 
     def __init__(self, consumer_key, consumer_secret):
@@ -166,7 +165,7 @@ class YahooPlaceFinder(Geocoder):
         """
         Returns a reverse geocoded location using Yahoo's PlaceFinder API.
         """
-        # TODO
+        # TODO cleanup
         point = None
         try:
             point = (inp.lat, inp.lon)

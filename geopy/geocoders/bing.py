@@ -12,7 +12,10 @@ from geopy.util import logger, decode_page, join_filter
 
 
 class Bing(Geocoder):
-    """Geocoder using the Bing Maps API."""
+    """
+    Geocoder using the Bing Maps Locations API. Documentation at:
+        http://msdn.microsoft.com/en-us/library/ff701715.aspx
+    """
 
     def __init__(self, api_key, format_string='%s', output_format=None):
         """Initialize a customized Bing geocoder with location-specific
@@ -54,7 +57,7 @@ class Bing(Geocoder):
         url = "%s?%s" % (self.url, urlencode(params))
         return self.geocode_url(url, exactly_one)
 
-    def reverse(self, point, exactly_one=True):
+    def reverse(self, point, exactly_one=True): # pylint: disable=W0221
         """Reverse geocode a point.
 
         ``point`` should be an instance of geopy.Point.

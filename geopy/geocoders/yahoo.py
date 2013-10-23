@@ -11,6 +11,9 @@ from geopy.util import json
 
 
 class Yahoo(Geocoder):
+    """
+    Yahoo... how is this different from .placefinder.YahooPlaceFinder?
+    """
 
     def __init__(self, app_id, format_string=None, output_format=None):
         super(Yahoo, self).__init__(format_string)

@@ -11,8 +11,11 @@ from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page
 
 
-class OpenMapQuest(Geocoder):
-    """Geocoder using the MapQuest Open Platform Web Services."""
+class OpenMapQuest(Geocoder): # pylint: disable=W0223
+    """
+    Geocoder using MapQuest Open Platform Web Services. Documentation at:
+        http://developer.mapquest.com/web/products/open/geocoding-service
+    """
 
     def __init__(self, api_key=None, format_string=None):
         """Initialize an Open MapQuest geocoder with location-specific
