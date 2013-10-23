@@ -77,11 +77,6 @@ def get_first_text(node, tag_names, strip=None):
                 child = nodes[0].firstChild
                 return child and child.nodeValue.strip(strip)
 
-def join_filter(sep, seq, pred=bool):
-    return sep.join([unicode(i) for i in seq if pred(i)])
-
-    import re, htmlentitydefs
-
 def unescape(text):
     """
     Removes HTML or XML character references and entities from a text string.

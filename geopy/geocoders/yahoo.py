@@ -52,8 +52,11 @@ class Yahoo(Geocoder):
                              "(Found %d.)" % len(results))
 
         def parse_result(place):
-            line1, line2, line3, line4 = place.get('line1'), place.get('line2'), place.get('line3'), place.get('line4')
-            address = util.join_filter(", ", [line1, line2, line3, line4])
+            address = util.join_filter(
+                ", ",
+                [place.get('line1'), place.get('line2'),
+                place.get('line3'), place.get('line4')]
+            )
             city = place.get('city')
             state = place.get('state')
             country = place.get('country')

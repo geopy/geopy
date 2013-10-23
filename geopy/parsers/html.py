@@ -114,13 +114,13 @@ class GeoMicroformat(Parser):
                     latitude = float(lat_match.group(1))
                     longitude = float(long_match.group(1))
                     text = unescape(self._get_text(element).strip())
-                    name = re.sub('\s+', ' ', text)
+                    name = re.sub(r'\s+', ' ', text)
                     yield Location(name, (latitude, longitude))
 
     def _get_text(self, element, preformatted=False):
         if isinstance(element, basestring):
             if not preformatted:
-                return re.sub('\s+', ' ', element)
+                return re.sub(r'\s+', ' ', element)
             else:
                 return element
         elif element.name == 'br':

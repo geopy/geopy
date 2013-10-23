@@ -22,14 +22,42 @@ ABBR_ARCMIN = 'arcmin'
 ABBR_ARCSEC = 'arcsec'
 
 DEGREES_FORMAT = "%(degrees)d%(deg)s %(minutes)d%(arcmin)s %(seconds)s%(arcsec)s"
-UNICODE_SYMBOLS = {'deg': DEGREE, 'arcmin': PRIME, 'arcsec': DOUBLE_PRIME}
-ASCII_SYMBOLS = {'deg': ASCII_DEGREE, 'arcmin': ASCII_PRIME, 'arcsec': ASCII_DOUBLE_PRIME}
-LATIN1_SYMBOLS = {'deg': LATIN1_DEGREE, 'arcmin': ASCII_PRIME, 'arcsec': ASCII_DOUBLE_PRIME}
-HTML_SYMBOLS = {'deg': HTML_DEGREE, 'arcmin': HTML_PRIME, 'arcsec': HTML_DOUBLE_PRIME}
-XML_SYMBOLS = {'deg': XML_DECIMAL_DEGREE, 'arcmin': XML_DECIMAL_PRIME, 'arcsec': XML_DECIMAL_DOUBLE_PRIME}
-ABBR_SYMBOLS = {'deg': ABBR_DEGREE, 'arcmin': ABBR_ARCMIN, 'arcsec': ABBR_ARCSEC}
 
-def format_degrees(degrees, format=DEGREES_FORMAT, symbols=ASCII_SYMBOLS):
+UNICODE_SYMBOLS = {
+    'deg': DEGREE,
+    'arcmin': PRIME,
+    'arcsec': DOUBLE_PRIME
+}
+ASCII_SYMBOLS = {
+    'deg': ASCII_DEGREE,
+    'arcmin': ASCII_PRIME,
+    'arcsec': ASCII_DOUBLE_PRIME
+}
+LATIN1_SYMBOLS = {
+    'deg': LATIN1_DEGREE,
+    'arcmin': ASCII_PRIME,
+    'arcsec': ASCII_DOUBLE_PRIME
+}
+HTML_SYMBOLS = {
+    'deg': HTML_DEGREE,
+    'arcmin': HTML_PRIME,
+    'arcsec': HTML_DOUBLE_PRIME
+}
+XML_SYMBOLS = {
+    'deg': XML_DECIMAL_DEGREE,
+    'arcmin': XML_DECIMAL_PRIME,
+    'arcsec': XML_DECIMAL_DOUBLE_PRIME
+}
+ABBR_SYMBOLS = {
+    'deg': ABBR_DEGREE,
+    'arcmin': ABBR_ARCMIN,
+    'arcsec': ABBR_ARCSEC
+}
+
+def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=ASCII_SYMBOLS):
+    """
+    TODO docs.
+    """
     arcminutes = round(units.arcminutes(degrees=degrees - int(degrees)))
     arcseconds = units.arcseconds(arcminutes=arcminutes - int(arcminutes))
     format_dict = dict(
@@ -38,7 +66,7 @@ def format_degrees(degrees, format=DEGREES_FORMAT, symbols=ASCII_SYMBOLS):
         minutes=abs(arcminutes),
         seconds=abs(arcseconds)
     )
-    return format % format_dict
+    return fmt % format_dict
 
 DISTANCE_FORMAT = "%(magnitude)s%(unit)s"
 DISTANCE_UNITS = {
@@ -49,9 +77,12 @@ DISTANCE_UNITS = {
     'nm': lambda d: units.nautical(kilometers=d),
     'nmi': lambda d: units.nautical(kilometers=d)
 }
-def format_distance(kilometers, format=DISTANCE_FORMAT, unit='km'):
+def format_distance(kilometers, fmt=DISTANCE_FORMAT, unit='km'):
+    """
+    TODO docs.
+    """
     magnitude = DISTANCE_UNITS[unit](kilometers)
-    return format % {'magnitude': magnitude, 'unit': unit}
+    return fmt % {'magnitude': magnitude, 'unit': unit}
 
 _DIRECTIONS = [
     ('north', 'N'),
@@ -74,4 +105,7 @@ ANGLE_DIRECTIONS = dict((n * 11.25, d) for n, d in enumerate(DIRECTIONS))
 ANGLE_DIRECTIONS_ABBR = dict((n * 11.25, d) for n, d in enumerate(DIRECTIONS_ABBR))
 
 def format_direction(degrees):
-    pass
+    """
+    TODO docs.
+    """
+    raise NotImplementedError()

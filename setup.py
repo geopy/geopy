@@ -3,6 +3,8 @@ from setuptools import setup, find_packages
 install_requires = []
 tests_require = [
     'nose-cov',
+    'oauth2',
+    'BeautifulSoup',
 ]
 
 # Test if we have built-in JSON - Python 2.6+, 3.0+.
