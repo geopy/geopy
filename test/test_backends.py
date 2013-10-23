@@ -1,8 +1,20 @@
+"""
+Full tests of geocoders including HTTP access.
+"""
+import os
 import unittest
 from urllib2 import URLError
 
 import socket
 socket.setdefaulttimeout(3.0)
+
+env = {
+    'BING_KEY': os.environ.get('BING_KEY', None),
+    'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', 'Dmjtd%7Clu612007nq%2C20%3Do5-50zah'),
+    'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
+    'LIVESTREETS_AUTH_ID': os.environ.get('LIVESTREETS_AUTH_ID', None),
+    'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', None)
+}
 
 # Define some generic test functions that are common to all backends
 
@@ -71,30 +83,26 @@ def _placename_test(self):
 # ==========
 # Define the test cases that actually perform the import and instantiation step
 
-class GoogleTestCase(unittest.TestCase):
-    def setUp(self):
-        from geopy.geocoders.google import Google
-        self.geocoder = Google()
-
 class GoogleV3TestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.googlev3 import GoogleV3
         self.geocoder = GoogleV3()
 
+@unittest.skipUnless(
+    env['BING_KEY'] is not None,
+    "No BING_KEY env variable set"
+)
 class BingTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.bing import Bing
-        self.geocoder = Bing('Ao8kAepVCp_mQ583XgHg-rga2dwneQ4LtivmtuDj307vGjteiiqfI6ggjmx63wYR')
+        self.geocoder = Bing(api_key=env['BING_KEY'])
 
-class YahooTestCase(unittest.TestCase):
-    def setUp(self):
-        from geopy.geocoders.yahoo import Yahoo
-        self.geocoder = Yahoo('IhDhBmjV34Es_uagpOkitrTdVbd71SFfJptjhE_MTV9kOpjrQ.TFWU.33viYp5_k')
 
 class DotUSTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.dot_us import GeocoderDotUS
         self.geocoder = GeocoderDotUS()
+
 
 class OpenMapQuestTestCase(unittest.TestCase):
     def setUp(self):
@@ -105,28 +113,44 @@ class OpenMapQuestTestCase(unittest.TestCase):
     test_basic_address = _basic_address_test
     test_placename = _placename_test
 
+
+@unittest.skipUnless(
+    env['MAPQUEST_KEY'] is not None,
+    "No MAPQUEST_KEY env variable set"
+)
 class MapQuestTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.mapquest import MapQuest
-        self.geocoder = MapQuest('Dmjtd%7Clu612007nq%2C20%3Do5-50zah')
+        self.geocoder = MapQuest(env['MAPQUEST_KEY'])
 
     # Does not do fuzzy address search.
     test_basic_address = _basic_address_test
     test_placename = _placename_test
 
+@unittest.skipUnless(
+    env['GEONAMES_USERNAME'] is not None,
+    "No GEONAMES_USERNAME env variable set"
+)
 class GeoNamesTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.geonames import GeoNames
-        self.geocoder = GeoNames()
+        self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
 
     # Does not do any address searching.
     test_placename = _placename_test
 
-
+@unittest.skipUnless(
+    env['LIVESTREETS_AUTH_ID'] is not None and \
+    env['LIVESTREETS_AUTH_KEY'] is not None,
+    "LIVESTREETS_AUTH_ID and LIVESTREETS_AUTH_KEY env variables not set"
+)
 class LiveAddressTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.smartystreets import LiveAddress
-        self.geocoder = LiveAddress('ENTER_A_VALID_AUTHENTICATION_TOKEN_HERE')
+        self.geocoder = LiveAddress(
+            auth_id=env['LIVESTREETS_AUTH_ID'],
+            auth_token=env['LIVESTREETS_AUTH_KEY']
+        )
 
     # Does not do any placename or intersection searching.
     test_basic_address = _basic_address_test
@@ -134,11 +158,9 @@ class LiveAddressTestCase(unittest.TestCase):
 
 
 BASIC_TESTCASES = [
-    GoogleTestCase,
     GoogleV3TestCase,
     BingTestCase,
     DotUSTestCase,
-    YahooTestCase,
     MapQuestTestCase,
     LiveAddressTestCase
 ]

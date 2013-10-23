@@ -32,7 +32,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         self.url = "http://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json&%s"
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, string, exactly_one=True): # pylint: disable=W0221
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {'q': self.format_string % string}

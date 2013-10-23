@@ -15,20 +15,22 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     http://smartystreets.com/products/liveaddress-api
 
     ``auth_token`` should be a valid authentication token.  Tokens can be
-    administered from here: https://smartystreets.com/account/keys/secret
+    administered from here:
+        https://smartystreets.com/account/keys/secret
 
     The token you use must correspond with an active LiveAddress subscription
     Subscriptions can be administered here:
-    https://smartystreets.com/account/subscription
+        https://smartystreets.com/account/subscription
 
     ``candidates`` is an integer between 1 and 10 indicating the max number of
     candidate addresses to return if a valid address could be found.
     """
     def __init__(self, auth_token, candidates=1):
         super(LiveAddress, self).__init__()
+        #self.auth_id = auth_id
         self.auth_token = auth_token
         self.candidates = candidates if 1 <= candidates <= 10 else 10
-        self.url = 'https://api.qualifiedaddress.com/street-address/'
+        self.url = 'https://api.qualifiedaddress.com/street-address'
 
     def geocode(self, location):
         url = self._compose_url(location)
@@ -41,6 +43,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         Generate API URL.
         """
         query = {
+            #'auth-id': self.auth_id,
             'auth-token': self.auth_token,
             'street': location,
             'candidates': self.candidates

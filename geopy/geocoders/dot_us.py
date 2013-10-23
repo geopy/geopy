@@ -71,8 +71,10 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     def _parse_result(result):
         # turn x=y pairs ("lat=47.6", "long=-117.426") into dict key/value pairs:
         place = dict(
-            filter(lambda x: len(x)>1, # strip off bits that aren't pairs (i.e. "geocoder modified" status string")
-            map(lambda x: x.split('=', 1), result) # split the key=val strings into (key, val) tuples
+            # strip off bits that aren't pairs (i.e. "geocoder modified" status string")
+            filter(lambda x: len(x)>1, # pylint: disable=W0141
+            # split the key=val strings into (key, val) tuples
+            map(lambda x: x.split('=', 1), result) # pylint: disable=W0141
         ))
 
         address = [
