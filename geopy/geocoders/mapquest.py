@@ -26,12 +26,11 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         self.api_key = api_key or ''
         self.api = "http://www.mapquestapi.com/geocoding/v1/address"
 
-    def geocode(self, location, exactly_one=True): # pylint: disable=W0221
-        if isinstance(location, unicode):
-            location = location.encode('utf-8')
+    def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+        super(MapQuest, self).geocode(query)
         params = {
             'key': self.api_key,
-            'location' : location
+            'location' : query
         }
         if exactly_one:
             params['maxResults'] = 1

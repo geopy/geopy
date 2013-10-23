@@ -32,11 +32,10 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         self.api = "http://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json&%s"
 
-    def geocode(self, string, exactly_one=True): # pylint: disable=W0221
-        if isinstance(string, unicode):
-            string = string.encode('utf-8')
+    def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+        super(OpenMapQuest, self).geocode(query)
         params = {
-            'q': self.format_string % string
+            'q': self.format_string % query
         }
         if exactly_one:
             params['maxResults'] = 1

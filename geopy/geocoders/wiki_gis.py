@@ -37,10 +37,9 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
         """Do the WikiMedia dance: replace spaces with underscores."""
         return string.replace(' ', '_')
 
-    def geocode(self, string):
-        if isinstance(string, unicode):
-            string = string.encode('utf-8')
-        wiki_string = self._transform_string(string)
+    def geocode(self, query):
+        super(MediaWiki, self).geocode(query)
+        wiki_string = self._transform_string(query)
         url = self.format_url % wiki_string
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url)

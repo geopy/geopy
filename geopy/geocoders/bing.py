@@ -31,17 +31,16 @@ class Bing(Geocoder):
         self.api_key = api_key
         self.api = "http://dev.virtualearth.net/REST/v1/Locations"
 
-    def geocode(self, string, exactly_one=True, user_location=None): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, user_location=None): # pylint: disable=W0221
         """
         Geocode an address.
 
         ``user_location`` should be an instance of geopy.Point. user_location
         position prioritizes results that are closer to this location.
         """
-        if isinstance(string, unicode):
-            string = string.encode('utf-8')
+        super(Bing, self).geocode(query)
         params = {
-            'query': self.format_string % string,
+            'query': self.format_string % query,
             'key': self.api_key
         }
         if user_location:

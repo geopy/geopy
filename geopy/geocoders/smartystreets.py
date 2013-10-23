@@ -37,8 +37,9 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         self.candidates = candidates or 1
         self.url = 'https://api.qualifiedaddress.com/street-address'
 
-    def geocode(self, location):
-        url = self._compose_url(location)
+    def geocode(self, query):
+        super(LiveAddress, self).geocode(query)
+        url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         request = self._execute_request(url)
         response = request.read()

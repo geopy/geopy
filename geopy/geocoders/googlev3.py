@@ -90,7 +90,7 @@ class GoogleV3(Geocoder):
 
         return self.parse_json(page, exactly_one)
 
-    def geocode(self, string, bounds=None, region=None, # pylint: disable=W0221,R0913
+    def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 language=None, sensor=False, exactly_one=True):
         '''Geocode an address.
 
@@ -112,14 +112,12 @@ class GoogleV3(Geocoder):
         comes from a device with a location sensor.
         This value must be either True or False.
         '''
-        if isinstance(string, unicode):
-            string = string.encode('utf-8')
+        super(GoogleV3, self).geocode(query)
 
         params = {
-            'address': self.format_string % string,
+            'address': self.format_string % query,
             'sensor': str(sensor).lower()
         }
-
         if bounds:
             params['bounds'] = bounds
         if region:

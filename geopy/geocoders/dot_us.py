@@ -41,8 +41,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         return 'http://%sgeocoder.us/%s' % (auth, resource)
 
     def geocode(self, query, exactly_one=True): # pylint: disable=W0613,W0221
-        if isinstance(query, unicode):
-            query = query.encode('utf-8')
+        super(GeocoderDotUS, self).geocode(query)
         query_str = self.format_string % query
 
         url = "?".join((self._get_url(), urlencode({'address':query_str})))

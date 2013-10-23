@@ -32,11 +32,10 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         self.country_bias = country_bias
         self.api = "http://api.geonames.org/searchJSON"
 
-    def geocode(self, string, exactly_one=True): # pylint: disable=W0221
-        if isinstance(string, unicode): # TODO py3k
-            string = string.encode('utf-8')
+    def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+        super(GeoNames, self).geocode(query)
         params = {
-            'q': string,
+            'q': query,
             'username': self.username
         }
         if self.country_bias:
