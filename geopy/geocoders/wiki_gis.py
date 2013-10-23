@@ -4,13 +4,11 @@
 
 from urllib2 import urlopen
 
+from geopy.compat import BeautifulSoup
+
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, parse_geo
 
-try:
-    from BeautifulSoup import BeautifulSoup
-except ImportError:
-    BeautifulSoup = None # pylint: disable=C0103
 
 class MediaWiki(Geocoder): # pylint: disable=W0223
     """

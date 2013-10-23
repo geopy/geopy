@@ -6,7 +6,7 @@ from urllib import urlencode
 from urllib2 import urlopen
 from geopy import util
 
-from geopy.util import json
+from geopy.compat import json
 from warnings import warn
 
 from geopy.geocoders.base import Geocoder

@@ -27,15 +27,6 @@ class NullHandler(logging.Handler):
 logger = logging.getLogger('geopy') # pylint: disable=C0103
 logger.addHandler(NullHandler())
 
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json # pylint: disable=F0401
-    except ImportError:
-        from django.utils import simplejson as json # pylint: disable=F0401
-
-assert json is not None
 
 def parse_geo(val): # pylint: disable=W0613
     """

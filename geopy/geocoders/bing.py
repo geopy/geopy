@@ -2,7 +2,7 @@
 :class:`.Bing` geocoder.
 """
 
-from geopy.util import json
+from geopy.compat import json
 
 from urllib import urlencode
 from urllib2 import urlopen
@@ -17,7 +17,7 @@ class Bing(Geocoder):
         http://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
-    def __init__(self, api_key, format_string='%s', output_format=None):
+    def __init__(self, api_key, format_string=None):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
@@ -30,13 +30,8 @@ class Bing(Geocoder):
         ``output_format`` (DEPRECATED) is ignored
         """
         super(Bing, self).__init__(format_string)
-        if output_format != None:
-            from warnings import warn
-            warn('geopy.geocoders.bing.Bing: The `output_format` parameter '
-                'is deprecated and ignored.', DeprecationWarning)
-
         self.api_key = api_key
-        self.url = "http://dev.virtualearth.net/REST/v1/Locations"
+        self.api = "http://dev.virtualearth.net/REST/v1/Locations"
 
     def geocode(self, string, exactly_one=True, user_location=None): # pylint: disable=W0221
         """Geocode an address.
@@ -54,25 +49,27 @@ class Bing(Geocoder):
             params['userLocation'] = "%s,%s" % (
                 user_location.latitude, user_location.longitude)
 
-        url = "%s?%s" % (self.url, urlencode(params))
+        url = "%s?%s" % (self.api, urlencode(params))
         return self.geocode_url(url, exactly_one)
 
     def reverse(self, point, exactly_one=True): # pylint: disable=W0221
         """Reverse geocode a point.
 
-        ``point`` should be an instance of geopy.Point.
+        ``point`` should be an instance of :class:`geopy.point.Point`.
         """
         params = {'key': self.api_key}
 
         url = "%s/%s,%s?%s" % (
-            self.url, point.latitude, point.longitude, urlencode(params))
+            self.api, point.latitude, point.longitude, urlencode(params))
 
         return self.geocode_url(url, exactly_one=exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
+        """
+        Geocode a given URL, rather than having the class construct the call.
+        """
         logger.debug("Fetching %s...", url)
         page = urlopen(url)
-
         return self.parse_json(page, exactly_one)
 
     @staticmethod
@@ -90,6 +87,9 @@ class Bing(Geocoder):
                              "(Found %d.)" % len(resources))
 
         def parse_resource(resource):
+            """
+            Parse each return object.
+            """
             stripchars = ", \n"
             addr = resource['address']
 

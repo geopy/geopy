@@ -13,7 +13,7 @@ import hmac
 from urllib import urlencode
 from urllib2 import urlopen
 
-from geopy.util import json
+from geopy.compat import json
 
 from geopy.geocoders.base import Geocoder, GeocoderResultError
 from geopy import util
@@ -64,7 +64,12 @@ class GoogleV3(Geocoder):
             self.client_id = None
             self.secret_key = None
 
-    def get_signed_url(self, params):
+    def _get_url(self, params):
+        '''Returns a standard geocoding api url.'''
+        return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
+            {'domain': self.domain, 'params': urlencode(params)})
+
+    def _get_signed_url(self, params):
         '''Returns a Premier account signed url.'''
         params['client'] = self.client_id
         url_params = {'protocol': self.protocol, 'domain': self.domain,
@@ -77,11 +82,6 @@ class GoogleV3(Geocoder):
 
         return ('%(protocol)s://%(domain)s%(url_part)s'
                 '&signature=%(signature)s' % url_params)
-
-    def get_url(self, params):
-        '''Returns a standard geocoding api url.'''
-        return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
-            {'domain': self.domain, 'params': urlencode(params)})
 
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
@@ -128,9 +128,9 @@ class GoogleV3(Geocoder):
             params['language'] = language
 
         if not self.premier:
-            url = self.get_url(params)
+            url = self._get_url(params)
         else:
-            url = self.get_signed_url(params)
+            url = self._get_signed_url(params)
 
         return self.geocode_url(url, exactly_one)
 
@@ -159,9 +159,9 @@ class GoogleV3(Geocoder):
             params['language'] = language
 
         if not self.premier:
-            url = self.get_url(params)
+            url = self._get_url(params)
         else:
-            url = self.get_signed_url(params)
+            url = self._get_signed_url(params)
 
         return self.geocode_url(url, exactly_one)
 
@@ -177,7 +177,8 @@ class GoogleV3(Geocoder):
             return None
         elif exactly_one and len(places) != 1:
             raise ValueError(
-                "Didn't find exactly one placemark! (Found %d)" % len(places))
+                "Didn't find exactly one placemark! (Found %d)" % len(places)
+            )
 
         def parse_place(place):
             '''Get the location, lat, lng from a single json place.'''

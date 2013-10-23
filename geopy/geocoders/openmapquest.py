@@ -2,7 +2,7 @@
 :class:`.OpenMapQuest` geocoder.
 """
 
-from geopy.util import json
+from geopy.compat import json
 
 from urllib import urlencode
 from urllib2 import urlopen

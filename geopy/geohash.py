@@ -1,6 +1,13 @@
+"""
+TODO docs.
+"""
+
 from geopy import Point
 
 class Geohash(object):
+    """
+    TODO docs.
+    """
     ENCODE_MAP = '0123456789bcdefghjkmnpqrstuvwxyz'
     DECODE_MAP = dict([(char, i) for i, char in enumerate(ENCODE_MAP)])
 

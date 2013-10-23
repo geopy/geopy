@@ -4,13 +4,11 @@
 
 import xml.dom.minidom
 from urllib2 import urlopen
+
+from geopy.compat import BeautifulSoup
+
 from geopy.geocoders.base import Geocoder
 from geopy import util
-
-try:
-    from BeautifulSoup import BeautifulSoup
-except ImportError:
-    BeautifulSoup = None # pylint: disable=C0103
 
 try:
     set
@@ -34,7 +32,10 @@ class SemanticMediaWiki(Geocoder):
         if transform_string:
             self._transform_string = transform_string
 
-    def get_url(self, string):
+    def _get_url(self, string):
+        """
+        Generate full query URL.
+        """
         return self.format_url % self._transform_string(string)
 
     def get_label(self, thing):

@@ -25,7 +25,10 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         self.username = username
         self.__password = password
 
-    def get_url(self):
+    def _get_url(self):
+        """
+        Generate full query URL.
+        """
         username = self.username
         password = self.__password
         if username and password:
@@ -43,7 +46,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         query_str = self.format_string % query
 
         page = urlopen("%s?%s" % (
-            self.get_url(),
+            self._get_url(),
             urlencode({'address':query_str})
         ))
 
