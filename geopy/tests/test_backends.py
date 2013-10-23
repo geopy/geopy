@@ -105,6 +105,15 @@ class OpenMapQuestTestCase(unittest.TestCase):
     test_basic_address = _basic_address_test
     test_placename = _placename_test
 
+class MapQuestTestCase(unittest.TestCase):
+    def setUp(self):
+        from geopy.geocoders.mapquest import MapQuest
+        self.geocoder = MapQuest('Dmjtd%7Clu612007nq%2C20%3Do5-50zah')
+
+    # Does not do fuzzy address search.
+    test_basic_address = _basic_address_test
+    test_placename = _placename_test
+
 class GeoNamesTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.geonames import GeoNames
@@ -112,6 +121,7 @@ class GeoNamesTestCase(unittest.TestCase):
 
     # Does not do any address searching.
     test_placename = _placename_test
+
 
 class LiveAddressTestCase(unittest.TestCase):
     def setUp(self):
@@ -123,7 +133,15 @@ class LiveAddressTestCase(unittest.TestCase):
     test_partial_address = _partial_address_test
 
 
-BASIC_TESTCASES = [GoogleTestCase, GoogleV3TestCase, BingTestCase, DotUSTestCase, YahooTestCase, LiveAddressTestCase]
+BASIC_TESTCASES = [
+    GoogleTestCase,
+    GoogleV3TestCase,
+    BingTestCase,
+    DotUSTestCase,
+    YahooTestCase,
+    MapQuestTestCase,
+    LiveAddressTestCase
+]
 
 # geonames does not actually test against addresses (just place names)
 #TESTCASES = [GoogleTestCase, BingTestCase, YahooTestCase, DotUSTestCase, GeoNamesTestCase]
@@ -153,6 +171,8 @@ def get_suite():
 
     tests.append(OpenMapQuestTestCase('test_basic_address'))
     tests.append(OpenMapQuestTestCase('test_placename'))
+    tests.append(MapQuestTestCase('test_basic_address'))
+    tests.append(MapQuestTestCase('test_placename'))
     tests.append(GeoNamesTestCase('test_placename'))
     tests.append(LiveAddressTestCase('test_basic_address'))
     tests.append(LiveAddressTestCase('test_partial_address'))
