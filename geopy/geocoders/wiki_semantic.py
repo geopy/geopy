@@ -17,13 +17,13 @@ except NameError:
 
 
 class SemanticMediaWiki(Geocoder):
+    """
+     SemanticMediaWiki geocoder. No idea on documentation. Not compliant with
+     geocoder API of #geocode &c. TODO.
+    """
+
     def __init__(self, format_url, attributes=None, relations=None,
                  prefer_semantic=False, transform_string=None):
-        if not BeautifulSoup:
-            raise ImportError(
-                "BeautifulSoup was not found. Please install BeautifulSoup "
-                "in order to use the SemanticMediaWiki Geocoder."
-            )
         super(SemanticMediaWiki, self).__init__()
         self.format_url = format_url
         self.attributes = attributes

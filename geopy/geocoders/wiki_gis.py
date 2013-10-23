@@ -27,14 +27,8 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
         given, the default _transform_string which replaces ' ' with '_' will be
         used.
         """
-        if not BeautifulSoup:
-            raise ImportError(
-                "BeautifulSoup was not found. Please install BeautifulSoup "
-                "in order to use the MediaWiki Geocoder."
-            )
         super(MediaWiki, self).__init__()
         self.format_url = format_url
-
         if transform_string:
             self._transform_string = transform_string
 
