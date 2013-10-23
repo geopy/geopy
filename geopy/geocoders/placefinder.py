@@ -5,11 +5,8 @@
 from __future__ import absolute_import, division
 from __future__ import print_function, unicode_literals
 
-import json
-try:
-    import oauth2
-except ImportError:
-    oauth2 = None # pylint: disable=C0103
+from geopy.compat import json, oauth2
+
 import time
 import urllib
 import urllib2
@@ -28,8 +25,6 @@ class YahooPlaceFinder(Geocoder):
         Sets consumer key and secret.
         """
         super(YahooPlaceFinder, self).__init__()
-        if oauth2 is None:
-            raise ImportError('No module named oauth2')
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
@@ -137,13 +132,13 @@ class YahooPlaceFinder(Geocoder):
             if location[line]
         ])
 
-    def geocode(self, location, min_quality=0,
+    def geocode(self, query, min_quality=0,
                 raw=False, reverse=False, valid_country_codes=None):
         """
         Returns a geocoded location using Yahoo's PlaceFinder API.
         """
-
-        request = self._build_request(location, reverse=reverse)
+        super(YahooPlaceFinder, self).geocode(query)
+        request = self._build_request(query, reverse=reverse)
         response = self._get_response(request)
         results = self._parse_response(response)
 

@@ -22,6 +22,8 @@ env = {
 
 # Define some generic test functions that are common to all backends
 
+
+
 class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
     """
     Base for geocoder-specific test cases.
@@ -31,11 +33,18 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
     delta_exact = 0.002
     delta_placename = 0.02
 
-    def test_basic_address(self):
-        if self.geocoder.__class__.__name__ in ('GeocoderDotUS', 'GeoNames', ):
+    def skip_known_failure(self, classes):
+        """
+        When a Geocoder gives no value for a query, skip the test.
+        """
+        if self.geocoder.__class__.__name__ in classes:
             raise unittest.SkipTest("%s is known to not have results for this query" % \
                 self.geocoder.__class__.__name__
             )
+
+    def test_basic_address(self):
+        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', ))
+
         address = '999 W. Riverside Ave., Spokane, WA 99201'
 
         try:
@@ -53,10 +62,8 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
 
     def test_partial_address(self):
-        if self.geocoder.__class__.__name__ in ('GeocoderDotUS', 'GeoNames', ):
-            raise unittest.SkipTest("%s is known to not have results for this query" % \
-                self.geocoder.__class__.__name__
-            )
+        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', ))
+
         address = '435 north michigan, chicago 60611'
 
         try:
@@ -75,10 +82,8 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
     def test_intersection(self):
-        if self.geocoder.__class__.__name__ in ('OpenMapQuest', 'GeoNames', ):
-            raise unittest.SkipTest("%s is known to not have results for this query" % \
-                self.geocoder.__class__.__name__
-            )
+        self.skip_known_failure(('OpenMapQuest', 'GeoNames', ))
+
         address = 'e. 161st st & river ave, new york, ny'
 
         try:
@@ -97,10 +102,8 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -73.926, delta=self.delta_exact)
 
     def test_placename(self):
-        if self.geocoder.__class__.__name__ in ('GeocoderDotUS', ):
-            raise unittest.SkipTest("%s is known to not have results for this query" % \
-                self.geocoder.__class__.__name__
-            )
+        self.skip_known_failure(('GeocoderDotUS', ))
+
         address = 'Mount St. Helens'
 
         try:
@@ -188,3 +191,8 @@ class LiveAddressTestCase(_BackendTestCase):
             auth_token=env['LIVESTREETS_AUTH_KEY']
         )
         self.delta_placename = 0.04
+
+# class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
+#     def setUp(self):
+#         from geopy.geocoders.placefinder import YahooPlaceFinder
+#         self.geocoder = YahooPlaceFinder()
