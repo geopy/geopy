@@ -36,7 +36,6 @@ setup(name='geopy',
     packages=find_packages(),
     install_requires=install_requires,
     tests_require=tests_require,
-    test_suite = "test.run_tests.all_tests",
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',
     classifiers=[

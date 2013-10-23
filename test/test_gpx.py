@@ -13,6 +13,9 @@ TEST_FILE = os.path.join(
             # From http://www.topografix.com/fells_loop.gpx
 
 class GPX(object):
+
+    GPXi = None
+
     def test_version(self):
         self.assertTrue(self.GPXi.version == '1.1')
 
@@ -57,19 +60,3 @@ class GPXOpenerTestCase(GPX, unittest.TestCase):
 
     def tearDown(self):
         self.f.close()
-
-def get_suite():
-    test_methods = [
-        'test_version',
-        'test_creator',
-        'test_route_names',
-        'test_route_list',
-    ]
-    tests = []
-    tests.extend(map(GPXInitTestCase,test_methods))
-    tests.extend(map(GPXOpenerTestCase,test_methods))
-
-    return unittest.TestSuite(tests)
-
-if __name__ == '__main__':
-    unittest.main()

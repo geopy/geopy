@@ -3,6 +3,10 @@ Full tests of geocoders including HTTP access.
 """
 import os
 import unittest
+
+from optparse import OptionParser
+import inspect
+
 from urllib2 import URLError
 
 import socket
@@ -44,7 +48,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[0], 47.658, delta=.002)
         self.assertAlmostEqual(latlon[1], -117.426, delta=.002)
 
-    def partial_address_test(self):
+    def test_partial_address(self):
         address = '435 north michigan, chicago 60611'
 
         try:
@@ -132,8 +136,8 @@ def _partial_address_test(self): # pylint: disable=C0111
         else:
             raise
 
-    self.assertAlmostEqual(latlon[0], 41.890, delta=.002)
-    self.assertAlmostEqual(latlon[1], -87.624, delta=.002)
+    self.assertAlmostEqual(latlon[0], 41.890, delta=.04)
+    self.assertAlmostEqual(latlon[1], -87.624, delta=.04)
 
 def _intersection_test(self): # pylint: disable=C0111
     address = 'e. 161st st & river ave, new york, ny'
@@ -166,9 +170,9 @@ def _placename_test(self): # pylint: disable=C0111
         else:
             raise
 
-    # And since this is a pretty fuzzy search, we'll only test to .02
-    self.assertAlmostEqual(latlon[0], 46.1912, delta=.02)
-    self.assertAlmostEqual(latlon[1], -122.1944, delta=.02)
+    # And since this is a pretty fuzzy search, we'll only test to .04
+    self.assertAlmostEqual(latlon[0], 46.1912, delta=.04)
+    self.assertAlmostEqual(latlon[1], -122.1944, delta=.04)
 
 # ==========
 # Define the test cases that actually perform the import and instantiation step
@@ -182,7 +186,10 @@ def _placename_test(self): # pylint: disable=C0111
 class BingTestCase(unittest.TestCase):
     def setUp(self):
         from geopy.geocoders.bing import Bing
-        self.geocoder = Bing(api_key=env['BING_KEY'])
+        self.geocoder = Bing(
+            format_string='%s',
+            api_key=env['BING_KEY']
+        )
 
 
 class DotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
@@ -199,6 +206,7 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     # Does not do fuzzy address search.
     test_basic_address = _basic_address_test
     test_placename = _placename_test
+    test_partial_address = _partial_address_test
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
@@ -242,48 +250,3 @@ class LiveAddressTestCase(_BackendTestCase):
     # Does not do any placename or intersection searching.
     test_basic_address = _basic_address_test
     test_partial_address = _partial_address_test
-
-
-# BASIC_TESTCASES = [
-#     GoogleV3TestCase,
-#     BingTestCase,
-#     DotUSTestCase,
-#     MapQuestTestCase,
-#     LiveAddressTestCase
-# ]
-
-
-# # ==========
-# # Monkey patch the "generic" test functions into the testcases above
-
-# for x in BASIC_TESTCASES:
-#     x.test_basic_address = _basic_address_test
-#     x.test_partial_address = _partial_address_test
-#     x.test_intersection = _intersection_test
-#     x.test_placename = _placename_test
-
-# # ==========
-
-# def get_suite():
-#     test_methods = [
-#         'test_basic_address',
-#         'test_partial_address',
-#         'test_intersection',
-#         'test_placename',
-#     ]
-#     tests = []
-#     for tc in BASIC_TESTCASES:
-#         tests.extend(map(tc,test_methods))
-
-#     tests.append(OpenMapQuestTestCase('test_basic_address'))
-#     tests.append(OpenMapQuestTestCase('test_placename'))
-#     tests.append(MapQuestTestCase('test_basic_address'))
-#     tests.append(MapQuestTestCase('test_placename'))
-#     tests.append(GeoNamesTestCase('test_placename'))
-#     tests.append(LiveAddressTestCase('test_basic_address'))
-#     tests.append(LiveAddressTestCase('test_partial_address'))
-
-#     return unittest.TestSuite(tests)
-
-# if __name__ == '__main__':
-#     unittest.main()
