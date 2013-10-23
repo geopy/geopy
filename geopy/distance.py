@@ -172,7 +172,10 @@ class GreatCircleDistance(Distance):
 
         return self.RADIUS * d
 
-    def destination(self, point, bearing, distance=None):
+    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
+        """
+        TODO docs.
+        """
         point = Point(point)
         lat1 = units.radians(degrees=point.latitude)
         lng1 = units.radians(degrees=point.longitude)

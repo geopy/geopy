@@ -7,7 +7,7 @@ from geopy.compat import json
 from urllib import urlencode
 from urllib2 import urlopen
 from geopy.geocoders.base import Geocoder
-from geopy.util import decode_page, join_filter
+from geopy.util import logger, decode_page, join_filter
 
 
 class MapQuest(Geocoder): # pylint: disable=W0223
@@ -23,14 +23,18 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         """
         super(MapQuest, self).__init__(format_string)
         self.api_key = api_key or ''
-        self.url = "http://www.mapquestapi.com/geocoding/v1/address"
+        self.api = "http://www.mapquestapi.com/geocoding/v1/address"
 
-    def geocode(self, location, exactly_one=True):
+    def geocode(self, location, exactly_one=True): # pylint: disable=W0221
         if isinstance(location, unicode):
             location = location.encode('utf-8')
-        params = {'location' : location}
-        data = urlencode(params)
-        page = urlopen(self.url + '?key=' + self.api_key + '&' + data).read()
+        params = {
+            'key': self.api_key,
+            'location' : location
+        }
+        url = "?".join((self.api, urlencode(params)))
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        page = urlopen(url).read()
         return self.parse_json(page, exactly_one)
 
     def parse_json(self, page, exactly_one=True):

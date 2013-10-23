@@ -4,7 +4,7 @@
 
 from urllib import urlencode
 from urllib2 import urlopen
-from geopy import util
+from geopy.util import logger, decode_page
 
 from geopy.compat import json
 from warnings import warn
@@ -43,7 +43,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             self.username = username
 
         self.country_bias = country_bias
-        self.url = "http://api.geonames.org/searchJSON?%s"
+        self.api = "http://api.geonames.org/searchJSON"
 
     def geocode(self, string, exactly_one=True): # pylint: disable=W0221
         if isinstance(string, unicode): # TODO py3k
@@ -55,7 +55,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         if self.country_bias:
             params['countryBias'] = self.country_bias
 
-        url = self.url % urlencode(params)
+        url = "?".join((self.api, urlencode(params)))
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
@@ -68,7 +69,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         Parse JSON response body.
         """
         if not isinstance(page, basestring):
-            page = util.decode_page(page)
+            page = decode_page(page)
 
         doc = json.loads(page)
         places = doc.get('geonames', [])

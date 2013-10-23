@@ -42,6 +42,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
             string = string.encode('utf-8')
         wiki_string = self._transform_string(string)
         url = self.format_url % wiki_string
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url)
 
     def geocode_url(self, url):

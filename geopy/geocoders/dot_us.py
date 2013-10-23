@@ -6,7 +6,7 @@ import getpass
 from urllib import urlencode
 from urllib2 import urlopen
 from geopy.geocoders.base import Geocoder
-from geopy import util
+from geopy.util import logger, join_filter
 import csv
 
 
@@ -40,19 +40,16 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
         return 'http://%sgeocoder.us/%s' % (auth, resource)
 
-    def geocode(self, query, exactly_one=True):
+    def geocode(self, query, exactly_one=True): # pylint: disable=W0613,W0221
         if isinstance(query, unicode):
             query = query.encode('utf-8')
         query_str = self.format_string % query
 
-        page = urlopen("%s?%s" % (
-            self._get_url(),
-            urlencode({'address':query_str})
-        ))
+        url = "?".join((self._get_url(), urlencode({'address':query_str})))
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        reader = csv.reader(page)
-
-        places = [r for r in reader]
+        page = urlopen(url)
+        places = [r for r in csv.reader(page)]
 
         # GeoNames only returns the closest match, no matter what.
         #
@@ -69,6 +66,9 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
     @staticmethod
     def _parse_result(result):
+        """
+        TODO docs.
+        """
         # turn x=y pairs ("lat=47.6", "long=-117.426") into dict key/value pairs:
         place = dict(
             # strip off bits that aren't pairs (i.e. "geocoder modified" status string")
@@ -88,10 +88,10 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         state = place.get('state', None)
         zip_code = place.get('zip', None)
 
-        name = util.join_filter(", ", [
-            util.join_filter(" ", address),
+        name = join_filter(", ", [
+            join_filter(" ", address),
             city,
-            util.join_filter(" ", [state, zip_code])
+            join_filter(" ", [state, zip_code])
         ])
 
         latitude = place.get('lat', None)

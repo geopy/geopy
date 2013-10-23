@@ -34,22 +34,25 @@ class Bing(Geocoder):
         self.api = "http://dev.virtualearth.net/REST/v1/Locations"
 
     def geocode(self, string, exactly_one=True, user_location=None): # pylint: disable=W0221
-        """Geocode an address.
+        """
+        Geocode an address.
 
         ``user_location`` should be an instance of geopy.Point. user_location
         position prioritizes results that are closer to this location.
         """
         if isinstance(string, unicode):
             string = string.encode('utf-8')
-        params = {'query': self.format_string % string,
-                  'key': self.api_key
-                  }
-
+        params = {
+            'query': self.format_string % string,
+            'key': self.api_key
+        }
         if user_location:
-            params['userLocation'] = "%s,%s" % (
-                user_location.latitude, user_location.longitude)
+            params['userLocation'] = ",".join(
+                (user_location.latitude, user_location.longitude)
+            )
 
-        url = "%s?%s" % (self.api, urlencode(params))
+        url = "?".join((self.api, urlencode(params)))
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one)
 
     def reverse(self, point, exactly_one=True): # pylint: disable=W0221
@@ -58,7 +61,6 @@ class Bing(Geocoder):
         ``point`` should be an instance of :class:`geopy.point.Point`.
         """
         params = {'key': self.api_key}
-
         url = "%s/%s,%s?%s" % (
             self.api, point.latitude, point.longitude, urlencode(params))
 

@@ -29,16 +29,16 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         super(OpenMapQuest, self).__init__(format_string)
 
         self.api_key = api_key or ''
-        self.url = "http://open.mapquestapi.com/nominatim/v1/search" \
+        self.api = "http://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json&%s"
 
     def geocode(self, string, exactly_one=True): # pylint: disable=W0221
         if isinstance(string, unicode):
             string = string.encode('utf-8')
         params = {'q': self.format_string % string}
-        url = self.url % urlencode(params)
+        url = self.api % urlencode(params)
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        logger.debug("Fetching %s...", url)
         page = urlopen(url)
 
         return self.parse_json(page, exactly_one)

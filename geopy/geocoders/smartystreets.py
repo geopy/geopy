@@ -5,7 +5,9 @@
 import json
 import urllib
 import urllib2
+
 from geopy.geocoders.base import Geocoder
+from geopy.util import logger
 
 
 class LiveAddress(Geocoder): # pylint: disable=W0223
@@ -34,6 +36,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
 
     def geocode(self, location):
         url = self._compose_url(location)
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         request = self._execute_request(url)
         response = request.read()
         return self._parse_json(response)

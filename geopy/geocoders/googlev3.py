@@ -16,7 +16,7 @@ from urllib2 import urlopen
 from geopy.compat import json
 
 from geopy.geocoders.base import Geocoder, GeocoderResultError
-from geopy import util
+from geopy.util import logger, decode_page
 
 
 class GoogleV3(Geocoder):
@@ -85,7 +85,7 @@ class GoogleV3(Geocoder):
 
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
-        util.logger.debug("Fetching %s...", url)
+        logger.debug("Fetching %s...", url)
         page = urlopen(url)
 
         return self.parse_json(page, exactly_one)
@@ -132,6 +132,7 @@ class GoogleV3(Geocoder):
         else:
             url = self._get_signed_url(params)
 
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one)
 
     def reverse(self, point, language=None, # pylint: disable=W0221
@@ -168,7 +169,7 @@ class GoogleV3(Geocoder):
     def parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
         if not isinstance(page, basestring):
-            page = util.decode_page(page)
+            page = decode_page(page)
         self.doc = json.loads(page)
         places = self.doc.get('results', [])
 
