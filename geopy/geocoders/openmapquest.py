@@ -35,13 +35,15 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
     def geocode(self, string, exactly_one=True): # pylint: disable=W0221
         if isinstance(string, unicode):
             string = string.encode('utf-8')
-        params = {'q': self.format_string % string}
+        params = {
+            'q': self.format_string % string
+        }
+        if exactly_one:
+            params['maxResults'] = 1
         url = self.api % urlencode(params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        page = urlopen(url)
-
-        return self.parse_json(page, exactly_one)
+        return self.parse_json(urlopen(url), exactly_one)
 
     @classmethod
     def parse_json(cls, page, exactly_one=True):
@@ -51,13 +53,8 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         if not isinstance(page, basestring):
             page = decode_page(page)
         resources = json.loads(page)
-
-        if exactly_one and len(resources) != 1:
-            from warnings import warn
-            warn("Didn't find exactly one resource!" + \
-                "(Found %d.), use exactly_one=False\n" % len(resources)
-            )
-
+        if not len(resources):
+            return None
         if exactly_one:
             return cls.parse_resource(resources[0])
         else:

@@ -2,12 +2,13 @@
 :class:`.MapQuest` geocoder.
 """
 
-from geopy.compat import json
-
 from urllib import urlencode
 from urllib2 import urlopen
+
+from geopy.compat import json
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page, join_filter
+from geopy import exc
 
 
 class MapQuest(Geocoder): # pylint: disable=W0223
@@ -32,26 +33,25 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             'key': self.api_key,
             'location' : location
         }
+        if exactly_one:
+            params['maxResults'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         page = urlopen(url).read()
         return self.parse_json(page, exactly_one)
 
     def parse_json(self, page, exactly_one=True):
-        """Parse display name, latitude, and longitude from an JSON response."""
+        """
+        Parse display name, latitude, and longitude from an JSON response.
+        """
         if not isinstance(page, basestring):
             page = decode_page(page)
         resources = json.loads(page)
-        statuscode = resources.get('info').get('statuscode')
-        if statuscode == 403:
-            return "Bad API Key"
-        resources = resources.get('results')[0].get('locations')
+        if resources.get('info').get('statuscode') == 403:
+            raise exc.GeocoderAuthenticationFailure()
 
-        if exactly_one and len(resources) != 1:
-            from warnings import warn
-            warn("Didn't find exactly one resource!" + \
-                "(Found %d.), use exactly_one=False\n" % len(resources)
-            )
+        # TODO fix len==0
+        resources = resources.get('results')[0].get('locations')
 
         def parse_resource(resource):
             city = resource['adminArea5']
