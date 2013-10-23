@@ -1,8 +1,9 @@
-import os
 from setuptools import setup, find_packages
-from pkg_resources import resource_string
 
 install_requires = []
+tests_require = [
+    'nose-cov',
+]
 
 # Test if we have built-in JSON - Python 2.6+, 3.0+.
 # Older Python versions require simplejson.
@@ -21,7 +22,7 @@ except ImportError:
 
 # note: not automated since py3k cannot import geopy.get_version at
 # install-time (since 2to3 has not yet run)
-version = "0.95.1"
+version = "0.96dev" # pylint: disable=C0103
 
 setup(name='geopy',
     version=version,
@@ -32,10 +33,12 @@ setup(name='geopy',
     download_url='http://code.google.com/p/geopy/downloads/list',
     packages=find_packages(),
     install_requires=install_requires,
+    tests_require=tests_require,
     test_suite = "geopy.tests.run_tests.all_tests",
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',
-    classifiers=["Development Status :: 5 - Production/Stable",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",

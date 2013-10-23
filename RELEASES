@@ -1,3 +1,29 @@
+0.96dev
+==========
+
+ADDED:  SmartyStreets LiveAddress geocoder implemented. Contributed by
+        Michael Whatcott.
+
+ADDED:  OpenStreetMap Nominatim geocoder implemented. Contributed by
+        Alessandro Pasotti.
+
+ADDED:  Yahoo! BOSS Geo PlaceFinder geocoder implemented. Contributed by
+        jhmaddox and Philip Kimmey.
+
+ADDED:  GeoNames geocoder is implements GeoNames' new username
+        requirement and `api.geonames.org` endpoint. Contributed by David
+        Wilson and Benoit Grégoire.
+
+ADDED:  Bing geocoder supports `user_location` (`Point`) parameter. Bing will
+        prefer results near the coordinates of `user_location`. Contributed by
+        Ryan Nagle.
+
+FIXED: `format_degrees` now rounds minutes properly. Contributed by avdd.
+
+FIXED:  No longer warn if the optional dependency `BeautifulSoup` is
+        not present.
+
+
 0.95.1 - March 22, 2013
 ==========
 FIXED:   Fix #12, where `DeprecationWarning` was showing for GoogleV2 even if
@@ -87,4 +113,4 @@ FIXED: Issue 23. Fixed GreatCircleDistance ValueErrors due to floating
 
 Changes between 0.93 (October 8, 2006) and February 15, 2009
 ============================================================
-See https://github.com/mtigas/geopy/compare/0451a051...ffebd5f3
+See https://github.com/geopy/geopy/compare/0451a051...ffebd5f3
