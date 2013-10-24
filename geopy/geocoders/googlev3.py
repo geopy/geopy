@@ -14,6 +14,7 @@ from urllib import urlencode
 from urllib2 import urlopen
 
 from geopy.compat import json
+from geopy.point import Point
 
 from geopy.geocoders.base import Geocoder, GeocoderResultError
 from geopy.util import logger, decode_page
@@ -32,15 +33,16 @@ class GoogleV3(Geocoder):
 
         API authentication is only required for Google Maps Premier customers.
 
-        ``domain`` should be the localized Google Maps domain to connect to. The default
-        is 'maps.google.com', but if you're geocoding address in the UK (for
-        example), you may want to set it to 'maps.google.co.uk' to properly bias results.
+        :param string domain: should be the localized Google Maps domain to
+            connect to. The default is 'maps.google.com', but if you're
+            geocoding address in the UK (for example), you may want to set it
+            to 'maps.google.co.uk' to properly bias results.
 
-        ``protocol`` http or https.
+        :param string protocol: http or https.
 
-        ``client_id`` Premier account client id.
+        :param string client_id: If using premier, the account client id.
 
-        ``secret_key`` Premier account secret key.
+        :param string secret_key: If using premier, the account secret key.
         """
         super(GoogleV3, self).__init__()
 
@@ -72,11 +74,15 @@ class GoogleV3(Geocoder):
     def _get_signed_url(self, params):
         '''Returns a Premier account signed url.'''
         params['client'] = self.client_id
-        url_params = {'protocol': self.protocol, 'domain': self.domain,
-                      'params': urlencode(params)}
+        url_params = {
+            'protocol': self.protocol,
+            'domain': self.domain,
+            'params': urlencode(params)
+        }
         secret = base64.urlsafe_b64decode(self.secret_key)
         url_params['url_part'] = (
-            '/maps/api/geocode/json?%(params)s' % url_params)
+            '/maps/api/geocode/json?%(params)s' % url_params
+        )
         signature = hmac.new(secret, url_params['url_part'], hashlib.sha1)
         url_params['signature'] = base64.urlsafe_b64encode(signature.digest())
 
@@ -85,33 +91,36 @@ class GoogleV3(Geocoder):
 
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
-        logger.debug("Fetching %s...", url)
-        page = urlopen(url)
-
-        return self.parse_json(page, exactly_one)
+        logger.debug("%s.geocode_url: %s", self.__class__.__name__, url)
+        return self.parse_json(urlopen(url), exactly_one)
 
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 language=None, sensor=False, exactly_one=True):
-        '''Geocode an address.
+        """
+        Geocode an address or other text query. For example:
 
-        ``string`` (required) The address that you want to geocode.
+            address, latitude, longitude = \
+                GoogleV3().geocode("1 Central Wharf Boston MA")
 
-        ``bounds`` (optional) The bounding box of the viewport within which
-        to bias geocode results more prominently.
+        :param string query: The address or query you wish to geocode.
 
-        ``region`` (optional) The region code, specified as a ccTLD
-        ("top-level domain") two-character value.
+        :param bounds: The bounding box of the viewport within which
+            to bias geocode results more prominently. TODO type?, test
 
-        ``language`` (optional) The language in which to return results.
-        See the supported list of domain languages. Note that we often update
-        supported languages so this list may not be exhaustive. If language is
-        not supplied, the geocoder will attempt to use the native language of
-        the domain from which the request is sent wherever possible.
+        :param string region: The region code, specified as a ccTLD
+            ("top-level domain") two-character value.
 
-        ``sensor`` (required) Indicates whether or not the geocoding request
-        comes from a device with a location sensor.
-        This value must be either True or False.
-        '''
+        :param string language: The language in which to return results.
+            Default None.
+
+        :param boolean sensor: Whether the geocoding request comes from a
+            device with a location sensor. Default False.
+
+        :param boolean exactly_one: Return one result or a list of results, if
+            available. Default True.
+
+        :rtype: (address<String>, (latitude<Float>, longitude<Float>))
+        """
         super(GoogleV3, self).geocode(query)
 
         params = {
@@ -135,25 +144,35 @@ class GoogleV3(Geocoder):
 
     def reverse(self, point, language=None, # pylint: disable=W0221
                     sensor=False, exactly_one=False):
-        '''Reverse geocode a point.
-        ``point`` (required) The textual latitude/longitude value for which
-        you wish to obtain the closest, human-readable address
+        """
+        Given a point, find an address. For example:
 
-        ``language`` (optional) The language in which to return results.
-        See the supported list of domain languages. Note that we often update
-        supported languages so this list may not be exhaustive. If language is
-        not supplied, the geocoder will attempt to use the native language of
-        the domain from which the request is sent wherever possible.
+            address, (latitude, longitude) = \
+                GoogleV3().reverse(
+                    "40.75376406311989, -73.98489005863667",
+                    exactly_one=True
+                )
 
-        ``sensor`` (required) Indicates whether or not the geocoding request
-        comes from a device with a location sensor.
-        This value must be either True or False.
-        '''
+        :param point: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type limit: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "latitude, longitude"
+
+        :param string language: The language in which to return results.
+            Default None.
+
+        :param boolean sensor: Whether the geocoding request comes from a
+            device with a location sensor. Default False.
+
+        :param boolean exactly_one: Return one result or a list of results, if
+            available. Default True.
+
+        :rtype: (address<String>, (latitude<Float>, longitude<Float>))
+        """
         params = {
-            'latlng': point,
+            'latlng': self._coerce_point_to_string(point),
             'sensor': str(sensor).lower()
         }
-
         if language:
             params['language'] = language
 
@@ -162,6 +181,7 @@ class GoogleV3(Geocoder):
         else:
             url = self._get_signed_url(params)
 
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one)
 
     def parse_json(self, page, exactly_one=True):
@@ -174,10 +194,6 @@ class GoogleV3(Geocoder):
         if not places:
             self._check_status(self.doc.get('status'))
             return None
-        elif exactly_one and len(places) != 1:
-            raise ValueError(
-                "Didn't find exactly one placemark! (Found %d)" % len(places)
-            )
 
         def parse_place(place):
             '''Get the location, lat, lng from a single json place.'''
@@ -190,6 +206,18 @@ class GoogleV3(Geocoder):
             return parse_place(places[0])
         else:
             return [parse_place(place) for place in places]
+
+    @staticmethod
+    def _coerce_point_to_string(point):
+        """
+        Do the right thing on "point" input.
+        """
+        if isinstance(point, Point):
+            point = ",".join(point.latitude, point.longitude)
+        elif isinstance(point, (list, tuple)):
+            point = ",".join(point[0], point[1])
+        # else assume string
+        return point
 
     @staticmethod
     def _check_status(status):

@@ -9,6 +9,8 @@ from urllib2 import URLError
 import socket
 socket.setdefaulttimeout(3.0)
 
+from geopy.point import Point
+
 env = {
     'BING_KEY': os.environ.get(
         'BING_KEY',
@@ -130,6 +132,17 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         from geopy.geocoders.googlev3 import GoogleV3
         self.geocoder = GoogleV3()
 
+    def test_reverse(self):
+        known_addr = '1060-1078 Avenue of the Americas, New York, NY 10018, USA'
+        known_coords = (40.75376406311989, -73.98489005863667)
+        addr, coords = self.geocoder.reverse(
+            "40.75376406311989, -73.98489005863667",
+            exactly_one=True
+        )
+        self.assertEqual(str(addr), known_addr)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['BING_KEY'] is not None,
@@ -142,6 +155,14 @@ class BingTestCase(_BackendTestCase):
             format_string='%s',
             api_key=env['BING_KEY']
         )
+
+    def test_reverse(self):
+        known_addr = '1067 6th Ave, New York, NY 10018, United States'
+        known_coords = (40.75376406311989, -73.98489005863667)
+        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071))
+        self.assertEqual(str(addr), known_addr)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
 
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111

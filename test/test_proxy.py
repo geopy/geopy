@@ -1,10 +1,11 @@
-import SimpleHTTPServer
-import SocketServer
+"""
+Test ability to proxy requests.
+"""
+
 import os
-import urllib
 import urllib2
 import unittest
-import proxy_server
+from test import proxy_server
 from geopy.geocoders.base import Geocoder
 
 ### UNIT TEST(S) to test Proxy in Geocoder base class ###
@@ -14,8 +15,10 @@ from geopy.geocoders.base import Geocoder
 ### stoped using the command `kill -9 $(cat /var/run/proxy_server.pid)`
 
 
-class ProxyTestCase(unittest.TestCase):
+class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
     def setUp(self):
+
+        # TODO subprocess.Popen proxy locally on os.name=="posix", and skip if not
 
         # Backup environ settings
         self.orig_http_proxy = os.environ['http_proxy'] if os.environ.has_key('http_proxy') else None

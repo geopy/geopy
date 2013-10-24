@@ -64,15 +64,15 @@ class Bing(Geocoder):
         url = "%s/%s,%s?%s" % (
             self.api, point.latitude, point.longitude, urlencode(params))
 
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one=exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
         """
         Geocode a given URL, rather than having the class construct the call.
         """
-        logger.debug("Fetching %s...", url)
-        page = urlopen(url)
-        return self.parse_json(page, exactly_one)
+        logger.debug("%s.geocode_url: %s", self.__class__.__name__, url)
+        return self.parse_json(urlopen(url), exactly_one)
 
     @staticmethod
     def parse_json(page, exactly_one=True):

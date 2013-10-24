@@ -52,7 +52,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         if not isinstance(page, basestring):
             page = decode_page(page)
         resources = json.loads(page)
-        if not len(resources):
+        if not len(resources): # pragma: no cover
             return None
         if exactly_one:
             return cls.parse_resource(resources[0])
