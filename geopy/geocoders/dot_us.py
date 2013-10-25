@@ -41,6 +41,14 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         return 'http://%sgeocoder.us/%s' % (auth, resource)
 
     def geocode(self, query, exactly_one=True): # pylint: disable=W0613,W0221
+        """
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+        """
         super(GeocoderDotUS, self).geocode(query)
         query_str = self.format_string % query
 

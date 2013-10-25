@@ -16,13 +16,14 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
     """
 
     def __init__(self, format_url, transform_string=None):
-        """Initialize a geocoder that can parse MediaWiki pages with the GIS
+        """
+        Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
 
-        ``format_url`` is a URL string containing '%s' where the page name to
+        :param string format_url: is a URL string containing '%s' where the page name to
         request will be interpolated. For example: 'http://www.wiki.com/wiki/%s'
 
-        ``_transform_string`` is a callable that will make appropriate
+        :param callable _transform_string: is a callable that will make appropriate
         replacements to the input string before requesting the page. If None is
         given, the default _transform_string which replaces ' ' with '_' will be
         used.
@@ -38,6 +39,11 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
         return string.replace(' ', '_')
 
     def geocode(self, query):
+        """
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+        """
         super(MediaWiki, self).geocode(query)
         wiki_string = self._transform_string(query)
         url = self.format_url % wiki_string

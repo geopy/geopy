@@ -1,8 +1,13 @@
+"""
+:class:`Point` data structure.
+"""
+
 import re
 from itertools import islice
-from geopy import util, units, format
+from geopy import util, units, format # pylint: disable=W0622
 
-class Point(object):
+
+class Point(object): # pylint: disable=R0924
     """
     A geodetic point with latitude, longitude, and altitude.
 
@@ -13,32 +18,38 @@ class Point(object):
 
     Points can be created in a number of ways...
 
-    With longitude, latitude, and altitude:
+    With longitude, latitude, and altitude::
+
     >>> p1 = Point(41.5, -81, 0)
     >>> p2 = Point(latitude=41.5, longitude=-81)
 
-    With a sequence of 0 to 3 values (longitude, latitude, altitude):
+    With a sequence of 0 to 3 values (longitude, latitude, altitude)::
+
     >>> p1 = Point([41.5, -81, 0])
     >>> p2 = Point((41.5, -81))
 
-    Copy another `Point` instance:
+    Copy another `Point` instance::
+
     >>> p2 = Point(p1)
     >>> p2 == p1
     True
     >>> p2 is p1
     False
 
-    Give an object with a 'point' attribute, such as a `Location` instance:
+    Give an object with a 'point' attribute, such as a `Location` instance::
+
     >>> p = Point(location)
 
-    Give a string containing at least latitude and longitude:
+    Give a string containing at least latitude and longitude::
+
     >>> p1 = Point('41.5,-81.0')
     >>> p2 = Point('41.5 N -81.0 W')
     >>> p3 = Point('-41.5 S, 81.0 E, 2.5km')
     >>> p4 = Point('23 26m 22s N 23 27m 30s E 21.0mi')
     >>> p5 = Point('''3 26' 22" N 23 27' 30" E''')
 
-    Point values can be accessed by name or by index:
+    Point values can be accessed by name or by index::
+
     >>> p = Point(41.5, -81.0, 0)
     >>> p.latitude == p[0]
     True
@@ -47,7 +58,8 @@ class Point(object):
     >>> p.altitude == p[2]
     True
 
-    When unpacking (or iterating), a (latitude, longitude, altitude) tuple is returned
+    When unpacking (or iterating), a (latitude, longitude, altitude) tuple is returned::
+
     >>> latitude, longitude, altitude = p
 
     """
@@ -79,6 +91,11 @@ class Point(object):
     """ % UTIL_PATTERNS, re.X)
 
     def __new__(cls, latitude=None, longitude=None, altitude=None):
+        """
+        :param float latitude: Latitude of point.
+        :param float longitude: Longitude of point.
+        :param float altitude: Altitude of point.
+        """
         single_arg = longitude is None and altitude is None
         if single_arg and not isinstance(latitude, util.NUMBER_TYPES):
             arg = latitude
@@ -225,7 +242,7 @@ class Point(object):
     @classmethod
     def from_string(cls, string):
         """
-        Create and return a Point instance from a string containing latitude
+        Create and return a ``Point`` instance from a string containing latitude
         and longitude, and optionally, altitude.
 
         Latitude and longitude must be in degrees and may be in decimal form
@@ -243,21 +260,21 @@ class Point(object):
         Altitude, if supplied, must be a decimal number with given units.
         The following unit abbrevations (case-insensitive) are supported:
 
-            km (kilometers)
-            m (meters)
-            mi (miles)
-            ft (feet)
-            nm, nmi (nautical miles)
+            - ``km`` (kilometers)
+            - ``m`` (meters)
+            - ``mi`` (miles)
+            - ``ft`` (feet)
+            - ``nm``, ``nmi`` (nautical miles)
 
         Some example strings the will work include:
 
-            41.5;-81.0
-            41.5,-81.0
-            41.5 -81.0
-            41.5 N -81.0 W
-            -41.5 S;81.0 E
-            23 26m 22s N 23 27m 30s E
-            23 26' 22" N 23 27' 30" E
+            - 41.5;-81.0
+            - 41.5,-81.0
+            - 41.5 -81.0
+            - 41.5 N -81.0 W
+            - -41.5 S;81.0 E
+            - 23 26m 22s N 23 27m 30s E
+            - 23 26' 22" N 23 27' 30" E
 
         """
         match = re.match(cls.POINT_PATTERN, string)
@@ -287,10 +304,9 @@ class Point(object):
     @classmethod
     def from_sequence(cls, seq):
         """
-        Create and return a new Point instance from any iterable with 0 to
+        Create and return a new ``Point`` instance from any iterable with 0 to
         3 elements.  The elements, if present, must be latitude, longitude,
         and altitude, respectively.
-
         """
         args = tuple(islice(seq, 4))
         return cls(*args)
@@ -298,7 +314,7 @@ class Point(object):
     @classmethod
     def from_point(cls, point):
         """
-        Create and return a new Point instance from another Point instance.
+        Create and return a new ``Point`` instance from another ``Point`` instance.
 
         """
         return cls(point.latitude, point.longitude, point.altitude)

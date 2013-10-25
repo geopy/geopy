@@ -18,11 +18,12 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
     """
 
     def __init__(self, api_key=None, format_string=None):
-        """Initialize an Open MapQuest geocoder with location-specific
+        """
+        Initialize an Open MapQuest geocoder with location-specific
         address information, no API Key is needed by the Nominatim based
         platform.
 
-        ``format_string`` is a string containing '%s' where the string to
+        :param string format_string: is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
         """
@@ -33,6 +34,14 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
                     "?format=json&%s"
 
     def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+        """
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+        """
         super(OpenMapQuest, self).geocode(query)
         params = {
             'q': self.format_string % query

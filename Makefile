@@ -1,6 +1,7 @@
 .PHONY: lint
 .PHONY: test
 .PHONY: clean
+.PHONY: docs
 
 develop:
 	virtualenv .venv --distribute
@@ -14,3 +15,7 @@ test:
 
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf
+
+docs:
+	touch docs/_build/html/index.rst
+	cd docs && make html

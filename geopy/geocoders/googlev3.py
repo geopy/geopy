@@ -1,10 +1,5 @@
 """
 :class:`.GoogleV3` is the Google Maps V3 geocoder.
-
-Largely adapted from the existing v2 geocoder with modifications made where
-possible to support the v3 API as well as to clean up the class without
-breaking its compatibility or diverging its API too far from the rest of the
-geocoder classes.
 """
 
 import base64
@@ -97,10 +92,7 @@ class GoogleV3(Geocoder):
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 language=None, sensor=False, exactly_one=True):
         """
-        Geocode an address or other text query. For example:
-
-            address, latitude, longitude = \
-                GoogleV3().geocode("1 Central Wharf Boston MA")
+        Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
 
@@ -113,13 +105,11 @@ class GoogleV3(Geocoder):
         :param string language: The language in which to return results.
             Default None.
 
-        :param boolean sensor: Whether the geocoding request comes from a
+        :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor. Default False.
 
-        :param boolean exactly_one: Return one result or a list of results, if
-            available. Default True.
-
-        :rtype: (address<String>, (latitude<Float>, longitude<Float>))
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
         """
         super(GoogleV3, self).geocode(query)
 
@@ -145,18 +135,12 @@ class GoogleV3(Geocoder):
     def reverse(self, point, language=None, # pylint: disable=W0221
                     sensor=False, exactly_one=False):
         """
-        Given a point, find an address. For example:
-
-            address, (latitude, longitude) = \
-                GoogleV3().reverse(
-                    "40.75376406311989, -73.98489005863667",
-                    exactly_one=True
-                )
+        Given a point, find an address.
 
         :param point: The coordinates for which you wish to obtain the
             closest human-readable addresses.
-        :type limit: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "latitude, longitude"
+        :type point: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param string language: The language in which to return results.
             Default None.
@@ -165,9 +149,7 @@ class GoogleV3(Geocoder):
             device with a location sensor. Default False.
 
         :param boolean exactly_one: Return one result or a list of results, if
-            available. Default True.
-
-        :rtype: (address<String>, (latitude<Float>, longitude<Float>))
+            available.
         """
         params = {
             'latlng': self._coerce_point_to_string(point),

@@ -5,13 +5,18 @@
 from __future__ import absolute_import, division
 from __future__ import print_function, unicode_literals
 
-from geopy.compat import json, oauth2
+from geopy.compat import json
 
 import time
 import urllib
 import urllib2
 
 from geopy.geocoders.base import Geocoder, GeocoderError
+
+try:
+    import oauth2 # pylint: disable=F0401
+except ImportError:
+    oauth2 = None
 
 
 class YahooPlaceFinder(Geocoder):
@@ -24,17 +29,16 @@ class YahooPlaceFinder(Geocoder):
         """
         Sets consumer key and secret.
         """
+        if oauth2 is None:
+            raise ImportError('oauth2 is needed for YahooPlaceFinder')
         super(YahooPlaceFinder, self).__init__()
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
     def _build_request(self, string, reverse):
-
         """
-        returns a signed oauth request for the given query
-
+        Returns a signed oauth request for the given query
         """
-
         request = oauth2.Request(
             method='GET',
             parameters={
@@ -135,7 +139,21 @@ class YahooPlaceFinder(Geocoder):
     def geocode(self, query, min_quality=0,
                 raw=False, reverse=False, valid_country_codes=None):
         """
-        Returns a geocoded location using Yahoo's PlaceFinder API.
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+
+        :param int min_quality: TODO.
+
+        :param bool raw: TODO.
+
+        :param bool reverse: TODO.
+
+        :param valid_country_codes: TODO.
+        :type valid_country_codes: list or tuple
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
         """
         super(YahooPlaceFinder, self).geocode(query)
         request = self._build_request(query, reverse=reverse)

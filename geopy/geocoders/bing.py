@@ -21,9 +21,9 @@ class Bing(Geocoder):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
-        ``api_key`` should be a valid Bing Maps API key.
+        :param string api_key: should be a valid Bing Maps API key.
 
-        ``format_string`` is a string containing '%s' where the string to
+        :param string format_string: is a string containing '%s' where the string to
         geocode should be interpolated before querying the geocoder.
         For example: '%s, Mountain View, CA'. The default is just '%s'.
         """
@@ -35,8 +35,17 @@ class Bing(Geocoder):
         """
         Geocode an address.
 
-        ``user_location`` should be an instance of geopy.Point. user_location
-        position prioritizes results that are closer to this location.
+        :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param user_location: Prioritize results closer to
+            this location.
+
+            .. versionadded:: 0.96.0
+
+        :type user_location: :class:`geopy.point.Point`
         """
         super(Bing, self).geocode(query)
         params = {
@@ -58,7 +67,10 @@ class Bing(Geocoder):
         """
         Reverse geocode a point.
 
-        ``point`` should be an instance of :class:`geopy.point.Point`.
+        :param point: Location which you would like an address for.
+        :type point: :class:`geopy.point.Point`
+
+        :param bool exactly_one: Return one result, or a list?
         """
         params = {'key': self.api_key}
         url = "%s/%s,%s?%s" % (

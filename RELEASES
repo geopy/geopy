@@ -1,8 +1,6 @@
 0.96dev
 ==========
 
-REMOVED:    Google V2 geocoder has been removed. Please use the Google V3
-            geocoder instead.
 
 ADDED:  SmartyStreets LiveAddress geocoder implemented. Contributed by
         Michael Whatcott.
@@ -30,6 +28,8 @@ FIXED: `format_degrees` now rounds minutes properly. Contributed by avdd.
 
 FIXED:  No longer warn if the optional dependency `BeautifulSoup` is
         not present.
+
+REMOVED:    Google V2 geocoder has been removed as its API was shutdown.
 
 
 0.95.1 - March 22, 2013

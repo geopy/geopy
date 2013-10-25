@@ -38,6 +38,11 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         self.url = 'https://api.qualifiedaddress.com/street-address'
 
     def geocode(self, query):
+        """
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+        """
         super(LiveAddress, self).geocode(query)
         url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

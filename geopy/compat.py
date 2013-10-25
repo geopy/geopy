@@ -27,14 +27,3 @@ except ImportError: # pragma: no cover
                 "BeautifulSoup was not found. Please install BeautifulSoup "
                 "in order to use the SemanticMediaWiki Geocoder."
             ) # pylint: disable=C0103
-
-try:
-    import oauth2 # pylint: disable=W0611,F0401
-except ImportError:
-    class oauth2(object): # pylint: disable=R0903
-        """
-        Raise import error.
-        """
-
-        def __init__(self):
-            raise ImportError('No module named oauth2')
