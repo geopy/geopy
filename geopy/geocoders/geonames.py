@@ -20,8 +20,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         http://www.geonames.org/maps/us-reverse-geocoder.html
     """
 
-    def __init__(self, country_bias=None, username=None):
-        super(GeoNames, self).__init__()
+    def __init__(self, country_bias=None, username=None, proxies=None):
+        super(GeoNames, self).__init__(proxies=proxies)
         if username == None:
             raise ValueError(
                 'No username given, required for api access.  If you do not '
@@ -55,7 +55,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         return self.geocode_url(url, exactly_one)
 
     def geocode_url(self, url, exactly_one=True):
-        page = urlopen(url)
+        page = self.urlopen(url)
         return self.parse_json(page, exactly_one)
 
 

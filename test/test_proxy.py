@@ -49,7 +49,8 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
                 return geo_html if geo_html else None
 
         '''Testcase to test that proxy standup code works'''
-        geocoder_dummy = DummyGeocoder()
+        geocoder_dummy = DummyGeocoder(proxies={"http": "http://localhost:1337"})
+        self.assertTrue(geocoder_dummy.urlopen != urllib2.urlopen)
         self.assertTrue(self.noproxy_data, geocoder_dummy.geocode('http://www.blankwebsite.com/'))
 
 if __name__ == '__main__':

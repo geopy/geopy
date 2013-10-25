@@ -27,8 +27,8 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     ``candidates`` is an integer between 1 and 10 indicating the max number of
     candidate addresses to return if a valid address could be found.
     """
-    def __init__(self, auth_id, auth_token, candidates=None):
-        super(LiveAddress, self).__init__()
+    def __init__(self, auth_id, auth_token, candidates=None, proxies=None):
+        super(LiveAddress, self).__init__(proxies=proxies)
         self.auth_id = auth_id
         self.auth_token = auth_token
         if candidates:
@@ -68,7 +68,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         Call API.
         """
         try:
-            return urllib2.urlopen(url)
+            return urllib2.self.urlopen(url)
         except urllib2.HTTPError as error:
             raise LiveAddressError(error.getcode(), error.message or error.msg)
 

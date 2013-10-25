@@ -22,9 +22,9 @@ class SemanticMediaWiki(Geocoder):
      geocoder API of #geocode &c. TODO.
     """
 
-    def __init__(self, format_url, attributes=None, relations=None,
-                 prefer_semantic=False, transform_string=None):
-        super(SemanticMediaWiki, self).__init__()
+    def __init__(self, format_url, attributes=None, relations=None, # pylint: disable=R0913
+                 prefer_semantic=False, transform_string=None, proxies=None):
+        super(SemanticMediaWiki, self).__init__(proxies=proxies)
         self.format_url = format_url
         self.attributes = attributes
         self.relations = relations
@@ -94,12 +94,12 @@ class SemanticMediaWiki(Geocoder):
             attempted = set()
 
         util.logger.debug("Fetching %s...", url)
-        page = urlopen(url)
+        page = self.urlopen(url)
         soup = BeautifulSoup(page)
 
         rdf_url = self.parse_rdf_link(soup)
         util.logger.debug("Fetching %s..." % rdf_url)
-        page = urlopen(rdf_url)
+        page = self.urlopen(rdf_url)
 
         things, thing = self.parse_rdf(page) # TODO
         name = self.get_label(thing)

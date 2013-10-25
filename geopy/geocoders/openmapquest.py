@@ -17,7 +17,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         http://developer.mapquest.com/web/products/open/geocoding-service
     """
 
-    def __init__(self, api_key=None, format_string=None):
+    def __init__(self, api_key=None, format_string=None, proxies=None):
         """
         Initialize an Open MapQuest geocoder with location-specific
         address information, no API Key is needed by the Nominatim based
@@ -28,7 +28,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             the geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
         """
-        super(OpenMapQuest, self).__init__(format_string)
+        super(OpenMapQuest, self).__init__(format_string, proxies)
 
         self.api_key = api_key or ''
         self.api = "http://open.mapquestapi.com/nominatim/v1/search" \
@@ -52,7 +52,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         url = self.api % urlencode(params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        return self.parse_json(urlopen(url), exactly_one)
+        return self.parse_json(self.urlopen(url), exactly_one)
 
     @classmethod
     def parse_json(cls, page, exactly_one=True):

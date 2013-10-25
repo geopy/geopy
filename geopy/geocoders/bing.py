@@ -17,7 +17,7 @@ class Bing(Geocoder):
         http://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
-    def __init__(self, api_key, format_string=None):
+    def __init__(self, api_key, format_string=None, proxies=None):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
@@ -28,7 +28,7 @@ class Bing(Geocoder):
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
         """
-        super(Bing, self).__init__(format_string)
+        super(Bing, self).__init__(format_string, proxies)
         self.api_key = api_key
         self.api = "http://dev.virtualearth.net/REST/v1/Locations"
 
@@ -85,7 +85,7 @@ class Bing(Geocoder):
         Geocode a given URL, rather than having the class construct the call.
         """
         logger.debug("%s.geocode_url: %s", self.__class__.__name__, url)
-        return self.parse_json(urlopen(url), exactly_one)
+        return self.parse_json(self.urlopen(url), exactly_one)
 
     @staticmethod
     def parse_json(page, exactly_one=True):

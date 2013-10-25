@@ -16,8 +16,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         http://geocoder.us/
     """
 
-    def __init__(self, username=None, password=None, format_string=None):
-        super(GeocoderDotUS, self).__init__(format_string)
+    def __init__(self, username=None, password=None, format_string=None, proxies=None):
+        super(GeocoderDotUS, self).__init__(format_string, proxies)
         if username and (password is None):
             password = getpass.getpass(
                 "geocoder.us password for %r: " % username
@@ -55,7 +55,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         url = "?".join((self._get_url(), urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        page = urlopen(url)
+        page = self.urlopen(url)
         places = [r for r in csv.reader(page)]
 
         # GeoNames only returns the closest match, no matter what.

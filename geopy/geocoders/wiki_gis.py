@@ -15,7 +15,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
     MediaWiki geocoder. No idea on documentation.
     """
 
-    def __init__(self, format_url, transform_string=None):
+    def __init__(self, format_url, transform_string=None, proxies=None):
         """
         Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
@@ -29,7 +29,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
             the page. If ``None`` is given, the default _transform_string
             which replaces ' ' with '_' will be used.
         """
-        super(MediaWiki, self).__init__()
+        super(MediaWiki, self).__init__(proxies=proxies)
         self.format_url = format_url
         if transform_string:
             self._transform_string = transform_string
@@ -53,7 +53,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
 
     def geocode_url(self, url):
         logger.debug("Fetching %s...", url)
-        page = urlopen(url)
+        page = self.urlopen(url)
         name, (latitude, longitude) = self.parse_xhtml(page)
         return (name, (latitude, longitude))
 

@@ -12,16 +12,22 @@ class Geocoder(object): # pylint: disable=R0921
     Template object for geocoders.
     """
 
-    def __init__(self, format_string=None):
+    def __init__(self, format_string=None, proxies=None):
         self.format_string = format_string or '%s'
+        self.proxies = proxies
 
         # Add urllib proxy support using environment variables or
         # built in OS proxy details
         # See: http://docs.python.org/2/library/urllib2.html
         # And: http://stackoverflow.com/questions/1450132/proxy-with-urllib2
-        proxy = urllib2.ProxyHandler()
-        opener = urllib2.build_opener(proxy)
-        urllib2.install_opener(opener)
+        if self.proxies is None:
+            print proxies
+            self.urlopen = urllib2.urlopen
+        else:
+            self.urlopen = urllib2.build_opener(
+                urllib2.ProxyHandler(self.proxies)
+            )
+
 
     def geocode(self, query): # pylint: disable=R0201,W0613
         """

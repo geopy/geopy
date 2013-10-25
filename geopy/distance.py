@@ -274,12 +274,13 @@ class vincenty(Distance):
     devised by Thaddeus Vincenty, with an accurate ellipsoidal model of the
     earth.
 
-    Set which ellipsoidal model of the earth to use by calling
-    ``set_ellipsoid``. If it is a string, it is looked up in the `ELLIPSOIDS`
-    dictionary to obtain the major and minor semiaxes and the flattening.
-    Otherwise, it should be a tuple with those values. The most globally
-    accurate model is WGS-84. See the comments above the `ELLIPSOIDS`
-    dictionary for more information.
+    Set which ellipsoidal model of the earth to use by specifying an
+    ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
+    most globally accurate model.  If ``ellipsoid`` is a string, it is
+    looked up in the `ELLIPSOIDS` dictionary to obtain the major and minor
+    semiaxes and the flattening. Otherwise, it should be a tuple with those
+    values.  See the comments above the `ELLIPSOIDS` dictionary for
+    more information.
     """
 
     ellipsoid_key = None

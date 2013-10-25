@@ -22,7 +22,7 @@ class GoogleV3(Geocoder):
     """
 
     def __init__(self, domain='maps.googleapis.com', protocol='http',
-                 client_id=None, secret_key=None):
+                 client_id=None, secret_key=None, proxies=None):
         """
         Initialize a customized Google geocoder.
 
@@ -39,7 +39,7 @@ class GoogleV3(Geocoder):
 
         :param string secret_key: If using premier, the account secret key.
         """
-        super(GoogleV3, self).__init__()
+        super(GoogleV3, self).__init__(proxies=proxies)
 
         if protocol not in ('http', 'https'):
             raise ValueError('Supported protocols are http and https.')
@@ -87,7 +87,7 @@ class GoogleV3(Geocoder):
     def geocode_url(self, url, exactly_one=True):
         '''Fetches the url and returns the result.'''
         logger.debug("%s.geocode_url: %s", self.__class__.__name__, url)
-        return self.parse_json(urlopen(url), exactly_one)
+        return self.parse_json(self.urlopen(url), exactly_one)
 
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 language=None, sensor=False, exactly_one=True):
@@ -97,7 +97,8 @@ class GoogleV3(Geocoder):
         :param string query: The address or query you wish to geocode.
 
         :param bounds: The bounding box of the viewport within which
-            to bias geocode results more prominently. TODO type?, test
+            to bias geocode results more prominently.
+        :type bounds: list or tuple
 
         :param string region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.

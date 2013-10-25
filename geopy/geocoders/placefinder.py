@@ -25,13 +25,13 @@ class YahooPlaceFinder(Geocoder):
         http://developer.yahoo.com/boss/geo/docs/
     """
 
-    def __init__(self, consumer_key, consumer_secret):
+    def __init__(self, consumer_key, consumer_secret, proxies=None):
         """
         Sets consumer key and secret.
         """
         if oauth2 is None:
             raise ImportError('oauth2 is needed for YahooPlaceFinder')
-        super(YahooPlaceFinder, self).__init__()
+        super(YahooPlaceFinder, self).__init__(proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
@@ -93,7 +93,7 @@ class YahooPlaceFinder(Geocoder):
                 None,
                 request.to_header(realm='yahooapis.com'),
             )
-            response = urllib2.urlopen(urllib_req)
+            response = urllib2.self.urlopen(urllib_req)
             content = response.read()
         except urllib2.HTTPError as exc:
             raise GeocoderError(
@@ -143,13 +143,13 @@ class YahooPlaceFinder(Geocoder):
 
         :param string query: The address or query you wish to geocode.
 
-        :param int min_quality: TODO.
+        :param int min_quality:
 
-        :param bool raw: TODO.
+        :param bool raw:
 
-        :param bool reverse: TODO.
+        :param bool reverse:
 
-        :param valid_country_codes: TODO.
+        :param valid_country_codes:
         :type valid_country_codes: list or tuple
 
         :param bool exactly_one: Return one result or a list of results, if
