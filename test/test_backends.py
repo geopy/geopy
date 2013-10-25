@@ -224,7 +224,7 @@ class LiveAddressTestCase(_BackendTestCase):
 class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
         from geopy.geocoders.osm import Nominatim
-        self.geocoder = Nominatim(output_format='xml')
+        self.geocoder = Nominatim()
 
     def test_reverse(self):
         known_addr = 'Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond '\
