@@ -23,9 +23,10 @@ class Bing(Geocoder):
 
         :param string api_key: should be a valid Bing Maps API key.
 
-        :param string format_string: is a string containing '%s' where the string to
-        geocode should be interpolated before querying the geocoder.
-        For example: '%s, Mountain View, CA'. The default is just '%s'.
+        :param string format_string: is a string containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
         """
         super(Bing, self).__init__(format_string)
         self.api_key = api_key

@@ -8,6 +8,7 @@ third-party geocoders and other data sources.
 To geolocate a query to an address and coordinates::
 
     from geopy.geocoders import GoogleV3
+
     geolocator = GoogleV3()
     address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
     print address, latitude, longitude
@@ -16,6 +17,7 @@ To geolocate a query to an address and coordinates::
 To find the address corresponding to a set of coordinates::
 
     from geopy.geocoders import GoogleV3
+
     geolocator = GoogleV3()
     address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578", exactly_one=True)
     print address, latitude, longitude
@@ -28,7 +30,7 @@ types of values:
 - When there are no results found, returns ``None``.
 
 - When the method's ``exactly_one`` argument is ``True`` and at least one result is found, returns a tuple of:
-    (address<String>, (latitude<Float>, longitude<Float>)).
+    (address<String>, (latitude<Float>, longitude<Float>))
 
 - When ``exactly_one`` is False, and there is at least one result, returns a list of tuples:
     [(address<String>, (latitude<Float>, longitude<Float>)), [...]]
