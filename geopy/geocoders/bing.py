@@ -61,7 +61,7 @@ class Bing(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.geocode_url(url, exactly_one)
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
     def reverse(self, query, exactly_one=True): # pylint: disable=W0221
         """
@@ -80,14 +80,7 @@ class Bing(Geocoder):
             self.api, point, urlencode(params))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self.geocode_url(url, exactly_one=exactly_one)
-
-    def geocode_url(self, url, exactly_one=True):
-        """
-        Geocode a given URL, rather than having the class construct the call.
-        """
-        logger.debug("%s.geocode_url: %s", self.__class__.__name__, url)
-        return self.parse_json(self.urlopen(url), exactly_one)
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
     @staticmethod
     def parse_json(page, exactly_one=True):

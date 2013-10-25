@@ -37,8 +37,8 @@ and ``reverse`` methods  may return three types of values:
 - When ``exactly_one`` is False, and there is at least one result, returns a list of tuples:
     [(address<String>, (latitude<Float>, longitude<Float>)), [...]]
 
-Geocoders do not catch HTTP exceptions. If a service is unavailable you may
-receive a :class:`.urllib2.HTTPError`.
+If a service is unavailable or otherwise returns a non-OK response you will
+receive a :class:`.geopy.exc.GeocoderServiceError`.
 
 Every geocoder accepts an argument ``format_string`` that defaults to '%s' where
 the input string to geocode is interpolated. For example, if you only need to

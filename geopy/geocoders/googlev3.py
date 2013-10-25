@@ -83,11 +83,6 @@ class GoogleV3(Geocoder):
         return ('%(protocol)s://%(domain)s%(url_part)s'
                 '&signature=%(signature)s' % url_params)
 
-    def geocode_url(self, url, exactly_one=True):
-        '''Fetches the url and returns the result.'''
-        logger.debug("%s.geocode_url: %s", self.__class__.__name__, url)
-        return self.parse_json(self.urlopen(url), exactly_one)
-
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 language=None, sensor=False, exactly_one=True):
         """
@@ -130,7 +125,7 @@ class GoogleV3(Geocoder):
             url = self._get_signed_url(params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.geocode_url(url, exactly_one)
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
     def reverse(self, query, language=None, # pylint: disable=W0221
                     sensor=False, exactly_one=False):
@@ -164,7 +159,7 @@ class GoogleV3(Geocoder):
             url = self._get_signed_url(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self.geocode_url(url, exactly_one)
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
     def parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''

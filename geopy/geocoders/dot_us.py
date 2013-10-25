@@ -54,7 +54,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         url = "?".join((self._get_url(), urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        page = self.urlopen(url)
+        page = self._call_geocoder(url)
         places = [r for r in csv.reader(page)]
         if not len(places):
             return None

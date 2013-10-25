@@ -7,6 +7,7 @@ from warnings import warn
 
 from geopy.compat import py3k
 from geopy.point import Point
+from geopy.exc import GeocoderServiceError
 
 
 class Geocoder(object): # pylint: disable=R0921
@@ -44,6 +45,14 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             raise ValueError("Invalid point")
 
+    def _call_geocoder(self, url):
+        """
+        For a generated query URL, get the results.
+        """
+        try:
+            return self.urlopen(url)
+        except urllib2.HTTPError as error:
+            raise GeocoderServiceError(error.getcode(), error.message or error.msg)
 
     def geocode(self, query, exactly_one=True): # pylint: disable=R0201,W0613
         """

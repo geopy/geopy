@@ -2,12 +2,11 @@
 :class:`.LiveAddress` geocoder.
 """
 
-import json
 import urllib
-import urllib2
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
+from geopy.compat import json
 
 
 class LiveAddress(Geocoder): # pylint: disable=W0223
@@ -34,7 +33,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
             if not (1 <= candidates <= 10):
                 raise ValueError('candidates must be between 1 and 10')
         self.candidates = candidates or 1
-        self.url = 'https://api.qualifiedaddress.com/street-address'
+        self.api = 'https://api.qualifiedaddress.com/street-address'
 
     def geocode(self, query, exactly_one=True):
         """
@@ -48,9 +47,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         super(LiveAddress, self).geocode(query)
         url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        request = self._execute_request(url)
-        response = request.read()
-        return self._parse_json(response, exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
     def _compose_url(self, location):
         """
@@ -63,30 +60,21 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         }
         # don't urlencode the api token
         return '?'.join((
-            self.url,
+            self.api,
             "&".join(("=".join(('auth-token', self.auth_token)), urllib.urlencode(query)))
     ))
-
-    def _execute_request(self, url):
-        """
-        Call API.
-        """
-        try:
-            return self.urlopen(url)
-        except urllib2.HTTPError as error:
-            raise LiveAddressError(error.getcode(), error.message or error.msg)
 
     def _parse_json(self, response, exactly_one=True):
         """
         Parse responses as JSON objects.
         """
-        candidates = json.loads(response)
-        if not len(candidates):
+        response = json.loads(response.read())
+        if not len(response):
             return None
         if exactly_one is True:
-            return self._format_structured_address(candidates[0])
+            return self._format_structured_address(response[0])
         else:
-            return [self._format_structured_address(c) for c in candidates]
+            return [self._format_structured_address(c) for c in response]
 
     @staticmethod
     def _format_structured_address(address):
@@ -100,12 +88,3 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         metadata = address['metadata']
         latlon = metadata['latitude'], metadata['longitude']
         return formatted, latlon
-
-
-class LiveAddressError(Exception):
-    """
-    TODO generalize.
-    """
-    def __init__(self, http_status, message):
-        self.http_status = http_status
-        super(LiveAddressError, self).__init__(message)

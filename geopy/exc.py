@@ -31,3 +31,11 @@ class GeocoderQuotaExceeded(GeocoderError):
     """
     Too many requests.
     """
+
+class GeocoderServiceError(GeocoderError):
+    """
+    HTTP error code given by the remote service.
+    """
+    def __init__(self, http_status, message):
+        self.http_status = http_status
+        super(GeocoderServiceError, self).__init__(message)

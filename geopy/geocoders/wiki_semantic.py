@@ -93,7 +93,7 @@ class SemanticMediaWiki(Geocoder):
             attempted = set()
 
         util.logger.debug("Fetching %s...", url)
-        page = self.urlopen(url)
+        page = self._call_geocoder(url)
         soup = BeautifulSoup(page)
 
         rdf_url = self.parse_rdf_link(soup)

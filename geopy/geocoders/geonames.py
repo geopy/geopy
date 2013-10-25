@@ -52,12 +52,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             params['maxRows'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.geocode_url(url, exactly_one)
-
-    def geocode_url(self, url, exactly_one=True):
-        page = self.urlopen(url)
-        return self.parse_json(page, exactly_one)
-
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
     def parse_json(self, page, exactly_one):
         """
