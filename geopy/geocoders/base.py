@@ -3,8 +3,10 @@
 """
 
 import urllib2
+from warnings import warn
 
 from geopy.compat import py3k
+from geopy.point import Point
 
 
 class Geocoder(object): # pylint: disable=R0921
@@ -27,21 +29,40 @@ class Geocoder(object): # pylint: disable=R0921
                 urllib2.ProxyHandler(self.proxies)
             )
 
+    @staticmethod
+    def _coerce_point_to_string(point):
+        """
+        Do the right thing on "point" input. For geocoders with reverse
+        methods.
+        """
+        if isinstance(point, Point):
+            return ",".join((str(point.latitude), str(point.longitude)))
+        elif isinstance(point, (list, tuple)):
+            return ",".join((str(point[0]), str(point[1]))) # -altitude
+        elif isinstance(point, (str, unicode)):
+            return point
+        else:
+            raise ValueError("Invalid point")
 
-    def geocode(self, query): # pylint: disable=R0201,W0613
+
+    def geocode(self, query, exactly_one=True): # pylint: disable=R0201,W0613
         """
         Implemented in subclasses. Just string coercion here.
         """
         if isinstance(query, unicode) and not py3k:
             query = query.encode('utf-8')
 
-    def reverse(self, point):
+    def reverse(self, query, exactly_one=True):
         """
         Implemented in subclasses.
         """
         raise NotImplementedError()
 
-    def geocode_one(self, query):
+    def geocode_one(self, query): # pylint: disable=C0111
+        warn(
+            "geocode_one is deprecated and will be removed in the next"
+            "non-bugfix release. Call geocode with exactly_one=True instead."
+        )
         results = self.geocode(query)
         first = None
         for result in results:
@@ -56,14 +77,19 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             raise GeocoderResultError("Geocoder returned no results!")
 
-    def geocode_first(self, query):
+    def geocode_first(self, query): # pylint: disable=C0111
+        warn(
+            "geocode_first is deprecated and will be removed in the next"
+            "non-bugfix release. Call geocode with exactly_one=True instead."
+        )
         results = self.geocode(query)
         for result in results:
             return result
         return None
 
-class GeocoderError(Exception):
+
+class GeocoderError(Exception): # pylint: disable=C0111
     pass
 
-class GeocoderResultError(GeocoderError):
+class GeocoderResultError(GeocoderError): # pylint: disable=C0111
     pass

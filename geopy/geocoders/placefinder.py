@@ -66,7 +66,6 @@ class YahooPlaceFinder(Geocoder):
         Returns only the results that meet the minimum quality threshold
         and are located in expected countries.
         """
-
         results = [
             (place, point)
             for (place, point) in results
@@ -86,7 +85,6 @@ class YahooPlaceFinder(Geocoder):
         """
         Returns the result of a PlaceFinder API call.
         """
-
         try:
             urllib_req = urllib2.Request(
                 request.url,
@@ -110,7 +108,6 @@ class YahooPlaceFinder(Geocoder):
         """
         Returns the parsed result of a PlaceFinder API call.
         """
-
         try:
             placefinder = json.loads(response)['bossresponse']['placefinder']
             if not len(placefinder):
@@ -126,12 +123,9 @@ class YahooPlaceFinder(Geocoder):
 
     @staticmethod
     def humanize(location):
-
         """
-        returns a human readable representation of a raw PlaceFinder location
-
+        Returns a human readable representation of a raw PlaceFinder location
         """
-
         return ', '.join([
             location[line]
             for line in ['line1', 'line2', 'line3', 'line4']
@@ -181,22 +175,20 @@ class YahooPlaceFinder(Geocoder):
         else:
             return results
 
-    def reverse(self, inp):
+    def reverse(self, query, exactly_one=True):
         """
         Returns a reverse geocoded location using Yahoo's PlaceFinder API.
+
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
         """
-        # TODO cleanup
-        point = None
-        try:
-            point = (inp.lat, inp.lon)
-        except AttributeError:
-            pass
-        try:
-            point = (inp.latitude, inp.longitude)
-        except AttributeError:
-            pass
-
-        if not isinstance(point, tuple):
-            raise TypeError('point is not a tuple or a Point instance')
-
-        return self.geocode('%s, %s' % point, reverse=True)
+        return self.geocode(
+            self._coerce_point_to_string(query),
+            reverse=True,
+            exactly_one=exactly_one
+        )

@@ -3,12 +3,12 @@
 """
 
 from urllib import urlencode
-from urllib2 import urlopen
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page
 from geopy.compat import json
-from geopy import exc
+from geopy.exc import GeocoderInsufficientPrivileges, GeocoderError, \
+    ConfigurationError
 
 
 class GeoNames(Geocoder): # pylint: disable=W0223
@@ -23,7 +23,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
     def __init__(self, country_bias=None, username=None, proxies=None):
         super(GeoNames, self).__init__(proxies=proxies)
         if username == None:
-            raise ValueError(
+            raise ConfigurationError(
                 'No username given, required for api access.  If you do not '
                 'have a GeoNames username, sign up here: '
                 'http://www.geonames.org/login'
@@ -63,7 +63,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         """
         Parse JSON response body.
         """
-        if not isinstance(page, basestring):
+        if not isinstance(page, (str, unicode)):
             page = decode_page(page)
 
         doc = json.loads(page)
@@ -71,9 +71,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         err = doc.get('status', None)
         if err and 'message' in err:
             if err['message'].startswith("user account not enabled to use"):
-                raise exc.GeocoderInsufficientPrivileges(err['message'])
+                raise GeocoderInsufficientPrivileges(err['message'])
             else:
-                raise exc.GeocoderError(err['message'])
+                raise GeocoderError(err['message'])
         if not places:
             return None
 

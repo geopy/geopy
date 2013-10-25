@@ -56,24 +56,17 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
         page = self.urlopen(url)
         places = [r for r in csv.reader(page)]
-
-        # GeoNames only returns the closest match, no matter what.
-        #
-        #if exactly_one and len(places) != 1:
-        #    raise ValueError("Didn't find exactly one placemark! " \
-        #                     "(Found %d.)" % len(places))
-        #
-        #if exactly_one:
-        #    return self._parse_result(places[0])
-        #else:
-        #    return [self._parse_result(place) for place in places]
-
-        return self._parse_result(places[0])
+        if not len(places):
+            return None
+        if exactly_one is True:
+            return self._parse_result(places[0])
+        else:
+            return [self._parse_result(res) for res in places]
 
     @staticmethod
     def _parse_result(result):
         """
-        TODO docs.
+        TODO docs, accept iterable
         """
         # turn x=y pairs ("lat=47.6", "long=-117.426") into dict key/value pairs:
         place = dict(
@@ -106,11 +99,4 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
             latlon = float(latitude), float(longitude)
         else:
             return None
-
-        # TODO use Point/Location object API in 0.95
-        #if latitude and longitude:
-        #    point = Point(latitude, longitude)
-        #else:
-        #    point = None
-        #return Location(name, point, dict(result))
         return name, latlon

@@ -82,7 +82,7 @@ def get_first_text(node, tag_names, strip=None):
     """
     TODO docs.
     """
-    if isinstance(tag_names, basestring):
+    if isinstance(tag_names, (str, unicode)):
         tag_names = [tag_names]
     if node:
         while tag_names:

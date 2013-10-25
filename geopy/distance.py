@@ -313,7 +313,7 @@ class vincenty(Distance):
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
 
-        if isinstance(self.ELLIPSOID, basestring):
+        if isinstance(self.ELLIPSOID, (str, unicode)):
             major, minor, f = ELLIPSOIDS[self.ELLIPSOID]
         else:
             major, minor, f = self.ELLIPSOID
@@ -416,7 +416,7 @@ class vincenty(Distance):
             distance = distance.kilometers
 
         ellipsoid = self.ELLIPSOID
-        if isinstance(ellipsoid, basestring):
+        if isinstance(ellipsoid, (str, unicode)):
             ellipsoid = ELLIPSOIDS[ellipsoid]
 
         major, minor, f = ellipsoid

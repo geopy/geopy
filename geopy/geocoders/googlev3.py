@@ -8,10 +8,10 @@ import hmac
 from urllib import urlencode
 
 from geopy.compat import json
-from geopy.point import Point
 
-from geopy.geocoders.base import Geocoder, GeocoderResultError
+from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page
+from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded, ConfigurationError
 
 
 class GoogleV3(Geocoder):
@@ -41,11 +41,11 @@ class GoogleV3(Geocoder):
         super(GoogleV3, self).__init__(proxies=proxies)
 
         if protocol not in ('http', 'https'):
-            raise ValueError('Supported protocols are http and https.')
+            raise ConfigurationError('Supported protocols are http and https.')
         if client_id and not secret_key:
-            raise ValueError('Must provide secret_key with client_id.')
+            raise ConfigurationError('Must provide secret_key with client_id.')
         if secret_key and not client_id:
-            raise ValueError('Must provide client_id with secret_key.')
+            raise ConfigurationError('Must provide client_id with secret_key.')
 
         self.domain = domain.strip('/')
         self.protocol = protocol
@@ -132,14 +132,14 @@ class GoogleV3(Geocoder):
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one)
 
-    def reverse(self, point, language=None, # pylint: disable=W0221
+    def reverse(self, query, language=None, # pylint: disable=W0221
                     sensor=False, exactly_one=False):
         """
         Given a point, find an address.
 
-        :param point: The coordinates for which you wish to obtain the
+        :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
-        :type point: :class:`geopy.point.Point`, list or tuple of (latitude,
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param string language: The language in which to return results.
@@ -152,7 +152,7 @@ class GoogleV3(Geocoder):
             available.
         """
         params = {
-            'latlng': self._coerce_point_to_string(point),
+            'latlng': self._coerce_point_to_string(query),
             'sensor': str(sensor).lower()
         }
         if language:
@@ -168,7 +168,7 @@ class GoogleV3(Geocoder):
 
     def parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
-        if not isinstance(page, basestring):
+        if not isinstance(page, (str, unicode)):
             page = decode_page(page)
         self.doc = json.loads(page)
         places = self.doc.get('results', [])
@@ -190,47 +190,22 @@ class GoogleV3(Geocoder):
             return [parse_place(place) for place in places]
 
     @staticmethod
-    def _coerce_point_to_string(point):
-        """
-        Do the right thing on "point" input.
-        """
-        if isinstance(point, Point):
-            point = ",".join(point.latitude, point.longitude)
-        elif isinstance(point, (list, tuple)):
-            point = ",".join(point[0], point[1])
-        # else assume string
-        return point
-
-    @staticmethod
     def _check_status(status):
-        '''Validates error statuses.'''
-        if status == 'ZERO_RESULTS':
-            raise GQueryError(
-                'The geocode was successful but returned no results. This may'
-                ' occur if the geocode was passed a non-existent address or a'
-                ' latlng in a remote location.'
-            )
-        elif status == 'OVER_QUERY_LIMIT':
-            raise GTooManyQueriesError(
+        """
+        Validates error statuses.
+        """
+        if status == 'OVER_QUERY_LIMIT':
+            raise GeocoderQuotaExceeded(
                 'The given key has gone over the requests limit in the 24'
                 ' hour period or has submitted too many requests in too'
                 ' short a period of time.'
             )
         elif status == 'REQUEST_DENIED':
-            raise GQueryError(
-                'Your request was denied, probably because of lack of a'
-                ' sensor parameter.'
+            raise GeocoderQueryError(
+                'Your request was denied.'
             )
         elif status == 'INVALID_REQUEST':
-            raise GQueryError('Probably missing address or latlng.')
+            raise GeocoderQueryError('Probably missing address or latlng.')
         else:
-            raise GeocoderResultError('Unknown error.')
+            raise GeocoderQueryError('Unknown error.')
 
-
-class GQueryError(GeocoderResultError):
-    '''Generic Google query error.'''
-    pass
-
-class GTooManyQueriesError(GeocoderResultError):
-    '''Raised when the query rate limit is hit.'''
-    pass

@@ -22,7 +22,12 @@ class ConfigurationError(GeocoderError):
     Error in configuring a geocoder
     """
 
-class QueryError(GeocoderError):
+class GeocoderQueryError(GeocoderError):
     """
-    Bad input to a geocoder method cannot be handled.
+    Geocoder threw over the user's input
+    """
+
+class GeocoderQuotaExceeded(GeocoderError):
+    """
+    Too many requests.
     """

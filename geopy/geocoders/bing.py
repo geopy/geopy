@@ -63,18 +63,21 @@ class Bing(Geocoder):
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one)
 
-    def reverse(self, point, exactly_one=True): # pylint: disable=W0221
+    def reverse(self, query, exactly_one=True): # pylint: disable=W0221
         """
         Reverse geocode a point.
 
-        :param point: Location which you would like an address for.
-        :type point: :class:`geopy.point.Point`
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param bool exactly_one: Return one result, or a list?
         """
+        point = self._coerce_point_to_string(query)
         params = {'key': self.api_key}
-        url = "%s/%s,%s?%s" % (
-            self.api, point.latitude, point.longitude, urlencode(params))
+        url = "%s/%s?%s" % (
+            self.api, point, urlencode(params))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self.geocode_url(url, exactly_one=exactly_one)
@@ -91,7 +94,7 @@ class Bing(Geocoder):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """
-        if not isinstance(page, basestring):
+        if not isinstance(page, (str, unicode)):
             page = decode_page(page)
         doc = json.loads(page)
         resources = doc['resourceSets'][0]['resources']

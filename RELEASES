@@ -1,6 +1,13 @@
 0.96dev
 ==========
 
+CHANGED:    GoogleV3's reverse geocoder now returns one result by default. Set
+            `exactly_one` to False for a list.
+
+CHANGED:    GoogleV3 returns new exception types:
+                `geopy.geocoders.base.GQueryError` -> `geopy.exc.GeocoderQueryError`
+                `geopy.geocoders.base.GeocoderResultError` -> `geopy.exc.GeocoderQueryError`
+                `geopy.geocoders.base.GTooManyQueriesError` -> `geopy.exc.GeocoderQuotaExceeded`
 
 ADDED:  SmartyStreets LiveAddress geocoder implemented. Contributed by
         Michael Whatcott.

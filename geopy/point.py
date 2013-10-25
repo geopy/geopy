@@ -103,7 +103,7 @@ class Point(object): # pylint: disable=R0924
                 pass
             elif isinstance(arg, Point):
                 return cls.from_point(arg)
-            elif isinstance(arg, basestring):
+            elif isinstance(arg, (str, unicode)):
                 return cls.from_string(arg)
             else:
                 try:
@@ -165,7 +165,7 @@ class Point(object): # pylint: disable=R0924
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, basestring):
+            if not isinstance(altitude, (str, unicode)):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
@@ -179,7 +179,7 @@ class Point(object): # pylint: disable=R0924
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, basestring):
+            if not isinstance(altitude, (str, unicode)):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
