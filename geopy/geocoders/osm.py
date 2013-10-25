@@ -54,7 +54,7 @@ class Nominatim(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
     def reverse(self, query, exactly_one=True):
         """
@@ -76,9 +76,9 @@ class Nominatim(Geocoder):
           }
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self.parse_json(self._call_geocoder(url), exactly_one, reverse=True)
+        return self._parse_json(self._call_geocoder(url), exactly_one, reverse=True)
 
-    def parse_json(self, page, exactly_one, reverse=False):
+    def _parse_json(self, page, exactly_one, reverse=False):
         places = json.loads(page)
         if not isinstance (places, list):
             places = [places]

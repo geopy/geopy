@@ -1,4 +1,4 @@
-0.96dev
+0.96.0 - October 25, 2013
 ==========
 
 CHANGED:    GoogleV3's reverse geocoder now returns one result by default. Set

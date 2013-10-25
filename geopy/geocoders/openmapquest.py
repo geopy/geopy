@@ -51,10 +51,10 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         url = self.api % urlencode(params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        return self.parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
     @classmethod
-    def parse_json(cls, page, exactly_one=True):
+    def _parse_json(cls, page, exactly_one=True):
         """
         Parse display name, latitude, and longitude from an JSON response.
         """

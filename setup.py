@@ -2,7 +2,7 @@
 geopy
 """
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 install_requires = []
 tests_require = [
@@ -38,7 +38,7 @@ setup(name='geopy',
     author_email='mike@tig.as', # subject to change
     url='https://github.com/geopy/geopy',
     download_url = 'https://github.com/geopy/geopy/archive/%s.tar.gz' % version,
-    packages=('geopy', ),
+    packages=find_packages(),
     install_requires=install_requires,
     tests_require=tests_require,
     license='MIT',

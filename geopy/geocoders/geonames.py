@@ -52,14 +52,12 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             params['maxRows'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
-    def parse_json(self, page, exactly_one):
+    def _parse_json(self, page, exactly_one):
         """
         Parse JSON response body.
         """
-
-
         doc = json.loads(page)
         places = doc.get('geonames', [])
         err = doc.get('status', None)
@@ -68,7 +66,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
                 raise GeocoderInsufficientPrivileges(err['message'])
             else:
                 raise GeocoderError(err['message'])
-        if not places:
+        if not len(places):
             return None
 
         def parse_code(place):

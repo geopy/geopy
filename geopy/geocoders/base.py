@@ -50,6 +50,22 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             raise ValueError("Invalid point")
 
+    def _parse_json(self, page, exactly_one):
+        """
+        Template for subclasses
+        """
+        raise NotImplementedError()
+
+    def parse_json(self, *args, **kwargs):
+        """
+        Compatibility until 0.97.0
+        """
+        warn(
+            "parse_json is now a private method at _parse_json; this name "
+            "will be removed in the next non-bugfix release"
+        )
+        return self._parse_json(*args, **kwargs)
+
     def _call_geocoder(self, url, raw=False):
         """
         For a generated query URL, get the results.

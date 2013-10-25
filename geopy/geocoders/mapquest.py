@@ -47,9 +47,9 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         ))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         page = self.urlopen(url).read()
-        return self.parse_json(page, exactly_one)
+        return self._parse_json(page, exactly_one)
 
-    def parse_json(self, page, exactly_one=True):
+    def _parse_json(self, page, exactly_one=True):
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
@@ -58,9 +58,8 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         if resources.get('info').get('statuscode') == 403:
             raise exc.GeocoderAuthenticationFailure()
 
-        # TODO fix len==0
         resources = resources.get('results')[0].get('locations')
-        if not len(resources):
+        if resources is None or not len(resources):
             return None
 
         def parse_resource(resource):

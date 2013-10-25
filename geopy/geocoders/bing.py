@@ -61,7 +61,7 @@ class Bing(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
     def reverse(self, query, exactly_one=True): # pylint: disable=W0221
         """
@@ -80,16 +80,18 @@ class Bing(Geocoder):
             self.api, point, urlencode(params))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self.parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
     @staticmethod
-    def parse_json(page, exactly_one=True):
+    def _parse_json(page, exactly_one=True):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """
 
         doc = json.loads(page)
         resources = doc['resourceSets'][0]['resources']
+        if resources is None or not len(resources):
+            return None
 
         def parse_resource(resource):
             """
