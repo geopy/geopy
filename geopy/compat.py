@@ -3,7 +3,6 @@ Compatibility...
 """
 
 import sys
-from warnings import warn
 
 py3k = sys.version_info >= (3, 0)
 
@@ -37,7 +36,6 @@ try:
 except ImportError:
     try:
         from BeautifulSoup import BeautifulSoup # pylint: disable=W0611,F0401
-        warn('BeautifulSoup from package beautifulsoup4, which is Py2k/Py3k, is preferred')
     except ImportError: # pragma: no cover
         class BeautifulSoup(object): # pylint: disable=R0903
             """
