@@ -12,14 +12,11 @@ socket.setdefaulttimeout(3.0)
 from geopy.point import Point
 
 env = {
-    'BING_KEY': os.environ.get(
-        'BING_KEY',
-        'AjneXRt2fFPq3tE_xbBvnvvPJmIjTVFv2_UPfBZX5kKyOXHa2CT1NOi5EYhUk-4P'
-    ),
+    'BING_KEY': os.environ.get('BING_KEY', None),
     'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', None),
     'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
     'LIVESTREETS_AUTH_ID': os.environ.get('LIVESTREETS_AUTH_ID', None),
-    'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', None)
+    'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', "NG%2FFqbewSgoe8zedWo4SHcEdceaCD%2F%2FHew0RjO5j1OzWbLQR7Gmw18qRic7UatsxDon7poWD2FziHP2h4Amiug%3D%3D")
 }
 
 # Define some generic test functions that are common to all backends
@@ -84,7 +81,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
     def test_intersection(self):
-        self.skip_known_failure(('OpenMapQuest', 'GeoNames', ))
+        self.skip_known_failure(('OpenMapQuest', 'GeoNames', 'LiveAddress'))
 
         address = 'e. 161st st & river ave, new york, ny'
 
@@ -104,7 +101,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -73.926, delta=self.delta_exact)
 
     def test_placename(self):
-        self.skip_known_failure(('GeocoderDotUS', ))
+        self.skip_known_failure(('GeocoderDotUS', 'LiveAddress'))
 
         address = 'Mount St. Helens'
 
@@ -200,7 +197,6 @@ class GeoNamesTestCase(_BackendTestCase):
         self.delta_placename = 0.04
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['LIVESTREETS_AUTH_ID'] is not None and \
     env['LIVESTREETS_AUTH_KEY'] is not None,
     "LIVESTREETS_AUTH_ID and LIVESTREETS_AUTH_KEY env variables not set"
 )
@@ -208,7 +204,6 @@ class LiveAddressTestCase(_BackendTestCase):
     def setUp(self):
         from geopy.geocoders.smartystreets import LiveAddress
         self.geocoder = LiveAddress(
-            auth_id=env['LIVESTREETS_AUTH_ID'],
             auth_token=env['LIVESTREETS_AUTH_KEY']
         )
         self.delta_placename = 0.04

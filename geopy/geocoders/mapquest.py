@@ -16,13 +16,13 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         http://www.mapquestapi.com/geocoding/
     """
 
-    def __init__(self, api_key=None, format_string=None, proxies=None):
+    def __init__(self, api_key, format_string=None, proxies=None):
         """
         Initialize a MapQuest geocoder with address information and
         MapQuest API key.
         """
         super(MapQuest, self).__init__(format_string, proxies)
-        self.api_key = api_key or ''
+        self.api_key = api_key
         self.api = "http://www.mapquestapi.com/geocoding/v1/address"
 
     def geocode(self, query, exactly_one=True): # pylint: disable=W0221
@@ -36,12 +36,15 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         """
         super(MapQuest, self).geocode(query)
         params = {
-            'key': self.api_key,
             'location' : query
         }
         if exactly_one:
             params['maxResults'] = 1
-        url = "?".join((self.api, urlencode(params)))
+        # don't urlencode MapQuest API keys
+        url = "?".join((
+            self.api,
+            "&".join(("=".join(('key', self.api_key)), urlencode(params)))
+        ))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         page = self.urlopen(url).read()
         return self.parse_json(page, exactly_one)

@@ -27,9 +27,8 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     ``candidates`` is an integer between 1 and 10 indicating the max number of
     candidate addresses to return if a valid address could be found.
     """
-    def __init__(self, auth_id, auth_token, candidates=None, proxies=None):
+    def __init__(self, auth_token, candidates=None, proxies=None):
         super(LiveAddress, self).__init__(proxies=proxies)
-        self.auth_id = auth_id
         self.auth_token = auth_token
         if candidates:
             if not (1 <= candidates <= 10):
@@ -37,30 +36,36 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         self.candidates = candidates or 1
         self.url = 'https://api.qualifiedaddress.com/street-address'
 
-    def geocode(self, query):
+    def geocode(self, query, exactly_one=True):
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
         """
         super(LiveAddress, self).geocode(query)
         url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         request = self._execute_request(url)
         response = request.read()
-        return self._parse_json(response)
+        return self._parse_json(response, exactly_one)
 
     def _compose_url(self, location):
         """
         Generate API URL.
         """
         query = {
-            'auth-id': self.auth_id,
-            'auth-token': self.auth_token,
+
             'street': location,
             'candidates': self.candidates
         }
-        return '?'.join((self.url, urllib.urlencode(query)))
+        # don't urlencode the api token
+        return '?'.join((
+            self.url,
+            "&".join(("=".join(('auth-token', self.auth_token)), urllib.urlencode(query)))
+    ))
 
     def _execute_request(self, url):
         """
@@ -71,15 +76,17 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         except urllib2.HTTPError as error:
             raise LiveAddressError(error.getcode(), error.message or error.msg)
 
-    def _parse_json(self, response):
+    def _parse_json(self, response, exactly_one=True):
         """
         Parse responses as JSON objects.
         """
         candidates = json.loads(response)
-        if len(candidates) > 1:
+        if not len(candidates):
+            return None
+        if exactly_one is True:
+            return self._format_structured_address(candidates[0])
+        else:
             return [self._format_structured_address(c) for c in candidates]
-
-        return self._format_structured_address(candidates[0])
 
     @staticmethod
     def _format_structured_address(address):
