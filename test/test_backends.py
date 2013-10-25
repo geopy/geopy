@@ -4,6 +4,8 @@ Full tests of geocoders including HTTP access.
 import os
 import unittest
 
+import json
+
 from urllib2 import URLError
 
 import socket
@@ -11,12 +13,16 @@ socket.setdefaulttimeout(3.0)
 
 from geopy.point import Point
 
-env = {
-    'BING_KEY': os.environ.get('BING_KEY', None),
-    'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', None),
-    'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
-    'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', None)
-}
+try:
+    with open(".test_keys") as fp:
+        env = json.loads(fp.read())
+except IOError:
+    env = {
+        'BING_KEY': os.environ.get('BING_KEY', None),
+        'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', None),
+        'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
+        'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', None)
+    }
 
 # Define some generic test functions that are common to all backends
 

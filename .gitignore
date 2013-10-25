@@ -7,3 +7,4 @@ dist
 *.egg
 *.egg-info
 docs/_build
+.test_keys
