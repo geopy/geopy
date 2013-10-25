@@ -51,7 +51,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
 
     def geocode_url(self, url):
         logger.debug("Fetching %s...", url)
-        page = self._call_geocoder(url)
+        page = self.urlopen(url)
         name, (latitude, longitude) = self.parse_xhtml(page)
         return (name, (latitude, longitude))
 

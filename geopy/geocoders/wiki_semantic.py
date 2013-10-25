@@ -40,16 +40,18 @@ class SemanticMediaWiki(Geocoder):
     def get_label(self, thing):
         raise NotImplementedError()
 
-    def parse_rdf_link(self, page, mime_type='application/rdf+xml'):
+    @staticmethod
+    def parse_rdf_link(page, mime_type='application/rdf+xml'):
         """Parse the URL of the RDF link from the <head> of ``page``."""
         soup = BeautifulSoup(page)
-        link = soup.head.find('link', rel='alternate', type=mime_type)
+        link = soup.head.find( # pylint: disable=E1101,E1103
+            'link', rel='alternate', type=mime_type
+        )
         return link and link['href'] or None
 
     def parse_rdf(self, data):
         # TODO cleanup
         dom = xml.dom.minidom.parseString(data)
-        thing_map = {}
         things = dom.getElementsByTagName('smw:Thing')
         things.reverse()
         for thing in things:
