@@ -1,10 +1,15 @@
+"""
+geopy
+"""
+
 from setuptools import setup
 
 install_requires = []
 tests_require = [
     'nose-cov',
     'oauth2',
-    'BeautifulSoup',
+    'beautifulsoup4',
+    'tox',
 ]
 
 # Test if we have built-in JSON - Python 2.6+, 3.0+.
@@ -12,14 +17,14 @@ tests_require = [
 # Alternatively, if Django is installed, plug into the django
 # copy of simplejson.
 try:
-    import json
+    import json # pylint: disable=W0611
 except ImportError:
     try:
-        import simplejson
+        import simplejson # pylint: disable=W0611,F0401
     except ImportError:
         try:
-            from django.utils import simplejson
-        except:
+            from django.utils import simplejson # pylint: disable=F0401
+        except ImportError:
             install_requires.append('simplejson')
 
 # note: not automated since py3k cannot import geopy.get_version at

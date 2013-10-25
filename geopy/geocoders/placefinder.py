@@ -8,8 +8,12 @@ from __future__ import print_function, unicode_literals
 from geopy.compat import json
 
 import time
+
 import urllib
-import urllib2
+try:
+    from urllib2 import Request, HTTPError, URLError
+except ImportError:
+    Request, HTTPError, URLError = None, None, None
 
 from geopy.geocoders.base import Geocoder, GeocoderError
 
@@ -31,6 +35,8 @@ class YahooPlaceFinder(Geocoder):
         """
         if oauth2 is None:
             raise ImportError('oauth2 is needed for YahooPlaceFinder')
+        if Request is None:
+            raise NotImplementedError("YahooPlaceFinder is not compatible with Py3k")
         super(YahooPlaceFinder, self).__init__(proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret

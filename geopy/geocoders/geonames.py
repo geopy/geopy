@@ -2,7 +2,7 @@
 :class:`GeoNames` geocoder.
 """
 
-from urllib import urlencode
+from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page
@@ -58,8 +58,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         """
         Parse JSON response body.
         """
-        if not isinstance(page, (str, unicode)):
-            page = decode_page(page)
+
 
         doc = json.loads(page)
         places = doc.get('geonames', [])

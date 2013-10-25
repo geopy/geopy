@@ -2,7 +2,7 @@
 :class:`.MapQuest` geocoder.
 """
 
-from urllib import urlencode
+from geopy.compat import urlencode
 
 from geopy.compat import json
 from geopy.geocoders.base import Geocoder
@@ -53,14 +53,15 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
-        if not isinstance(page, (str, unicode)):
-            page = decode_page(page)
+
         resources = json.loads(page)
         if resources.get('info').get('statuscode') == 403:
             raise exc.GeocoderAuthenticationFailure()
 
         # TODO fix len==0
         resources = resources.get('results')[0].get('locations')
+        if not len(resources):
+            return None
 
         def parse_resource(resource):
             city = resource['adminArea5']
@@ -81,11 +82,3 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             return parse_resource(resources[0])
         else:
             return [parse_resource(resource) for resource in resources]
-
-if __name__ == "__main__":
-    # TODO test
-    mq = MapQuest("Dmjtd%7Clu612007nq%2C20%3Do5-50zah")
-    print mq.geocode('Mount St. Helens')
-    mq = MapQuest("hDmjtd%7Clu612007nq%2C20%3Do5-50zah")
-    print mq.geocode('Mount St. Helens')
-

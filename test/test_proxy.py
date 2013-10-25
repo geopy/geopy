@@ -3,7 +3,10 @@ Test ability to proxy requests.
 """
 
 import os
-import urllib2
+try: # Py2k
+    from urllib2 import urlopen # pylint: disable=F0401
+except ImportError: # Py3k
+    from urllib.request import urlopen # pylint: disable=F0401,E0611
 import unittest
 from test import proxy_server
 from geopy.geocoders.base import Geocoder
@@ -24,7 +27,7 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         self.orig_http_proxy = os.environ['http_proxy'] if os.environ.has_key('http_proxy') else None
 
         # Get HTTP for comparison before proxy test
-        base_http = urllib2.urlopen('http://www.blankwebsite.com/')
+        base_http = urlopen('http://www.blankwebsite.com/')
         base_html = base_http.read()
         self.noproxy_data = base_html if base_html else None
 
@@ -44,13 +47,13 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         ''' Test of OTB Geocoder Proxy functionality works'''
         class DummyGeocoder(Geocoder):
             def geocode(self, location):
-                geo_request = urllib2.urlopen(location)
+                geo_request = urlopen(location)
                 geo_html = geo_request.read()
                 return geo_html if geo_html else None
 
         '''Testcase to test that proxy standup code works'''
         geocoder_dummy = DummyGeocoder(proxies={"http": "http://localhost:1337"})
-        self.assertTrue(geocoder_dummy.urlopen != urllib2.urlopen)
+        self.assertTrue(geocoder_dummy.urlopen != urlopen)
         self.assertTrue(self.noproxy_data, geocoder_dummy.geocode('http://www.blankwebsite.com/'))
 
 if __name__ == '__main__':

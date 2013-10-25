@@ -5,7 +5,7 @@
 import base64
 import hashlib
 import hmac
-from urllib import urlencode
+from geopy.compat import urlencode
 
 from geopy.compat import json
 
@@ -163,8 +163,7 @@ class GoogleV3(Geocoder):
 
     def parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
-        if not isinstance(page, (str, unicode)):
-            page = decode_page(page)
+
         self.doc = json.loads(page)
         places = self.doc.get('results', [])
 

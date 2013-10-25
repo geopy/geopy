@@ -3,7 +3,7 @@
 """
 
 import getpass
-from urllib import urlencode
+from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, join_filter
 import csv

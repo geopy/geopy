@@ -1,4 +1,12 @@
+"""
+Formatting...
+"""
+
 from geopy import units
+from geopy.compat import py3k
+
+if py3k:
+    unichr = chr # pylint: disable=W0622
 
 # Unicode characters for symbols that appear in coordinate strings.
 DEGREE = unichr(176)

@@ -4,7 +4,7 @@
 
 from geopy.compat import json
 
-from urllib import urlencode
+from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page, join_filter
@@ -87,8 +87,7 @@ class Bing(Geocoder):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """
-        if not isinstance(page, (str, unicode)):
-            page = decode_page(page)
+
         doc = json.loads(page)
         resources = doc['resourceSets'][0]['resources']
 

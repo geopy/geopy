@@ -2,11 +2,9 @@
 :class:`.LiveAddress` geocoder.
 """
 
-import urllib
-
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
-from geopy.compat import json
+from geopy.compat import json, urlencode
 
 
 class LiveAddress(Geocoder): # pylint: disable=W0223
@@ -47,7 +45,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         super(LiveAddress, self).geocode(query)
         url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, raw=True), exactly_one)
 
     def _compose_url(self, location):
         """
@@ -61,7 +59,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         # don't urlencode the api token
         return '?'.join((
             self.api,
-            "&".join(("=".join(('auth-token', self.auth_token)), urllib.urlencode(query)))
+            "&".join(("=".join(('auth-token', self.auth_token)), urlencode(query)))
     ))
 
     def _parse_json(self, response, exactly_one=True):

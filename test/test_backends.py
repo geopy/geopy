@@ -6,7 +6,10 @@ import unittest
 
 import json
 
-from urllib2 import URLError
+try:
+    from urllib2 import URLError
+except ImportError:
+    from urllib.error import URLError # pylint: disable=F0401,E0611
 
 import socket
 socket.setdefaulttimeout(3.0)
@@ -99,7 +102,6 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
                 raise
         if result is None:
             self.fail('No result found')
-        print result
         clean_address, latlon = result # pylint: disable=W0612
 
         self.assertAlmostEqual(latlon[0], 40.828, delta=self.delta_exact)

@@ -5,6 +5,7 @@
 import re
 from itertools import islice
 from geopy import util, units, format # pylint: disable=W0622
+from geopy.compat import string_compare
 
 
 class Point(object): # pylint: disable=R0924
@@ -103,7 +104,7 @@ class Point(object): # pylint: disable=R0924
                 pass
             elif isinstance(arg, Point):
                 return cls.from_point(arg)
-            elif isinstance(arg, (str, unicode)):
+            elif isinstance(arg, string_compare):
                 return cls.from_string(arg)
             else:
                 try:
@@ -165,7 +166,7 @@ class Point(object): # pylint: disable=R0924
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, (str, unicode)):
+            if not isinstance(altitude, string_compare):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
@@ -179,7 +180,7 @@ class Point(object): # pylint: disable=R0924
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, (str, unicode)):
+            if not isinstance(altitude, string_compare):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 

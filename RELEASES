@@ -9,6 +9,10 @@ CHANGED:    GoogleV3 returns new exception types:
                 `geopy.geocoders.base.GeocoderResultError` -> `geopy.exc.GeocoderQueryError`
                 `geopy.geocoders.base.GTooManyQueriesError` -> `geopy.exc.GeocoderQuotaExceeded`
 
+CHANGED:    Optional dependency of BeautifulSoup is now preferred to come
+            from the package ``beautifulsoup4``, which is both Py2k and Py3k
+            compliant, rather than the original ``BeautifulSoup``.
+
 ADDED:  SmartyStreets LiveAddress geocoder implemented. Contributed by
         Michael Whatcott.
 

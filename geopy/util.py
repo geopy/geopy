@@ -5,16 +5,24 @@ Utils.
 from sys import version_info
 import re
 import logging
-import htmlentitydefs
+try: # Py2k
+    import htmlentitydefs # pylint: disable=F0401
+except ImportError: # Py3k
+    import html.entities as htmlentitydefs # pylint: disable=F0401
 import xml.dom.minidom
 from xml.parsers.expat import ExpatError
 
 try:
-    from decimal import Decimal
-except ImportError:
     NUMBER_TYPES = (int, long, float)
-else:
-    NUMBER_TYPES = (int, long, float, Decimal)
+except NameError:
+    NUMBER_TYPES = (int, float) # float -> int in Py3k
+try:
+    from decimal import Decimal
+    NUMBER_TYPES = NUMBER_TYPES + (Decimal, )
+except ImportError:
+    pass
+
+from geopy.compat import py3k, string_compare
 
 class NullHandler(logging.Handler):
     """
@@ -41,11 +49,19 @@ def pairwise(seq):
     for i in range(0, len(seq) - 1):
         yield (seq[i], seq[i + 1])
 
-def join_filter(sep, seq, pred=bool):
-    """
-    TODO docs.
-    """
-    return sep.join([unicode(i) for i in seq if pred(i)])
+if not py3k:
+    def join_filter(sep, seq, pred=bool):
+        """
+        TODO docs.
+        """
+        return sep.join([unicode(i) for i in seq if pred(i)])
+else:
+    def join_filter(sep, seq, pred=bool):
+        """
+        TODO docs.
+        """
+        return sep.join([str(i) for i in seq if pred(i)])
+
 
 def get_encoding(page, contents=None):
     """
@@ -82,7 +98,7 @@ def get_first_text(node, tag_names, strip=None):
     """
     TODO docs.
     """
-    if isinstance(tag_names, (str, unicode)):
+    if isinstance(tag_names, string_compare):
         tag_names = [tag_names]
     if node:
         while tag_names:

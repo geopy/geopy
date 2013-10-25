@@ -2,12 +2,17 @@
 :class:`.GeoCoder` base object from which other geocoders are templated.
 """
 
-import urllib2
+try:
+    from urllib2 import urlopen as urllib_urlopen, build_opener, ProxyHandler
+except ImportError:
+    from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
+        build_opener, ProxyHandler)
 from warnings import warn
 
-from geopy.compat import py3k
+from geopy.compat import py3k, string_compare, HTTPError
 from geopy.point import Point
 from geopy.exc import GeocoderServiceError
+from geopy.util import decode_page
 
 
 class Geocoder(object): # pylint: disable=R0921
@@ -24,10 +29,10 @@ class Geocoder(object): # pylint: disable=R0921
         # See: http://docs.python.org/2/library/urllib2.html
         # And: http://stackoverflow.com/questions/1450132/proxy-with-urllib2
         if self.proxies is None:
-            self.urlopen = urllib2.urlopen
+            self.urlopen = urllib_urlopen
         else:
-            self.urlopen = urllib2.build_opener(
-                urllib2.ProxyHandler(self.proxies)
+            self.urlopen = build_opener(
+                ProxyHandler(self.proxies)
             )
 
     @staticmethod
@@ -40,25 +45,30 @@ class Geocoder(object): # pylint: disable=R0921
             return ",".join((str(point.latitude), str(point.longitude)))
         elif isinstance(point, (list, tuple)):
             return ",".join((str(point[0]), str(point[1]))) # -altitude
-        elif isinstance(point, (str, unicode)):
+        elif isinstance(point, string_compare):
             return point
         else:
             raise ValueError("Invalid point")
 
-    def _call_geocoder(self, url):
+    def _call_geocoder(self, url, raw=False):
         """
         For a generated query URL, get the results.
         """
         try:
-            return self.urlopen(url)
-        except urllib2.HTTPError as error:
+            page = self.urlopen(url)
+        except HTTPError as error:
             raise GeocoderServiceError(error.getcode(), error.message or error.msg)
+        if raw:
+            return page
+        if not isinstance(page, string_compare):
+            page = decode_page(page)
+        return page
 
     def geocode(self, query, exactly_one=True): # pylint: disable=R0201,W0613
         """
         Implemented in subclasses. Just string coercion here.
         """
-        if isinstance(query, unicode) and not py3k:
+        if not py3k and isinstance(query, unicode):
             query = query.encode('utf-8')
 
     def reverse(self, query, exactly_one=True):

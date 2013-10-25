@@ -4,7 +4,7 @@
 
 from geopy.compat import json
 
-from urllib import urlencode
+from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page
@@ -58,8 +58,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
-        if not isinstance(page, (str, unicode)):
-            page = decode_page(page)
+
         resources = json.loads(page)
         if not len(resources): # pragma: no cover
             return None
