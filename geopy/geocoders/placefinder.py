@@ -113,6 +113,8 @@ class YahooPlaceFinder(Geocoder):
 
         try:
             placefinder = json.loads(response)['bossresponse']['placefinder']
+            if not len(placefinder):
+                return None
             results = [
                 (place, (float(place['latitude']), float(place['longitude'])))
                 for place in placefinder.get('results', [])
@@ -136,8 +138,8 @@ class YahooPlaceFinder(Geocoder):
             if location[line]
         ])
 
-    def geocode(self, query, min_quality=0,
-                raw=False, reverse=False, valid_country_codes=None):
+    def geocode(self, query, min_quality=0, raw=False, reverse=False, # pylint: disable=W0221,R0913
+                        valid_country_codes=None, exactly_one=True):
         """
         Geocode a location query.
 
@@ -159,6 +161,8 @@ class YahooPlaceFinder(Geocoder):
         request = self._build_request(query, reverse=reverse)
         response = self._get_response(request)
         results = self._parse_response(response)
+        if results is None:
+            return None
 
         results = self._filtered_results(
             results,
@@ -172,7 +176,10 @@ class YahooPlaceFinder(Geocoder):
                 for (place, point) in results
             ]
 
-        return results
+        if exactly_one:
+            return results[0]
+        else:
+            return results
 
     def reverse(self, inp):
         """
