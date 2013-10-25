@@ -4,19 +4,18 @@
 Geopy can calculate geodesic distance. Two distance formulas are included:
 great-circle distance and Vincenty distance.
 
-Great-circle distance uses a spherical model of the earth, using the
-average great-circle radius of 6372.795 kilometers, resulting in an
-error of up to about 0.5%. The radius value is stored in
+Great-circle distance (:class:.`great_circle`) uses a spherical model of
+the earth, using the average great-circle radius of 6372.795 kilometers,
+resulting in an error of up to about 0.5%. The radius value is stored in
 :const:`distance.EARTH_RADIUS`, so it can be customized
 (it should always be in kilometers, however).
 
-Vincenty distance uses a more accurate ellipsoidal model of the earth.
-This is the default distance formula, and is thus aliased as
-``distance.distance`` -- so you can easily swap out distance formulas just
-by changing distance.distance at the top of your code. There are multiple
-popular ellipsoidal models, and which one will be the most accurate depends
-on where your points are located on the earth. The default is the WGS-84
-ellipsoid, which is the most globally accurate. geopy includes a few other
+Vincenty distance (:class:`.vincenty`) uses a more accurate ellipsoidal model
+of the earth. This is the default distance formula, and is thus aliased as
+``distance.distance``. There are multiple popular ellipsoidal models, and
+which one will be the most accurate depends on where your points are located
+on the earth. The default is the WGS-84 ellipsoid, which is the most globally
+accurate. geopy includes a few other
 models in the distance.ELLIPSOIDS dictionary::
 
                   model             major (km)   minor (km)     flattening
@@ -28,7 +27,6 @@ models in the distance.ELLIPSOIDS dictionary::
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
                   }
 
-
 Here's an example usage of distance.vincenty::
 
     >>> from geopy import distance
@@ -37,13 +35,11 @@ Here's an example usage of distance.vincenty::
     >>> distance.vincenty(ne, cl).miles
     538.37173614757057
 
-
 Using Great-circle distance::
 
     >>> from geopy import distance
     >>> distance.great_circle(ne, cl).miles
     537.12986466281222
-
 
 You can change the ellipsoid model used by the Vincenty formula like so::
 
@@ -289,8 +285,8 @@ class vincenty(Distance):
     ellipsoid_key = None
     ELLIPSOID = None
 
-    def __init__(self, ellipsoid='WGS-84', *args, **kwargs):
-        self.set_ellipsoid(ellipsoid)
+    def __init__(self, *args, **kwargs):
+        self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         major, minor, f = self.ELLIPSOID # pylint: disable=W0612
         super(VincentyDistance, self).__init__(*args, **kwargs)
 

@@ -180,8 +180,7 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases):
     def test_should_get_distinct_results_for_different_ellipsoids(self):
         results = []
         for ellipsoid_name in ELLIPSOIDS.keys():
-            self.cls.ELLIPSOID = ELLIPSOIDS[ellipsoid_name]
-            results.append(self.cls((0, 0), (0, 1)))
+            results.append(self.cls((0, 0), (0, 1), ellipsoid=ELLIPSOIDS[ellipsoid_name]))
 
         assert not any(results[x].kilometers == results[y].kilometers
                        for x in range(len(results))
