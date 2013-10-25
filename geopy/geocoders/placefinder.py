@@ -93,7 +93,7 @@ class YahooPlaceFinder(Geocoder):
                 None,
                 request.to_header(realm='yahooapis.com'),
             )
-            response = urllib2.self.urlopen(urllib_req)
+            response = self.urlopen(urllib_req)
             content = response.read()
         except urllib2.HTTPError as exc:
             raise GeocoderError(

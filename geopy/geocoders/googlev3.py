@@ -6,7 +6,6 @@ import base64
 import hashlib
 import hmac
 from urllib import urlencode
-from urllib2 import urlopen
 
 from geopy.compat import json
 from geopy.point import Point
@@ -21,7 +20,7 @@ class GoogleV3(Geocoder):
         https://developers.google.com/maps/documentation/geocoding/
     """
 
-    def __init__(self, domain='maps.googleapis.com', protocol='http',
+    def __init__(self, domain='maps.googleapis.com', protocol='http', # pylint: disable=R0913
                  client_id=None, secret_key=None, proxies=None):
         """
         Initialize a customized Google geocoder.

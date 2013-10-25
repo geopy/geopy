@@ -5,7 +5,6 @@
 from geopy.compat import json
 
 from urllib import urlencode
-from urllib2 import urlopen
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, decode_page, join_filter

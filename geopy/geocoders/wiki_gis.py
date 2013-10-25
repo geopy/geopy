@@ -2,8 +2,6 @@
 :class:`.MediaWiki` geocoder.
 """
 
-from urllib2 import urlopen
-
 from geopy.compat import BeautifulSoup
 
 from geopy.geocoders.base import Geocoder

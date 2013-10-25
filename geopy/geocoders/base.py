@@ -21,7 +21,6 @@ class Geocoder(object): # pylint: disable=R0921
         # See: http://docs.python.org/2/library/urllib2.html
         # And: http://stackoverflow.com/questions/1450132/proxy-with-urllib2
         if self.proxies is None:
-            print proxies
             self.urlopen = urllib2.urlopen
         else:
             self.urlopen = urllib2.build_opener(

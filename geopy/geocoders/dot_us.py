@@ -4,7 +4,6 @@
 
 import getpass
 from urllib import urlencode
-from urllib2 import urlopen
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, join_filter
 import csv

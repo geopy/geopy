@@ -62,13 +62,12 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         }
         return '?'.join((self.url, urllib.urlencode(query)))
 
-    @staticmethod
-    def _execute_request(url):
+    def _execute_request(self, url):
         """
         Call API.
         """
         try:
-            return urllib2.self.urlopen(url)
+            return self.urlopen(url)
         except urllib2.HTTPError as error:
             raise LiveAddressError(error.getcode(), error.message or error.msg)
 

@@ -3,7 +3,6 @@
 """
 
 from urllib import urlencode
-from urllib2 import urlopen
 
 from geopy.compat import json
 from geopy.geocoders.base import Geocoder

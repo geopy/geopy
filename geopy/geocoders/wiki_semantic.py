@@ -3,7 +3,6 @@
 """
 
 import xml.dom.minidom
-from urllib2 import urlopen
 
 from geopy.compat import BeautifulSoup
 
@@ -114,7 +113,7 @@ class SemanticMediaWiki(Geocoder):
             tried = set() # TODO undefined tried -- is this right?
             relations = self.get_relations(thing)
             for _, resource in relations:
-                url = things.get(resource, resource)
+                url = things.get(resource, resource) # pylint: disable=E1103
                 if url in tried: # Avoid cyclic relationships.
                     continue
                 tried.add(url)
