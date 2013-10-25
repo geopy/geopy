@@ -61,3 +61,4 @@ from geopy.geocoders.wiki_semantic import SemanticMediaWiki
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.mapquest import MapQuest
+from geopy.geocoders.osm import Nominatim
