@@ -26,13 +26,12 @@ Using [pip](http://www.pip-installer.org/en/latest/):
 
     pip install geopy
 
-Or, manually: [Download the tarball from PyPI](https://pypi.python.org/pypi/geopy), unzip, and execute this in the same directory:
+Or, manually: [Download the tarball from PyPI](https://pypi.python.org/pypi/geopy),
+unzip, and execute this in the same directory:
 
     python setup.py install
 
-## Basic Geocoding
-
-**Examples**
+## Usage
 
 To geolocate a query to an address and coordinates:
 
@@ -50,4 +49,7 @@ To find the address corresponding to a set of coordinates:
     >>> print address, latitude, longitude
     77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
 
-More documentation and examples can be found at [Read the Docs](http://geopy.readthedocs.org/en/latest/).
+## Documentation
+
+More documentation and examples can be found at
+[Read the Docs](http://geopy.readthedocs.org/en/latest/).
