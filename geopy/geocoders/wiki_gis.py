@@ -20,13 +20,14 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
         Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
 
-        :param string format_url: is a URL string containing '%s' where the page name to
-        request will be interpolated. For example: 'http://www.wiki.com/wiki/%s'
+        :param string format_url: is a URL string containing '%s' where the
+            page name to request will be interpolated. For
+            example: 'http://www.wiki.com/wiki/%s'
 
-        :param callable _transform_string: is a callable that will make appropriate
-        replacements to the input string before requesting the page. If None is
-        given, the default _transform_string which replaces ' ' with '_' will be
-        used.
+        :param callable _transform_string: is a callable that will make
+            appropriate replacements to the input string before requesting
+            the page. If ``None`` is given, the default _transform_string
+            which replaces ' ' with '_' will be used.
         """
         super(MediaWiki, self).__init__()
         self.format_url = format_url

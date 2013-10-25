@@ -20,47 +20,47 @@ class Point(object): # pylint: disable=R0924
 
     With longitude, latitude, and altitude::
 
-    >>> p1 = Point(41.5, -81, 0)
-    >>> p2 = Point(latitude=41.5, longitude=-81)
+        >>> p1 = Point(41.5, -81, 0)
+        >>> p2 = Point(latitude=41.5, longitude=-81)
 
     With a sequence of 0 to 3 values (longitude, latitude, altitude)::
 
-    >>> p1 = Point([41.5, -81, 0])
-    >>> p2 = Point((41.5, -81))
+        >>> p1 = Point([41.5, -81, 0])
+        >>> p2 = Point((41.5, -81))
 
     Copy another `Point` instance::
 
-    >>> p2 = Point(p1)
-    >>> p2 == p1
-    True
-    >>> p2 is p1
-    False
+        >>> p2 = Point(p1)
+        >>> p2 == p1
+        True
+        >>> p2 is p1
+        False
 
     Give an object with a 'point' attribute, such as a `Location` instance::
 
-    >>> p = Point(location)
+        >>> p = Point(location)
 
     Give a string containing at least latitude and longitude::
 
-    >>> p1 = Point('41.5,-81.0')
-    >>> p2 = Point('41.5 N -81.0 W')
-    >>> p3 = Point('-41.5 S, 81.0 E, 2.5km')
-    >>> p4 = Point('23 26m 22s N 23 27m 30s E 21.0mi')
-    >>> p5 = Point('''3 26' 22" N 23 27' 30" E''')
+        >>> p1 = Point('41.5,-81.0')
+        >>> p2 = Point('41.5 N -81.0 W')
+        >>> p3 = Point('-41.5 S, 81.0 E, 2.5km')
+        >>> p4 = Point('23 26m 22s N 23 27m 30s E 21.0mi')
+        >>> p5 = Point('''3 26' 22" N 23 27' 30" E''')
 
     Point values can be accessed by name or by index::
 
-    >>> p = Point(41.5, -81.0, 0)
-    >>> p.latitude == p[0]
-    True
-    >>> p.longitude == p[1]
-    True
-    >>> p.altitude == p[2]
-    True
+        >>> p = Point(41.5, -81.0, 0)
+        >>> p.latitude == p[0]
+        True
+        >>> p.longitude == p[1]
+        True
+        >>> p.altitude == p[2]
+        True
 
     When unpacking (or iterating), a (latitude, longitude, altitude) tuple is returned::
 
-    >>> latitude, longitude, altitude = p
+        >>> latitude, longitude, altitude = p
 
     """
     UTIL_PATTERNS = dict(

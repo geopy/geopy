@@ -11,11 +11,9 @@ Welcome to GeoPy's documentation!
 
 Geocoders
 ~~~~~~~~~
-Geocoders each define at least a ``geocode`` method, for resolving a location
-from a string, and may define a ``reverse`` method, which resolves a pair of
-coordinates to an address. Each Geocoder accepts any credentials
-or settings needed to interact with its service, e.g., an API key or
-locale, during its initialization.
+
+.. automodule:: geopy.geocoders
+   :members: __doc__
 
 .. autoclass:: geopy.geocoders.Bing
     :members: __init__, geocode, reverse
@@ -40,6 +38,18 @@ locale, during its initialization.
 
 .. autoclass:: geopy.geocoders.YahooPlaceFinder
     :members: __init__, geocode
+
+Calculating Distance
+~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: geopy.distance
+    :members: __doc__
+
+.. autoclass:: geopy.distance.vincenty
+    :members: __init__
+
+.. autoclass:: geopy.distance.great_circle
+    :members: __init__
 
 Data
 ~~~~

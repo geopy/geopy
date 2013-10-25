@@ -1,3 +1,70 @@
+"""
+.. versionadded:: 0.93.0
+
+Geopy can calculate geodesic distance. Two distance formulas are included:
+great-circle distance and Vincenty distance.
+
+Great-circle distance uses a spherical model of the earth, using the
+average great-circle radius of 6372.795 kilometers, resulting in an
+error of up to about 0.5%. The radius value is stored in
+:const:`distance.EARTH_RADIUS`, so it can be customized
+(it should always be in kilometers, however).
+
+Vincenty distance uses a more accurate ellipsoidal model of the earth.
+This is the default distance formula, and is thus aliased as
+``distance.distance`` -- so you can easily swap out distance formulas just
+by changing distance.distance at the top of your code. There are multiple
+popular ellipsoidal models, and which one will be the most accurate depends
+on where your points are located on the earth. The default is the WGS-84
+ellipsoid, which is the most globally accurate. geopy includes a few other
+models in the distance.ELLIPSOIDS dictionary::
+
+                  model             major (km)   minor (km)     flattening
+    ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / 298.257223563),
+                  'GRS-80':        (6378.137,    6356.7523141,  1 / 298.257222101),
+                  'Airy (1830)':   (6377.563396, 6356.256909,   1 / 299.3249646),
+                  'Intl 1924':     (6378.388,    6356.911946,   1 / 297.0),
+                  'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
+                  'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
+                  }
+
+
+Here's an example usage of distance.vincenty::
+
+    >>> from geopy import distance
+    >>> _, ne = g.geocode('Newport, RI')
+    >>> _, cl = g.geocode('Cleveland, OH')
+    >>> distance.vincenty(ne, cl).miles
+    538.37173614757057
+
+
+Using Great-circle distance::
+
+    >>> from geopy import distance
+    >>> distance.great_circle(ne, cl).miles
+    537.12986466281222
+
+
+You can change the ellipsoid model used by the Vincenty formula like so::
+
+    >>> distance.vincenty(ne, cl, ellipsoid='GRS-80').miles
+
+The above model name will automatically be retrieved from the ELLIPSOIDS dictionary.
+Alternatively, you can specify the model values directly::
+
+    >>> distance.vincenty(ne, cl, ellipsoid=(6377., 6356., 1 / 297.)).miles
+
+Distances support simple arithmetic, making it easy to do things like
+calculate the length of a path::
+
+    >>> d = distance.distance
+    >>> _, wa = g.geocode('Washington, DC')
+    >>> _, pa = g.geocode('Palo Alto, CA')
+    >>> (d(ne, cl) + d(cl, wa) + d(wa, pa)).miles
+    3276.157156868931
+
+"""
+
 from math import atan, tan, sin, cos, pi, sqrt, atan2, acos, asin
 from geopy.units import radians
 from geopy import units, util
@@ -25,6 +92,10 @@ ELLIPSOIDS = {
 }
 
 class Distance(object):
+    """
+    Base for GreatCircleDistance and VincentyDistance.
+    """
+
     def __init__(self, *args, **kwargs):
         kilometers = kwargs.pop('kilometers', 0)
         if len(args) == 1:
@@ -124,7 +195,7 @@ class Distance(object):
         return self.nautical
 
 
-class GreatCircleDistance(Distance):
+class great_circle(Distance):
     """
     Use spherical geometry to calculate the surface distance between two
     geodesic points. This formula can be written many different ways,
@@ -201,22 +272,44 @@ class GreatCircleDistance(Distance):
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
 
-class VincentyDistance(Distance):
+class vincenty(Distance):
     """
     Calculate the geodesic distance between two points using the formula
     devised by Thaddeus Vincenty, with an accurate ellipsoidal model of the
     earth.
 
-    The class attribute `ELLIPSOID` indicates which ellipsoidal model of the
-    earth to use. If it is a string, it is looked up in the `ELLIPSOIDS`
+    Set which ellipsoidal model of the earth to use by calling
+    ``set_ellipsoid``. If it is a string, it is looked up in the `ELLIPSOIDS`
     dictionary to obtain the major and minor semiaxes and the flattening.
     Otherwise, it should be a tuple with those values. The most globally
     accurate model is WGS-84. See the comments above the `ELLIPSOIDS`
     dictionary for more information.
-
     """
 
-    ELLIPSOID = 'WGS-84'
+    ellipsoid_key = None
+    ELLIPSOID = None
+
+    def __init__(self, ellipsoid='WGS-84', *args, **kwargs):
+        self.set_ellipsoid(ellipsoid)
+        major, minor, f = self.ELLIPSOID # pylint: disable=W0612
+        super(VincentyDistance, self).__init__(*args, **kwargs)
+
+    def set_ellipsoid(self, ellipsoid):
+        """
+        Change the ellipsoid used in the calculation.
+        """
+        if not isinstance(ellipsoid, (list, tuple)):
+            try:
+                self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
+                self.ellipsoid_key = ellipsoid
+            except KeyError:
+                raise Exception(
+                    "Invalid ellipsoid. See geopy.distance.ELIPSOIDS"
+                )
+        else:
+            self.ELLIPSOID = ellipsoid
+            self.ellipsoid_key = None
+        return
 
     def measure(self, a, b):
         a, b = Point(a), Point(b)
@@ -404,4 +497,6 @@ class VincentyDistance(Distance):
 
 
 # Set the default distance formula to the most generally accurate.
-distance = VincentyDistance
+
+distance = VincentyDistance = vincenty
+GreatCircleDistance = great_circle
