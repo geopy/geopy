@@ -10,7 +10,7 @@ from geopy.compat import urlencode
 from geopy.compat import json
 
 from geopy.geocoders.base import Geocoder
-from geopy.util import logger, decode_page
+from geopy.util import logger
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded, ConfigurationError
 
 

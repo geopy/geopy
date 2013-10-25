@@ -15,6 +15,12 @@ import socket
 socket.setdefaulttimeout(3.0)
 
 from geopy.point import Point
+from geopy.compat import py3k
+
+if py3k:
+    str_coerce = str
+else:
+    str_coerce = unicode
 
 try:
     with open(".test_keys") as fp:
@@ -69,7 +75,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
 
     def test_partial_address(self):
-        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', ))
+        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', 'Nominatim'))
 
         address = '435 north michigan, chicago 60611'
 
@@ -89,7 +95,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
     def test_intersection(self):
-        self.skip_known_failure(('OpenMapQuest', 'GeoNames', 'LiveAddress'))
+        self.skip_known_failure(('OpenMapQuest', 'GeoNames', 'LiveAddress', 'Nominatim'))
 
         address = 'e. 161st st & river ave, new york, ny'
 
@@ -143,7 +149,7 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
             "40.75376406311989, -73.98489005863667",
             exactly_one=True
         )
-        self.assertEqual(str(addr), known_addr)
+        self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
@@ -164,7 +170,7 @@ class BingTestCase(_BackendTestCase):
         known_addr = '1067 6th Ave, New York, NY 10018, United States'
         known_coords = (40.75376406311989, -73.98489005863667)
         addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071))
-        self.assertEqual(str(addr), known_addr)
+        self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
@@ -214,6 +220,23 @@ class LiveAddressTestCase(_BackendTestCase):
             auth_token=env['LIVESTREETS_AUTH_KEY']
         )
         self.delta_placename = 0.04
+
+class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
+    def setUp(self):
+        from geopy.geocoders.osm import Nominatim
+        self.geocoder = Nominatim()
+
+    def test_reverse(self):
+        known_addr = 'Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond '\
+            'District, Chelsea, NYC, New York, 10020, United States of America'
+        known_coords = (40.75376406311989, -73.98489005863667)
+        addr, coords = self.geocoder.reverse(
+            "40.75376406311989, -73.98489005863667",
+            exactly_one=True
+        )
+        self.assertEqual(str_coerce(addr), known_addr)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
 # class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 #     def setUp(self):

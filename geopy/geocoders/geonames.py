@@ -5,7 +5,7 @@
 from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
-from geopy.util import logger, decode_page
+from geopy.util import logger
 from geopy.compat import json
 from geopy.exc import GeocoderInsufficientPrivileges, GeocoderError, \
     ConfigurationError

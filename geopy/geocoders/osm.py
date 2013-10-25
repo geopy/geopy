@@ -1,29 +1,31 @@
-# OSM geocoder
-# See: http://wiki.openstreetmap.org/wiki/Nominatim
-# Author: Alessandro Pasotti (ItOpen)
-# URL: http://www.itopen.it
-# Licence: AGPL
-# Date: 2011-12-20
-
-
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        from django.utils import simplejson as json
+"""
+OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
+"""
 
 from geopy.geocoders.base import Geocoder
-from geopy.util import logger, decode_page
-from geopy.point import Point
-from urllib import urlencode
-from urllib2 import urlopen
+from geopy.util import logger
+from geopy.compat import json, urlencode
+from geopy.exc import ConfigurationError
 
 
 class Nominatim(Geocoder):
-    def __init__(self, api_key=None, format_string='%s', output_format='json', view_box=(-180,-90,180,90), country_bias=None):
+    """
+    Nominatim geocoder for OpenStreetMap servers. Documentation at:
+        http://wiki.openstreetmap.org/wiki/Nominatim
+    """
 
+    def __init__(self, format_string='%s', output_format='json', # pylint: disable=R0913
+                        view_box=(-180,-90,180,90), country_bias=None, proxies=None):
+        """
+        :param string format_string:
+
+        :param string output_format:
+
+        :param tuple view_box:
+
+        :param string country_bias:
+        """
+        super(Nominatim, self).__init__(format_string, proxies)
         self.country_bias = country_bias
         self.format_string = format_string
         self.output_format = output_format
@@ -31,14 +33,23 @@ class Nominatim(Geocoder):
         self.country_bias = country_bias
 
         if self.output_format and not self.output_format in (['xml', 'json']):
-            raise ValueError('if defined, `output_format` must be one of: "json","xml"')
+            raise ConfigurationError('if defined, `output_format` must be one of: "json","xml"')
 
-        self.url = "http://nominatim.openstreetmap.org/search?%s"
-        self.reverse_url = " http://nominatim.openstreetmap.org/reverse?%s"
+        self.api = "http://nominatim.openstreetmap.org/search"
+        self.reverse_api = " http://nominatim.openstreetmap.org/reverse"
 
-    def geocode(self, string, exactly_one=True):
+    def geocode(self, query, exactly_one=True):
+        """
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+        """
+        super(Nominatim, self).geocode(query)
         params = {
-            'q': self.format_string % string,
+            'q': self.format_string % query,
             'view_box' : self.view_box,
             'format' : self.output_format,
         }
@@ -46,45 +57,40 @@ class Nominatim(Geocoder):
         if self.country_bias:
             params['countrycodes'] = self.country_bias
 
-        url = self.url % urlencode(params)
-        return self.geocode_url(url, exactly_one)
+        url = "?".join((self.api, urlencode(params)))
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
-    def geocode_url(self, url, exactly_one=True, reverse=False):
-        logger.debug("Fetching %s..." % url)
-        page = urlopen(url)
-        return self.parse_json(page, exactly_one)
+    def reverse(self, query, exactly_one=True):
+        """
+        Returns a reverse geocoded location.
 
-    def reverse(self, coord, exactly_one=True):
-        if isinstance(coord, Point):
-            (lat, lng, _) = coord
-        else:
-            (lat, lng) = coord
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
 
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+        """
+        lat, lng = self._coerce_point_to_string(query).split(',') # doh
         params = {
                 'lat': lat,
                 'lon' : lng,
                 'format': self.output_format.lower(),
           }
 
-        url = self.reverse_url % urlencode(params)
-        return self.geocode_url(url, exactly_one, reverse=True)
+        url = "?".join((self.reverse_api, urlencode(params)))
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+        return self.parse_json(self._call_geocoder(url), exactly_one)
 
     def parse_json(self, page, exactly_one):
-        if not isinstance(page, basestring):
-            page = decode_page(page)
-
-        doc = json.loads(page)
-        places = doc
+        places = json.loads(page)
 
         if not isinstance (places, list):
             places = [places]
-
-        if not places:
+        if not len(places):
             return None
-
-        if exactly_one and len(places) != 1:
-            raise ValueError("Didn't find exactly one code! " \
-                             "(Found %d.)" % len(places))
 
         def parse_code(place):
             latitude = place.get('lat', None)

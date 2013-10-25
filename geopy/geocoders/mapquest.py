@@ -6,7 +6,7 @@ from geopy.compat import urlencode
 
 from geopy.compat import json
 from geopy.geocoders.base import Geocoder
-from geopy.util import logger, decode_page, join_filter
+from geopy.util import logger, join_filter
 from geopy import exc
 
 

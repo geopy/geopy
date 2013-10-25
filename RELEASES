@@ -9,11 +9,14 @@ CHANGED:    GoogleV3 returns new exception types:
                 `geopy.geocoders.base.GeocoderResultError` -> `geopy.exc.GeocoderQueryError`
                 `geopy.geocoders.base.GTooManyQueriesError` -> `geopy.exc.GeocoderQuotaExceeded`
 
-ADDED:  SmartyStreets LiveAddress geocoder implemented. Contributed by
-        Michael Whatcott.
+ADDED:  OpenStreetMap Nominatim geocoder implemented. Contributed by
+        Alessandro Pasotti.
 
 ADDED:  Yahoo! BOSS Geo PlaceFinder geocoder implemented. Contributed by
         jhmaddox and Philip Kimmey.
+
+ADDED:  SmartyStreets LiveAddress geocoder implemented. Contributed by
+        Michael Whatcott.
 
 ADDED:  GeoNames geocoder is implements GeoNames' new username
         requirement and `api.geonames.org` endpoint. Contributed by David
@@ -32,6 +35,8 @@ FIXED: `format_degrees` now rounds minutes properly. Contributed by avdd.
 
 FIXED:  No longer warn if the optional dependency `BeautifulSoup` is
         not present.
+
+FIXED: Miscellaneous inconsistent behavior and errors in geolocating.
 
 REMOVED:    Google V2 geocoder has been removed as its API was shutdown.
 

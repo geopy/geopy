@@ -205,10 +205,10 @@ class Point(object): # pylint: disable=R0924
 
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):
-        negative = degrees < 0 or degrees.startswith('-')
-        degrees = float(degrees or 0)
-        arcminutes = float(arcminutes or 0)
-        arcseconds = float(arcseconds or 0)
+        degrees = float(degrees)
+        negative = degrees < 0
+        arcminutes = float(arcminutes)
+        arcseconds = float(arcseconds)
 
         if arcminutes or arcseconds:
             more = units.degrees(arcminutes=arcminutes, arcseconds=arcseconds)

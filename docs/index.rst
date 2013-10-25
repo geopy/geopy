@@ -30,6 +30,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.MapQuest
     :members: __init__, geocode
 
+.. autoclass:: geopy.geocoders.Nominatim
+    :members: __init__, geocode, reverse
+
 .. autoclass:: geopy.geocoders.OpenMapQuest
     :members: __init__, geocode
 

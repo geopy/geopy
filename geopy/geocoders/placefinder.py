@@ -92,18 +92,18 @@ class YahooPlaceFinder(Geocoder):
         Returns the result of a PlaceFinder API call.
         """
         try:
-            urllib_req = urllib2.Request(
+            urllib_req = Request(
                 request.url,
                 None,
                 request.to_header(realm='yahooapis.com'),
             )
             response = self.urlopen(urllib_req)
             content = response.read()
-        except urllib2.HTTPError as exc:
+        except HTTPError as exc:
             raise GeocoderError(
                 'PlaceFinder service returned status code %s.' % exc.code,
             )
-        except urllib2.URLError as exc:
+        except URLError as exc:
             raise GeocoderError(
                 'PlaceFinder service exception %s.' % exc.reason,
             )
