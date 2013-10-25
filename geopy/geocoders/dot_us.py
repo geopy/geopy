@@ -2,11 +2,11 @@
 :class:`GeocoderDotUS` geocoder.
 """
 
-import getpass
-from geopy.compat import urlencode
+import csv
+from geopy.compat import urlencode, py3k
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, join_filter
-import csv
+from geopy.exc import ConfigurationError
 
 
 class GeocoderDotUS(Geocoder): # pylint: disable=W0223
@@ -17,10 +17,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
     def __init__(self, username=None, password=None, format_string=None, proxies=None):
         super(GeocoderDotUS, self).__init__(format_string, proxies)
-        if username and (password is None):
-            password = getpass.getpass(
-                "geocoder.us password for %r: " % username
-            )
+        if username and password is None:
+            raise ConfigurationError("password must be specified with username")
         self.username = username
         self.__password = password
 
@@ -55,7 +53,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
         page = self._call_geocoder(url, raw=True)
-        places = [r for r in csv.reader(page)]
+        page = page.read().decode("utf-8") if py3k else page.read()
+        places = [r for r in csv.reader([page, ] if not isinstance(page, list) else page)]
         if not len(places):
             return None
         if exactly_one is True:

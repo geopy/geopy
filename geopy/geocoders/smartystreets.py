@@ -4,7 +4,7 @@
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
-from geopy.compat import json, urlencode
+from geopy.compat import urlencode
 
 
 class LiveAddress(Geocoder): # pylint: disable=W0223

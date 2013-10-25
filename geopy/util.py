@@ -2,7 +2,6 @@
 Utils.
 """
 
-from sys import version_info
 import re
 import logging
 try: # Py2k
@@ -68,7 +67,7 @@ def get_encoding(page, contents=None):
     TODO docs.
     """
     # TODO: clean up Py3k support
-    if version_info < (3, 0):
+    if not py3k:
         charset = page.headers.getparam("charset") or None
     else:
         charset = page.headers.get_param("charset") or None
@@ -89,7 +88,7 @@ def decode_page(page):
     # HTTP 1.1 defines iso-8859-1 as the 'implied' encoding if none is given
     encoding = get_encoding(page, contents) or 'iso-8859-1'
     # TODO: clean up Py3k support
-    if version_info < (3, 0):
+    if not py3k:
         return unicode(contents, encoding=encoding).encode('utf-8')
     else:
         return str(contents, encoding=encoding)

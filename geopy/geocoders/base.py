@@ -73,7 +73,7 @@ class Geocoder(object): # pylint: disable=R0921
         try:
             page = self.urlopen(url)
         except HTTPError as error:
-            raise GeocoderServiceError(error.getcode(), error.message or error.msg)
+            raise GeocoderServiceError(error.getcode(), getattr(error, 'msg', None))
         if raw:
             return page
         return json.loads(decode_page(page))

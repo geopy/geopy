@@ -1,5 +1,10 @@
-import SimpleHTTPServer
-import SocketServer
+try:
+    import SimpleHTTPServer
+    import SocketServer
+except ImportError:
+    import socketserver as SockServer
+    import http.server as SimpleHTTPServer
+
 import urllib
 
 class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -19,7 +24,7 @@ class ProxyServer():
         #Setup Proxy in thread
         self.proxyd = SocketServer.TCPServer((self.proxy_host, self.proxy_port), Proxy).serve_forever()
         # Start Proxy Process
-        print "serving at port %s on PID %s " % (self.proxy_port, self.proxyd.pid)
+        print("serving at port %s on PID %s " % (self.proxy_port, self.proxyd.pid))
 
     def get_proxy_url(self):
         return "http://%s:%s" % (self.proxy_host, self.proxy_port)
