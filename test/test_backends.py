@@ -15,8 +15,7 @@ env = {
     'BING_KEY': os.environ.get('BING_KEY', None),
     'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', None),
     'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
-    'LIVESTREETS_AUTH_ID': os.environ.get('LIVESTREETS_AUTH_ID', None),
-    'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', "NG%2FFqbewSgoe8zedWo4SHcEdceaCD%2F%2FHew0RjO5j1OzWbLQR7Gmw18qRic7UatsxDon7poWD2FziHP2h4Amiug%3D%3D")
+    'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', None)
 }
 
 # Define some generic test functions that are common to all backends
