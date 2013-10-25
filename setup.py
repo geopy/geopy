@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 install_requires = []
 tests_require = [
@@ -24,16 +24,16 @@ except ImportError:
 
 # note: not automated since py3k cannot import geopy.get_version at
 # install-time (since 2to3 has not yet run)
-version = "0.96dev" # pylint: disable=C0103
+version = "0.96.0" # pylint: disable=C0103
 
 setup(name='geopy',
     version=version,
     description='Python Geocoding Toolbox',
-    author='GeoPy Project / Mike Tigas',
+    author='GeoPy Contributors',
     author_email='mike@tig.as', # subject to change
-    url='http://code.google.com/p/geopy/',
-    download_url='http://code.google.com/p/geopy/downloads/list',
-    packages=find_packages(),
+    url='https://github.com/geopy/geopy',
+    download_url = 'https://github.com/geopy/geopy/archive/%s.tar.gz' % version,
+    packages=('geopy', ),
     install_requires=install_requires,
     tests_require=tests_require,
     license='MIT',

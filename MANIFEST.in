@@ -1,3 +1,7 @@
 include LICENSE
 include MANIFEST.in
 include RELEASES
+include README
+recursive-exclude test *
+prune geopy.egg-info
+exclude .*

@@ -2,6 +2,8 @@
 .PHONY: test
 .PHONY: clean
 .PHONY: docs
+.PHONY: dist
+.PHONY: release
 
 develop:
 	virtualenv .venv --distribute
@@ -19,3 +21,14 @@ clean:
 docs:
 	touch docs/_build/html/index.rst
 	cd docs && make html
+
+dist:
+	rm -rf dist
+	pandoc -f markdown -t rst README.markdown > README
+	python setup.py sdist --format=gztar
+	rm README
+	rm -rf *.egg-info
+
+release:
+	make dist
+	git tag -a release-$(version) -m "Release $(version)"
