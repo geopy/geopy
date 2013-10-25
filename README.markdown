@@ -10,7 +10,7 @@ addresses, cities, countries, and landmarks across the globe using third-party
 geocoders and other data sources.
 
 geopy includes geocoder classes for the [Google Geocoding API (V3)][google_v3],
-the [Yahoo! geocoder][yahoo], [geocoder.us][geocoderus], [Bing Maps API][bing],
+the [Yahoo! BOSS geocoder][yahoo], [geocoder.us][geocoderus], [Bing Maps API][bing],
 and several more Geocoder API services. The various geocoder classes are located in
 [geopy.geocoders][geocoders_src].
 
@@ -19,11 +19,6 @@ and several more Geocoder API services. The various geocoder classes are located
 [bing]: http://www.microsoft.com/maps/developers/web.aspx
 [geocoderus]: http://geocoder.us/
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
-
-## Notes
-
-* Having `geopy.geocoders.google.GBadKeyError` issues with Google geocoder?
-  [You can fix that by updating GeoPy and updating your code.](https://github.com/geopy/geopy/tree/master/docs/google_v3_upgrade.md)
 
 ## Installation
 
@@ -39,20 +34,20 @@ Or, manually: [Download the tarball from PyPI](https://pypi.python.org/pypi/geop
 
 **Examples**
 
-Using the GoogleV3 geocoder:
+To geolocate a query to an address and coordinates:
 
-    >>> from geopy import geocoders
-    >>> g = geocoders.GoogleV3()
-    >>> place, (lat, lng) = g.geocode("10900 Euclid Ave in Cleveland")
-    >>> print "%s: %.5f, %.5f" % (place, lat, lng)
-    10900 Euclid Ave, Cleveland, OH 44106, USA: 41.50489, -81.61027
+    >>> from geopy.geocoders import GoogleV3
+    >>> geolocator = GoogleV3()
+    >>> address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
+    >>> print address, latitude, longitude
+    175 5th Avenue, New York, NY 10010, USA 40.7410262 -73.9897806
 
-Using the Yahoo! BOSS Geo PlaceFinder ([requires a consumer key and secret](http://developer.yahoo.com/boss/geo/)):
+To find the address corresponding to a set of coordinates:
 
-    >>> from geopy import geocoders
-    >>> y = geocoders.YahooPlaceFinder('YOUR_CONSUMER_KEY', 'YOUR_CONSUMER_SECRET')
-    >>> place, (lat, lng) = y.geocode_one("Thames Street, Newport, RI")
-    >>> print "%s: %.5f, %.5f" % (place, lat, lng)
-    Thames St, Newport, RI 02840, United States: 41.48327, -71.31461
+    >>> from geopy.geocoders import GoogleV3
+    >>> geolocator = GoogleV3()
+    >>> address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578", exactly_one=True)
+    >>> print address, latitude, longitude
+    77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
 
-More documentation and examples can be found on the [old Google Code documentation site](http://code.google.com/p/geopy/w/list).
+More documentation and examples can be found at [Read the Docs](http://geopy.readthedocs.org/en/latest/).
