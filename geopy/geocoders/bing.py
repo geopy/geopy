@@ -2,8 +2,6 @@
 :class:`.Bing` geocoder.
 """
 
-from geopy.compat import json
-
 from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
@@ -83,12 +81,10 @@ class Bing(Geocoder):
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
     @staticmethod
-    def _parse_json(page, exactly_one=True):
+    def _parse_json(doc, exactly_one=True): # pylint: disable=W0221
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """
-
-        doc = json.loads(page)
         resources = doc['resourceSets'][0]['resources']
         if resources is None or not len(resources):
             return None

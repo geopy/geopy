@@ -9,7 +9,7 @@ except ImportError:
         build_opener, ProxyHandler)
 from warnings import warn
 
-from geopy.compat import py3k, string_compare, HTTPError
+from geopy.compat import py3k, string_compare, HTTPError, json
 from geopy.point import Point
 from geopy.exc import GeocoderServiceError
 from geopy.util import decode_page
@@ -76,9 +76,7 @@ class Geocoder(object): # pylint: disable=R0921
             raise GeocoderServiceError(error.getcode(), error.message or error.msg)
         if raw:
             return page
-        if not isinstance(page, string_compare):
-            page = decode_page(page)
-        return page
+        return json.loads(decode_page(page))
 
     def geocode(self, query, exactly_one=True): # pylint: disable=R0201,W0613
         """

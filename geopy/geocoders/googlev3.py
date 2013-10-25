@@ -7,8 +7,6 @@ import hashlib
 import hmac
 from geopy.compat import urlencode
 
-from geopy.compat import json
-
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded, ConfigurationError
@@ -164,10 +162,9 @@ class GoogleV3(Geocoder):
     def _parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
 
-        self.doc = json.loads(page)
-        places = self.doc.get('results', [])
+        places = page.get('results', [])
         if not len(places):
-            self._check_status(self.doc.get('status'))
+            self._check_status(page.get('status'))
             return None
 
         def parse_place(place):

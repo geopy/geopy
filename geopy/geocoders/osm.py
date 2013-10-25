@@ -4,7 +4,7 @@ OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
-from geopy.compat import json, urlencode
+from geopy.compat import urlencode
 
 
 class Nominatim(Geocoder):
@@ -76,10 +76,9 @@ class Nominatim(Geocoder):
           }
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one, reverse=True)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
-    def _parse_json(self, page, exactly_one, reverse=False):
-        places = json.loads(page)
+    def _parse_json(self, places, exactly_one):
         if not isinstance (places, list):
             places = [places]
         if not len(places):

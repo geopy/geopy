@@ -6,7 +6,6 @@ from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
-from geopy.compat import json
 from geopy.exc import GeocoderInsufficientPrivileges, GeocoderError, \
     ConfigurationError
 
@@ -54,11 +53,10 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
-    def _parse_json(self, page, exactly_one):
+    def _parse_json(self, doc, exactly_one):
         """
         Parse JSON response body.
         """
-        doc = json.loads(page)
         places = doc.get('geonames', [])
         err = doc.get('status', None)
         if err and 'message' in err:

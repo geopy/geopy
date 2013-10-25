@@ -45,7 +45,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         super(LiveAddress, self).geocode(query)
         url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, raw=True), exactly_one)
+        return self._parse_json(self._call_geocoder(url), exactly_one)
 
     def _compose_url(self, location):
         """
@@ -66,7 +66,6 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         """
         Parse responses as JSON objects.
         """
-        response = json.loads(response.read())
         if not len(response):
             return None
         if exactly_one is True:

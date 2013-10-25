@@ -2,8 +2,6 @@
 :class:`.OpenMapQuest` geocoder.
 """
 
-from geopy.compat import json
-
 from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder
@@ -54,11 +52,10 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
     @classmethod
-    def _parse_json(cls, page, exactly_one=True):
+    def _parse_json(cls, resources, exactly_one=True):
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
-        resources = json.loads(page)
         if not len(resources): # pragma: no cover
             return None
         if exactly_one:
