@@ -8,3 +8,4 @@ dist
 *.egg-info
 docs/_build
 .test_keys
+.tox
