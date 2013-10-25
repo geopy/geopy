@@ -10,21 +10,19 @@ locale, during its initialization.
 
 To geolocate a query to an address and coordinates::
 
-    from geopy.geocoders import GoogleV3
-
-    geolocator = GoogleV3()
-    address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
-    print address, latitude, longitude
-    # 175 5th Avenue, New York, NY 10010, USA 40.7410262 -73.9897806
+    >>> from geopy.geocoders import GoogleV3
+    >>> geolocator = GoogleV3()
+    >>> address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
+    >>> print address, latitude, longitude
+    175 5th Avenue, New York, NY 10010, USA 40.7410262 -73.9897806
 
 To find the address corresponding to a set of coordinates::
 
-    from geopy.geocoders import GoogleV3
-
-    geolocator = GoogleV3()
-    address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578", exactly_one=True)
-    print address, latitude, longitude
-    # 77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
+    >>> from geopy.geocoders import GoogleV3
+    >>> geolocator = GoogleV3()
+    >>> address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578", exactly_one=True)
+    >>> print address, latitude, longitude
+    77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
 
 
 Locators' ``geolocate`` and ``reverse`` methods may return three
@@ -42,12 +40,11 @@ Every geocoder accepts an argument ``format_string`` that defaults to '%s' where
 the input string to geocode is interpolated. For example, if you only need to
 geocode locations in Cleveland, Ohio, you could do::
 
-    from geopy.geocoders import GeocoderDotUs
-
-    >>> dotus = GeocoderDotUs(format_string="%s, Cleveland OH")
-    >>> place (lat, lng) = dotus.geocode("11111 Euclid Ave")
-    >>> print "%s: %.5f, %.5f" % (place, lat, lng)
-    11111 Euclid Ave, Cleveland, OH 44106: 41.50678, -81.60815
+    >>> from geopy.geocoders import GeocoderDotUS
+    >>> geolocator = GeocoderDotUS(format_string="%s, Cleveland OH")
+    >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
+    >>> print address, latitude, longitude
+    11111 Euclid Ave, Cleveland, OH 44106 41.506784 -81.608148
 
 """
 
