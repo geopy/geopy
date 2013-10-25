@@ -2,6 +2,8 @@
 OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
 """
 
+import xml.dom.minidom
+
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
 from geopy.compat import json, urlencode
@@ -19,9 +21,9 @@ class Nominatim(Geocoder):
         """
         :param string format_string:
 
-        :param string output_format:
+        :param string output_format: 'json' or 'xml' output format
 
-        :param tuple view_box:
+        :param tuple view_box: Coordinates to restrict search within.
 
         :param string country_bias:
         """
@@ -85,7 +87,12 @@ class Nominatim(Geocoder):
         return self.parse_json(self._call_geocoder(url), exactly_one)
 
     def parse_json(self, page, exactly_one):
-        places = json.loads(page)
+        if self.output_format == 'json':
+            places = json.loads(page)
+        elif self.output_format == 'xml':
+            places = xml.dom.minidom.parseString(page).getElementsByTagName('place')
+        else:
+            raise NotImplementedError()
 
         if not isinstance (places, list):
             places = [places]
@@ -93,15 +100,22 @@ class Nominatim(Geocoder):
             return None
 
         def parse_code(place):
-            latitude = place.get('lat', None)
-            longitude = place.get('lon', None)
+            if self.output_format == 'xml':
+                latitude = place.attributes['lat'].value
+                longitude = place.attributes['lon'].value
+                placename = place.attributes['display_name'].value
+            else:
+                latitude = place.get('lat', None)
+                longitude = place.get('lon', None)
+                placename = place.get('display_name')
+
             if latitude and longitude:
                 latitude = float(latitude)
                 longitude = float(longitude)
             else:
                 return None
 
-            placename = place.get('display_name')
+
 
             return (placename, (latitude, longitude))
 
