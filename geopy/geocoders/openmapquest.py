@@ -58,7 +58,6 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
-
         resources = json.loads(page)
         if not len(resources): # pragma: no cover
             return None

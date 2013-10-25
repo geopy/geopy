@@ -166,8 +166,7 @@ class GoogleV3(Geocoder):
 
         self.doc = json.loads(page)
         places = self.doc.get('results', [])
-
-        if not places:
+        if not len(places):
             self._check_status(self.doc.get('status'))
             return None
 
