@@ -2,6 +2,8 @@
 :class:`.GoogleV3` is the Google Maps V3 geocoder.
 """
 
+from warnings import warn
+
 import base64
 import hashlib
 import hmac
@@ -18,8 +20,8 @@ class GoogleV3(Geocoder):
         https://developers.google.com/maps/documentation/geocoding/
     """
 
-    def __init__(self, domain='maps.googleapis.com', protocol='http', # pylint: disable=R0913
-                 client_id=None, secret_key=None, proxies=None):
+    def __init__(self, domain='maps.googleapis.com', scheme='https', # pylint: disable=R0913
+                 client_id=None, secret_key=None, proxies=None, protocol=None):
         """
         Initialize a customized Google geocoder.
 
@@ -30,23 +32,36 @@ class GoogleV3(Geocoder):
             geocoding address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
 
-        :param string protocol: http or https.
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 0.96.1
+
+        :param string protocol: Deprecated version of `scheme` argument.
 
         :param string client_id: If using premier, the account client id.
 
         :param string secret_key: If using premier, the account secret key.
-        """
-        super(GoogleV3, self).__init__(proxies=proxies)
 
-        if protocol not in ('http', 'https'):
-            raise ConfigurationError('Supported protocols are http and https.')
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96.0
+        """
+        if protocol:
+            warn('protocol argument is deprecated in favor of scheme')
+        scheme = scheme or protocol
+        super(GoogleV3, self).__init__(scheme=scheme, proxies=proxies)
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')
         if secret_key and not client_id:
             raise ConfigurationError('Must provide client_id with secret_key.')
 
         self.domain = domain.strip('/')
-        self.protocol = protocol
+        self.scheme = scheme
         self.doc = {}
 
         if client_id and secret_key:
@@ -60,14 +75,14 @@ class GoogleV3(Geocoder):
 
     def _get_url(self, params):
         '''Returns a standard geocoding api url.'''
-        return 'http://%(domain)s/maps/api/geocode/json?%(params)s' % (
-            {'domain': self.domain, 'params': urlencode(params)})
+        return '%(scheme)s://%(domain)s/maps/api/geocode/json?%(params)s' % (
+            {'scheme': self.scheme, 'domain': self.domain, 'params': urlencode(params)})
 
     def _get_signed_url(self, params):
         '''Returns a Premier account signed url.'''
         params['client'] = self.client_id
         url_params = {
-            'protocol': self.protocol,
+            'scheme': self.scheme,
             'domain': self.domain,
             'params': urlencode(params)
         }
@@ -78,7 +93,7 @@ class GoogleV3(Geocoder):
         signature = hmac.new(secret, url_params['url_part'], hashlib.sha1)
         url_params['signature'] = base64.urlsafe_b64encode(signature.digest())
 
-        return ('%(protocol)s://%(domain)s%(url_part)s'
+        return ('%(scheme)s://%(domain)s%(url_part)s'
                 '&signature=%(signature)s' % url_params)
 
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913

@@ -4,7 +4,6 @@
 
 from geopy.compat import urlencode
 
-from geopy.compat import json
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger, join_filter
 from geopy import exc
@@ -16,14 +15,32 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         http://www.mapquestapi.com/geocoding/
     """
 
-    def __init__(self, api_key, format_string=None, proxies=None):
+    def __init__(self, api_key, format_string=None, scheme='https', proxies=None):
         """
         Initialize a MapQuest geocoder with address information and
         MapQuest API key.
+
+        :param string api_key: Key provided by MapQuest.
+
+        :param string format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 0.96.1
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
         """
-        super(MapQuest, self).__init__(format_string, proxies)
+        super(MapQuest, self).__init__(format_string, scheme, proxies)
         self.api_key = api_key
-        self.api = "http://www.mapquestapi.com/geocoding/v1/address"
+        self.api = "%s://www.mapquestapi.com/geocoding/v1/address" % self.scheme
 
     def geocode(self, query, exactly_one=True): # pylint: disable=W0221
         """

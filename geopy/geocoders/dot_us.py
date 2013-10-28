@@ -11,14 +11,33 @@ from geopy.exc import ConfigurationError
 
 class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     """
-    GeoCoderDotUS geocoder, documentation at:
+    GeocoderDotUS geocoder, documentation at:
         http://geocoder.us/
+
+    Note that GeocoderDotUS does not support SSL.
     """
 
     def __init__(self, username=None, password=None, format_string=None, proxies=None):
+        """
+        :param string username:
+
+        :param string password:
+
+        :param string format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96.0
+        """
         super(GeocoderDotUS, self).__init__(format_string, proxies)
         if username and password is None:
-            raise ConfigurationError("password must be specified with username")
+            raise ConfigurationError("Password must be specified with username")
         self.username = username
         self.__password = password
 

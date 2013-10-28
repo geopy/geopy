@@ -11,27 +11,41 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     """
     Initialize a customized LiveAddress geocoder provided by SmartyStreets.
     More information regarding the LiveAddress API can be found here:
-    http://smartystreets.com/products/liveaddress-api
-
-    ``auth_token`` should be a valid authentication token.  Tokens can be
-    administered from here:
-        https://smartystreets.com/account/keys/secret
-
-    The token you use must correspond with an active LiveAddress subscription
-    Subscriptions can be administered here:
-        https://smartystreets.com/account/subscription
-
-    ``candidates`` is an integer between 1 and 10 indicating the max number of
-    candidate addresses to return if a valid address could be found.
+        https://smartystreets.com/products/liveaddress-api
     """
-    def __init__(self, auth_token, candidates=None, proxies=None):
-        super(LiveAddress, self).__init__(proxies=proxies)
+    def __init__(self, auth_token, candidates=1, scheme='https', proxies=None):
+        """
+        Initialize a customized SmartyStreets LiveAddress geocoder.
+
+
+        :param string auth_token: Valid authentication token. Tokens can be
+            administered here:
+                https://smartystreets.com/account/keys/secret
+
+        :param int candidates: An integer between 1 and 10 indicating the max
+            number of candidate addresses to return if a valid address
+            could be found.
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 0.96.1
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96.0
+        """
+        super(LiveAddress, self).__init__(scheme=scheme, proxies=proxies)
         self.auth_token = auth_token
         if candidates:
             if not (1 <= candidates <= 10):
                 raise ValueError('candidates must be between 1 and 10')
-        self.candidates = candidates or 1
-        self.api = 'https://api.qualifiedaddress.com/street-address'
+        self.candidates = candidates
+        self.api = '%s://api.qualifiedaddress.com/street-address' % self.scheme
 
     def geocode(self, query, exactly_one=True):
         """

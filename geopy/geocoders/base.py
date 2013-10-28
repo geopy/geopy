@@ -11,7 +11,7 @@ from warnings import warn
 
 from geopy.compat import py3k, string_compare, HTTPError, json
 from geopy.point import Point
-from geopy.exc import GeocoderServiceError
+from geopy.exc import GeocoderServiceError, ConfigurationError
 from geopy.util import decode_page
 
 
@@ -20,8 +20,15 @@ class Geocoder(object): # pylint: disable=R0921
     Template object for geocoders.
     """
 
-    def __init__(self, format_string=None, proxies=None):
+    def __init__(self, format_string=None, scheme=None, proxies=None):
+        """
+        Mostly-common geocoder validation, proxies, &c. Not all geocoders
+        specify format_string and such.
+        """
         self.format_string = format_string or '%s'
+        self.scheme = scheme or 'https'
+        if self.scheme not in ('http', 'https'):
+            raise ConfigurationError('Supported schemes are `http` and `https`.')
         self.proxies = proxies
 
         # Add urllib proxy support using environment variables or

@@ -11,27 +11,39 @@ class Nominatim(Geocoder):
     """
     Nominatim geocoder for OpenStreetMap servers. Documentation at:
         http://wiki.openstreetmap.org/wiki/Nominatim
+
+    Note that Nominatim does not support SSL.
     """
 
     def __init__(self, format_string='%s', # pylint: disable=R0913
                         view_box=(-180,-90,180,90), country_bias=None, proxies=None):
         """
-        :param string format_string:
+        :param string format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
 
         :param tuple view_box: Coordinates to restrict search within.
 
-        :param string country_bias:
+        :param string country_bias: Bias results to this country.
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96.0
         """
-        super(Nominatim, self).__init__(format_string, proxies)
+        super(Nominatim, self).__init__(format_string, 'http', proxies)
         # XML needs all sorts of conditionals because of API differences
-        # between geocode and reverse, so forget it
+        # between geocode and reverse, so only implementing JSON format
         self.country_bias = country_bias
         self.format_string = format_string
         self.view_box = view_box
         self.country_bias = country_bias
 
-        self.api = "http://nominatim.openstreetmap.org/search"
-        self.reverse_api = " http://nominatim.openstreetmap.org/reverse"
+        self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
+        self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
 
     def geocode(self, query, exactly_one=True):
         """

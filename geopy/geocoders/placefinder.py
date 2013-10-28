@@ -23,21 +23,38 @@ except ImportError:
     oauth2 = None
 
 
-class YahooPlaceFinder(Geocoder):
+class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
     """
     Geocoder that utilizes the Yahoo! BOSS PlaceFinder API. Documentation at:
-        http://developer.yahoo.com/boss/geo/docs/
+        https://developer.yahoo.com/boss/geo/docs/
     """
 
-    def __init__(self, consumer_key, consumer_secret, proxies=None):
+    def __init__(self, consumer_key, consumer_secret, scheme='https', proxies=None):
         """
         Sets consumer key and secret.
+
+        :param string consumer_key: Key provided by Yahoo.
+
+        :param string consumer_secret: Secret corresponding to the key provided by Yahoo.
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 0.96.1
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96.0
         """
         if oauth2 is None:
             raise ImportError('oauth2 is needed for YahooPlaceFinder')
         if Request is None:
             raise NotImplementedError("YahooPlaceFinder is not compatible with Py3k")
-        super(YahooPlaceFinder, self).__init__(proxies=proxies)
+        super(YahooPlaceFinder, self).__init__(scheme=scheme, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
@@ -53,9 +70,9 @@ class YahooPlaceFinder(Geocoder):
                 'oauth_version': '1.0',
             },
             url='%s?location=%s&flags=J%s' % (
-                'http://yboss.yahooapis.com/geo/placefinder',
+                '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme,
                 urllib.quote(string.encode('utf-8')),
-                '&gflags=R' if reverse else '',
+                '&gflags=R' if reverse else '', # todo refactor
             ),
         )
 

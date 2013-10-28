@@ -14,22 +14,34 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         http://developer.mapquest.com/web/products/open/geocoding-service
     """
 
-    def __init__(self, api_key=None, format_string=None, proxies=None):
+    def __init__(self, api_key=None, format_string=None, scheme='https', proxies=None):
         """
         Initialize an Open MapQuest geocoder with location-specific
-        address information, no API Key is needed by the Nominatim based
+        address information. No API Key is needed by the Nominatim based
         platform.
 
         :param string format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
             the geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
-        """
-        super(OpenMapQuest, self).__init__(format_string, proxies)
 
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 0.96.1
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96.0
+        """
+        super(OpenMapQuest, self).__init__(format_string, scheme, proxies)
         self.api_key = api_key or ''
-        self.api = "http://open.mapquestapi.com/nominatim/v1/search" \
-                    "?format=json&%s"
+        self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \
+                    "?format=json" % self.scheme
 
     def geocode(self, query, exactly_one=True): # pylint: disable=W0221
         """
@@ -46,9 +58,9 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         }
         if exactly_one:
             params['maxResults'] = 1
-        url = self.api % urlencode(params)
-        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        url = "&".join((self.api, urlencode(params)))
 
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
     @classmethod

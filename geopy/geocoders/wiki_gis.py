@@ -22,10 +22,15 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
             page name to request will be interpolated. For
             example: 'http://www.wiki.com/wiki/%s'
 
-        :param callable _transform_string: is a callable that will make
+        :param callable transform_string: is a callable that will make
             appropriate replacements to the input string before requesting
-            the page. If ``None`` is given, the default _transform_string
+            the page. If ``None`` is given, the default transform_string
             which replaces ' ' with '_' will be used.
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
         """
         super(MediaWiki, self).__init__(proxies=proxies)
         self.format_url = format_url
