@@ -1,5 +1,27 @@
-0.96.0 - October 25, 2013
-==========
+master
+=============
+
+CHANGED:    SSL connections are used by default for services with support.
+            These geocoders accept a new 'scheme' argument in their init,
+            which may be 'https' or 'http'. Users desiring unencrypted
+            connections must now specify 'http'. Note that SSL connections'
+            certificates are not verified.
+
+CHANGED:    GoogleV3's `protocol` argument is deprecated in favor of `scheme`.
+
+ADDED:  Geocoders accept a `proxies` argument which specifies a proxy to
+        route its geocoder requests through. This was present but undocumented
+        in 0.96.0.
+
+ADDED:  Geocoders check a new method, `_geocoder_exception_handler`, if
+        defined, when non-OK responses are returned. See LiveStreets for
+        an example. Users can define or override this method.
+
+ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when appropriate.
+
+
+0.96 - October 25, 2013
+=======================
 
 CHANGED:    GoogleV3's reverse geocoder now returns one result by default. Set
             `exactly_one` to False for a list.
@@ -36,13 +58,14 @@ FIXED: `format_degrees` now rounds minutes properly. Contributed by avdd.
 FIXED:  No longer warn if the optional dependency `BeautifulSoup` is
         not present.
 
-FIXED: Miscellaneous inconsistent behavior and errors in geolocating.
+FIXED:  Miscellaneous inconsistent behavior and errors in geolocating.
 
 REMOVED:    Google V2 geocoder has been removed as its API was shutdown.
 
 
 0.95.1 - March 22, 2013
-==========
+=======================
+
 FIXED:   Fix #12, where `DeprecationWarning` was showing for GoogleV2 even if
          it wasn't being used (due to `geopy.geocoders` importing it).
          Contributed by Dave Arter.
@@ -53,8 +76,10 @@ CHANGED: `GoogleV3.geocode` "address" kwarg renamed to "string" to match
 FIXED:   Geocoders now properly handle Unicode objects as input (previously
          would fail on non-ASCII characters due to wanting UTF-8 strings).
 
+
 0.95 - March 12, 2013
-==========
+=====================
+
 ADDED:   Google Geocoding API V3 support. Contributed by Jordan Bouvier
          (jbouvier). "google.Google()" should be replaced by
          "googlev3.GoogleV3()", with no `api_key`.
@@ -64,16 +89,20 @@ ADDED:   Google Geocoding API V3 support. Contributed by Jordan Bouvier
 UPDATED: setup.py updated to now automatically support Python 3+ (via 2to3
          auto-compile option). Contributed by Feanil Patel.
 
+
 0.94.2 - March 12, 2012
-==========
+=======================
+
 ADDED:   MANIFEST.in so that LICENSE file gets included in dist packages
          (per req by Debian Python Module Team)
 
 UPDATED: Yahoo geocoder uses new PlaceFinder API instead of outdated MapsService
          V1 API.
 
+
 0.94.1 - March 24, 2011
-==========
+=======================
+
 ADDED:   Test suite includes geocoding tests for the Google, Bing, Yahoo,
          GeocoderDotUS, and GeoNames geocoders.
 
@@ -106,8 +135,10 @@ CHANGED: Added __repr__ and __str__ to Distance
 ADDED:   Issue 46. Geocoder backend for MapQuest's OpenMapQuest API, contributed
          by Shashwat Anand.
 
+
 0.94 - March 7, 2010
 ====================
+
 ADDED: Partial test suite can now be run via "setup.py test"
 
 FIXED: Issue 5. Converted "print" statements to logger calls to
@@ -128,6 +159,8 @@ FIXED: Issue 22. Fixed string representation of Point objects so
 FIXED: Issue 23. Fixed GreatCircleDistance ValueErrors due to floating
        point precision on extremely close points.
 
+
 Changes between 0.93 (October 8, 2006) and February 15, 2009
 ============================================================
+
 See https://github.com/geopy/geopy/compare/0451a051...ffebd5f3
