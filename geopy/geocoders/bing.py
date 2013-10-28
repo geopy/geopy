@@ -18,9 +18,9 @@ class Bing(Geocoder):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
-        :param string api_key: should be a valid Bing Maps API key.
+        :param string api_key: Should be a valid Bing Maps API key.
 
-        :param string format_string: is a string containing '%s' where the
+        :param string format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.

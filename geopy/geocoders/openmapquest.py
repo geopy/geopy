@@ -20,7 +20,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         address information, no API Key is needed by the Nominatim based
         platform.
 
-        :param string format_string: is a string containing '%s' where
+        :param string format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
             the geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.

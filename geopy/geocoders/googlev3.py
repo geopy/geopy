@@ -25,7 +25,7 @@ class GoogleV3(Geocoder):
 
         API authentication is only required for Google Maps Premier customers.
 
-        :param string domain: should be the localized Google Maps domain to
+        :param string domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.google.com', but if you're
             geocoding address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
