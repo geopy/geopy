@@ -80,6 +80,8 @@ class Geocoder(object): # pylint: disable=R0921
         try:
             page = self.urlopen(url)
         except HTTPError as error:
+            if hasattr(self, '_geocoder_exception_handler'):
+                self._geocoder_exception_handler(error) # pylint: disable=E1101
             raise GeocoderServiceError(error.getcode(), getattr(error, 'msg', None))
         if raw:
             return page

@@ -5,6 +5,7 @@
 from geopy.geocoders.base import Geocoder
 from geopy.util import logger
 from geopy.compat import urlencode
+from geopy.exc import GeocoderQuotaExceeded
 
 
 class LiveAddress(Geocoder): # pylint: disable=W0223
@@ -61,12 +62,18 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
+    def _geocoder_exception_handler(self, error): # pylint: disable=R0201
+        """
+        LiveStreets-specific exceptions.
+        """
+        if error.msg == "No active subscriptions found.":
+            raise GeocoderQuotaExceeded(error.msg)
+
     def _compose_url(self, location):
         """
         Generate API URL.
         """
         query = {
-
             'street': location,
             'candidates': self.candidates
         }
