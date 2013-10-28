@@ -1,5 +1,5 @@
 """
-:class:`Point` data structure.
+:class:`.Point` data structure.
 """
 
 import re

@@ -4,7 +4,7 @@
 Geopy can calculate geodesic distance. Two distance formulas are included:
 great-circle distance and Vincenty distance.
 
-Great-circle distance (:class:.`great_circle`) uses a spherical model of
+Great-circle distance (:class:`.great_circle`) uses a spherical model of
 the earth, using the average great-circle radius of 6372.795 kilometers,
 resulting in an error of up to about 0.5%. The radius value is stored in
 :const:`distance.EARTH_RADIUS`, so it can be customized
