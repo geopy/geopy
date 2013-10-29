@@ -15,7 +15,7 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         http://www.mapquestapi.com/geocoding/
     """
 
-    def __init__(self, api_key, format_string=None, scheme='https',  # pylint: disable=R0913
+    def __init__(self, api_key, format_string='%s', scheme='https',  # pylint: disable=R0913
                         timeout=None, proxies=None):
         """
         Initialize a MapQuest geocoder with address information and

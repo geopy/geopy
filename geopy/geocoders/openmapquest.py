@@ -14,7 +14,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         http://developer.mapquest.com/web/products/open/geocoding-service
     """
 
-    def __init__(self, api_key=None, format_string=None, scheme='https', # pylint: disable=R0913
+    def __init__(self, api_key=None, format_string='%s', scheme='https', # pylint: disable=R0913
                         timeout=None, proxies=None):
         """
         Initialize an Open MapQuest geocoder with location-specific

@@ -14,7 +14,7 @@ class Bing(Geocoder):
         http://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
-    def __init__(self, api_key, format_string=None, scheme='https',  # pylint: disable=R0913
+    def __init__(self, api_key, format_string='%s', scheme='https',  # pylint: disable=R0913
                         timeout=None, proxies=None):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.

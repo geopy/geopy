@@ -17,7 +17,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     Note that GeocoderDotUS does not support SSL.
     """
 
-    def __init__(self, username=None, password=None, format_string=None,  # pylint: disable=R0913
+    def __init__(self, username=None, password=None, format_string='%s',  # pylint: disable=R0913
                         timeout=None, proxies=None):
         """
         :param string username:
