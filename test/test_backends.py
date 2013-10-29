@@ -15,6 +15,7 @@ except ImportError:
 import socket
 socket.setdefaulttimeout(3.0)
 
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.point import Point
 from geopy.compat import py3k
 
@@ -37,6 +38,37 @@ except IOError:
 # Define some generic test functions that are common to all backends
 
 
+class LocalTestCase(unittest.TestCase):
+
+    def test_init(self):
+        """
+        Geocoder()
+        """
+        format_string = '%s Los Angeles, CA USA'
+        scheme = 'http'
+        timeout = DEFAULT_TIMEOUT+1
+        proxies = {'https': '192.0.2.0'}
+        geocoder = Geocoder(
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies
+        )
+        for attr in ('format_string', 'scheme', 'timeout', 'proxies'):
+            self.assertEqual(locals()[attr], getattr(geocoder, attr))
+
+    def test_point_coercion(self):
+        """
+        Geocoder._coerce_point_to_string
+        """
+        ok = "40.74113,-73.989656"
+        coords = (40.74113, -73.989656)
+        geocoder = Geocoder()
+        self.assertEqual(geocoder._coerce_point_to_string(coords), ok) # pylint: disable=W0212
+        self.assertEqual(geocoder._coerce_point_to_string( # pylint: disable=W0212
+            Point(*coords)),
+            ok
+        )
 
 class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
     """

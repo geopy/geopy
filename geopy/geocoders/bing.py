@@ -120,7 +120,7 @@ class Bing(Geocoder):
         Parse a location name, latitude, and longitude from an JSON response.
         """
         resources = doc['resourceSets'][0]['resources']
-        if resources is None or not len(resources):
+        if resources is None or not len(resources): # pragma: no cover
             return None
 
         def parse_resource(resource):

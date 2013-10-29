@@ -4,7 +4,7 @@
 
 try:
     from urllib2 import urlopen as urllib_urlopen, build_opener, ProxyHandler
-except ImportError:
+except ImportError: # pragma: no cover
     from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
         build_opener, ProxyHandler)
 from warnings import warn
@@ -16,7 +16,7 @@ from geopy.util import decode_page
 
 DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
-DEFAULT_TIMEOUT = 10
+DEFAULT_TIMEOUT = 1
 
 
 class Geocoder(object): # pylint: disable=R0921
@@ -24,14 +24,15 @@ class Geocoder(object): # pylint: disable=R0921
     Template object for geocoders.
     """
 
-    def __init__(self, format_string='%s', scheme='https', timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(self, format_string=DEFAULT_FORMAT_STRING, scheme=DEFAULT_SCHEME,
+                        timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
         specify format_string and such.
         """
         self.format_string = format_string
         self.scheme = scheme
-        if self.scheme not in ('http', 'https'):
+        if self.scheme not in ('http', 'https'): # pragma: no cover
             raise ConfigurationError('Supported schemes are `http` and `https`.')
         self.proxies = proxies
         self.timeout = timeout
@@ -59,16 +60,16 @@ class Geocoder(object): # pylint: disable=R0921
             return ",".join((str(point[0]), str(point[1]))) # -altitude
         elif isinstance(point, string_compare):
             return point
-        else:
+        else: # pragma: no cover
             raise ValueError("Invalid point")
 
-    def _parse_json(self, page, exactly_one):
+    def _parse_json(self, page, exactly_one): # pragma: no cover
         """
         Template for subclasses
         """
         raise NotImplementedError()
 
-    def parse_json(self, *args, **kwargs):
+    def parse_json(self, *args, **kwargs): # pragma: no cover
         """
         Compatibility until 0.97.0
         """
@@ -99,13 +100,13 @@ class Geocoder(object): # pylint: disable=R0921
         if not py3k and isinstance(query, unicode):
             query = query.encode('utf-8')
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None): # pragma: no cover
         """
         Implemented in subclasses.
         """
         raise NotImplementedError()
 
-    def geocode_one(self, query): # pylint: disable=C0111
+    def geocode_one(self, query): # pylint: disable=C0111 # pragma: no cover
         warn(
             "geocode_one is deprecated and will be removed in the next"
             "non-bugfix release. Call geocode with exactly_one=True instead."
@@ -124,7 +125,7 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             raise GeocoderResultError("Geocoder returned no results!")
 
-    def geocode_first(self, query): # pylint: disable=C0111
+    def geocode_first(self, query): # pylint: disable=C0111 # pragma: no cover
         warn(
             "geocode_first is deprecated and will be removed in the next"
             "non-bugfix release. Call geocode with exactly_one=True instead."

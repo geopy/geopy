@@ -112,10 +112,9 @@ class GoogleV3(Geocoder):
             ("top-level domain") two-character value.
 
         :param string language: The language in which to return results.
-            Default None.
 
         :param bool sensor: Whether the geocoding request comes from a
-            device with a location sensor. Default False.
+            device with a location sensor.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -159,10 +158,9 @@ class GoogleV3(Geocoder):
             longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param string language: The language in which to return results.
-            Default None.
 
         :param boolean sensor: Whether the geocoding request comes from a
-            device with a location sensor. Default False.
+            device with a location sensor.
 
         :param boolean exactly_one: Return one result or a list of results, if
             available.
