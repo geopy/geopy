@@ -20,17 +20,17 @@ class Geocoder(object): # pylint: disable=R0921
     Template object for geocoders.
     """
 
-    def __init__(self, format_string=None, scheme=None, proxies=None, timeout=None):
+    def __init__(self, format_string='%s', scheme='https', proxies=None, timeout=10):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
         specify format_string and such.
         """
-        self.format_string = format_string or '%s'
-        self.scheme = scheme or 'https'
+        self.format_string = format_string
+        self.scheme = scheme
         if self.scheme not in ('http', 'https'):
             raise ConfigurationError('Supported schemes are `http` and `https`.')
         self.proxies = proxies
-        self.timeout = timeout or 10
+        self.timeout = timeout
 
         # Add urllib proxy support using environment variables or
         # built in OS proxy details
