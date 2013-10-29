@@ -106,7 +106,7 @@ class Geocoder(object): # pylint: disable=R0921
         """
         raise NotImplementedError()
 
-    def geocode_one(self, query): # pylint: disable=C0111 # pragma: no cover
+    def geocode_one(self, query): # pragma: no cover # pylint: disable=C0111
         warn(
             "geocode_one is deprecated and will be removed in the next"
             "non-bugfix release. Call geocode with exactly_one=True instead."
@@ -125,7 +125,7 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             raise GeocoderResultError("Geocoder returned no results!")
 
-    def geocode_first(self, query): # pylint: disable=C0111 # pragma: no cover
+    def geocode_first(self, query): # pragma: no cover # pylint: disable=C0111
         warn(
             "geocode_first is deprecated and will be removed in the next"
             "non-bugfix release. Call geocode with exactly_one=True instead."

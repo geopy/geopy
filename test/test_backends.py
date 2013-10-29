@@ -46,7 +46,7 @@ class LocalTestCase(unittest.TestCase):
         """
         format_string = '%s Los Angeles, CA USA'
         scheme = 'http'
-        timeout = DEFAULT_TIMEOUT+1
+        timeout = DEFAULT_TIMEOUT + 1
         proxies = {'https': '192.0.2.0'}
         geocoder = Geocoder(
             format_string=format_string,

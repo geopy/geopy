@@ -2,26 +2,22 @@
 Utils.
 """
 
-import re
 import logging
-try: # Py2k
-    import htmlentitydefs # pylint: disable=F0401
-except ImportError: # Py3k
-    import html.entities as htmlentitydefs # pylint: disable=F0401
 import xml.dom.minidom
 from xml.parsers.expat import ExpatError
 
 try:
     NUMBER_TYPES = (int, long, float)
-except NameError:
+except NameError: # pragma: no cover
     NUMBER_TYPES = (int, float) # float -> int in Py3k
 try:
     from decimal import Decimal
     NUMBER_TYPES = NUMBER_TYPES + (Decimal, )
-except ImportError:
+except ImportError: # pragma: no cover
     pass
 
 from geopy.compat import py3k, string_compare
+
 
 class NullHandler(logging.Handler):
     """
@@ -34,8 +30,7 @@ class NullHandler(logging.Handler):
 logger = logging.getLogger('geopy') # pylint: disable=C0103
 logger.addHandler(NullHandler())
 
-
-def parse_geo(val): # pylint: disable=W0613
+def parse_geo(val): # pragma: no cover # pylint: disable=W0613
     """
     Undefined func called in MediaWiki and SemanticMediaWiki geocoders.
     """
@@ -48,13 +43,13 @@ def pairwise(seq):
     for i in range(0, len(seq) - 1):
         yield (seq[i], seq[i + 1])
 
-if not py3k:
+if not py3k: # pragma: no cover
     def join_filter(sep, seq, pred=bool):
         """
         TODO docs.
         """
         return sep.join([unicode(i) for i in seq if pred(i)])
-else:
+else: # pragma: no cover
     def join_filter(sep, seq, pred=bool):
         """
         TODO docs.
@@ -66,19 +61,19 @@ def get_encoding(page, contents=None):
     """
     TODO docs.
     """
-    # TODO: clean up Py3k support
+    # TODO: clean up Py3k support.. BeautifulSoup
     if not py3k:
         charset = page.headers.getparam("charset") or None
     else:
         charset = page.headers.get_param("charset") or None
     if charset:
         return charset
-
     if contents:
         try:
             return xml.dom.minidom.parseString(contents).encoding
         except ExpatError:
             pass
+    return None
 
 def decode_page(page):
     """
@@ -105,46 +100,3 @@ def get_first_text(node, tag_names, strip=None):
             if nodes:
                 child = nodes[0].firstChild
                 return child and child.nodeValue.strip(strip)
-
-def unescape(text):
-    """
-    Removes HTML or XML character references and entities from a text string.
-    """
-
-    def fixup(val):
-        """
-        Callable for re.sub below.
-        """
-        text = val.group(0)
-        if text[:2] == "&#":
-            # character reference
-            try:
-                if text[:3] == "&#x":
-                    return unichr(int(text[3:-1], 16))
-                else:
-                    return unichr(int(text[2:-1]))
-            except ValueError:
-                pass
-        else:
-            # named entity
-            try:
-                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
-            except KeyError:
-                pass
-        return text # leave as is
-
-    return re.sub(r"&#?\w+;", fixup, text)
-
-try:
-    reversed
-except NameError:
-    def reversed(seq): # pylint: disable=W0622
-        """
-        Compat for builtin... not sure which Py version this allows. todo.
-        """
-        i = len(seq)
-        while i > 0:
-            i -= 1
-            yield seq[i]
-else:
-    reversed = reversed
