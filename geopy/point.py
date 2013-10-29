@@ -37,10 +37,6 @@ class Point(object): # pylint: disable=R0924
         >>> p2 is p1
         False
 
-    Give an object with a 'point' attribute, such as a `Location` instance::
-
-        >>> p = Point(location)
-
     Give a string containing at least latitude and longitude::
 
         >>> p1 = Point('41.5,-81.0')
@@ -316,6 +312,5 @@ class Point(object): # pylint: disable=R0924
     def from_point(cls, point):
         """
         Create and return a new ``Point`` instance from another ``Point`` instance.
-
         """
         return cls(point.latitude, point.longitude, point.altitude)

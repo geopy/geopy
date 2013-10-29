@@ -1,6 +1,7 @@
 """
 Full tests of geocoders including HTTP access.
 """
+
 import os
 import unittest
 
