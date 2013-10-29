@@ -99,7 +99,7 @@ class Point(object): # pylint: disable=R0924
         single_arg = longitude is None and altitude is None
         if single_arg and not isinstance(latitude, util.NUMBER_TYPES):
             arg = latitude
-            if arg is None:
+            if arg is None: # pragma: no cover
                 pass
             elif isinstance(arg, Point):
                 return cls.from_point(arg)
@@ -108,22 +108,22 @@ class Point(object): # pylint: disable=R0924
             else:
                 try:
                     seq = iter(arg)
-                except TypeError:
+                except TypeError: # pragma: no cover
                     raise TypeError(
                         "Failed to create Point instance from %r." % (arg,)
                     )
                 else:
                     return cls.from_sequence(seq)
 
-        latitude = float(latitude or 0)
+        latitude = float(latitude or 0.0)
         if abs(latitude) > 90:
             latitude = ((latitude + 90) % 180) - 90
 
-        longitude = float(longitude or 0)
+        longitude = float(longitude or 0.0)
         if abs(longitude) > 180:
             longitude = ((longitude + 180) % 360) - 180
 
-        altitude = float(altitude or 0)
+        altitude = float(altitude or 0.0)
 
         self = super(Point, cls).__new__(cls)
         self.latitude = latitude
@@ -235,7 +235,12 @@ class Point(object): # pylint: disable=R0924
                 'nm': lambda d: units.kilometers(nautical=d),
                 'nmi': lambda d: units.kilometers(nautical=d)
             }
-            return CONVERTERS[unit](distance)
+            try:
+                return CONVERTERS[unit](distance)
+            except KeyError: # pragma: no cover
+                raise NotImplementedError(
+                    'Bad distance unit specified, valid are: %r' % CONVERTERS.keys()
+                )
         else:
             return distance
 
@@ -292,15 +297,15 @@ class Point(object): # pylint: disable=R0924
             elif match.group("longitude_direction_back"):
                 longitude_direction = match.group("longitude_direction_back")
             latitude = cls.parse_degrees(
-                match.group('latitude_degrees'),
-                match.group('latitude_arcminutes'),
-                match.group('latitude_arcseconds'),
+                match.group('latitude_degrees') or 0.0,
+                match.group('latitude_arcminutes') or 0.0,
+                match.group('latitude_arcseconds') or 0.0,
                 latitude_direction
             )
             longitude = cls.parse_degrees(
-                match.group('longitude_degrees'),
-                match.group('longitude_arcminutes'),
-                match.group('longitude_arcseconds'),
+                match.group('longitude_degrees') or 0.0,
+                match.group('longitude_arcminutes') or 0.0,
+                match.group('longitude_arcseconds') or 0.0,
                 longitude_direction
             )
             altitude = cls.parse_altitude(
@@ -329,9 +334,3 @@ class Point(object): # pylint: disable=R0924
         Create and return a new ``Point`` instance from another ``Point`` instance.
         """
         return cls(point.latitude, point.longitude, point.altitude)
-
-if __name__ == "__main__":
-    t = Point(u"UT: N 39°20' 0'' / W 74°35' 0''")
-    print t.latitude, t.longitude
-    t = Point(u"19.387092,-99.165697")
-    print t.latitude, t.longitude
