@@ -15,7 +15,8 @@ try:
 except ImportError:
     Request, HTTPError, URLError = None, None, None
 
-from geopy.geocoders.base import Geocoder, GeocoderError
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
+    GeocoderError
 
 try:
     import oauth2 # pylint: disable=F0401
@@ -29,7 +30,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         https://developer.yahoo.com/boss/geo/docs/
     """
 
-    def __init__(self, consumer_key, consumer_secret, scheme='https', timeout=None, proxies=None):
+    def __init__(self, consumer_key, consumer_secret, # pylint: disable=R0913
+                        scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT,
+                        proxies=None):
         """
         Sets consumer key and secret.
 

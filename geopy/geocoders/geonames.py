@@ -4,7 +4,7 @@
 
 from geopy.compat import urlencode
 
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.util import logger
 from geopy.exc import GeocoderInsufficientPrivileges, GeocoderError, \
     ConfigurationError
@@ -19,7 +19,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         http://www.geonames.org/maps/us-reverse-geocoder.html
     """
 
-    def __init__(self, country_bias=None, username=None, timeout=None, proxies=None):
+    def __init__(self, country_bias=None, username=None, timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         :param string country_bias:
 

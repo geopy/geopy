@@ -8,8 +8,7 @@ import base64
 import hashlib
 import hmac
 from geopy.compat import urlencode
-
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.util import logger
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded, ConfigurationError
 
@@ -20,8 +19,9 @@ class GoogleV3(Geocoder):
         https://developers.google.com/maps/documentation/geocoding/
     """
 
-    def __init__(self, domain='maps.googleapis.com', scheme='https', # pylint: disable=R0913
-                 client_id=None, secret_key=None, timeout=None, proxies=None, protocol=None):
+    def __init__(self, domain='maps.googleapis.com', scheme=DEFAULT_SCHEME, # pylint: disable=R0913
+                 client_id=None, secret_key=None, timeout=DEFAULT_TIMEOUT,
+                 proxies=None, protocol=None):
         """
         Initialize a customized Google geocoder.
 

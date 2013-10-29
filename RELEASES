@@ -25,6 +25,9 @@ ADDED:  Geocoders check a new method, `_geocoder_exception_handler`, if
 
 ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when appropriate.
 
+ADDED:  `Point` can parse a greater variety of coordinate strings. Contributed
+        by nucflash.
+
 
 0.96 - October 25, 2013
 =======================

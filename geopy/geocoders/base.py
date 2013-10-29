@@ -14,13 +14,17 @@ from geopy.point import Point
 from geopy.exc import GeocoderServiceError, ConfigurationError
 from geopy.util import decode_page
 
+DEFAULT_FORMAT_STRING = '%s'
+DEFAULT_SCHEME = 'https'
+DEFAULT_TIMEOUT = 10
+
 
 class Geocoder(object): # pylint: disable=R0921
     """
     Template object for geocoders.
     """
 
-    def __init__(self, format_string='%s', scheme='https', proxies=None, timeout=10):
+    def __init__(self, format_string='%s', scheme='https', timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
         specify format_string and such.

@@ -2,7 +2,7 @@
 :class:`.LiveAddress` geocoder.
 """
 
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.util import logger
 from geopy.compat import urlencode
 from geopy.exc import GeocoderQuotaExceeded
@@ -14,8 +14,8 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     More information regarding the LiveAddress API can be found here:
         https://smartystreets.com/products/liveaddress-api
     """
-    def __init__(self, auth_token, candidates=1, scheme='https', # pylint: disable=R0913
-                        timeout=None, proxies=None):
+    def __init__(self, auth_token, candidates=1, scheme=DEFAULT_SCHEME, # pylint: disable=R0913
+                        timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 

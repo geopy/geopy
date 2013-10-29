@@ -3,8 +3,8 @@
 """
 
 from geopy.compat import urlencode
-
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
+    DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.util import logger
 
 
@@ -14,8 +14,8 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         http://developer.mapquest.com/web/products/open/geocoding-service
     """
 
-    def __init__(self, api_key=None, format_string='%s', scheme='https', # pylint: disable=R0913
-                        timeout=None, proxies=None):
+    def __init__(self, api_key=None, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
+                        scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Initialize an Open MapQuest geocoder with location-specific
         address information. No API Key is needed by the Nominatim based

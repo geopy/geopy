@@ -3,8 +3,7 @@
 """
 
 from geopy.compat import BeautifulSoup
-
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.util import logger, parse_geo
 
 
@@ -13,7 +12,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
     MediaWiki geocoder. No idea on documentation.
     """
 
-    def __init__(self, format_url, transform_string=None, timeout=None, proxies=None):
+    def __init__(self, format_url, transform_string=None, timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.

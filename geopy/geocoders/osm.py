@@ -2,7 +2,8 @@
 OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
 """
 
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
+    DEFAULT_TIMEOUT
 from geopy.util import logger
 from geopy.compat import urlencode
 
@@ -15,9 +16,9 @@ class Nominatim(Geocoder):
     Note that Nominatim does not support SSL.
     """
 
-    def __init__(self, format_string='%s', # pylint: disable=R0913
+    def __init__(self, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
                         view_box=(-180,-90,180,90), country_bias=None,
-                        timeout=None, proxies=None):
+                        timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         :param string format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the

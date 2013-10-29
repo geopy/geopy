@@ -4,7 +4,8 @@
 
 import csv
 from geopy.compat import urlencode, py3k
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
+    DEFAULT_TIMEOUT
 from geopy.util import logger, join_filter
 from geopy.exc import ConfigurationError
 
@@ -17,8 +18,9 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     Note that GeocoderDotUS does not support SSL.
     """
 
-    def __init__(self, username=None, password=None, format_string='%s',  # pylint: disable=R0913
-                        timeout=None, proxies=None):
+    def __init__(self, username=None, password=None, # pylint: disable=R0913
+                        format_string=DEFAULT_FORMAT_STRING,
+                        timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         :param string username:
 

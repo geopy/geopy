@@ -3,8 +3,8 @@
 """
 
 from geopy.compat import urlencode
-
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
+    DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.util import logger, join_filter
 
 
@@ -14,8 +14,8 @@ class Bing(Geocoder):
         http://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
-    def __init__(self, api_key, format_string='%s', scheme='https',  # pylint: disable=R0913
-                        timeout=None, proxies=None):
+    def __init__(self, api_key, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
+                        scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT, proxies=None):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 

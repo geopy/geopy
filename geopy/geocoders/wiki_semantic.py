@@ -5,8 +5,7 @@
 import xml.dom.minidom
 
 from geopy.compat import BeautifulSoup
-
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy import util
 
 try:
@@ -22,7 +21,8 @@ class SemanticMediaWiki(Geocoder):
     """
 
     def __init__(self, format_url, attributes=None, relations=None, # pylint: disable=R0913
-                 prefer_semantic=False, transform_string=None, timeout=None, proxies=None):
+                 prefer_semantic=False, transform_string=None, timeout=DEFAULT_TIMEOUT,
+                 proxies=None):
         super(SemanticMediaWiki, self).__init__(timeout=timeout, proxies=proxies)
         self.format_url = format_url
         self.attributes = attributes
