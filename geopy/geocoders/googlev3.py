@@ -21,7 +21,7 @@ class GoogleV3(Geocoder):
     """
 
     def __init__(self, domain='maps.googleapis.com', scheme='https', # pylint: disable=R0913
-                 client_id=None, secret_key=None, proxies=None, protocol=None):
+                 client_id=None, secret_key=None, timeout=None, proxies=None, protocol=None):
         """
         Initialize a customized Google geocoder.
 
@@ -36,7 +36,7 @@ class GoogleV3(Geocoder):
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.96.1
+            .. versionadded:: 0.97
 
         :param string protocol: Deprecated version of `scheme` argument.
 
@@ -49,12 +49,13 @@ class GoogleV3(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96.0
+            .. versionadded:: 0.96
         """
         if protocol:
-            warn('protocol argument is deprecated in favor of scheme')
+            warn('protocol argument is deprecated in favor of scheme, to be'
+                'removed in 0.98')
         scheme = scheme or protocol
-        super(GoogleV3, self).__init__(scheme=scheme, proxies=proxies)
+        super(GoogleV3, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')
         if secret_key and not client_id:
@@ -97,7 +98,7 @@ class GoogleV3(Geocoder):
                 '&signature=%(signature)s' % url_params)
 
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
-                language=None, sensor=False, exactly_one=True):
+                language=None, sensor=False, exactly_one=True, timeout=None):
         """
         Geocode a location query.
 
@@ -118,6 +119,13 @@ class GoogleV3(Geocoder):
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         super(GoogleV3, self).geocode(query)
 
@@ -138,10 +146,10 @@ class GoogleV3(Geocoder):
             url = self._get_signed_url(params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
-    def reverse(self, query, language=None, # pylint: disable=W0221
-                    sensor=False, exactly_one=False):
+    def reverse(self, query, language=None, # pylint: disable=W0221,R0913
+                    sensor=False, exactly_one=False, timeout=None):
         """
         Given a point, find an address.
 
@@ -158,6 +166,12 @@ class GoogleV3(Geocoder):
 
         :param boolean exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
         """
         params = {
             'latlng': self._coerce_point_to_string(query),
@@ -172,7 +186,7 @@ class GoogleV3(Geocoder):
             url = self._get_signed_url(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
     def _parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''

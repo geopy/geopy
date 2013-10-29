@@ -26,7 +26,7 @@ Using [pip](http://www.pip-installer.org/en/latest/):
 
     pip install geopy
 
-Or, manually: [Download the tarball from PyPI](https://pypi.python.org/pypi/geopy),
+Or, manually: [download the tarball from PyPI](https://pypi.python.org/pypi/geopy),
 unzip, and execute this in the same directory:
 
     python setup.py install
@@ -38,7 +38,7 @@ To geolocate a query to an address and coordinates:
     >>> from geopy.geocoders import GoogleV3
     >>> geolocator = GoogleV3()
     >>> address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
-    >>> print address, latitude, longitude
+    >>> print(address, latitude, longitude)
     175 5th Avenue, New York, NY 10010, USA 40.7410262 -73.9897806
 
 To find the address corresponding to a set of coordinates:
@@ -46,7 +46,7 @@ To find the address corresponding to a set of coordinates:
     >>> from geopy.geocoders import GoogleV3
     >>> geolocator = GoogleV3()
     >>> address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578")
-    >>> print address, latitude, longitude
+    >>> print(address, latitude, longitude)
     77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
 
 ## Documentation

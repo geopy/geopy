@@ -14,7 +14,8 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     More information regarding the LiveAddress API can be found here:
         https://smartystreets.com/products/liveaddress-api
     """
-    def __init__(self, auth_token, candidates=1, scheme='https', proxies=None):
+    def __init__(self, auth_token, candidates=1, scheme='https', # pylint: disable=R0913
+                        timeout=None, proxies=None):
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
@@ -31,16 +32,22 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.96.1
+            .. versionadded:: 0.97
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising an :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96.0
+            .. versionadded:: 0.96
         """
-        super(LiveAddress, self).__init__(scheme=scheme, proxies=proxies)
+        super(LiveAddress, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.auth_token = auth_token
         if candidates:
             if not (1 <= candidates <= 10):

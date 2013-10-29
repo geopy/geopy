@@ -16,7 +16,8 @@ class Nominatim(Geocoder):
     """
 
     def __init__(self, format_string='%s', # pylint: disable=R0913
-                        view_box=(-180,-90,180,90), country_bias=None, proxies=None):
+                        view_box=(-180,-90,180,90), country_bias=None,
+                        timeout=None, proxies=None):
         """
         :param string format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
@@ -32,9 +33,9 @@ class Nominatim(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96.0
+            .. versionadded:: 0.96
         """
-        super(Nominatim, self).__init__(format_string, 'http', proxies)
+        super(Nominatim, self).__init__(format_string, 'http', timeout, proxies)
         # XML needs all sorts of conditionals because of API differences
         # between geocode and reverse, so only implementing JSON format
         self.country_bias = country_bias
@@ -45,7 +46,7 @@ class Nominatim(Geocoder):
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
         self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
 
-    def geocode(self, query, exactly_one=True):
+    def geocode(self, query, exactly_one=True, timeout=None):
         """
         Geocode a location query.
 
@@ -53,6 +54,13 @@ class Nominatim(Geocoder):
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         super(Nominatim, self).geocode(query)
         params = {
@@ -66,9 +74,9 @@ class Nominatim(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
-    def reverse(self, query, exactly_one=True):
+    def reverse(self, query, exactly_one=True, timeout=None):
         """
         Returns a reverse geocoded location.
 
@@ -79,6 +87,13 @@ class Nominatim(Geocoder):
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         lat, lon = [x.strip() for x in self._coerce_point_to_string(query).split(',')] # doh
         params = {
@@ -88,7 +103,7 @@ class Nominatim(Geocoder):
           }
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
     def _parse_json(self, places, exactly_one):
         if not isinstance (places, list):

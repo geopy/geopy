@@ -20,7 +20,7 @@ class Geocoder(object): # pylint: disable=R0921
     Template object for geocoders.
     """
 
-    def __init__(self, format_string=None, scheme=None, proxies=None):
+    def __init__(self, format_string=None, scheme=None, proxies=None, timeout=None):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
         specify format_string and such.
@@ -30,6 +30,7 @@ class Geocoder(object): # pylint: disable=R0921
         if self.scheme not in ('http', 'https'):
             raise ConfigurationError('Supported schemes are `http` and `https`.')
         self.proxies = proxies
+        self.timeout = timeout or 10
 
         # Add urllib proxy support using environment variables or
         # built in OS proxy details
@@ -73,12 +74,12 @@ class Geocoder(object): # pylint: disable=R0921
         )
         return self._parse_json(*args, **kwargs)
 
-    def _call_geocoder(self, url, raw=False):
+    def _call_geocoder(self, url, timeout=None, raw=False):
         """
         For a generated query URL, get the results.
         """
         try:
-            page = self.urlopen(url)
+            page = self.urlopen(url, timeout=timeout or self.timeout)
         except HTTPError as error:
             if hasattr(self, '_geocoder_exception_handler'):
                 self._geocoder_exception_handler(error) # pylint: disable=E1101
@@ -87,14 +88,14 @@ class Geocoder(object): # pylint: disable=R0921
             return page
         return json.loads(decode_page(page))
 
-    def geocode(self, query, exactly_one=True): # pylint: disable=R0201,W0613
+    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=R0201,W0613
         """
         Implemented in subclasses. Just string coercion here.
         """
         if not py3k and isinstance(query, unicode):
             query = query.encode('utf-8')
 
-    def reverse(self, query, exactly_one=True):
+    def reverse(self, query, exactly_one=True, timeout=None):
         """
         Implemented in subclasses.
         """

@@ -12,7 +12,7 @@ To geolocate a query to an address and coordinates::
     >>> from geopy.geocoders import GoogleV3
     >>> geolocator = GoogleV3()
     >>> address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
-    >>> print address, latitude, longitude
+    >>> print(address, latitude, longitude)
     175 5th Avenue, New York, NY 10010, USA 40.7410262 -73.9897806
 
 To find the address corresponding to a set of coordinates::
@@ -20,7 +20,7 @@ To find the address corresponding to a set of coordinates::
     >>> from geopy.geocoders import GoogleV3
     >>> geolocator = GoogleV3()
     >>> address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578")
-    >>> print address, latitude, longitude
+    >>> print(address, latitude, longitude)
     77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
 
 Locators' ``geolocate`` and ``reverse`` methods require the argument ``query``,
@@ -47,7 +47,7 @@ geocode locations in Cleveland, Ohio, you could do::
     >>> from geopy.geocoders import GeocoderDotUS
     >>> geolocator = GeocoderDotUS(format_string="%s, Cleveland OH")
     >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
-    >>> print address, latitude, longitude
+    >>> print(address, latitude, longitude)
     11111 Euclid Ave, Cleveland, OH 44106 41.506784 -81.608148
 
 """

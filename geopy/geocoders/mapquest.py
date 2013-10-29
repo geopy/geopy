@@ -15,7 +15,8 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         http://www.mapquestapi.com/geocoding/
     """
 
-    def __init__(self, api_key, format_string=None, scheme='https', proxies=None):
+    def __init__(self, api_key, format_string=None, scheme='https',  # pylint: disable=R0913
+                        timeout=None, proxies=None):
         """
         Initialize a MapQuest geocoder with address information and
         MapQuest API key.
@@ -31,18 +32,24 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.96.1
+            .. versionadded:: 0.97
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
         """
-        super(MapQuest, self).__init__(format_string, scheme, proxies)
+        super(MapQuest, self).__init__(format_string, scheme, timeout, proxies)
         self.api_key = api_key
         self.api = "%s://www.mapquestapi.com/geocoding/v1/address" % self.scheme
 
-    def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -50,6 +57,13 @@ class MapQuest(Geocoder): # pylint: disable=W0223
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         super(MapQuest, self).geocode(query)
         params = {
@@ -63,7 +77,7 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             "&".join(("=".join(('key', self.api_key)), urlencode(params)))
         ))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
     def _parse_json(self, resources, exactly_one=True):
         """

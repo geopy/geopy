@@ -57,6 +57,19 @@ Data
 .. autoclass:: geopy.point.Point
     :members: __new__, from_string, from_sequence, from_point
 
+Exceptions
+~~~~~~~~~~
+
+.. autoclass:: geopy.exc.ConfigurationError
+
+.. autoclass:: geopy.exc.GeocoderQueryError
+
+.. autoclass:: geopy.exc.GeocoderAuthenticationFailure
+
+.. autoclass:: geopy.exc.GeocoderInsufficientPrivileges
+
+.. autoclass:: geopy.exc.GeocoderServiceError
+
 Indices and search
 ==================
 

@@ -39,3 +39,8 @@ class GeocoderServiceError(GeocoderError):
     def __init__(self, http_status, message):
         self.http_status = http_status
         super(GeocoderServiceError, self).__init__(message)
+
+class GeocoderTimedOut(GeocoderError):
+    """
+    Geocoder's request exceeded timeout arg
+    """

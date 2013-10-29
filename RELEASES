@@ -9,9 +9,15 @@ CHANGED:    SSL connections are used by default for services with support.
 
 CHANGED:    GoogleV3's `protocol` argument is deprecated in favor of `scheme`.
 
+ADDED:  Geocoders accept a `timeout` argument which specifies the number of
+        seconds to wait before raising a `GeocoderTimedOut` exception. This
+        can be specified in the init, or specified one-off in each `geocode` or
+        `reverse` call. There is now a default of 10 seconds.
+
 ADDED:  Geocoders accept a `proxies` argument which specifies a proxy to
-        route its geocoder requests through. This was present but undocumented
-        in 0.96.0.
+        route its geocoder requests through. It uses urllib, and accepts
+        proxies in the form of a dictionary of {scheme: proxy address}, e.g.,
+        {"https": "192.0.2.0"}. This was present but undocumented in 0.96.
 
 ADDED:  Geocoders check a new method, `_geocoder_exception_handler`, if
         defined, when non-OK responses are returned. See LiveStreets for

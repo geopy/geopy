@@ -19,8 +19,32 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         http://www.geonames.org/maps/us-reverse-geocoder.html
     """
 
-    def __init__(self, country_bias=None, username=None, proxies=None):
-        super(GeoNames, self).__init__(proxies=proxies)
+    def __init__(self, country_bias=None, username=None, timeout=None, proxies=None):
+        """
+        :param string country_bias:
+
+        :param string username:
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+
+            .. versionadded:: 0.96
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
+        """
+        super(GeoNames, self).__init__(scheme='http', timeout=timeout, proxies=proxies)
         if username == None:
             raise ConfigurationError(
                 'No username given, required for api access.  If you do not '
@@ -29,9 +53,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             )
         self.username = username
         self.country_bias = country_bias
-        self.api = "http://api.geonames.org/searchJSON"
+        self.api = "%s://api.geonames.org/searchJSON" % self.scheme
 
-    def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -39,6 +63,13 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         super(GeoNames, self).geocode(query)
         params = {
@@ -51,7 +82,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             params['maxRows'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
     def _parse_json(self, doc, exactly_one):
         """

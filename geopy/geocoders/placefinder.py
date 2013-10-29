@@ -29,7 +29,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         https://developer.yahoo.com/boss/geo/docs/
     """
 
-    def __init__(self, consumer_key, consumer_secret, scheme='https', proxies=None):
+    def __init__(self, consumer_key, consumer_secret, scheme='https', timeout=None, proxies=None):
         """
         Sets consumer key and secret.
 
@@ -41,20 +41,20 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.96.1
+            .. versionadded:: 0.97
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96.0
+            .. versionadded:: 0.96
         """
         if oauth2 is None:
             raise ImportError('oauth2 is needed for YahooPlaceFinder')
         if Request is None:
             raise NotImplementedError("YahooPlaceFinder is not compatible with Py3k")
-        super(YahooPlaceFinder, self).__init__(scheme=scheme, proxies=proxies)
+        super(YahooPlaceFinder, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 

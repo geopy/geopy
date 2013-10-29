@@ -17,7 +17,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     Note that GeocoderDotUS does not support SSL.
     """
 
-    def __init__(self, username=None, password=None, format_string=None, proxies=None):
+    def __init__(self, username=None, password=None, format_string=None,  # pylint: disable=R0913
+                        timeout=None, proxies=None):
         """
         :param string username:
 
@@ -28,14 +29,22 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
 
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising an :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
+
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96.0
+            .. versionadded:: 0.96
         """
-        super(GeocoderDotUS, self).__init__(format_string, proxies)
+        super(GeocoderDotUS, self).__init__(
+            format_string=format_string, timeout=timeout, proxies=proxies
+        )
         if username and password is None:
             raise ConfigurationError("Password must be specified with username")
         self.username = username
@@ -56,7 +65,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
         return 'http://%sgeocoder.us/%s' % (auth, resource)
 
-    def geocode(self, query, exactly_one=True): # pylint: disable=W0613,W0221
+    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0613,W0221
         """
         Geocode a location query.
 
@@ -64,6 +73,13 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         super(GeocoderDotUS, self).geocode(query)
         query_str = self.format_string % query
@@ -71,9 +87,9 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         url = "?".join((self._get_url(), urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        page = self._call_geocoder(url, raw=True)
-        page = page.read().decode("utf-8") if py3k else page.read()
-        places = [r for r in csv.reader([page, ] if not isinstance(page, list) else page)]
+        page = self._call_geocoder(url, timeout=timeout, raw=True)
+        content = page.read().decode("utf-8") if py3k else page.read()
+        places = [r for r in csv.reader([content, ] if not isinstance(content, list) else content)]
         if not len(places):
             return None
         if exactly_one is True:

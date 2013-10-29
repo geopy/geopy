@@ -13,7 +13,7 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
     MediaWiki geocoder. No idea on documentation.
     """
 
-    def __init__(self, format_url, transform_string=None, proxies=None):
+    def __init__(self, format_url, transform_string=None, timeout=None, proxies=None):
         """
         Initialize a geocoder that can parse MediaWiki pages with the GIS
         extension enabled.
@@ -27,12 +27,18 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
             the page. If ``None`` is given, the default transform_string
             which replaces ' ' with '_' will be used.
 
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
+
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
         """
-        super(MediaWiki, self).__init__(proxies=proxies)
+        super(MediaWiki, self).__init__(timeout=timeout, proxies=proxies)
         self.format_url = format_url
         if transform_string:
             self._transform_string = transform_string
@@ -42,23 +48,23 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
         """Do the WikiMedia dance: replace spaces with underscores."""
         return string.replace(' ', '_')
 
-    def geocode(self, query):
+    def geocode(self, query, timeout=None):
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
         """
         super(MediaWiki, self).geocode(query)
         wiki_string = self._transform_string(query)
         url = self.format_url % wiki_string
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self.geocode_url(url)
-
-    def geocode_url(self, url):
-        logger.debug("Fetching %s...", url)
-        page = self.urlopen(url)
-        name, (latitude, longitude) = self.parse_xhtml(page)
-        return (name, (latitude, longitude))
+        return self.parse_xhtml(self._call_geocoder(url, timeout=timeout))
 
     def parse_xhtml(self, page):
         soup = isinstance(page, BeautifulSoup) and page or BeautifulSoup(page)

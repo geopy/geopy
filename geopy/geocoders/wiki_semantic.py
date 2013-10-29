@@ -22,8 +22,8 @@ class SemanticMediaWiki(Geocoder):
     """
 
     def __init__(self, format_url, attributes=None, relations=None, # pylint: disable=R0913
-                 prefer_semantic=False, transform_string=None, proxies=None):
-        super(SemanticMediaWiki, self).__init__(proxies=proxies)
+                 prefer_semantic=False, transform_string=None, timeout=None, proxies=None):
+        super(SemanticMediaWiki, self).__init__(timeout=timeout, proxies=proxies)
         self.format_url = format_url
         self.attributes = attributes
         self.relations = relations

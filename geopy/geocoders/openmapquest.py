@@ -14,7 +14,8 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         http://developer.mapquest.com/web/products/open/geocoding-service
     """
 
-    def __init__(self, api_key=None, format_string=None, scheme='https', proxies=None):
+    def __init__(self, api_key=None, format_string=None, scheme='https', # pylint: disable=R0913
+                        timeout=None, proxies=None):
         """
         Initialize an Open MapQuest geocoder with location-specific
         address information. No API Key is needed by the Nominatim based
@@ -29,21 +30,27 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.96.1
+            .. versionadded:: 0.97
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: 0.97
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96.0
+            .. versionadded:: 0.96
         """
-        super(OpenMapQuest, self).__init__(format_string, scheme, proxies)
+        super(OpenMapQuest, self).__init__(format_string, scheme, timeout, proxies)
         self.api_key = api_key or ''
         self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json" % self.scheme
 
-    def geocode(self, query, exactly_one=True): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -51,6 +58,13 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
         """
         super(OpenMapQuest, self).geocode(query)
         params = {
@@ -61,7 +75,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         url = "&".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
     @classmethod
     def _parse_json(cls, resources, exactly_one=True):
