@@ -153,6 +153,10 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
+    def test_zero_results(self):
+        result = self.geocoder.geocode('')
+        self.assertIsNone(result)
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['BING_KEY'] is not None,

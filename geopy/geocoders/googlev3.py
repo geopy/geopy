@@ -184,6 +184,9 @@ class GoogleV3(Geocoder):
         """
         Validates error statuses.
         """
+        if status == 'ZERO_RESULTS':
+            # When there are no results, just return.
+            return
         if status == 'OVER_QUERY_LIMIT':
             raise GeocoderQuotaExceeded(
                 'The given key has gone over the requests limit in the 24'
