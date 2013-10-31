@@ -39,6 +39,7 @@ class GoogleV3(Geocoder):
             .. versionadded:: 0.97
 
         :param string protocol: Deprecated version of `scheme` argument.
+            Override scheme, if present.
 
         :param string client_id: If using premier, the account client id.
 
@@ -54,7 +55,7 @@ class GoogleV3(Geocoder):
         if protocol:
             warn('protocol argument is deprecated in favor of scheme, to be'
                 'removed in 0.98')
-        scheme = scheme or protocol
+        scheme = protocol or scheme
         super(GoogleV3, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')
