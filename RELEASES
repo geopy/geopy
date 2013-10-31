@@ -30,7 +30,7 @@ ADDED:  `Point` can parse a greater variety of coordinate strings. Contributed
 
 
 0.96.1 - October 31, 2013
-=======================
+=========================
 FIXED:  GoogleV3 returns `None` when the service returns an error status of
         `ZERO_RESULTS`. Contributed by Ian A Wilson.
 

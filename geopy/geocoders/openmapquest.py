@@ -66,7 +66,6 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.97
         """
-        super(OpenMapQuest, self).geocode(query)
         params = {
             'q': self.format_string % query
         }

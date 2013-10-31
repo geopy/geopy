@@ -71,7 +71,6 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.97
         """
-        super(GeoNames, self).geocode(query)
         params = {
             'q': query,
             'username': self.username

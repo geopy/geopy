@@ -59,7 +59,6 @@ class MediaWiki(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.97
         """
-        super(MediaWiki, self).geocode(query)
         wiki_string = self._transform_string(query)
         url = self.format_url % wiki_string
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

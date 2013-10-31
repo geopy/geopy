@@ -11,7 +11,7 @@ from warnings import warn
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 
-from geopy.compat import py3k, string_compare, HTTPError, json
+from geopy.compat import string_compare, HTTPError, json
 from geopy.point import Point
 from geopy.exc import GeocoderServiceError, ConfigurationError, GeocoderTimedOut
 from geopy.util import decode_page
@@ -108,10 +108,9 @@ class Geocoder(object): # pylint: disable=R0921
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=R0201,W0613
         """
-        Implemented in subclasses. Just string coercion here.
+        Implemented in subclasses.
         """
-        if not py3k and isinstance(query, unicode):
-            query = query.encode('utf-8')
+        raise NotImplementedError()
 
     def reverse(self, query, exactly_one=True, timeout=None): # pragma: no cover
         """

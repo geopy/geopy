@@ -66,7 +66,6 @@ class MapQuest(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.97
         """
-        super(MapQuest, self).geocode(query)
         params = {
             'location' : query
         }

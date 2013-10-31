@@ -63,7 +63,6 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.97
         """
-        super(Nominatim, self).geocode(query)
         params = {
             'q': self.format_string % query,
             'view_box' : self.view_box,

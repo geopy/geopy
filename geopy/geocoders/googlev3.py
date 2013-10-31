@@ -127,8 +127,6 @@ class GoogleV3(Geocoder):
 
             .. versionadded:: 0.97
         """
-        super(GoogleV3, self).geocode(query)
-
         params = {
             'address': self.format_string % query,
             'sensor': str(sensor).lower()

@@ -72,7 +72,6 @@ class Bing(Geocoder):
 
             .. versionadded:: 0.97
         """
-        super(Bing, self).geocode(query)
         params = {
             'query': self.format_string % query,
             'key': self.api_key

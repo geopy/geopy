@@ -83,7 +83,6 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.97
         """
-        super(GeocoderDotUS, self).geocode(query)
         query_str = self.format_string % query
 
         url = "?".join((self._get_url(), urlencode({'address':query_str})))
