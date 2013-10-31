@@ -8,10 +8,12 @@ except ImportError: # pragma: no cover
     from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
         build_opener, ProxyHandler)
 from warnings import warn
+from ssl import SSLError
+from socket import timeout as SocketTimeout
 
 from geopy.compat import py3k, string_compare, HTTPError, json
 from geopy.point import Point
-from geopy.exc import GeocoderServiceError, ConfigurationError
+from geopy.exc import GeocoderServiceError, ConfigurationError, GeocoderTimedOut
 from geopy.util import decode_page
 
 DEFAULT_FORMAT_STRING = '%s'
@@ -85,10 +87,21 @@ class Geocoder(object): # pylint: disable=R0921
         """
         try:
             page = self.urlopen(url, timeout=timeout or self.timeout)
-        except HTTPError as error:
+        except Exception as error: # pylint: disable=W0703
             if hasattr(self, '_geocoder_exception_handler'):
                 self._geocoder_exception_handler(error) # pylint: disable=E1101
-            raise GeocoderServiceError(error.getcode(), getattr(error, 'msg', None))
+            elif isinstance(error, HTTPError):
+                raise GeocoderServiceError(error.getcode(), error.msg)
+            elif isinstance(error, SSLError):
+                if error.message == 'The read operation timed out':
+                    raise GeocoderTimedOut(
+                        'Service timed out while using SSL connection'
+                    )
+                raise
+            elif isinstance(error, SocketTimeout):
+                raise GeocoderTimedOut('Service timed out')
+            else:
+                raise
         if raw:
             return page
         return json.loads(decode_page(page))
