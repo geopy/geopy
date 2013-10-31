@@ -7,12 +7,12 @@ CHANGED:    SSL connections are used by default for services with support.
             connections must now specify 'http'. Note that SSL connections'
             certificates are not verified.
 
-CHANGED:    GoogleV3's `protocol` argument is deprecated in favor of `scheme`.
+CHANGED:    Geocoders accept a `timeout` argument which specifies the number of
+            seconds to wait before raising a `GeocoderTimedOut` exception. This
+            can be specified in the init, or specified one-off in each `geocode`
+            or `reverse` call. There is now a default of 1 second.
 
-ADDED:  Geocoders accept a `timeout` argument which specifies the number of
-        seconds to wait before raising a `GeocoderTimedOut` exception. This
-        can be specified in the init, or specified one-off in each `geocode` or
-        `reverse` call. There is now a default of 10 seconds.
+CHANGED:    GoogleV3's `protocol` argument is deprecated in favor of `scheme`.
 
 ADDED:  Geocoders accept a `proxies` argument which specifies a proxy to
         route its geocoder requests through. It uses urllib, and accepts
@@ -20,8 +20,9 @@ ADDED:  Geocoders accept a `proxies` argument which specifies a proxy to
         {"https": "192.0.2.0"}. This was present but undocumented in 0.96.
 
 ADDED:  Geocoders check a new method, `_geocoder_exception_handler`, if
-        defined, when non-OK responses are returned. See LiveStreets for
-        an example. Users can define or override this method.
+        defined, when the HTTP call to the geocoder's service raises an
+        exception. See LiveStreets for an example. Users can define or
+        override this method.
 
 ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when appropriate.
 
@@ -31,6 +32,7 @@ ADDED:  `Point` can parse a greater variety of coordinate strings. Contributed
 
 0.96.1 - October 31, 2013
 =========================
+
 FIXED:  GoogleV3 returns `None` when the service returns an error status of
         `ZERO_RESULTS`. Contributed by Ian A Wilson.
 

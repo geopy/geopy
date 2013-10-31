@@ -71,16 +71,6 @@ class Geocoder(object): # pylint: disable=R0921
         """
         raise NotImplementedError()
 
-    def parse_json(self, *args, **kwargs): # pragma: no cover
-        """
-        Compatibility until 0.97.0
-        """
-        warn(
-            "parse_json is now a private method at _parse_json; this name "
-            "will be removed in the next non-bugfix release"
-        )
-        return self._parse_json(*args, **kwargs)
-
     def _call_geocoder(self, url, timeout=None, raw=False):
         """
         For a generated query URL, get the results.
@@ -117,39 +107,3 @@ class Geocoder(object): # pylint: disable=R0921
         Implemented in subclasses.
         """
         raise NotImplementedError()
-
-    def geocode_one(self, query): # pragma: no cover # pylint: disable=C0111
-        warn(
-            "geocode_one is deprecated and will be removed in the next"
-            "non-bugfix release. Call geocode with exactly_one=True instead."
-        )
-        results = self.geocode(query)
-        first = None
-        for result in results:
-            if first is None:
-                first = result
-            else:
-                raise GeocoderResultError(
-                    "Geocoder returned more than one result!"
-                )
-        if first is not None:
-            return first
-        else:
-            raise GeocoderResultError("Geocoder returned no results!")
-
-    def geocode_first(self, query): # pragma: no cover # pylint: disable=C0111
-        warn(
-            "geocode_first is deprecated and will be removed in the next"
-            "non-bugfix release. Call geocode with exactly_one=True instead."
-        )
-        results = self.geocode(query)
-        for result in results:
-            return result
-        return None
-
-
-class GeocoderError(Exception): # pylint: disable=C0111
-    pass
-
-class GeocoderResultError(GeocoderError): # pylint: disable=C0111
-    pass
