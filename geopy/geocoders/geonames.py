@@ -40,7 +40,6 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(GeoNames, self).geocode(query)
         params = {
             'q': query,
             'username': self.username

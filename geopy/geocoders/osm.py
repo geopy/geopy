@@ -42,7 +42,6 @@ class Nominatim(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(Nominatim, self).geocode(query)
         params = {
             'q': self.format_string % query,
             'view_box' : self.view_box,

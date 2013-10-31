@@ -46,7 +46,6 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(GeocoderDotUS, self).geocode(query)
         query_str = self.format_string % query
 
         url = "?".join((self._get_url(), urlencode({'address':query_str})))

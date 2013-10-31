@@ -40,7 +40,6 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(OpenMapQuest, self).geocode(query)
         params = {
             'q': self.format_string % query
         }

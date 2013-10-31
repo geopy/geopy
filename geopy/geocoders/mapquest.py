@@ -34,7 +34,6 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(MapQuest, self).geocode(query)
         params = {
             'location' : query
         }

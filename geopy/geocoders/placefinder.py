@@ -157,7 +157,6 @@ class YahooPlaceFinder(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(YahooPlaceFinder, self).geocode(query)
         request = self._build_request(query, reverse=reverse)
         response = self._get_response(request)
         results = self._parse_response(response)

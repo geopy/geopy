@@ -45,7 +45,6 @@ class Bing(Geocoder):
 
         :type user_location: :class:`geopy.point.Point`
         """
-        super(Bing, self).geocode(query)
         params = {
             'query': self.format_string % query,
             'key': self.api_key

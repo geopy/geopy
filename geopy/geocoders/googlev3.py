@@ -104,8 +104,6 @@ class GoogleV3(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        super(GoogleV3, self).geocode(query)
-
         params = {
             'address': self.format_string % query,
             'sensor': str(sensor).lower()

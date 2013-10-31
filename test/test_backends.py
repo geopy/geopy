@@ -232,7 +232,7 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 
     def test_reverse(self):
         known_addr = 'Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond '\
-            'District, Chelsea, NYC, New York, 10020, United States of America'
+            'District, Manhattan, NYC, New York, 10020, United States of America'
         known_coords = (40.75376406311989, -73.98489005863667)
         addr, coords = self.geocoder.reverse(
             "40.75376406311989, -73.98489005863667",
