@@ -7,7 +7,6 @@ try:
 except ImportError: # pragma: no cover
     from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
         build_opener, ProxyHandler)
-from warnings import warn
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 

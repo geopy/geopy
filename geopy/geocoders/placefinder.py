@@ -15,8 +15,8 @@ try:
 except ImportError:
     Request, HTTPError, URLError = None, None, None
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
-    GeocoderError
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.exc import GeocoderError
 
 try:
     import oauth2 # pylint: disable=F0401
