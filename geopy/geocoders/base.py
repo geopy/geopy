@@ -80,7 +80,7 @@ class Geocoder(object): # pylint: disable=R0921
         except Exception as error: # pylint: disable=W0703
             if hasattr(self, '_geocoder_exception_handler'):
                 self._geocoder_exception_handler(error) # pylint: disable=E1101
-            elif isinstance(error, HTTPError):
+            if isinstance(error, HTTPError):
                 raise GeocoderServiceError(error.getcode(), error.msg)
             elif isinstance(error, SSLError):
                 if error.message == 'The read operation timed out':
