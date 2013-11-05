@@ -214,15 +214,28 @@ class BingTestCase(_BackendTestCase):
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
+    def test_user_location(self):
+        pensylvania = "20 Main St, Bally, PA 19503, United States"
+        colorado = "20 Main St, Broomfield, CO 80020, United States"
+
+        pennsylvania_bias = (40.922351, -75.096562)
+        colorado_bias = (39.914231, -105.070104)
+        for each in ((pensylvania, pennsylvania_bias), (colorado, colorado_bias)):
+            self.assertEqual(
+                self.geocoder.geocode(
+                    "20 Main Street", user_location=Point(each[1])
+                )[0],
+                each[0]
+            )
 
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = GeocoderDotUS()
+        self.geocoder = GeocoderDotUS(timeout=3)
 
 
 class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = OpenMapQuest()
+        self.geocoder = OpenMapQuest(timeout=3)
         self.delta_exact = 0.04
         self.delta_placename = 0.04
 
@@ -233,8 +246,9 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 )
 class MapQuestTestCase(_BackendTestCase):
     def setUp(self):
-        self.geocoder = MapQuest(env['MAPQUEST_KEY'])
+        self.geocoder = MapQuest(env['MAPQUEST_KEY'], timeout=3)
         self.delta_placename = 0.04
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['GEONAMES_USERNAME'] is not None,
@@ -244,6 +258,7 @@ class GeoNamesTestCase(_BackendTestCase):
     def setUp(self):
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.delta_placename = 0.04
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['LIVESTREETS_AUTH_KEY'] is not None,
@@ -255,6 +270,7 @@ class LiveAddressTestCase(_BackendTestCase):
             auth_token=env['LIVESTREETS_AUTH_KEY']
         )
         self.delta_placename = 0.04
+
 
 class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
@@ -271,6 +287,7 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['YAHOO_KEY'] is not None and env['YAHOO_SECRET'] is not None,

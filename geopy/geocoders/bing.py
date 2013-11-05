@@ -11,7 +11,7 @@ from geopy.util import logger, join_filter
 class Bing(Geocoder):
     """
     Geocoder using the Bing Maps Locations API. Documentation at:
-        http://msdn.microsoft.com/en-us/library/ff701715.aspx
+        https://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
     def __init__(self, api_key, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
@@ -78,7 +78,7 @@ class Bing(Geocoder):
         }
         if user_location:
             params['userLocation'] = ",".join(
-                (user_location.latitude, user_location.longitude)
+                (str(user_location.latitude), str(user_location.longitude))
             )
         if exactly_one is True:
             params['maxResults'] = 1

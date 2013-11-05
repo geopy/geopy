@@ -8,7 +8,6 @@ install_requires = []
 tests_require = [
     'nose-cov',
     'pylint',
-    'beautifulsoup4',
     'tox'
 ]
 

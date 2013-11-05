@@ -14,7 +14,8 @@ import json
 
 from geopy.compat import string_compare, HTTPError
 from geopy.point import Point
-from geopy.exc import GeocoderServiceError, ConfigurationError, GeocoderTimedOut
+from geopy.exc import (GeocoderServiceError, ConfigurationError,
+    GeocoderTimedOut, GeocoderAuthenticationFailure)
 from geopy.util import decode_page
 
 DEFAULT_FORMAT_STRING = '%s'
@@ -82,6 +83,8 @@ class Geocoder(object): # pylint: disable=R0921
             if hasattr(self, '_geocoder_exception_handler'):
                 self._geocoder_exception_handler(error) # pylint: disable=E1101
             if isinstance(error, HTTPError):
+                if error.msg.lower().contains("unauthorized"):
+                    raise GeocoderAuthenticationFailure("Unauthorized")
                 raise GeocoderServiceError(error.getcode(), error.msg)
             elif isinstance(error, URLError):
                 if error.message == '<urlopen error timed out>':
