@@ -98,6 +98,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             return None
 
         def parse_code(place):
+            """
+            Parse each record.
+            """
             latitude = place.get('lat', None)
             longitude = place.get('lng', None)
             if latitude and longitude:

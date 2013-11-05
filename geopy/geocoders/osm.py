@@ -112,6 +112,9 @@ class Nominatim(Geocoder):
             return None
 
         def parse_code(place):
+            """
+            Parse each resource.
+            """
             latitude = place.get('lat', None)
             longitude = place.get('lon', None)
             placename = place.get('display_name', None)

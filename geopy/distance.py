@@ -62,9 +62,7 @@ calculate the length of a path::
 """
 from __future__ import division
 
-import sys
-
-from math import atan, tan, sin, cos, pi, sqrt, atan2, acos, asin
+from math import atan, tan, sin, cos, pi, sqrt, atan2, asin
 from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
@@ -93,7 +91,7 @@ ELLIPSOIDS = {
 
 class Distance(object):
     """
-    Base for GreatCircleDistance and VincentyDistance.
+    Base for :calss:`.great_circle` and :class:`.vincenty`.
     """
 
     def __init__(self, *args, **kwargs):
@@ -139,7 +137,7 @@ class Distance(object):
         return self.__class__(abs(self.kilometers))
 
     def __nonzero__(self):
-        return bool(self.kilometers > 0)
+        return bool(self.kilometers)
 
     __bool__ = __nonzero__
 
@@ -225,20 +223,6 @@ class great_circle(Distance):
 
         delta_lng = lng2 - lng1
         cos_delta_lng, sin_delta_lng = cos(delta_lng), sin(delta_lng)
-
-        central_angle = acos(
-            # We're correcting from floating point rounding errors
-            # on very-near and exact points here
-            min(1.0, sin_lat1 * sin_lat2 +
-                     cos_lat1 * cos_lat2 * cos_delta_lng))
-
-        # From http://en.wikipedia.org/wiki/Great_circle_distance:
-        #   Historically, the use of this formula was simplified by the
-        #   availability of tables for the haversine function. Although this
-        #   formula is accurate for most distances, it too suffers from
-        #   rounding errors for the special (and somewhat unusual) case of
-        #   antipodal points (on opposite ends of the sphere). A more
-        #   complicated formula that is accurate for all distances is: (below)
 
         d = atan2(sqrt((cos_lat2 * sin_delta_lng) ** 2 +
                        (cos_lat1 * sin_lat2 -
@@ -413,6 +397,9 @@ class vincenty(Distance):
         return s
 
     def destination(self, point, bearing, distance=None):
+        """
+        TODO docs.
+        """
         point = Point(point)
         lat1 = units.radians(degrees=point.latitude)
         lng1 = units.radians(degrees=point.longitude)
@@ -489,11 +476,6 @@ class vincenty(Distance):
                     )
                 )
             )
-        )
-
-        final_bearing = atan2(
-            sin_alpha,
-            cos_reduced1 * cos_sigma * cos_bearing - sin_reduced1 * sin_sigma
         )
 
         lng2 = lng1 + delta_lng

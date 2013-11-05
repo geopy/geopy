@@ -101,15 +101,12 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     @staticmethod
     def _parse_result(result):
         """
-        TODO docs, accept iterable
+        Parse individual results. Different, but lazy actually, so... ok.
         """
         # turn x=y pairs ("lat=47.6", "long=-117.426") into dict key/value pairs:
         place = dict(
-            # strip off bits that aren't pairs (i.e. "geocoder modified" status string")
-            filter(lambda x: len(x)>1, # pylint: disable=W0141
-            # split the key=val strings into (key, val) tuples
-            map(lambda x: x.split('=', 1), result) # pylint: disable=W0141
-        ))
+            [x.split('=') for x in result if len(x.split('=')) > 1]
+        )
 
         address = [
             place.get('number', None),

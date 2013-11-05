@@ -91,6 +91,9 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             return None
 
         def parse_resource(resource):
+            """
+            Parse each record.
+            """
             city = resource['adminArea5']
             county = resource['adminArea4']
             state = resource['adminArea3']

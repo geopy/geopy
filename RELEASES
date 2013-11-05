@@ -32,6 +32,8 @@ ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when appropriate.
 ADDED:  `Point` can parse a greater variety of coordinate strings. Contributed
         by nucflash.
 
+REMOVED:    MediaWiki and SemanticMediaWiki geocoders removed.
+
 
 0.96.1 - October 31, 2013
 =========================

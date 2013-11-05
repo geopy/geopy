@@ -62,10 +62,11 @@ ABBR_SYMBOLS = {
     'arcsec': ABBR_ARCSEC
 }
 
-def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=ASCII_SYMBOLS):
+def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=None):
     """
     TODO docs.
     """
+    symbols = symbols or ASCII_SYMBOLS
     arcminutes = round(units.arcminutes(degrees=degrees - int(degrees)))
     arcseconds = units.arcseconds(arcminutes=arcminutes - int(arcminutes))
     format_dict = dict(
@@ -111,9 +112,3 @@ _DIRECTIONS = [
 DIRECTIONS, DIRECTIONS_ABBR = zip(*_DIRECTIONS)
 ANGLE_DIRECTIONS = dict((n * 11.25, d) for n, d in enumerate(DIRECTIONS))
 ANGLE_DIRECTIONS_ABBR = dict((n * 11.25, d) for n, d in enumerate(DIRECTIONS_ABBR))
-
-def format_direction(degrees):
-    """
-    TODO docs.
-    """
-    raise NotImplementedError()

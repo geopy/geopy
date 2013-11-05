@@ -3,10 +3,11 @@
 """
 
 try:
-    from urllib2 import urlopen as urllib_urlopen, build_opener, ProxyHandler
+    from urllib2 import (urlopen as urllib_urlopen, build_opener,
+        ProxyHandler, URLError)
 except ImportError: # pragma: no cover
     from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
-        build_opener, ProxyHandler)
+        build_opener, ProxyHandler, URLError)
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 import json
@@ -82,14 +83,16 @@ class Geocoder(object): # pylint: disable=R0921
                 self._geocoder_exception_handler(error) # pylint: disable=E1101
             if isinstance(error, HTTPError):
                 raise GeocoderServiceError(error.getcode(), error.msg)
-            elif isinstance(error, SSLError):
-                if error.message == 'The read operation timed out':
-                    raise GeocoderTimedOut(
-                        'Service timed out while using SSL connection'
-                    )
+            elif isinstance(error, URLError):
+                if error.message == '<urlopen error timed out>':
+                    raise GeocoderTimedOut('Service timed out')
                 raise
             elif isinstance(error, SocketTimeout):
                 raise GeocoderTimedOut('Service timed out')
+            elif isinstance(error, SSLError):
+                if error.message == 'The read operation timed out':
+                    raise GeocoderTimedOut('Service timed out')
+                raise
             else:
                 raise
         if raw:

@@ -31,14 +31,18 @@ and ``reverse`` methods  may return three types of values:
 
 - When there are no results found, returns ``None``.
 
-- When the method's ``exactly_one`` argument is ``True`` and at least one result is found, returns a tuple of:
+- When the method's ``exactly_one`` argument is ``True`` and at least one
+    result is found, returns a tuple of:
+
     (address<String>, (latitude<Float>, longitude<Float>))
 
-- When ``exactly_one`` is False, and there is at least one result, returns a list of tuples:
+- When ``exactly_one`` is False, and there is at least one result, returns a
+    list of tuples:
+
     [(address<String>, (latitude<Float>, longitude<Float>)), [...]]
 
 If a service is unavailable or otherwise returns a non-OK response you will
-receive a :class:`.geopy.exc.GeocoderServiceError`.
+receive one of the `Exceptions`_ detailed below.
 
 Every geocoder accepts an argument ``format_string`` that defaults to '%s' where
 the input string to geocode is interpolated. For example, if you only need to
@@ -56,9 +60,8 @@ from geopy.geocoders.bing import Bing
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geonames import GeoNames
-from geopy.geocoders.wiki_gis import MediaWiki
-from geopy.geocoders.wiki_semantic import SemanticMediaWiki
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.mapquest import MapQuest
+from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.osm import Nominatim

@@ -16,8 +16,10 @@ import socket
 socket.setdefaulttimeout(3.0)
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.geocoders import *
 from geopy.point import Point
 from geopy.compat import py3k
+from collections import defaultdict
 
 if py3k:
     str_coerce = str
@@ -26,9 +28,12 @@ else:
 
 try:
     with open(".test_keys") as fp:
-        env = json.loads(fp.read())
+        env = defaultdict(lambda: None)
+        env.update(json.loads(fp.read()))
 except IOError:
     env = {
+        'YAHOO_KEY': os.environ.get('YAHOO_KEY', None),
+        'YAHOO_SECRET': os.environ.get('YAHOO_SECRET', None),
         'BING_KEY': os.environ.get('BING_KEY', None),
         'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', None),
         'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
@@ -172,7 +177,6 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 
 class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        from geopy.geocoders.googlev3 import GoogleV3
         self.geocoder = GoogleV3()
 
     def test_reverse(self):
@@ -197,7 +201,6 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 )
 class BingTestCase(_BackendTestCase):
     def setUp(self):
-        from geopy.geocoders.bing import Bing
         self.geocoder = Bing(
             format_string='%s',
             api_key=env['BING_KEY']
@@ -214,13 +217,11 @@ class BingTestCase(_BackendTestCase):
 
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        from geopy.geocoders.dot_us import GeocoderDotUS
         self.geocoder = GeocoderDotUS()
 
 
 class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        from geopy.geocoders.openmapquest import OpenMapQuest
         self.geocoder = OpenMapQuest()
         self.delta_exact = 0.04
         self.delta_placename = 0.04
@@ -232,7 +233,6 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 )
 class MapQuestTestCase(_BackendTestCase):
     def setUp(self):
-        from geopy.geocoders.mapquest import MapQuest
         self.geocoder = MapQuest(env['MAPQUEST_KEY'])
         self.delta_placename = 0.04
 
@@ -242,17 +242,15 @@ class MapQuestTestCase(_BackendTestCase):
 )
 class GeoNamesTestCase(_BackendTestCase):
     def setUp(self):
-        from geopy.geocoders.geonames import GeoNames
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.delta_placename = 0.04
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['LIVESTREETS_AUTH_KEY'] is not None,
-    "LIVESTREETS_AUTH_ID and LIVESTREETS_AUTH_KEY env variables not set"
+    "No LIVESTREETS_AUTH_KEY env variable set"
 )
 class LiveAddressTestCase(_BackendTestCase):
     def setUp(self):
-        from geopy.geocoders.smartystreets import LiveAddress
         self.geocoder = LiveAddress(
             auth_token=env['LIVESTREETS_AUTH_KEY']
         )
@@ -260,7 +258,6 @@ class LiveAddressTestCase(_BackendTestCase):
 
 class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        from geopy.geocoders.osm import Nominatim
         self.geocoder = Nominatim()
 
     def test_reverse(self):
@@ -275,7 +272,10 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
-# class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
-#     def setUp(self):
-#         from geopy.geocoders.placefinder import YahooPlaceFinder
-#         self.geocoder = YahooPlaceFinder()
+@unittest.skipUnless( # pylint: disable=R0904,C0111
+    env['YAHOO_KEY'] is not None and env['YAHOO_SECRET'] is not None,
+    "YAHOO_KEY and YAHOO_SECRET env variables not set"
+)
+class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
+    def setUp(self):
+        self.geocoder = YahooPlaceFinder()
