@@ -20,20 +20,3 @@ try:
     from urllib import urlencode # pylint: disable=W0611,F0401,W0611,E0611
 except ImportError: # pragma: no cover
     from urllib.parse import urlencode # pylint: disable=W0611,F0401,W0611,E0611
-
-try:
-    from beautifulsoup4 import BeautifulSoup # pylint: disable=W0611,F0401
-except ImportError:
-    try:
-        from BeautifulSoup import BeautifulSoup # pylint: disable=W0611,F0401
-    except ImportError: # pragma: no cover
-        class BeautifulSoup(object): # pylint: disable=R0903
-            """
-            Raise import error.
-            """
-
-            def __init__(self):
-                raise ImportError(
-                    "BeautifulSoup was not found. Please install BeautifulSoup "
-                    "in order to use the SemanticMediaWiki Geocoder."
-                ) # pylint: disable=C0103

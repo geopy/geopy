@@ -29,17 +29,19 @@ models in the distance.ELLIPSOIDS dictionary::
 
 Here's an example usage of distance.vincenty::
 
-    >>> from geopy import distance
-    >>> _, ne = g.geocode('Newport, RI')
-    >>> _, cl = g.geocode('Cleveland, OH')
-    >>> distance.vincenty(ne, cl).miles
-    538.37173614757057
+    >>> from geopy.distance import vincenty
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> vincenty(newport_ri, cleveland_oh).miles
+    538.3904451566326
 
 Using Great-circle distance::
 
-    >>> from geopy import distance
-    >>> distance.great_circle(ne, cl).miles
-    537.12986466281222
+    >>> from geopy.distance import great_circle
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> great_circle(newport_ri, cleveland_oh).miles
+    537.1485284062816
 
 You can change the ellipsoid model used by the Vincenty formula like so::
 
@@ -207,6 +209,15 @@ class great_circle(Distance):
     Set which radius of the earth to use by specifying a 'radius' keyword
     argument. It must be in kilometers. The default is to use the module
     constant `EARTH_RADIUS`, which uses the average great-circle radius.
+
+    Example::
+
+        >>> from geopy.distance import great_circle
+        >>> newport_ri = (41.49008, -71.312796)
+        >>> cleveland_oh = (41.499498, -81.695391)
+        >>> great_circle(newport_ri, cleveland_oh).miles
+        537.1485284062816
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -274,6 +285,15 @@ class vincenty(Distance):
     semiaxes and the flattening. Otherwise, it should be a tuple with those
     values.  See the comments above the `ELLIPSOIDS` dictionary for
     more information.
+
+    Example::
+
+        >>> from geopy.distance import vincenty
+        >>> newport_ri = (41.49008, -71.312796)
+        >>> cleveland_oh = (41.499498, -81.695391)
+        >>> vincenty(newport_ri, cleveland_oh).miles
+        538.3904451566326
+
     """
 
     ellipsoid_key = None

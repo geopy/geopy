@@ -41,8 +41,9 @@ and ``reverse`` methods  may return three types of values:
 
     [(address<String>, (latitude<Float>, longitude<Float>)), [...]]
 
-If a service is unavailable or otherwise returns a non-OK response you will
-receive one of the `Exceptions`_ detailed below.
+If a service is unavailable or otherwise returns a non-OK response, or doesn't
+receive a response in the allotted timeout, you will receive one of the
+`Exceptions`_ detailed below.
 
 Every geocoder accepts an argument ``format_string`` that defaults to '%s' where
 the input string to geocode is interpolated. For example, if you only need to
