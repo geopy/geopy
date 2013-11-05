@@ -1,6 +1,6 @@
 *.pyc
 .coverage
-.venv
+.venv*
 venv
 build
 dist

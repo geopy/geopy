@@ -22,16 +22,6 @@ except ImportError: # pragma: no cover
     from urllib.parse import urlencode # pylint: disable=W0611,F0401,W0611,E0611
 
 try:
-    import json
-except ImportError: # pragma: no cover
-    try:
-        import simplejson as json # pylint: disable=F0401
-    except ImportError:
-        from django.utils import simplejson as json # pylint: disable=F0401
-
-assert json is not None
-
-try:
     from beautifulsoup4 import BeautifulSoup # pylint: disable=W0611,F0401
 except ImportError:
     try:

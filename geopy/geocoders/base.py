@@ -9,8 +9,9 @@ except ImportError: # pragma: no cover
         build_opener, ProxyHandler)
 from ssl import SSLError
 from socket import timeout as SocketTimeout
+import json
 
-from geopy.compat import string_compare, HTTPError, json
+from geopy.compat import string_compare, HTTPError
 from geopy.point import Point
 from geopy.exc import GeocoderServiceError, ConfigurationError, GeocoderTimedOut
 from geopy.util import decode_page

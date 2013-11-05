@@ -14,6 +14,8 @@ CHANGED:    Geocoders accept a `timeout` argument which specifies the number of
 
 CHANGED:    GoogleV3's `protocol` argument is deprecated in favor of `scheme`.
 
+CHANGED:    Python 2.5 is no longer supported.
+
 ADDED:  Geocoders accept a `proxies` argument which specifies a proxy to
         route its geocoder requests through. It uses urllib, and accepts
         proxies in the form of a dictionary of {scheme: proxy address}, e.g.,

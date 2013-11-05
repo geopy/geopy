@@ -7,7 +7,7 @@
 
 develop:
 	virtualenv .venv --distribute
-	. .venv/bin/activate && python setup.py develop && pip install nose-cov pylint
+	. .venv/bin/activate && python setup.py develop && python setup.py test
 
 lint:
 	pylint --rcfile .pylintrc geopy

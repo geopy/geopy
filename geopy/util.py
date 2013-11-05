@@ -9,7 +9,7 @@ from xml.parsers.expat import ExpatError
 try:
     NUMBER_TYPES = (int, long, float)
 except NameError: # pragma: no cover
-    NUMBER_TYPES = (int, float) # float -> int in Py3k
+    NUMBER_TYPES = (int, float) # long -> int in Py3k
 try:
     from decimal import Decimal
     NUMBER_TYPES = NUMBER_TYPES + (Decimal, )
