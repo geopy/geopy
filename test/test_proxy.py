@@ -24,7 +24,7 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         # TODO subprocess.Popen proxy locally on os.name=="posix", and skip if not
 
         # Backup environ settings
-        self.orig_http_proxy = os.environ['http_proxy'] if os.environ.has_key('http_proxy') else None
+        self.orig_http_proxy = os.environ['http_proxy'] if 'http_proxy' in os.environ else None
 
         # Get HTTP for comparison before proxy test
         base_http = urlopen('http://www.blankwebsite.com/')

@@ -60,6 +60,9 @@ calculate the length of a path::
     3276.157156868931
 
 """
+from __future__ import division
+
+import sys
 
 from math import atan, tan, sin, cos, pi, sqrt, atan2, acos, asin
 from geopy.units import radians
@@ -130,14 +133,18 @@ class Distance(object):
         else:
             return self.__class__(self.kilometers / other)
 
+    __truediv__ = __div__
+
     def __abs__(self):
         return self.__class__(abs(self.kilometers))
 
     def __nonzero__(self):
-        return bool(self.kilometers)
+        return bool(self.kilometers > 0)
+
+    __bool__ = __nonzero__
 
     def measure(self, a, b):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def __repr__(self): # pragma: no cover
         return 'Distance(%s)' % self.kilometers

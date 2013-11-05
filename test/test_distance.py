@@ -1,3 +1,6 @@
+"""
+Test distance formulas
+"""
 import math
 
 from nose.tools import assert_raises, assert_almost_equal
