@@ -204,13 +204,14 @@ class great_circle(Distance):
     including just the use of the spherical law of cosines or the haversine
     formula.
 
-    The class attribute `RADIUS` indicates which radius of the earth to use,
-    in kilometers. The default is to use the module constant `EARTH_RADIUS`,
-    which uses the average great-circle radius.
-
+    Set which radius of the earth to use by specifying a 'radius' keyword
+    argument. It must be in kilometers. The default is to use the module
+    constant `EARTH_RADIUS`, which uses the average great-circle radius.
     """
 
-    RADIUS = EARTH_RADIUS
+    def __init__(self, *args, **kwargs):
+        self.RADIUS = kwargs.pop('radius', EARTH_RADIUS)
+        super(great_circle, self).__init__(*args, **kwargs)
 
     def measure(self, a, b):
         a, b = Point(a), Point(b)
@@ -281,7 +282,7 @@ class vincenty(Distance):
     def __init__(self, *args, **kwargs):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         major, minor, f = self.ELLIPSOID # pylint: disable=W0612
-        super(VincentyDistance, self).__init__(*args, **kwargs)
+        super(vincenty, self).__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
         """

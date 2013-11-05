@@ -32,12 +32,12 @@ and ``reverse`` methods  may return three types of values:
 - When there are no results found, returns ``None``.
 
 - When the method's ``exactly_one`` argument is ``True`` and at least one
-    result is found, returns a tuple of:
+  result is found, returns a tuple of:
 
     (address<String>, (latitude<Float>, longitude<Float>))
 
 - When ``exactly_one`` is False, and there is at least one result, returns a
-    list of tuples:
+  list of tuples:
 
     [(address<String>, (latitude<Float>, longitude<Float>)), [...]]
 
