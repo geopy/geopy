@@ -52,7 +52,7 @@ class GoogleV3(Geocoder):
 
             .. versionadded:: 0.96
         """
-        if protocol:
+        if protocol: # pragma: no cover
             warn('protocol argument is deprecated in favor of scheme, to be'
                 'removed in 0.98')
         scheme = protocol or scheme

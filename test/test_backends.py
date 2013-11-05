@@ -6,6 +6,7 @@ import os
 import unittest
 
 import json
+import base64
 
 try:
     from urllib2 import URLError
@@ -16,7 +17,8 @@ import socket
 socket.setdefaulttimeout(3.0)
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
-from geopy.geocoders import *
+from geopy.geocoders import * # pylint: disable=W0401
+from geopy import exc
 from geopy.point import Point
 from geopy.compat import py3k
 from collections import defaultdict
@@ -178,6 +180,33 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
         self.geocoder = GoogleV3()
+
+    def test_configuration_error(self):
+        with self.assertRaises(exc.ConfigurationError):
+            GoogleV3(client_id='a')
+        with self.assertRaises(exc.ConfigurationError):
+            GoogleV3(secret_key='a')
+
+    def test_check_status(self):
+        self.assertEqual(self.geocoder._check_status("ZERO_RESULTS"), None)
+        with self.assertRaises(exc.GeocoderQuotaExceeded):
+            self.geocoder._check_status("OVER_QUERY_LIMIT")
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocoder._check_status("REQUEST_DENIED")
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocoder._check_status("INVALID_REQUEST")
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocoder._check_status("_")
+
+    def test_get_signed_url(self):
+        geocoder = GoogleV3(
+            client_id='my_client_id',
+            secret_key=base64.urlsafe_b64encode('my_secret_key')
+        )
+        self.assertEqual(
+            geocoder._get_signed_url({'address': '1 5th Ave New York, NY'}),
+            "https://maps.googleapis.com/maps/api/geocode/json?client=my_client_id&address=1+5th+Ave+New+York%2C+NY&signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
+        )
 
     def test_reverse(self):
         known_addr = '1060-1078 Avenue of the Americas, New York, NY 10018, USA'
