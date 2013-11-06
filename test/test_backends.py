@@ -101,7 +101,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         address = '999 W. Riverside Ave., Spokane, WA 99201'
 
         try:
-            result = self.geocoder.geocode(address)
+            result = self.geocoder.geocode(address, exactly_one=True)
         except URLError as err:
             if "timed out" in str(err).lower():
                 raise unittest.SkipTest('Geocoder service timed out')
@@ -120,8 +120,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         address = '435 north michigan, chicago 60611'
 
         try:
-            result = self.geocoder.geocode(address)
-
+            result = self.geocoder.geocode(address, exactly_one=True)
         except URLError as err:
             if "timed out" in str(err).lower():
                 raise unittest.SkipTest('Geocoder service timed out')
@@ -174,7 +173,6 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         # And since this is a pretty fuzzy search, we'll only test to .02
         self.assertAlmostEqual(latlon[0], 46.1912, delta=self.delta_placename)
         self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_placename)
-
 
 
 class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
@@ -256,6 +254,18 @@ class BingTestCase(_BackendTestCase):
                 )[0],
                 each[0]
             )
+
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    env.get('ARCGIS_USERNAME') or env.get('ARCGIS_PASSWORD') or env.get('ARCGIS_REFERER') is not None,
+    "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
+)
+class ArcGISTestCase(_BackendTestCase):
+    def setUp(self):
+       from geopy.geocoders.arcgis import ArcGIS
+       self.geocoder = ArcGIS(username=env['ARCGIS_USERNAME'],
+                              password=env['ARCGIS_PASSWORD'],
+                              referer=env['ARCGIS_REFERER'])
+
 
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
