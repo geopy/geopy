@@ -256,16 +256,41 @@ class BingTestCase(_BackendTestCase):
                 )[0],
                 each[0]
             )
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
-    env.get('ARCGIS_USERNAME') or env.get('ARCGIS_PASSWORD') or env.get('ARCGIS_REFERER') is not None,
-    "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
-)
+
+
 class ArcGISTestCase(_BackendTestCase):
     def setUp(self):
-        from geopy.geocoders.arcgis import ArcGIS
+        self.geocoder = ArcGIS(timeout=3)
+
+    def test_config_error(self):
+        with self.assertRaises(exc.ConfigurationError):
+            ArcGIS(username='a')
+
+
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    env.get('ARCGIS_USERNAME') is not None \
+    or env.get('ARCGIS_PASSWORD') is not None\
+    or env.get('ARCGIS_REFERER') is not None,
+    "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
+)
+class ArcGISAuthenticatedTestCase(unittest.TestCase):
+
+    delta_exact = 0.002
+
+    def setUp(self):
         self.geocoder = ArcGIS(username=env['ARCGIS_USERNAME'],
                                password=env['ARCGIS_PASSWORD'],
-                               referer=env['ARCGIS_REFERER'])
+                               referer=env['ARCGIS_REFERER'],
+                               timeout=3)
+
+    def test_basic_address(self):
+        address = '999 W. Riverside Ave., Spokane, WA 99201'
+        result = self.geocoder.geocode(address, exactly_one=True)
+        if result is None:
+            self.fail('No result found')
+        clean_address, latlon = result # pylint: disable=W0612
+        self.assertAlmostEqual(latlon[0], 47.658, delta=self.delta_exact)
+        self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
 
 
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111

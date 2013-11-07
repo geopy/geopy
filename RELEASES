@@ -17,6 +17,8 @@ CHANGED:    geopy now supports Python 2 and Python 3 on a single codebase.
 
 CHANGED:    GoogleV3's `protocol` argument is deprecated in favor of `scheme`.
 
+ADDED:  ESRI's ArcGIS geocoder implemented. Contributed by Arsen Mamikonyan.
+
 ADDED:  Geocoders accept a `proxies` argument which specifies a proxy to
         route its geocoder requests through. It uses urllib, and accepts
         proxies in the form of a dictionary of {scheme: proxy address}, e.g.,
