@@ -3,11 +3,13 @@
 """
 
 import csv
+import base64
 from geopy.compat import urlencode, py3k
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
     DEFAULT_TIMEOUT
 from geopy.util import logger, join_filter
 from geopy.exc import ConfigurationError
+from urllib2 import Request, urlopen
 
 
 class GeocoderDotUS(Geocoder): # pylint: disable=W0223
@@ -47,25 +49,15 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         super(GeocoderDotUS, self).__init__(
             format_string=format_string, timeout=timeout, proxies=proxies
         )
-        if username and password is None:
+        if username and (password is None):
             raise ConfigurationError("Password must be specified with username")
         self.username = username
-        self.__password = password
+        self.password = password
 
     def _get_url(self):
-        """
-        Generate full query URL.
-        """
-        username = self.username
-        password = self.__password
-        if username and password:
-            auth = '%s@%s:' % (username, password)
-            resource = 'member/service/namedcsv'
-        else:
-            auth = ''
-            resource = 'service/namedcsv'
-
-        return 'http://%sgeocoder.us/%s' % (auth, resource)
+        if self.username and self.password:
+            return 'http://geocoder.us/member/service/namedcsv'
+        return 'http://geocoder.us/service/namedcsv'
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0613,W0221
         """
@@ -85,12 +77,16 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         """
         query_str = self.format_string % query
 
-        url = "?".join((self._get_url(), urlencode({'address':query_str})))
-        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        page = self._call_geocoder(url, timeout=timeout, raw=True)
+        request = Request(self._get_url(), urlencode({'address': query_str}))
+        if self.username and self.password:
+            request.add_header(
+                'Authorization',
+                'Basic %s' % base64.encodestring(
+                    '%s:%s' % (self.username, self.password)).strip())
+        page = self._call_geocoder(request, timeout=timeout, raw=True)
         content = page.read().decode("utf-8") if py3k else page.read()
-        places = [r for r in csv.reader([content, ] if not isinstance(content, list) else content)]
+        places = [r for r in csv.reader([content, ]
+                  if not isinstance(content, list) else content)]
         if not len(places):
             return None
         if exactly_one is True:
