@@ -122,7 +122,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
             )
 
     def test_basic_address(self):
-        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', ))
+        self.skip_known_failure(('GeoNames', ))
 
         address = '999 W. Riverside Ave., Spokane, WA 99201'
 
@@ -264,7 +264,22 @@ class ArcGISAuthenticatedTestCase(unittest.TestCase):
 
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = GeocoderDotUS(timeout=3)
+        self.geocoder = GeocoderDotUS(username=env['DOT_US_USERNAME'],
+                                      password=env['DOT_US_PASSWORD'],
+                                      timeout=3)
+
+    def test_forward(self):
+        known_addr = '1067 6th Ave, New York, NY 10018'
+        known_coords = (40.793728, -73.824066)
+        try:
+            address, coords = self.geocoder.geocode(known_addr, timeout=3)
+        except URLError as err:
+            if "timed out" in str(err).lower():
+                raise unittest.SkipTest('Geocoder service timed out')
+            else:
+                raise
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
 
 class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
