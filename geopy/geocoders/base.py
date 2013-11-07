@@ -87,7 +87,7 @@ class Geocoder(object): # pylint: disable=R0921
                     raise GeocoderAuthenticationFailure("Unauthorized")
                 raise GeocoderServiceError(error.getcode(), error.msg)
             elif isinstance(error, URLError):
-                if error.message == '<urlopen error timed out>':
+                if "timed out" in error.reason:
                     raise GeocoderTimedOut('Service timed out')
                 raise
             elif isinstance(error, SocketTimeout):

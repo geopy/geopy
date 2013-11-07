@@ -91,8 +91,10 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         """
         if self.token is None or int(time()) > self.token_expiry:
             self._refresh_authentication_token()
-        request = Request("&token=".join((url, self.token))) # no urlencoding
-        request.add_header('Referer', self.referer)
+        request = Request(
+            "&token=".join((url, self.token)), # no urlencoding
+            headers={"Referer": self.referer}
+        )
         return self._base_call_geocoder(request, timeout=timeout)
 
     def geocode(self, query, exactly_one=True, timeout=None):
