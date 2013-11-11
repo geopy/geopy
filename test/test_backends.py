@@ -106,9 +106,18 @@ class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
             secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8'))
         )
         self.assertTrue(geocoder.premier)
-        self.assertEqual(
-            geocoder._get_signed_url({'address': '1 5th Ave New York, NY'}),
-            "https://maps.googleapis.com/maps/api/geocode/json?client=my_client_id&address=1+5th+Ave+New+York%2C+NY&signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
+        # the two possible URLs handle both possible orders of the request
+        # params; because it's unordered, either is possible, and each has
+        # its own hash
+        self.assertTrue(
+            geocoder._get_signed_url({'address': '1 5th Ave New York, NY'}) in (
+            "https://maps.googleapis.com/maps/api/geocode/json?"
+            "address=1+5th+Ave+New+York%2C+NY&client=my_client_id&"
+            "signature=Z_1zMBa3Xu0W4VmQfaBR8OQMnDM=",
+            "https://maps.googleapis.com/maps/api/geocode/json?"
+            "client=my_client_id&address=1+5th+Ave+New+York%2C+NY&"
+            "signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
+            )
         )
 
     def test_zero_results(self):
