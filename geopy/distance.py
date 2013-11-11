@@ -1,5 +1,5 @@
 """
-.. versionadded:: 0.93.0
+.. versionadded:: 0.93
 
 Geopy can calculate geodesic distance. Two distance formulas are included:
 great-circle distance and Vincenty distance.

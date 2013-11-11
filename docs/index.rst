@@ -15,6 +15,9 @@ Geocoders
 .. automodule:: geopy.geocoders
    :members: __doc__
 
+.. autoclass:: geopy.geocoders.ArcGIS
+    :members: __init__, geocode
+
 .. autoclass:: geopy.geocoders.Bing
     :members: __init__, geocode, reverse
 
@@ -69,6 +72,16 @@ Exceptions
 .. autoclass:: geopy.exc.GeocoderInsufficientPrivileges
 
 .. autoclass:: geopy.exc.GeocoderServiceError
+
+
+Logging
+~~~~~~~
+
+geopy will log geocoding URLs with a logger name `geopy` at level `DEBUG`,
+and for some geocoders, these URLs will include authentication information.
+If this is a concern, one can disable this logging by specifying a logging
+level of `NOTSET` for logger name `geopy`.
+
 
 Indices and search
 ==================
