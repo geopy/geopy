@@ -21,6 +21,7 @@ from geopy.util import decode_page
 DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
+DEFAULT_WKID = 4326
 
 
 class Geocoder(object): # pylint: disable=R0921

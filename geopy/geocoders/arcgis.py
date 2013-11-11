@@ -4,10 +4,10 @@
 
 import json
 from time import time
-from geopy.compat import urlencode
-from urllib2 import Request
+from geopy.compat import urlencode, Request
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
+    DEFAULT_WKID
 from geopy.exc import GeocoderError, GeocoderAuthenticationFailure
 from geopy.exc import ConfigurationError
 from geopy.util import logger
@@ -22,37 +22,32 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
     _TOKEN_EXPIRED = 498
     _MAX_RETRIES = 3
     auth_api = 'https://www.arcgis.com/sharing/generateToken'
-    api = 'https://geocode.arcgis.com' \
-                '/arcgis/rest/services/World/GeocodeServer/find'
-    reverse_api = 'https://geocode.arcgis.com' \
-                '/arcgis/rest/services/World/GeocodeServer/reverseGeocode'
 
     def __init__(self, username=None, password=None, referer=None, # pylint: disable=R0913
-                 token_lifetime=60,
+                 token_lifetime=60, scheme=DEFAULT_SCHEME,
                  timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Create a ArcGIS-based geocoder.
 
             .. versionadded:: 0.97
 
-        ArcGIS requires an HTTPS connection for generating tokens,
-        so this geocoder does not accept a `scheme` argument setting the
-        use of HTTP or HTTPS.
+        :param string username: ArcGIS username. Required if authenticated
+            mode is desired.
 
-        :param string username: If specified, username and password are used
-        to generate authentication
-        tokens which are then used for each geocode request. If the token
-        expires, another one is generated.
+        :param string password: ArcGIS password. Required if authenticated
+            mode is desired.
 
-        :param string password: See username.
-
-        :param string referer: 'Referer' HTTP header to send with each request,
+        :param string referer: Required if authenticated mode is desired.
+            'Referer' HTTP header to send with each request,
             e.g., 'http://www.example.com'. This is tied to an issued token,
-            so fielding queries for multiple referers should be handled by
+            so fielding queries for multiple referrers should be handled by
             having multiple ArcGIS geocoder instances.
 
-        :param int token_lifetime: Lifetime, in minutes, of an ArcGIS-issued
-            token.
+        :param int token_lifetime: Desired lifetime, in minutes, of an
+            ArcGIS-issued token.
+
+        :param string scheme: Desired scheme. If authenticated mode is in use,
+            it must be 'https'.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -63,27 +58,32 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
         """
-        super(ArcGIS, self).__init__(timeout=timeout)
+        super(ArcGIS, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         if (username or password or referer):
             if not (username and password and referer):
                 raise ConfigurationError(
-                    'Authenticated mode requires username, password, and referer'
+                    "Authenticated mode requires username, password, and referer"
+                )
+            if self.scheme != 'https':
+                raise ConfigurationError(
+                    "Authenticated mode requires scheme of 'https'"
                 )
             self._base_call_geocoder = self._call_geocoder
             self._call_geocoder = self._authenticated_call_geocoder
+
         self.username = username
         self.password = password
         self.referer = referer
 
-        # It is tempting to get an authentication token at this point; however,
-        # if you do, it risks throwing an exception at startup for any service
-        # that instantiaties a ArcGIS geocoder. Instead, lazily get a token.
         self.token = None
         self.token_lifetime = token_lifetime * 60 # store in seconds
         self.token_expiry = None
         self.retry = 1
-        if username:
-            self.token = 'fake'  # This will fail and trigger re-authentication.
+
+        self.api = '%s://geocode.arcgis.com' \
+                    '/arcgis/rest/services/World/GeocodeServer/find' % self.scheme
+        self.reverse_api = '%s://geocode.arcgis.com' \
+                    '/arcgis/rest/services/World/GeocodeServer/reverseGeocode' % self.scheme
 
     def _authenticated_call_geocoder(self, url, timeout=None):
         """
@@ -98,6 +98,8 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         return self._base_call_geocoder(request, timeout=timeout)
 
     def geocode(self, query, exactly_one=True, timeout=None):
+        # TODO: dict as query for parameterized query
+        # TODO: SRID
         params = {'text': query, 'f': 'json'}
         if exactly_one is True:
             params['maxLocations'] = 1
@@ -108,15 +110,10 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         # Handle any errors; recursing in the case of an expired token.
         if 'error' in response:
             if response['error']['code'] == self._TOKEN_EXPIRED:
-                # Authentication token is expired or old; make a new one.
                 self.retry += 1
                 self._refresh_authentication_token()
                 return self.geocode(query, exactly_one=exactly_one, timeout=timeout)
-            raise GeocoderError(
-                'Got unknown error from ArcGIS. '
-                'Request URL: %s; response JSON: %s' %
-                (url, json.dumps(response))
-            )
+            raise GeocoderError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
         if not len(response['locations']):
@@ -129,13 +126,51 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
             return geocoded[0]
         return geocoded
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None, # pylint: disable=R0913,W0221
+                        distance=None, wkid=DEFAULT_WKID):
         """
-        ArcGIS has an API for this, so TODO:
-            http://resources.arcgis.com/en/help/arcgis-rest-api/index.html#//02r30000000n000000
-            http://resources.arcgis.com/en/help/rest/apiref/index.html?reverse.html
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s".
+
+        :param bool exactly_one: Return one result, or a list?
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+        :param int distance: Distance from the query location, in meters,
+            within which to search. ArcGIS has a default of 100 meters, if not
+            specified.
+
+        :param string wkid: WKID to use for both input and output coordinates.
         """
-        raise NotImplementedError()
+         # ArcGIS is lon,lat; maintain lat,lon convention of geopy
+        point = self._coerce_point_to_string(query).split(",")
+        if wkid != DEFAULT_WKID:
+            location = {"x": point[1], "y": point[0], "spatialReference": wkid}
+        else:
+            location = ",".join((point[1], point[0]))
+        params = {'location': location, 'f': 'json', 'outSR': wkid}
+        if distance is not None:
+            params['distance'] = distance
+        url = "?".join((self.reverse_api, urlencode(params)))
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+        response = self._call_geocoder(url, timeout=timeout)
+        if not len(response):
+            return None
+        if 'error' in response:
+            if response['error']['code'] == self._TOKEN_EXPIRED:
+                self.retry += 1
+                self._refresh_authentication_token()
+                return self.reverse(query, exactly_one=exactly_one,
+                        timeout=timeout, distance=distance, wkid=wkid)
+            raise GeocoderError(str(response['error']))
+        address = "%(Address)s, %(City)s, %(Region)s %(Postal)s, %(CountryCode)s" % \
+            response['address']
+        return (address, (response['location']['y'], response['location']['x']))
 
     def _refresh_authentication_token(self):
         """
