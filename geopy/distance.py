@@ -1,8 +1,11 @@
 """
 .. versionadded:: 0.93
 
-Geopy can calculate geodesic distance. Two distance formulas are included:
-great-circle distance and Vincenty distance.
+Geopy can calculate geodesic distance between two points using the
+[Vincenty distance](https://en.wikipedia.org/wiki/Vincenty's_formulae) or
+[great-circle distance](https://en.wikipedia.org/wiki/Great-circle_distance)
+formulas, with a default of Vincenty available as the function
+`geopy.distance.distance`.
 
 Great-circle distance (:class:`.great_circle`) uses a spherical model of
 the earth, using the average great-circle radius of 6372.795 kilometers,
@@ -35,7 +38,7 @@ Here's an example usage of distance.vincenty::
     >>> vincenty(newport_ri, cleveland_oh).miles
     538.3904451566326
 
-Using Great-circle distance::
+Using great-circle distance::
 
     >>> from geopy.distance import great_circle
     >>> newport_ri = (41.49008, -71.312796)

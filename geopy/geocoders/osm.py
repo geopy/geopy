@@ -11,7 +11,7 @@ from geopy.compat import urlencode
 class Nominatim(Geocoder):
     """
     Nominatim geocoder for OpenStreetMap servers. Documentation at:
-        http://wiki.openstreetmap.org/wiki/Nominatim
+        https://wiki.openstreetmap.org/wiki/Nominatim
 
     Note that Nominatim does not support SSL.
     """
