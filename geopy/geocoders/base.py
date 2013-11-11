@@ -12,7 +12,7 @@ from ssl import SSLError
 from socket import timeout as SocketTimeout
 import json
 
-from geopy.compat import string_compare, HTTPError
+from geopy.compat import string_compare, HTTPError, py3k
 from geopy.point import Point
 from geopy.exc import (GeocoderServiceError, ConfigurationError,
     GeocoderTimedOut, GeocoderAuthenticationFailure)
@@ -81,24 +81,23 @@ class Geocoder(object): # pylint: disable=R0921
         try:
             page = self.urlopen(url, timeout=timeout or self.timeout)
         except Exception as error: # pylint: disable=W0703
+            message = str(error) if not py3k else \
+                        (str(error.args[0] if len(error.args) else str(error)))
             if hasattr(self, '_geocoder_exception_handler'):
-                self._geocoder_exception_handler(error) # pylint: disable=E1101
+                self._geocoder_exception_handler(error, message) # pylint: disable=E1101
             if isinstance(error, HTTPError):
-                if error.msg.lower().contains("unauthorized"):
+                if "unauthorized" in message.lower():
                     raise GeocoderAuthenticationFailure("Unauthorized")
                 raise GeocoderServiceError(error.getcode(), error.msg)
             elif isinstance(error, URLError):
-                if "timed out" in error.reason:
+                if "timed out" in message:
                     raise GeocoderTimedOut('Service timed out')
-                raise
             elif isinstance(error, SocketTimeout):
                 raise GeocoderTimedOut('Service timed out')
             elif isinstance(error, SSLError):
-                if error.message == 'The read operation timed out':
+                if "timed out in message":
                     raise GeocoderTimedOut('Service timed out')
-                raise
-            else:
-                raise
+            raise
         if raw:
             return page
         return json.loads(decode_page(page))

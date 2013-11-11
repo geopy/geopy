@@ -84,7 +84,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         if self.authenticated is True:
             auth = " ".join((
                 "Basic",
-                encodestring(":".join((self.username, self.password))).strip()
+                encodestring(":".join((self.username, self.password))\
+                    .encode('utf-8')).strip().decode('utf-8')
             ))
             url = Request(url, headers={"Authorization": auth})
         page = self._call_geocoder(url, timeout=timeout, raw=True)

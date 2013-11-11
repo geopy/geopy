@@ -68,11 +68,10 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
-    def _geocoder_exception_handler(self, error): # pylint: disable=R0201
+    def _geocoder_exception_handler(self, error, message): # pylint: disable=R0201
         """
         LiveStreets-specific exceptions.
         """
-        message = getattr(error, 'msg') or getattr(error, 'message')
         if message == "No active subscriptions found.":
             raise GeocoderQuotaExceeded(message)
 

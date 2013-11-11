@@ -261,6 +261,7 @@ class ArcGISTestCase(_BackendTestCase):
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
+
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
     env.get('ARCGIS_USERNAME') is not None \
     or env.get('ARCGIS_PASSWORD') is not None\
@@ -313,7 +314,7 @@ class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
             geocoder.geocode("1 5th Ave NYC")
         except Exception as err:
             exc_raised = True
-            request = err.message
+            request = err.message if not py3k else err.args[0]
             self.assertEqual(request.get_header('Authorization'), 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=')
         self.assertTrue(exc_raised)
 
