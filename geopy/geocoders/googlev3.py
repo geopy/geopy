@@ -75,28 +75,22 @@ class GoogleV3(Geocoder):
             self.client_id = None
             self.secret_key = None
 
-    def _get_url(self, params):
-        '''Returns a standard geocoding api url.'''
-        return '%(scheme)s://%(domain)s/maps/api/geocode/json?%(params)s' % (
-            {'scheme': self.scheme, 'domain': self.domain, 'params': urlencode(params)})
+        self.api = '%s://%s/maps/api/geocode/json' % (self.scheme, self.domain)
 
     def _get_signed_url(self, params):
-        '''Returns a Premier account signed url.'''
+        """
+        Returns a Premier account signed url. Docs on signature:
+        https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
+        """
         params['client'] = self.client_id
-        url_params = {
-            'scheme': self.scheme,
-            'domain': self.domain,
-            'params': urlencode(params)
-        }
-        secret = base64.urlsafe_b64decode(self.secret_key)
-        url_params['url_part'] = (
-            '/maps/api/geocode/json?%(params)s' % url_params
+        path = "?".join(('/maps/api/geocode/json', urlencode(params)))
+        signature = hmac.new(
+            base64.urlsafe_b64decode(self.secret_key),
+            path.encode('utf-8'),
+            hashlib.sha1
         )
-        signature = hmac.new(secret, url_params['url_part'], hashlib.sha1)
-        url_params['signature'] = base64.urlsafe_b64encode(signature.digest())
-
-        return ('%(scheme)s://%(domain)s%(url_part)s'
-                '&signature=%(signature)s' % url_params)
+        signature = base64.urlsafe_b64encode(signature.digest()).decode('utf-8')
+        return '%s://%s%s&signature=%s' % (self.scheme, self.domain, path, signature)
 
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 language=None, sensor=False, exactly_one=True, timeout=None):
@@ -138,8 +132,8 @@ class GoogleV3(Geocoder):
         if language:
             params['language'] = language
 
-        if not self.premier:
-            url = self._get_url(params)
+        if self.premier is False:
+            url = "?".join((self.api, urlencode(params)))
         else:
             url = self._get_signed_url(params)
 
@@ -178,7 +172,7 @@ class GoogleV3(Geocoder):
             params['language'] = language
 
         if not self.premier:
-            url = self._get_url(params)
+            url = "?".join((self.api, urlencode(params)))
         else:
             url = self._get_signed_url(params)
 

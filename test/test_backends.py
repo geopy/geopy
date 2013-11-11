@@ -75,12 +75,18 @@ class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         self.geocoder = GoogleV3()
 
     def test_configuration_error(self):
+        """
+        GoogleV3 raises configuration errors on invalid auth params
+        """
         with self.assertRaises(exc.ConfigurationError):
             GoogleV3(client_id='a')
         with self.assertRaises(exc.ConfigurationError):
             GoogleV3(secret_key='a')
 
     def test_check_status(self):
+        """
+        GoogleV3 raises correctly on Google-specific API status flags
+        """
         self.assertEqual(self.geocoder._check_status("ZERO_RESULTS"), None)
         with self.assertRaises(exc.GeocoderQuotaExceeded):
             self.geocoder._check_status("OVER_QUERY_LIMIT")
@@ -92,16 +98,23 @@ class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
             self.geocoder._check_status("_")
 
     def test_get_signed_url(self):
+        """
+        GoogleV3._get_signed_url
+        """
         geocoder = GoogleV3(
             client_id='my_client_id',
             secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8'))
         )
+        self.assertTrue(geocoder.premier)
         self.assertEqual(
             geocoder._get_signed_url({'address': '1 5th Ave New York, NY'}),
             "https://maps.googleapis.com/maps/api/geocode/json?client=my_client_id&address=1+5th+Ave+New+York%2C+NY&signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
         )
 
     def test_zero_results(self):
+        """
+        GoogleV3.geocode returns None for no result
+        """
         result = self.geocoder.geocode('')
         self.assertIsNone(result)
 
