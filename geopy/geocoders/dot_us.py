@@ -3,7 +3,8 @@
 """
 
 import csv
-from geopy.compat import urlencode, py3k
+from base64 import encodestring
+from geopy.compat import urlencode, py3k, Request
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
     DEFAULT_TIMEOUT
 from geopy.util import logger, join_filter
@@ -47,25 +48,18 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         super(GeocoderDotUS, self).__init__(
             format_string=format_string, timeout=timeout, proxies=proxies
         )
-        if username and password is None:
-            raise ConfigurationError("Password must be specified with username")
-        self.username = username
-        self.__password = password
-
-    def _get_url(self):
-        """
-        Generate full query URL.
-        """
-        username = self.username
-        password = self.__password
-        if username and password:
-            auth = '%s@%s:' % (username, password)
-            resource = 'member/service/namedcsv'
+        if username or password:
+            if not (username and password):
+                raise ConfigurationError(
+                    "Username and password must both specified"
+                )
+            self.authenticated = True
+            self.api = "http://geocoder.us/member/service/namedcsv"
         else:
-            auth = ''
-            resource = 'service/namedcsv'
-
-        return 'http://%sgeocoder.us/%s' % (auth, resource)
+            self.authenticated = False
+            self.api = "http://geocoder.us/service/namedcsv"
+        self.username = username
+        self.password = password
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0613,W0221
         """
@@ -85,18 +79,31 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         """
         query_str = self.format_string % query
 
-        url = "?".join((self._get_url(), urlencode({'address':query_str})))
+        url = "?".join((self.api, urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
+        if self.authenticated is True:
+            auth = " ".join((
+                "Basic",
+                encodestring(":".join((self.username, self.password))).strip()
+            ))
+            url = Request(url, headers={"Authorization": auth})
         page = self._call_geocoder(url, timeout=timeout, raw=True)
         content = page.read().decode("utf-8") if py3k else page.read()
-        places = [r for r in csv.reader([content, ] if not isinstance(content, list) else content)]
+        places = [
+            r for r in csv.reader(
+                [content, ] if not isinstance(content, list)
+                else content
+            )
+        ]
         if not len(places):
             return None
         if exactly_one is True:
             return self._parse_result(places[0])
         else:
-            return [self._parse_result(res) for res in places]
+            result = [self._parse_result(res) for res in places]
+            if None in result: # todo
+                return None
+            return result
 
     @staticmethod
     def _parse_result(result):
@@ -107,6 +114,9 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         place = dict(
             [x.split('=') for x in result if len(x.split('=')) > 1]
         )
+        if 'error' in place:
+            if "couldn't find" in place['error']:
+                return None
 
         address = [
             place.get('number', None),

@@ -34,6 +34,9 @@ ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when appropriate.
 ADDED:  `Point` can parse a greater variety of coordinate strings. Contributed
         by nucflash.
 
+FIXED:  GeocodersDotUS now authenticates with an `Authorization` HTTP header.
+        Contributed by Arsen Mamikonyan.
+
 REMOVED:    MediaWiki and SemanticMediaWiki geocoders removed.
 
 

@@ -24,14 +24,17 @@ try:
     with open(".test_keys") as fp:
         env.update(json.loads(fp.read()))
 except IOError:
-    env = {
-        'YAHOO_KEY': os.environ.get('YAHOO_KEY', None),
-        'YAHOO_SECRET': os.environ.get('YAHOO_SECRET', None),
-        'BING_KEY': os.environ.get('BING_KEY', None),
-        'MAPQUEST_KEY': os.environ.get('MAPQUEST_KEY', None),
-        'GEONAMES_USERNAME': os.environ.get('GEONAMES_USERNAME', None),
-        'LIVESTREETS_AUTH_KEY': os.environ.get('LIVESTREETS_AUTH_KEY', None)
-    }
+    keys = (
+        'YAHOO_KEY',
+        'YAHOO_SECRET',
+        'BING_KEY',
+        'MAPQUEST_KEY',
+        'GEONAMES_USERNAME',
+        'LIVESTREETS_AUTH_KEY',
+        'GEOCODERDOTUS_USERNAME',
+        'GEOCODERDOTUS_PASSWORD',
+    )
+    env = {key: os.environ.get(key, None) for key in keys}
 
 
 class BaseLocalTestCase(unittest.TestCase):
@@ -91,7 +94,7 @@ class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
     def test_get_signed_url(self):
         geocoder = GoogleV3(
             client_id='my_client_id',
-            secret_key=base64.urlsafe_b64encode('my_secret_key')
+            secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8'))
         )
         self.assertEqual(
             geocoder._get_signed_url({'address': '1 5th Ave New York, NY'}),
@@ -117,28 +120,24 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         When a Geocoder gives no value for a query, skip the test.
         """
         if self.geocoder.__class__.__name__ in classes:
-            raise unittest.SkipTest("%s is known to not have results for this query" % \
-                self.geocoder.__class__.__name__
-            )
+            raise unittest.SkipTest("Known no result")
 
     def test_basic_address(self):
-        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', ))
+        self.skip_known_failure(('GeoNames', ))
 
-        address = '999 W. Riverside Ave., Spokane, WA 99201'
-
-        result = self.geocoder.geocode(address, exactly_one=True)
+        address = '435 north michigan ave, chicago il 60611'
+        result = self.geocoder.geocode(address, exactly_one=False)
         if result is None:
             self.fail('No result found')
-        clean_address, latlon = result # pylint: disable=W0612
+        clean_address, latlon = result[0] # pylint: disable=W0612
 
-        self.assertAlmostEqual(latlon[0], 47.658, delta=self.delta_exact)
-        self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
+        self.assertAlmostEqual(latlon[0], 41.890, delta=self.delta_exact)
+        self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
     def test_partial_address(self):
-        self.skip_known_failure(('GeocoderDotUS', 'GeoNames', 'Nominatim'))
+        self.skip_known_failure(('GeoNames', 'GeocoderDotUS', 'Nominatim'))
 
         address = '435 north michigan, chicago 60611'
-
         result = self.geocoder.geocode(address, exactly_one=True)
         if result is None:
             self.fail('No result found')
@@ -150,8 +149,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
     def test_intersection(self):
         self.skip_known_failure(('OpenMapQuest', 'GeoNames', 'LiveAddress', 'Nominatim'))
 
-        address = 'e. 161st st & river ave, new york, ny'
-
+        address = 'e. 161st st and river ave, new york, ny'
         result = self.geocoder.geocode(address, exactly_one=True)
         if result is None:
             self.fail('No result found')
@@ -165,14 +163,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 
         address = 'Mount St. Helens'
 
-        # Since a place name search is significantly less accurate,
-        # allow multiple results to come in. We'll check the top one.
-        result = self.geocoder.geocode(address, exactly_one=False)
+        result = self.geocoder.geocode(address, exactly_one=True)
         if result is None:
             self.fail('No result found')
-        clean_address, latlon = result[0] # pylint: disable=W0612
-
-        # And since this is a pretty fuzzy search, we'll only test to .02
+        clean_address, latlon = result # pylint: disable=W0612
         self.assertAlmostEqual(latlon[0], 46.1912, delta=self.delta_placename)
         self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_placename)
 
@@ -232,9 +226,40 @@ class ArcGISTestCase(_BackendTestCase):
         self.geocoder = ArcGIS(timeout=3)
 
     def test_config_error(self):
+        """
+        ArcGIS.__init__ invalid authentication
+        """
         with self.assertRaises(exc.ConfigurationError):
             ArcGIS(username='a')
 
+    def test_scheme_config_error(self):
+        """
+        ArcGIS.__init__ invalid scheme
+        """
+        with self.assertRaises(exc.ConfigurationError):
+            ArcGIS(username='a', password='b', referer='http://www.example.com', scheme='http')
+
+    def test_reverse(self):
+        """
+        ArcGIS.reverse
+        """
+        known_addr = '1065 Avenue Of The Americas, New York, NY 10018, USA'
+        known_coords = (40.75376406311989, -73.98489005863667)
+        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071))
+        self.assertEqual(str_coerce(addr), known_addr)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+
+    def test_reverse_wkid(self):
+        """
+        ArcGIS.reverse with non-default WKID
+        """
+        known_addr = '1065 Avenue Of The Americas, New York, NY 10018, USA'
+        known_coords = (4976081.5507647172, -8235964.7909936067)
+        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071), wkid=102100)
+        self.assertEqual(str_coerce(addr), known_addr)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
     env.get('ARCGIS_USERNAME') is not None \
@@ -262,9 +287,35 @@ class ArcGISAuthenticatedTestCase(unittest.TestCase):
         self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
 
 
+
+@unittest.skipUnless( # pylint: disable=R0904,C0111
+    env['GEOCODERDOTUS_USERNAME'] is not None and \
+    env['GEOCODERDOTUS_PASSWORD'] is not None,
+    "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
+)
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = GeocoderDotUS(timeout=3)
+        self.geocoder = GeocoderDotUS(
+            username=env['GEOCODERDOTUS_USERNAME'],
+            password=env['GEOCODERDOTUS_PASSWORD'],
+            timeout=3
+        )
+
+    def test_auth(self):
+        geocoder = GeocoderDotUS(username='username', password='password')
+        # this is a useful/shameful hack; we want to abort at call time, and
+        # just get the Request obj
+        def _print_call_geocoder(query, timeout, raw):
+            raise Exception(query)
+        geocoder._call_geocoder = _print_call_geocoder
+        exc_raised = False
+        try:
+            geocoder.geocode("1 5th Ave NYC")
+        except Exception as err:
+            exc_raised = True
+            request = err.message
+            self.assertEqual(request.get_header('Authorization'), 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=')
+        self.assertTrue(exc_raised)
 
 
 class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
@@ -308,6 +359,7 @@ class LiveAddressTestCase(_BackendTestCase):
 
 class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
+        self.delta_exact = 0.04
         self.geocoder = Nominatim()
 
     def test_reverse(self):
