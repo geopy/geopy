@@ -72,7 +72,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         """
         LiveStreets-specific exceptions.
         """
-        if message == "No active subscriptions found.":
+        if "no active subscriptions found" in message.lower():
             raise GeocoderQuotaExceeded(message)
 
     def _compose_url(self, location):
