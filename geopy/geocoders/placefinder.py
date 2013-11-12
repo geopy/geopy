@@ -1,24 +1,18 @@
 """
-:class:`.YahooPlaceFinder` geocoder.
+:class:`.YahooPlaceFinder` geocoder. It needs significant refactoring to
+replace oauth2 with oauthlib, use the base Geocoder template, ensure py3k
+support, and add `count` param to requests for exactly_one.
 """
-
-from __future__ import absolute_import, division
-from __future__ import print_function, unicode_literals
 
 import json
 import time
 
-import urllib
-try:
-    from urllib2 import Request, HTTPError, URLError
-except ImportError:
-    Request, HTTPError, URLError = None, None, None
-
+from geopy.compat import Request, quote
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import GeocoderServiceError, GeocoderParseError
 
 try:
-    import oauth2 # pylint: disable=F0401
+    import oauth2 # pylint: disable=F0401 # todo replace with oauthlib
 except ImportError:
     oauth2 = None
 
@@ -33,11 +27,10 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
                         scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT,
                         proxies=None):
         """
-        Sets consumer key and secret.
-
         :param string consumer_key: Key provided by Yahoo.
 
-        :param string consumer_secret: Secret corresponding to the key provided by Yahoo.
+        :param string consumer_secret: Secret corresponding to the key
+            provided by Yahoo.
 
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
@@ -59,6 +52,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         super(YahooPlaceFinder, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
+        self.api = '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme,
 
     def _build_request(self, string, reverse):
         """
@@ -72,8 +66,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
                 'oauth_version': '1.0',
             },
             url='%s?location=%s&flags=J%s' % (
-                '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme,
-                urllib.quote(string.encode('utf-8')),
+                self.api,
+                quote(string.encode('utf-8')),
                 '&gflags=R' if reverse else '', # todo refactor
             ),
         )
@@ -118,15 +112,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             )
             response = self.urlopen(urllib_req)
             content = response.read()
-        except HTTPError as exc:
-            raise GeocoderServiceError(
-                'PlaceFinder service returned status code %s.' % exc.code,
-            )
-        except URLError as exc:
-            raise GeocoderServiceError(
-                'PlaceFinder service exception %s.' % exc.reason,
-            )
-
+        except Exception as exc:
+            raise GeocoderServiceError(str(exc))
         return content
 
     def _parse_response(self, response):
