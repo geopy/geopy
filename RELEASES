@@ -39,6 +39,8 @@ FIXED:  GeocodersDotUS now authenticates with an `Authorization` HTTP header.
 
 REMOVED:    MediaWiki and SemanticMediaWiki geocoders removed.
 
+REMOVED:    Geohash module has been removed.
+
 
 0.96.1 - October 31, 2013
 =========================
