@@ -88,8 +88,10 @@ class Geocoder(object): # pylint: disable=R0921
                     401: GeocoderAuthenticationFailure,
                     402: GeocoderQuotaExceeded,
                     403: GeocoderInsufficientPrivileges,
-                    408: GeocoderTimedOut,
-                    409: GeocoderAuthenticationFailure,
+                    407: GeocoderAuthenticationFailure,
+                    412: GeocoderQueryError,
+                    413: GeocoderQueryError,
+                    414: GeocoderQueryError,
                     502: GeocoderServiceError,
                     503: GeocoderTimedOut,
                     504: GeocoderTimedOut
