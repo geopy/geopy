@@ -162,43 +162,43 @@ class Distance(object):
             return cmp(self.kilometers, other)
 
     @property
-    def kilometers(self):
+    def kilometers(self): # pylint: disable=C0111
         return self.__kilometers
 
     @property
-    def km(self):
+    def km(self): # pylint: disable=C0111
         return self.kilometers
 
     @property
-    def meters(self):
+    def meters(self): # pylint: disable=C0111
         return units.meters(kilometers=self.kilometers)
 
     @property
-    def m(self):
+    def m(self): # pylint: disable=C0111
         return self.meters
 
     @property
-    def miles(self):
+    def miles(self): # pylint: disable=C0111
         return units.miles(kilometers=self.kilometers)
 
     @property
-    def mi(self):
+    def mi(self): # pylint: disable=C0111
         return self.miles
 
     @property
-    def feet(self):
+    def feet(self): # pylint: disable=C0111
         return units.feet(kilometers=self.kilometers)
 
     @property
-    def ft(self):
+    def ft(self): # pylint: disable=C0111
         return self.feet
 
     @property
-    def nautical(self):
+    def nautical(self): # pylint: disable=C0111
         return units.nautical(kilometers=self.kilometers)
 
     @property
-    def nm(self):
+    def nm(self): # pylint: disable=C0111
         return self.nautical
 
 
@@ -420,7 +420,7 @@ class vincenty(Distance):
         s = minor * A * (sigma - delta_sigma)
         return s
 
-    def destination(self, point, bearing, distance=None):
+    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
         """
         TODO docs.
         """

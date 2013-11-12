@@ -97,10 +97,10 @@ class Nominatim(Geocoder):
         """
         lat, lon = [x.strip() for x in self._coerce_point_to_string(query).split(',')] # doh
         params = {
-                'lat': lat,
-                'lon' : lon,
-                'format' : 'json',
-          }
+            'lat': lat,
+            'lon' : lon,
+            'format' : 'json',
+        }
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
