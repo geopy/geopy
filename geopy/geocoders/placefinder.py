@@ -12,7 +12,7 @@ from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import GeocoderServiceError, GeocoderParseError
 
 try:
-    import oauth2 # pylint: disable=F0401 # todo replace with oauthlib
+    import oauth2 # pylint: disable=F0401
 except ImportError:
     oauth2 = None
 
@@ -52,7 +52,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         super(YahooPlaceFinder, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
-        self.api = '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme,
+        self.api = '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme
 
     def _build_request(self, string, reverse):
         """

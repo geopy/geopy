@@ -2,17 +2,12 @@
 :class:`.GeoCoder` base object from which other geocoders are templated.
 """
 
-try:
-    from urllib2 import (urlopen as urllib_urlopen, build_opener,
-        ProxyHandler, URLError)
-except ImportError: # pragma: no cover
-    from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
-        build_opener, ProxyHandler, URLError)
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 import json
 
-from geopy.compat import string_compare, HTTPError, py3k
+from geopy.compat import string_compare, HTTPError, py3k, \
+    urlopen as urllib_urlopen, build_opener, ProxyHandler, URLError
 from geopy.point import Point
 from geopy.exc import (GeocoderServiceError, ConfigurationError,
     GeocoderTimedOut, GeocoderAuthenticationFailure, GeocoderQuotaExceeded,
