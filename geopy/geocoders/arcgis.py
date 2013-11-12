@@ -8,7 +8,7 @@ from geopy.compat import urlencode, Request
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
     DEFAULT_WKID
-from geopy.exc import GeocoderError, GeocoderAuthenticationFailure
+from geopy.exc import GeocoderServiceError, GeocoderAuthenticationFailure
 from geopy.exc import ConfigurationError
 from geopy.util import logger
 
@@ -113,7 +113,7 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
                 self.retry += 1
                 self._refresh_authentication_token()
                 return self.geocode(query, exactly_one=exactly_one, timeout=timeout)
-            raise GeocoderError(str(response['error']))
+            raise GeocoderServiceError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
         if not len(response['locations']):
@@ -167,7 +167,7 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
                 self._refresh_authentication_token()
                 return self.reverse(query, exactly_one=exactly_one,
                         timeout=timeout, distance=distance, wkid=wkid)
-            raise GeocoderError(str(response['error']))
+            raise GeocoderServiceError(str(response['error']))
         address = "%(Address)s, %(City)s, %(Region)s %(Postal)s, %(CountryCode)s" % \
             response['address']
         return (address, (response['location']['y'], response['location']['x']))

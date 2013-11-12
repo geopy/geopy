@@ -15,7 +15,7 @@ except ImportError:
     Request, HTTPError, URLError = None, None, None
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
-from geopy.exc import GeocoderError
+from geopy.exc import GeocoderServiceError, GeocoderParseError
 
 try:
     import oauth2 # pylint: disable=F0401
@@ -119,11 +119,11 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             response = self.urlopen(urllib_req)
             content = response.read()
         except HTTPError as exc:
-            raise GeocoderError(
+            raise GeocoderServiceError(
                 'PlaceFinder service returned status code %s.' % exc.code,
             )
         except URLError as exc:
-            raise GeocoderError(
+            raise GeocoderServiceError(
                 'PlaceFinder service exception %s.' % exc.reason,
             )
 
@@ -142,7 +142,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
                 for place in placefinder.get('results', [])
             ]
         except (KeyError, ValueError):
-            raise GeocoderError('Error parsing PlaceFinder result')
+            raise GeocoderParseError('Error parsing PlaceFinder result')
 
         return results
 

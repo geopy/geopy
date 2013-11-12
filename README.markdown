@@ -55,8 +55,9 @@ To find the address corresponding to a set of coordinates:
 Geopy can calculate geodesic distance between two points using the
 [Vincenty distance](https://en.wikipedia.org/wiki/Vincenty's_formulae) or
 [great-circle distance](https://en.wikipedia.org/wiki/Great-circle_distance)
-formulas, with a default of Vincenty available as the function
-`geopy.distance.distance`.
+formulas, with a default of Vincenty available as the class
+`geopy.distance.distance`, and the computed distance available as attributes
+(e.g., `miles`, `meters`, etc.).
 
 Here's an example usage of Vincenty distance:
 

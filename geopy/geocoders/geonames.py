@@ -6,7 +6,7 @@ from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.util import logger
-from geopy.exc import GeocoderInsufficientPrivileges, GeocoderError, \
+from geopy.exc import GeocoderInsufficientPrivileges, GeocoderServiceError, \
     ConfigurationError
 
 
@@ -37,12 +37,6 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
-
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
-
-            .. versionadded:: 0.97
         """
         super(GeoNames, self).__init__(scheme='http', timeout=timeout, proxies=proxies)
         if username == None:
@@ -93,7 +87,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             if err['message'].startswith("user account not enabled to use"):
                 raise GeocoderInsufficientPrivileges(err['message'])
             else:
-                raise GeocoderError(err['message'])
+                raise GeocoderServiceError(err['message'])
         if not len(places):
             return None
 
