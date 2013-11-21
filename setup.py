@@ -29,7 +29,7 @@ except ImportError:
 
 # note: not automated since py3k cannot import geopy.get_version at
 # install-time (since 2to3 has not yet run)
-version = "0.96.1" # pylint: disable=C0103
+version = "0.96.2" # pylint: disable=C0103
 
 setup(name='geopy',
     version=version,
