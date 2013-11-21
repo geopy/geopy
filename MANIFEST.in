@@ -4,3 +4,5 @@ include RELEASES
 include README
 recursive-include geopy *
 recursive-exclude test *
+prune geopy/__pycache__
+prune geopy/geocoders/__pycache__
