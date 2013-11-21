@@ -42,6 +42,12 @@ REMOVED:    MediaWiki and SemanticMediaWiki geocoders removed.
 REMOVED:    Geohash module has been removed.
 
 
+0.96.2 - November 20, 2013
+=========================
+
+FIXED:  MANIFEST.in should not use `exclude`. Contributed by James Mills.
+
+
 0.96.1 - October 31, 2013
 =========================
 
