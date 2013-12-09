@@ -28,12 +28,12 @@ class Geocoder(object): # pylint: disable=R0921
         # built in OS proxy details
         # See: http://docs.python.org/2/library/urllib2.html
         # And: http://stackoverflow.com/questions/1450132/proxy-with-urllib2
-        if self.proxies is None:
-            self.urlopen = urllib_urlopen
-        else:
-            self.urlopen = build_opener(
+        if self.proxies:
+            opener = build_opener(
                 ProxyHandler(self.proxies)
             )
+            urllib2.install_opener(opener)
+        self.urlopen = urllib_urlopen
 
     @staticmethod
     def _coerce_point_to_string(point):
