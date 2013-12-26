@@ -265,7 +265,7 @@ class ArcGISTestCase(_BackendTestCase):
         """
         ArcGIS.reverse
         """
-        known_addr = '1065 Avenue Of The Americas, New York, NY 10018, USA'
+        known_addr = '1065 6th Ave, New York, New York 10018, USA'
         known_coords = (40.75376406311989, -73.98489005863667)
         addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071))
         self.assertEqual(str_coerce(addr), known_addr)
@@ -276,8 +276,8 @@ class ArcGISTestCase(_BackendTestCase):
         """
         ArcGIS.reverse with non-default WKID
         """
-        known_addr = '1065 Avenue Of The Americas, New York, NY 10018, USA'
-        known_coords = (4976081.5507647172, -8235964.7909936067)
+        known_addr = '1065 6th Ave, New York, New York 10018, USA'
+        known_coords = (4976084.454557315, -8235967.638346817)
         addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071), wkid=102100)
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
