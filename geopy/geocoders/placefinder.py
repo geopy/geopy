@@ -1,7 +1,7 @@
 """
 :class:`.YahooPlaceFinder` geocoder. It needs significant refactoring to
-replace oauth2 with oauthlib, use the base Geocoder template, ensure py3k
-support, and add `count` param to requests for exactly_one.
+replace oauth2 with oauthlib, ensure py3k
+support.
 """
 
 import json
@@ -9,7 +9,7 @@ import time
 
 from geopy.compat import Request, quote
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
-from geopy.exc import GeocoderServiceError, GeocoderParseError
+from geopy.exc import GeocoderParseError
 
 try:
     import oauth2 # pylint: disable=F0401
@@ -52,21 +52,25 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         self.consumer_secret = consumer_secret
         self.api = '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme
 
-    def _build_request(self, string, reverse):
+    def _call_yahoo(self, query, reverse, exactly_one, timeout):
         """
         Returns a signed oauth request for the given query
         """
+        params = {
+            'oauth_nonce': oauth2.generate_nonce(),
+            'oauth_timestamp': int(time.time()),
+            'oauth_version': '1.0',
+        }
+        if exactly_one is True:
+            params['count'] = 1
+
         request = oauth2.Request(
             method='GET',
-            parameters={
-                'oauth_nonce': oauth2.generate_nonce(),
-                'oauth_timestamp': int(time.time()),
-                'oauth_version': '1.0',
-            },
+            parameters=params,
             url='%s?location=%s&flags=J%s' % (
                 self.api,
-                quote(string.encode('utf-8')),
-                '&gflags=R' if reverse else '', # todo refactor
+                quote(query.encode('utf-8')),
+                '&gflags=R' if reverse else '',
             ),
         )
 
@@ -76,9 +80,16 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             None,
         )
 
-        return request
+        urllib_req = Request(
+            request.url,
+            None,
+            request.to_header(realm='yahooapis.com'),
+        )
 
-    def _filtered_results(self, results, min_quality, valid_country_codes):
+        return self._call_geocoder(urllib_req, timeout=timeout, raw=True)
+
+    @staticmethod
+    def _filtered_results(results, min_quality, valid_country_codes):
         """
         Returns only the results that meet the minimum quality threshold
         and are located in expected countries.
@@ -98,23 +109,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
         return results
 
-    def _get_response(self, request):
-        """
-        Returns the result of a PlaceFinder API call.
-        """
-        try:
-            urllib_req = Request(
-                request.url,
-                None,
-                request.to_header(realm='yahooapis.com'),
-            )
-            response = self.urlopen(urllib_req)
-            content = response.read()
-        except Exception as exc:
-            raise GeocoderServiceError(str(exc))
-        return content
-
-    def _parse_response(self, response):
+    @staticmethod
+    def _parse_response(response):
         """
         Returns the parsed result of a PlaceFinder API call.
         """
@@ -142,12 +138,16 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             if location[line]
         ])
 
-    def geocode(self, query, min_quality=0, raw=False, reverse=False, # pylint: disable=W0221,R0913
-                        valid_country_codes=None, exactly_one=True):
+    def geocode(self, query, exactly_one=True, timeout=None, # pylint: disable=W0221,R0913
+                        min_quality=0, raw=False,
+                        reverse=False, valid_country_codes=None):
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
 
         :param int min_quality:
 
@@ -157,12 +157,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
         :param valid_country_codes:
         :type valid_country_codes: list or tuple
-
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
         """
-        request = self._build_request(query, reverse=reverse)
-        response = self._get_response(request)
+        response = self._call_yahoo(query, reverse, exactly_one, timeout)
         results = self._parse_response(response)
         if results is None:
             return None
@@ -184,7 +180,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         else:
             return results
 
-    def reverse(self, query, exactly_one=True):
+    def reverse(self, query, exactly_one=True, timeout=None):
         """
         Returns a reverse geocoded location using Yahoo's PlaceFinder API.
 
@@ -198,6 +194,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         return self.geocode(
             self._coerce_point_to_string(query),
-            reverse=True,
-            exactly_one=exactly_one
+            exactly_one=exactly_one,
+            timeout=timeout,
+            reverse=True
         )
