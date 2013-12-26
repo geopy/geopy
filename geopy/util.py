@@ -5,9 +5,9 @@ Utils.
 import logging
 from geopy.compat import py3k
 
-try:
+if not py3k: # pragma: no cover
     NUMBER_TYPES = (int, long, float)
-except NameError: # pragma: no cover
+else: # pragma: no cover
     NUMBER_TYPES = (int, float) # long -> int in Py3k
 try:
     from decimal import Decimal
@@ -25,7 +25,6 @@ class NullHandler(logging.Handler):
         pass
 
 logger = logging.getLogger('geopy') # pylint: disable=C0103
-logger.addHandler(NullHandler())
 
 
 def pairwise(seq):

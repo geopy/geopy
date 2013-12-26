@@ -47,8 +47,6 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         if oauth2 is None:
             raise ImportError('oauth2 is needed for YahooPlaceFinder')
-        if Request is None:
-            raise NotImplementedError("YahooPlaceFinder is not compatible with Py3k")
         super(YahooPlaceFinder, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -177,7 +175,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
         if not raw:
             results = [
-                (YahooPlaceFinder.humanize(place), point)
+                (self.humanize(place), point)
                 for (place, point) in results
             ]
 

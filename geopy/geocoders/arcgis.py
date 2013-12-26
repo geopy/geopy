@@ -98,6 +98,19 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         return self._base_call_geocoder(request, timeout=timeout)
 
     def geocode(self, query, exactly_one=True, timeout=None):
+        """
+        Geocode a location query.
+
+        :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+        """
         # TODO: dict as query for parameterized query
         # TODO: SRID
         params = {'text': query, 'f': 'json'}
@@ -129,6 +142,8 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
     def reverse(self, query, exactly_one=True, timeout=None, # pylint: disable=R0913,W0221
                         distance=None, wkid=DEFAULT_WKID):
         """
+        Given a point, find an address.
+
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,

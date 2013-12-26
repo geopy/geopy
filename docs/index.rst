@@ -80,7 +80,8 @@ Logging
 geopy will log geocoding URLs with a logger name `geopy` at level `DEBUG`,
 and for some geocoders, these URLs will include authentication information.
 If this is a concern, one can disable this logging by specifying a logging
-level of `NOTSET` for logger name `geopy`.
+level of `NOTSET` or a level greater than `DEBUG` for logger name `geopy`.
+geopy does no logging above DEBUG.
 
 
 Indices and search
