@@ -1,7 +1,17 @@
-0.96.2 - November 20, 2013
-=========================
+0.96.3 - December 26, 2013
+==========================
 
-FIXED:  MANIFEST.in should not use `exclude`. Contributed by James Mills.
+ADDED:  Documentation warning that the Vincenty distance implementation fails
+        to converge for some valid points. Reported by mkeller-upb.
+
+FIXED:  Geocoder proxying fixed. Contributed by Marc-Olivier Titeux.
+
+
+0.96.2 - November 20, 2013
+==========================
+
+FIXED:  MANIFEST.in exclusions broke builds under `buildout`. Contributed by
+        James Mills.
 
 
 0.96.1 - October 31, 2013
