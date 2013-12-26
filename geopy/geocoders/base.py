@@ -3,10 +3,11 @@
 """
 
 try:
-    from urllib2 import urlopen as urllib_urlopen, build_opener, ProxyHandler
-except ImportError:
+    from urllib2 import (urlopen as urllib_urlopen, build_opener,
+        ProxyHandler, URLError, install_opener)
+except ImportError: # pragma: no cover
     from urllib.request import (urlopen as urllib_urlopen, # pylint: disable=F0401,E0611
-        build_opener, ProxyHandler)
+        build_opener, ProxyHandler, URLError, install_opener)
 from warnings import warn
 
 from geopy.compat import py3k, string_compare, HTTPError, json
@@ -24,15 +25,12 @@ class Geocoder(object): # pylint: disable=R0921
         self.format_string = format_string or '%s'
         self.proxies = proxies
 
-        # Add urllib proxy support using environment variables or
-        # built in OS proxy details
-        # See: http://docs.python.org/2/library/urllib2.html
-        # And: http://stackoverflow.com/questions/1450132/proxy-with-urllib2
         if self.proxies:
-            opener = build_opener(
-                ProxyHandler(self.proxies)
+            install_opener(
+                 build_opener(
+                     ProxyHandler(self.proxies)
+                 )
             )
-            urllib2.install_opener(opener)
         self.urlopen = urllib_urlopen
 
     @staticmethod
