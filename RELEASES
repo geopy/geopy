@@ -1,4 +1,4 @@
-master
+0.97 - December 26, 2013
 =============
 
 CHANGED:    SSL connections are used by default for services with support.
