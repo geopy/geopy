@@ -14,9 +14,9 @@ else: # pragma: no cover
 if py3k: # pragma: no cover
     from urllib.parse import urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
     from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611
-        build_opener, ProxyHandler, URLError)
+        build_opener, ProxyHandler, URLError, install_opener)
     from urllib.error import HTTPError # pylint: disable=W0611,F0401,W0611,E0611
 else: # pragma: no cover
     from urllib import urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
     from urllib2 import (Request, HTTPError,   # pylint: disable=W0611,F0401,W0611,E0611
-        ProxyHandler, URLError, urlopen, build_opener)
+        ProxyHandler, URLError, urlopen, build_opener, install_opener)

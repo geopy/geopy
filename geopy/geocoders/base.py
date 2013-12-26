@@ -7,7 +7,8 @@ from socket import timeout as SocketTimeout
 import json
 
 from geopy.compat import string_compare, HTTPError, py3k, \
-    urlopen as urllib_urlopen, build_opener, ProxyHandler, URLError
+    urlopen as urllib_urlopen, build_opener, ProxyHandler, URLError, \
+    install_opener
 from geopy.point import Point
 from geopy.exc import (GeocoderServiceError, ConfigurationError,
     GeocoderTimedOut, GeocoderAuthenticationFailure, GeocoderQuotaExceeded,
@@ -38,15 +39,12 @@ class Geocoder(object): # pylint: disable=R0921
         self.proxies = proxies
         self.timeout = timeout
 
-        # Add urllib proxy support using environment variables or
-        # built in OS proxy details
-        # See: http://docs.python.org/2/library/urllib2.html
-        # And: http://stackoverflow.com/questions/1450132/proxy-with-urllib2
         if self.proxies:
-            opener = build_opener(
-                ProxyHandler(self.proxies)
+            install_opener(
+                build_opener(
+                    ProxyHandler(self.proxies)
+                )
             )
-            urllib2.install_opener(opener)
         self.urlopen = urllib_urlopen
 
     @staticmethod
