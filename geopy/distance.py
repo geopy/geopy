@@ -297,6 +297,12 @@ class vincenty(Distance):
         >>> vincenty(newport_ri, cleveland_oh).miles
         538.3904451566326
 
+    Note: This implementation of Vincenty distance fails to converge for
+    some valid points. In some cases, a result can be obtained by increasing
+    the number of iterations (`iterations` keyword argument, given in the
+    class `__init__`, with a default of 20). It may be preferable to use
+    :class:`.great_circle`, which is marginally less accurate, but always
+    produces a result.
     """
 
     ellipsoid_key = None
@@ -304,6 +310,7 @@ class vincenty(Distance):
 
     def __init__(self, *args, **kwargs):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
+        self.iterations = kwargs.pop('iterations', 20)
         major, minor, f = self.ELLIPSOID # pylint: disable=W0612
         super(vincenty, self).__init__(*args, **kwargs)
 
@@ -345,9 +352,12 @@ class vincenty(Distance):
         lambda_lng = delta_lng
         lambda_prime = 2 * pi
 
-        iter_limit = 20
+        iter_limit = self.iterations
 
-        while abs(lambda_lng - lambda_prime) > 10e-12 and iter_limit > 0:
+        i = 0
+        while abs(lambda_lng - lambda_prime) > 10e-12 and i <= iter_limit:
+            i += 1
+
             sin_lambda_lng, cos_lambda_lng = sin(lambda_lng), cos(lambda_lng)
 
             sin_sigma = sqrt(
@@ -390,9 +400,8 @@ class vincenty(Distance):
                     )
                 )
             )
-            iter_limit -= 1
 
-        if iter_limit == 0:
+        if i > iter_limit:
             raise ValueError("Vincenty formula failed to converge!")
 
         u_sq = cos_sq_alpha * (major ** 2 - minor ** 2) / minor ** 2
