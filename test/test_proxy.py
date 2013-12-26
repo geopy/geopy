@@ -3,12 +3,9 @@ Test ability to proxy requests.
 """
 
 import os
-try: # Py2k
-    from urllib2 import urlopen # pylint: disable=F0401
-except ImportError: # Py3k
-    from urllib.request import urlopen # pylint: disable=F0401,E0611
 import unittest
 from test import proxy_server
+from geopy.compat import urlopen, URLError
 from geopy.geocoders.base import Geocoder
 
 ### UNIT TEST(S) to test Proxy in Geocoder base class ###
@@ -42,7 +39,6 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         else:
             del os.environ['http_proxy']
 
-
     def test_proxy(self):
         ''' Test of OTB Geocoder Proxy functionality works'''
         class DummyGeocoder(Geocoder):
@@ -53,7 +49,12 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
 
         '''Testcase to test that proxy standup code works'''
         geocoder_dummy = DummyGeocoder(proxies={"http": "http://localhost:1337"})
-        self.assertTrue(self.noproxy_data, geocoder_dummy.geocode('http://www.blankwebsite.com/'))
-
-if __name__ == '__main__':
-    unittest.main()
+        try:
+            self.assertTrue(
+                self.noproxy_data,
+                geocoder_dummy.geocode('http://www.blankwebsite.com/')
+            )
+        except URLError as err:
+            if "connection refused" in str(err).lower():
+                raise unittest.SkipTest("Proxy not running")
+            raise err
