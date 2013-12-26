@@ -120,13 +120,6 @@ class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
             )
         )
 
-    def test_zero_results(self):
-        """
-        GoogleV3.geocode returns None for no result
-        """
-        result = self.geocoder.geocode('')
-        self.assertIsNone(result)
-
 
 class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
     """
@@ -148,7 +141,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.skip_known_failure(('GeoNames', ))
 
         address = '435 north michigan ave, chicago il 60611'
-        result = self.geocoder.geocode(address, exactly_one=False)
+        try:
+            result = self.geocoder.geocode(address, exactly_one=False)
+        except exc.GeocoderQuotaExceeded:
+            raise unittest.SkipTest("Quota exceeded")
         if result is None:
             self.fail('No result found')
         clean_address, latlon = result[0] # pylint: disable=W0612
@@ -160,7 +156,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.skip_known_failure(('GeoNames', 'GeocoderDotUS', 'Nominatim'))
 
         address = '435 north michigan, chicago 60611'
-        result = self.geocoder.geocode(address, exactly_one=True)
+        try:
+            result = self.geocoder.geocode(address, exactly_one=True)
+        except exc.GeocoderQuotaExceeded:
+            raise unittest.SkipTest("Quota exceeded")
         if result is None:
             self.fail('No result found')
         clean_address, latlon = result # pylint: disable=W0612
@@ -172,7 +171,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.skip_known_failure(('OpenMapQuest', 'GeoNames', 'LiveAddress', 'Nominatim'))
 
         address = 'e. 161st st and river ave, new york, ny'
-        result = self.geocoder.geocode(address, exactly_one=True)
+        try:
+            result = self.geocoder.geocode(address, exactly_one=True)
+        except exc.GeocoderQuotaExceeded:
+            raise unittest.SkipTest("Quota exceeded")
         if result is None:
             self.fail('No result found')
         clean_address, latlon = result # pylint: disable=W0612
@@ -185,7 +187,10 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 
         address = 'Mount St. Helens'
 
-        result = self.geocoder.geocode(address, exactly_one=True)
+        try:
+            result = self.geocoder.geocode(address, exactly_one=True)
+        except exc.GeocoderQuotaExceeded:
+            raise unittest.SkipTest("Quota exceeded")
         if result is None:
             self.fail('No result found')
         clean_address, latlon = result # pylint: disable=W0612
@@ -195,7 +200,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 
 class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = GoogleV3()
+        self.geocoder = GoogleV3(scheme='http')
 
     def test_reverse(self):
         known_addr = '1060-1078 Avenue of the Americas, New York, NY 10018, USA'
@@ -208,6 +213,13 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
+    def test_zero_results(self):
+        """
+        GoogleV3.geocode returns None for no result
+        """
+        result = self.geocoder.geocode('')
+        self.assertIsNone(result)
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['BING_KEY'] is not None,
@@ -217,6 +229,7 @@ class BingTestCase(_BackendTestCase):
     def setUp(self):
         self.geocoder = Bing(
             format_string='%s',
+            scheme='http',
             api_key=env['BING_KEY']
         )
 
@@ -343,7 +356,7 @@ class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 
 class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = OpenMapQuest(timeout=3)
+        self.geocoder = OpenMapQuest(scheme='http', timeout=3)
         self.delta_exact = 0.04
         self.delta_placename = 0.04
 
@@ -354,7 +367,7 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 )
 class MapQuestTestCase(_BackendTestCase):
     def setUp(self):
-        self.geocoder = MapQuest(env['MAPQUEST_KEY'], timeout=3)
+        self.geocoder = MapQuest(env['MAPQUEST_KEY'], scheme='http', timeout=3)
         self.delta_placename = 0.04
 
 
@@ -375,7 +388,8 @@ class GeoNamesTestCase(_BackendTestCase):
 class LiveAddressTestCase(_BackendTestCase):
     def setUp(self):
         self.geocoder = LiveAddress(
-            auth_token=env['LIVESTREETS_AUTH_KEY']
+            auth_token=env['LIVESTREETS_AUTH_KEY'],
+            scheme='http'
         )
         self.delta_placename = 0.04
 
