@@ -1,20 +1,18 @@
 """
-:class:`.YahooPlaceFinder` geocoder. It needs significant refactoring to
-replace oauth2 with oauthlib, ensure py3k
+:class:`.YahooPlaceFinder` geocoder.
 support.
 """
 
 import json
-import time
 
-from geopy.compat import Request, quote
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.compat import Request, urlencode
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 
 try:
-    import oauth2 # pylint: disable=F0401
+    import oauthlib # pylint: disable=F0401
 except ImportError:
-    oauth2 = None
+    oauthlib = None
 
 
 class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
@@ -24,19 +22,16 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
     """
 
     def __init__(self, consumer_key, consumer_secret, # pylint: disable=R0913
-                        scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT,
-                        proxies=None):
+                        timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         :param string consumer_key: Key provided by Yahoo.
 
         :param string consumer_secret: Secret corresponding to the key
             provided by Yahoo.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
-
-            .. versionadded:: 0.97
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -45,48 +40,36 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
         """
-        if oauth2 is None:
-            raise ImportError('oauth2 is needed for YahooPlaceFinder')
-        super(YahooPlaceFinder, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
+        if oauthlib is None:
+            raise ImportError('oauthlib package is needed for YahooPlaceFinder')
+        super(YahooPlaceFinder, self).__init__(timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
-        self.api = '%s://yboss.yahooapis.com/geo/placefinder' % self.scheme
+        self.api = 'https://yboss.yahooapis.com/geo/placefinder'
 
     def _call_yahoo(self, query, reverse, exactly_one, timeout):
         """
         Returns a signed oauth request for the given query
         """
-        params = {
-            'oauth_nonce': oauth2.generate_nonce(),
-            'oauth_timestamp': int(time.time()),
-            'oauth_version': '1.0',
-        }
+        params = {'location': query, 'flags': 'J'}
+        if reverse is True:
+            params['gflags'] = 'R'
         if exactly_one is True:
             params['count'] = 1
 
-        request = oauth2.Request(
-            method='GET',
-            parameters=params,
-            url='%s?location=%s&flags=J%s' % (
-                self.api,
-                quote(query.encode('utf-8')),
-                '&gflags=R' if reverse else '',
-            ),
+        client = oauthlib.oauth1.Client(
+            self.consumer_key,
+            self.consumer_secret,
+            signature_method="HMAC-SHA1"
         )
-
-        request.sign_request(
-            oauth2.SignatureMethod_HMAC_SHA1(),
-            oauth2.Consumer(self.consumer_key, self.consumer_secret),
-            None,
+        url, headers, body = client.sign(
+            "?".join((self.api, urlencode(params))), realm='yahooapis.com'
         )
+        request = Request(url, body, headers)
 
-        urllib_req = Request(
-            request.url,
-            None,
-            request.to_header(realm='yahooapis.com'),
+        return self._call_geocoder(
+            request, timeout=timeout, raw=True
         )
-
-        return self._call_geocoder(urllib_req, timeout=timeout, raw=True)
 
     @staticmethod
     def _filtered_results(results, min_quality, valid_country_codes):
