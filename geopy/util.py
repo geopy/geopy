@@ -4,6 +4,7 @@ Utils.
 
 import re
 import logging
+from geopy.compat import py3k, string_compare
 try: # Py2k
     import htmlentitydefs # pylint: disable=F0401
 except ImportError: # Py3k
@@ -11,17 +12,16 @@ except ImportError: # Py3k
 import xml.dom.minidom
 from xml.parsers.expat import ExpatError
 
-try:
+if not py3k: # pragma: no cover
     NUMBER_TYPES = (int, long, float)
-except NameError:
-    NUMBER_TYPES = (int, float) # float -> int in Py3k
+else: # pragma: no cover
+    NUMBER_TYPES = (int, float) # long -> int in Py3k
 try:
     from decimal import Decimal
     NUMBER_TYPES = NUMBER_TYPES + (Decimal, )
 except ImportError:
     pass
 
-from geopy.compat import py3k, string_compare
 
 class NullHandler(logging.Handler):
     """
@@ -32,7 +32,6 @@ class NullHandler(logging.Handler):
         pass
 
 logger = logging.getLogger('geopy') # pylint: disable=C0103
-logger.addHandler(NullHandler())
 
 
 def parse_geo(val): # pylint: disable=W0613
