@@ -93,6 +93,7 @@ class GoogleV3(Geocoder):
         return '%s://%s%s&signature=%s' % (self.scheme, self.domain, path, signature)
 
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
+                components=None,
                 language=None, sensor=False, exactly_one=True, timeout=None):
         """
         Geocode a location query.
@@ -105,6 +106,9 @@ class GoogleV3(Geocoder):
 
         :param string region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.
+
+        :param dict components: Restricts to an area. Can use any combination
+            of: route, locality, administrative_area, postal_code, country.
 
         :param string language: The language in which to return results.
 
@@ -129,6 +133,9 @@ class GoogleV3(Geocoder):
             params['bounds'] = bounds
         if region:
             params['region'] = region
+        if components:
+            params['components'] = '|'.join(
+                    ['%s:%s' % (a, b) for a, b in components.items()])
         if language:
             params['language'] = language
 
