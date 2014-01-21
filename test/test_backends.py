@@ -236,6 +236,24 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         result = self.geocoder.geocode('')
         self.assertIsNone(result)
 
+    def test_format_components_param(self):
+        f = GoogleV3._format_components_param
+        self.assertEqual(f({}), '')
+        self.assertEqual(f({'country': 'FR'}), 'country:FR')
+        output = f({'administrative_area': 'CA', 'country': 'FR'})
+        # the order the dict is iterated over is not important
+        self.assertTrue(output == 'administrative_area:CA|country:FR' or
+            output == 'country:FR|administrative_area:CA')
+
+        with self.assertRaises(AttributeError):
+            f(None)
+
+        with self.assertRaises(AttributeError):
+            f([])
+
+        with self.assertRaises(AttributeError):
+            f('administrative_area:CA|country:FR')
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['BING_KEY'] is not None,

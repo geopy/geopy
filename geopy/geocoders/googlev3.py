@@ -92,6 +92,13 @@ class GoogleV3(Geocoder):
         signature = base64.urlsafe_b64encode(signature.digest()).decode('utf-8')
         return '%s://%s%s&signature=%s' % (self.scheme, self.domain, path, signature)
 
+    @staticmethod
+    def _format_components_param(components):
+        """
+        Format the components dict to something Google understands.
+        """
+        return '|'.join(['%s:%s' % (a, b) for a, b in components.items()])
+
     def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
                 components=None,
                 language=None, sensor=False, exactly_one=True, timeout=None):
@@ -134,8 +141,7 @@ class GoogleV3(Geocoder):
         if region:
             params['region'] = region
         if components:
-            params['components'] = '|'.join(
-                    ['%s:%s' % (a, b) for a, b in components.items()])
+            params['components'] = self._format_components_param(components)
         if language:
             params['language'] = language
 
