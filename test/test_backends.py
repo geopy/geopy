@@ -202,6 +202,22 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
         self.geocoder = GoogleV3(scheme='http')
 
+    def test_geocode_components(self):
+        known_addr = 'santa cruz'
+        # providing conflicting components should return no results
+        result = self.geocoder.geocode(known_addr, components={
+            'administrative_area': 'CA',
+            'country': 'FR',
+        })
+        self.assertIsNone(result)
+
+        known_coords = (28.4636296, -16.2518467)
+        addr, coords = self.geocoder.geocode(known_addr, components={
+            'country': 'ES',
+        })
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+
     def test_reverse(self):
         known_addr = '1060-1078 Avenue of the Americas, New York, NY 10018, USA'
         known_coords = (40.75376406311989, -73.98489005863667)
@@ -219,6 +235,24 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         """
         result = self.geocoder.geocode('')
         self.assertIsNone(result)
+
+    def test_format_components_param(self):
+        f = GoogleV3._format_components_param
+        self.assertEqual(f({}), '')
+        self.assertEqual(f({'country': 'FR'}), 'country:FR')
+        output = f({'administrative_area': 'CA', 'country': 'FR'})
+        # the order the dict is iterated over is not important
+        self.assertTrue(output == 'administrative_area:CA|country:FR' or
+            output == 'country:FR|administrative_area:CA')
+
+        with self.assertRaises(AttributeError):
+            f(None)
+
+        with self.assertRaises(AttributeError):
+            f([])
+
+        with self.assertRaises(AttributeError):
+            f('administrative_area:CA|country:FR')
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
