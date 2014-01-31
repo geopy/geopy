@@ -452,4 +452,4 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 )
 class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
-        self.geocoder = YahooPlaceFinder()
+        self.geocoder = YahooPlaceFinder(env['YAHOO_KEY'], env['YAHOO_SECRET'])
