@@ -44,7 +44,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         if requests_missing:
             raise ImportError(
-                'requests-oauthlib is needed for YahooPlaceFinder')
+                'requests-oauthlib is needed for YahooPlaceFinder'
+            )
         super(YahooPlaceFinder, self).__init__(timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -67,9 +68,10 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         auth = requests_oauthlib.OAuth1(
             self.consumer_key, self.consumer_secret)
 
-        url = u'{}?{}'.format(
+        url = u'?'.join((
             self.api,
-            u'&'.join(u'{}={}'.format(k, v) for k, v in params.iteritems()))
+            u'&'.join(u'='.join(item) for item in params.items())
+        ))
 
         return requests.get(url, auth=auth, timeout=timeout)
 

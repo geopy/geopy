@@ -4,8 +4,8 @@ geopy
 
 from setuptools import setup, find_packages
 
-install_requires = []
-tests_require = [
+INSTALL_REQUIRES = []
+TESTS_REQUIRES = [
     'nose-cov',
     'pylint',
     'tox'
@@ -20,10 +20,15 @@ setup(
     author='GeoPy Contributors',
     author_email='mike@tig.as', # subject to change
     url='https://github.com/geopy/geopy',
-    download_url = 'https://github.com/geopy/geopy/archive/release-%s.tar.gz' % version,
+    download_url = (
+        'https://github.com/geopy/geopy/archive/release-%s.tar.gz' % version
+    ),
     packages=find_packages(),
-    install_requires=install_requires,
-    tests_require=tests_require,
+    install_requires=INSTALL_REQUIRES,
+    tests_require=TESTS_REQUIRES,
+    extras_require={
+        "Yahoo BOSS": ["requests_oauthlib>=0.4.0"],
+    },
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',
     classifiers=[
