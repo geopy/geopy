@@ -4,15 +4,17 @@ support.
 """
 
 import json
+import urllib
 
-from geopy.compat import Request, urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 
 try:
-    import oauthlib # pylint: disable=F0401
+    import requests
+    import requests_oauthlib
+    requests_missing = False
 except ImportError:
-    oauthlib = None
+    requests_missing = True
 
 
 class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
@@ -40,8 +42,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
         """
-        if oauthlib is None:
-            raise ImportError('oauthlib package is needed for YahooPlaceFinder')
+        if requests_missing:
+            raise ImportError(
+                'requests-oauthlib is needed for YahooPlaceFinder')
         super(YahooPlaceFinder, self).__init__(timeout=timeout, proxies=proxies)
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -49,27 +52,26 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
     def _call_yahoo(self, query, reverse, exactly_one, timeout):
         """
-        Returns a signed oauth request for the given query
+        Returns a response for the given query
         """
-        params = {'location': query, 'flags': 'J'}
+        # we quote the location, because spaces must be encoded as "%20"
+        # instead of "+". this also means we can't later call urlencode on
+        # this value.
+        params = {'location': urllib.quote(query), 'flags': 'J'}
+
         if reverse is True:
             params['gflags'] = 'R'
         if exactly_one is True:
             params['count'] = 1
 
-        client = oauthlib.oauth1.Client(
-            self.consumer_key,
-            self.consumer_secret,
-            signature_method="HMAC-SHA1"
-        )
-        url, headers, body = client.sign(
-            "?".join((self.api, urlencode(params))), realm='yahooapis.com'
-        )
-        request = Request(url, body, headers)
+        auth = requests_oauthlib.OAuth1(
+            self.consumer_key, self.consumer_secret)
 
-        return self._call_geocoder(
-            request, timeout=timeout, raw=True
-        )
+        url = u'{}?{}'.format(
+            self.api,
+            u'&'.join(u'{}={}'.format(k, v) for k, v in params.iteritems()))
+
+        return requests.get(url, auth=auth, timeout=timeout)
 
     @staticmethod
     def _filtered_results(results, min_quality, valid_country_codes):
@@ -98,7 +100,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         Returns the parsed result of a PlaceFinder API call.
         """
         try:
-            placefinder = json.loads(response)['bossresponse']['placefinder']
+            placefinder = json.loads(response.content)['bossresponse']['placefinder']
             if not len(placefinder):
                 return None
             results = [
