@@ -1,6 +1,6 @@
 include LICENSE
 include MANIFEST.in
-include RELEASES
+include CHANGELOG
 include README
 recursive-include geopy *
 recursive-exclude test *
