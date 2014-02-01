@@ -371,7 +371,10 @@ class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
             timeout=3
         )
 
-    def test_auth(self):
+    def test_dot_us_auth(self):
+        """
+        GeocoderDotUS Authorization header
+        """
         geocoder = GeocoderDotUS(username='username', password='password')
         # this is a useful/shameful hack; we want to abort at call time, and
         # just get the Request obj
@@ -434,8 +437,8 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.geocoder = Nominatim()
 
     def test_reverse(self):
-        known_addr = 'Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond '\
-            'District, Manhattan, NYC, New York, 10020, United States of America'
+        known_addr = "Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond "\
+            "District, Hell's Kitchen, NYC, New York, 10020, United States of America"
         known_coords = (40.75376406311989, -73.98489005863667)
         addr, coords = self.geocoder.reverse(
             "40.75376406311989, -73.98489005863667",
