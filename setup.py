@@ -21,7 +21,7 @@ setup(
     author_email='uijllji@gmail',
     url='https://github.com/geopy/geopy',
     download_url = (
-        'https://github.com/geopy/geopy/archive/release-%s.tar.gz' % version
+        'https://github.com/geopy/geopy/archive/%s.tar.gz' % version
     ),
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
