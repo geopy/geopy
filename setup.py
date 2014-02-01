@@ -11,14 +11,14 @@ TESTS_REQUIRES = [
     'tox'
 ]
 
-version = "0.97" # pylint: disable=C0103
+version = "0.97.1" # pylint: disable=C0103
 
 setup(
     name='geopy',
     version=version,
     description='Python Geocoding Toolbox',
     author='GeoPy Contributors',
-    author_email='mike@tig.as', # subject to change
+    author_email='uijllji@gmail',
     url='https://github.com/geopy/geopy',
     download_url = (
         'https://github.com/geopy/geopy/archive/release-%s.tar.gz' % version

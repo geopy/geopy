@@ -1,5 +1,16 @@
+0.97.1 - February 1, 2014
+=========================
+
+FIXED: YahooPlaceFinder geocoder authentication and response parsing fixed.
+       Contributed by petergx.
+
+ADDED: GoogleV3 geocoding now supports a `components` parameter, which
+       is a filter for location criteria such as administrative area,
+       country, etc. Contributed by crccheck.
+
+
 0.97 - December 26, 2013
-=============
+========================
 
 CHANGED:    SSL connections are used by default for services with support.
             These geocoders accept a new 'scheme' argument in their init,
@@ -29,7 +40,8 @@ ADDED:  Geocoders check a new method, `_geocoder_exception_handler`, if
         exception. See LiveStreets for an example. Users can define or
         override this method.
 
-ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when appropriate.
+ADDED:  LiveStreets throws a `GeocoderQuotaExceeded` exception when
+        appropriate.
 
 ADDED:  `Point` can parse a greater variety of coordinate strings. Contributed
         by nucflash.
@@ -141,8 +153,8 @@ UPDATED: setup.py updated to now automatically support Python 3+ (via 2to3
 ADDED:   MANIFEST.in so that LICENSE file gets included in dist packages
          (per req by Debian Python Module Team)
 
-UPDATED: Yahoo geocoder uses new PlaceFinder API instead of outdated MapsService
-         V1 API.
+UPDATED: Yahoo geocoder uses new PlaceFinder API instead of outdated
+         MapsService V1 API.
 
 
 0.94.1 - March 24, 2011
@@ -177,8 +189,8 @@ FIXED:   Issue 45. Implement __cmp__ on Distance so that distance objects may
 
 CHANGED: Added __repr__ and __str__ to Distance
 
-ADDED:   Issue 46. Geocoder backend for MapQuest's OpenMapQuest API, contributed
-         by Shashwat Anand.
+ADDED:   Issue 46. Geocoder backend for MapQuest's OpenMapQuest API,
+         contributed by Shashwat Anand.
 
 
 0.94 - March 7, 2010
@@ -209,3 +221,4 @@ Changes between 0.93 (October 8, 2006) and February 15, 2009
 ============================================================
 
 See https://github.com/geopy/geopy/compare/0451a051...ffebd5f3
+f
