@@ -3,9 +3,10 @@
 """
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
-from geopy.util import logger
 from geopy.compat import urlencode
+from geopy.location import Location
 from geopy.exc import GeocoderQuotaExceeded
+from geopy.util import logger
 
 
 class LiveAddress(Geocoder): # pylint: disable=W0223
@@ -50,7 +51,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         super(LiveAddress, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.auth_token = auth_token
         if candidates:
-            if not (1 <= candidates <= 10):
+            if not 1 <= candidates <= 10:
                 raise ValueError('candidates must be between 1 and 10')
         self.candidates = candidates
         self.api = '%s://api.qualifiedaddress.com/street-address' % self.scheme
@@ -86,7 +87,9 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         # don't urlencode the api token
         return '?'.join((
             self.api,
-            "&".join(("=".join(('auth-token', self.auth_token)), urlencode(query)))
+            "&".join(("=".join((
+                'auth-token', self.auth_token)), urlencode(query)
+            ))
     ))
 
     def _parse_json(self, response, exactly_one=True):
@@ -105,10 +108,10 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         """
         Pretty-print address and return lat, lon tuple.
         """
-        formatted = '{0}, {1}'.format(
-            address['delivery_line_1'],
-            address['last_line'])
-
-        metadata = address['metadata']
-        latlon = metadata['latitude'], metadata['longitude']
-        return formatted, latlon
+        latitude = address['metadata'].get('latitude')
+        longitude = address['metadata'].get('longitude')
+        return Location(
+            ", ".join((address['delivery_line_1'], address['last_line'])),
+            (latitude, longitude) if latitude and longitude else None,
+            address
+        )

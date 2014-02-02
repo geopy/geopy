@@ -4,8 +4,9 @@ OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
 
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
     DEFAULT_TIMEOUT
-from geopy.util import logger
 from geopy.compat import urlencode
+from geopy.location import Location
+from geopy.util import logger
 
 
 class Nominatim(Geocoder):
@@ -17,7 +18,7 @@ class Nominatim(Geocoder):
     """
 
     def __init__(self, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
-                        view_box=(-180,-90,180,90), country_bias=None,
+                        view_box=(-180, -90, 180, 90), country_bias=None,
                         timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         :param string format_string: String containing '%s' where the
@@ -123,7 +124,7 @@ class Nominatim(Geocoder):
                 longitude = float(longitude)
             else:
                 return None
-            return (placename, (latitude, longitude))
+            return Location(placename, (latitude, longitude), place)
 
         if exactly_one:
             return parse_code(places[0])

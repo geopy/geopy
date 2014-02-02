@@ -9,12 +9,13 @@ import hashlib
 import hmac
 from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
-from geopy.util import logger
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
     ConfigurationError
 )
+from geopy.location import Location
+from geopy.util import logger
 
 
 class GoogleV3(Geocoder):
@@ -223,7 +224,7 @@ class GoogleV3(Geocoder):
             location = place.get('formatted_address')
             latitude = place['geometry']['location']['lat']
             longitude = place['geometry']['location']['lng']
-            return (location, (latitude, longitude))
+            return Location(location, (latitude, longitude), place)
 
         if exactly_one:
             return parse_place(places[0])

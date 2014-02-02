@@ -174,6 +174,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
             self.fail('No result found')
         clean_address, latlon = result[0] # pylint: disable=W0612
 
+        self.assertTrue(result[0].raw is not None)
         self.assertAlmostEqual(latlon[0], 41.890, delta=self.delta_exact)
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
@@ -189,6 +190,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
             self.fail('No result found')
         clean_address, latlon = result # pylint: disable=W0612
 
+        self.assertTrue(result.raw is not None)
         self.assertAlmostEqual(latlon[0], 41.890, delta=self.delta_exact)
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
@@ -204,6 +206,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
             self.fail('No result found')
         clean_address, latlon = result # pylint: disable=W0612
 
+        self.assertTrue(result.raw is not None)
         self.assertAlmostEqual(latlon[0], 40.828, delta=self.delta_exact)
         self.assertAlmostEqual(latlon[1], -73.926, delta=self.delta_exact)
 
@@ -218,7 +221,9 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
             raise unittest.SkipTest("Quota exceeded")
         if result is None:
             self.fail('No result found')
+
         clean_address, latlon = result # pylint: disable=W0612
+        self.assertTrue(result.raw is not None)
         self.assertAlmostEqual(latlon[0], 46.1912, delta=self.delta_placename)
         self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_placename)
 

@@ -6,15 +6,17 @@ support.
 import json
 import urllib
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
-from geopy.exc import GeocoderParseError
-
 try:
     import requests
     import requests_oauthlib
     requests_missing = False
 except ImportError:
     requests_missing = True
+
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.exc import GeocoderParseError
+from geopy.location import Location
+
 
 
 class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
@@ -103,11 +105,15 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         try:
             placefinder = json.loads(response.content)['bossresponse']['placefinder']
-            if not len(placefinder):
+            if not len(placefinder) or not len(placefinder.get('results', [])):
                 return None
             results = [
-                (place, (float(place['latitude']), float(place['longitude'])))
-                for place in placefinder.get('results', [])
+                Location(
+                    place['name'],
+                    (float(place['latitude']), float(place['longitude'])),
+                    place
+                )
+                for place in placefinder['results']
             ]
         except (KeyError, ValueError):
             raise GeocoderParseError('Error parsing PlaceFinder result')

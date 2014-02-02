@@ -5,9 +5,13 @@
 from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
-from geopy.util import logger
-from geopy.exc import GeocoderInsufficientPrivileges, GeocoderServiceError, \
+from geopy.location import Location
+from geopy.exc import (
+    GeocoderInsufficientPrivileges,
+    GeocoderServiceError,
     ConfigurationError
+)
+from geopy.util import logger
 
 
 class GeoNames(Geocoder): # pylint: disable=W0223
@@ -111,7 +115,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
                 [x for x in [placename, state, country] if x]
             )
 
-            return (location, (latitude, longitude))
+            return Location(location, (latitude, longitude), place)
 
         if exactly_one:
             return parse_code(places[0])

@@ -5,6 +5,7 @@
 from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
     DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.location import Location
 from geopy.util import logger, join_filter
 
 
@@ -145,7 +146,7 @@ class Bing(Geocoder):
                 latitude = float(latitude)
                 longitude = float(longitude)
 
-            return (location, (latitude, longitude))
+            return Location(location, (latitude, longitude), resource)
 
         if exactly_one:
             return parse_resource(resources[0])

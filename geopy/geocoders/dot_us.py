@@ -7,8 +7,9 @@ from base64 import encodestring
 from geopy.compat import urlencode, py3k, Request
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
     DEFAULT_TIMEOUT
-from geopy.util import logger, join_filter
+from geopy.location import Location
 from geopy.exc import ConfigurationError
+from geopy.util import logger, join_filter
 
 
 class GeocoderDotUS(Geocoder): # pylint: disable=W0223
@@ -142,4 +143,4 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
             latlon = float(latitude), float(longitude)
         else:
             return None
-        return name, latlon
+        return Location(name, latlon, place)
