@@ -1,34 +1,128 @@
 """
-TODO docs.
+:class:`.Location` returns geocoder results.
 """
 
 from geopy.point import Point
+from geopy.compat import string_compare
 
-class Location(object): # pylint: disable=R0903
-    def __init__(self, name="", point=None, attributes=None, **kwargs):
-        self.name = name
-        if point is not None:
-            self.point = Point(point)
-        if attributes is None:
-            attributes = {}
-        self.attributes = dict(attributes, **kwargs)
+
+class Location(object): # pylint: disable=R0903,R0921
+    """
+    Contains a parsed geocoder response. Can be iterated over as
+    (location<String>, (latitude<float>, longitude<Float)). Or one can access
+    the properties `address`, `latitude`, `longitude`, or `raw`. The last
+    is a dictionary of the geocoder's response for this item.
+
+    .. versionadded:: 0.98
+    """
+
+    __slots__ = ("_address", "_point", "_tuple", "_raw")
+
+    def __init__(self, address="", point=None, raw=None):
+        self._address = address
+        if point is None:
+            self._point = (None, None, None)
+        elif isinstance(point, Point):
+            self._point = point
+        elif isinstance(point, string_compare):
+            self._point = Point(point)
+        elif isinstance(point, (tuple, list)):
+            self._point = Point(point)
+        else:
+            raise TypeError(
+                "point an unsupported type: %r; use %r or Point",
+                type(point), type(string_compare)
+            )
+        self._tuple = (self._address, (self._point[0], self._point[1]))
+        self._raw = raw
+
+    @property
+    def address(self):
+        """
+        Location as a formatted string returned by the geocoder or constructed
+        by geopy, depending on the service.
+
+        :rtype: unicode
+        """
+        return self._address
+
+    @property
+    def latitude(self):
+        """
+        Location's latitude.
+
+        :rtype: float or None
+        """
+        return self._point[0]
+
+    @property
+    def longitude(self):
+        """
+        Location's longitude.
+
+        :rtype: float or None
+        """
+        return self._point[1]
+
+    @property
+    def altitude(self):
+        """
+        Location's altitude.
+
+        :rtype: float or None
+        """
+        return self._point[2]
+
+    @property
+    def point(self):
+        """
+        :class:`geopy.point.Point` instance representing the location's
+        latitude, longitude, and altitude.
+
+        :rtype: :class:`geopy.point.Point` or None
+        """
+        return self._point if self._point != (None, None, None) else None
+
+    @property
+    def raw(self):
+        """
+        Location's raw, unparsed geocoder response. For details on this,
+        consult the service's documentation.
+
+        :rtype: dict or None
+        """
+        return self._raw
 
     def __getitem__(self, index):
-        """Backwards compatibility with geopy 0.93 tuples."""
-        return (self.name, self.point)[index]
+        """
+        Backwards compatibility with geopy<0.98 tuples.
+        """
+        return self._tuple[index]
+
+    def __str__(self):
+        return self._address
+
+    __unicode__ = __str__
 
     def __repr__(self): # pragma: no cover
-        return "Location(%r, %r)" % (self.name, self.point)
+        return "".join((
+            "Location(", self._address, " ", str(self._point), ")"
+        ))
 
     def __iter__(self):
-        return iter((self.name, self.point))
+        return iter(self._tuple)
 
     def __eq__(self, other):
-        return (self.name, self.point) == (other.name, other.point)
+        return (
+            isinstance(other, Location) and
+            self._address == other._address and
+            self._point == other._point and
+            self.raw == other.raw
+        )
 
     def __ne__(self, other):
-        return (self.name, self.point) != (other.name, other.point)
+        return not self.__eq__(other)
 
     def __len__(self): # pragma: no cover
-        raise NotImplementedError()
+        return len(self._tuple)
 

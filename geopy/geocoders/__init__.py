@@ -32,14 +32,19 @@ and ``reverse`` methods  may return three types of values:
 - When there are no results found, returns ``None``.
 
 - When the method's ``exactly_one`` argument is ``True`` and at least one
-  result is found, returns a tuple of:
+  result is found, returns a :class:`geopy.location.Location` object, which
+  can be iterated over as:
 
     (address<String>, (latitude<Float>, longitude<Float>))
 
-- When ``exactly_one`` is False, and there is at least one result, returns a
-  list of tuples:
+  Or can be accessed as `Location.address`, `Location.latitude`,
+  `Location.longitude`, `Location.altitude`, and `Location.raw`. The
+  last contains the geocoder's unparsed response for this result.
 
-    [(address<String>, (latitude<Float>, longitude<Float>)), [...]]
+- When ``exactly_one`` is False, and there is at least one result, returns a
+  list of :class:`geopy.location.Location` objects, as above:
+
+    [Location, [...]]
 
 If a service is unavailable or otherwise returns a non-OK response, or doesn't
 receive a response in the allotted timeout, you will receive one of the

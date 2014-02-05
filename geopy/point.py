@@ -9,7 +9,7 @@ from geopy import util, units, format # pylint: disable=W0622
 from geopy.compat import string_compare
 
 
-class Point(object): # pylint: disable=R0924
+class Point(object):
     """
     A geodetic point with latitude, longitude, and altitude.
 
@@ -56,7 +56,8 @@ class Point(object): # pylint: disable=R0924
         >>> p.altitude == p[2]
         True
 
-    When unpacking (or iterating), a (latitude, longitude, altitude) tuple is returned::
+    When unpacking (or iterating), a (latitude, longitude, altitude) tuple is
+    returned::
 
         >>> latitude, longitude, altitude = p
 
@@ -149,13 +150,13 @@ class Point(object): # pylint: disable=R0924
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         latitude = "%s %s" % (
-            format.format_degrees(abs(self.latitude), symbols = {
+            format.format_degrees(abs(self.latitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
             }),
             self.latitude >= 0 and 'N' or 'S'
         )
         longitude = "%s %s" % (
-            format.format_degrees(abs(self.longitude), symbols = {
+            format.format_degrees(abs(self.longitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
             }),
             self.longitude >= 0 and 'E' or 'W'

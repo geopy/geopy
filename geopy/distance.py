@@ -96,7 +96,7 @@ ELLIPSOIDS = {
 
 class Distance(object):
     """
-    Base for :calss:`.great_circle` and :class:`.vincenty`.
+    Base for :class:`.great_circle` and :class:`.vincenty`.
     """
 
     def __init__(self, *args, **kwargs):

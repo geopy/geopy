@@ -11,7 +11,7 @@ TESTS_REQUIRES = [
     'tox'
 ]
 
-version = "0.97.1" # pylint: disable=C0103
+version = "0.98dev" # pylint: disable=C0103
 
 setup(
     name='geopy',
@@ -20,7 +20,7 @@ setup(
     author='GeoPy Contributors',
     author_email='uijllji@gmail',
     url='https://github.com/geopy/geopy',
-    download_url = (
+    download_url=(
         'https://github.com/geopy/geopy/archive/%s.tar.gz' % version
     ),
     packages=find_packages(),

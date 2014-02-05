@@ -57,6 +57,9 @@ Calculating Distance
 Data
 ~~~~
 
+.. autoclass:: geopy.location.Location
+    :members: __init__, address, latitude, longitude, altitude, raw
+
 .. autoclass:: geopy.point.Point
     :members: __new__, from_string, from_sequence, from_point
 

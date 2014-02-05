@@ -106,7 +106,7 @@ class Nominatim(Geocoder):
         return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
 
     def _parse_json(self, places, exactly_one):
-        if not isinstance (places, list):
+        if not isinstance(places, list):
             places = [places]
         if not len(places):
             return None
