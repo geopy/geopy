@@ -1,5 +1,5 @@
-0.98dev
-=======
+0.98 - February 5, 2014
+=======================
 
 CHANGED: Geocoders' `geocode` and `reverse` method return types have changed
          from None, a tuple, or a list of tuples, to None, a `geopy.Location`
