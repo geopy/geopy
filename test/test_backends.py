@@ -253,10 +253,12 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def test_reverse(self):
         known_addr = '1060-1078 Avenue of the Americas, New York, NY 10018, USA'
         known_coords = (40.75376406311989, -73.98489005863667)
-        addr, coords = self.geocoder.reverse(
+        result = self.geocoder.reverse(
             "40.75376406311989, -73.98489005863667",
             exactly_one=True
         )
+        addr, coords = result
+        self.assertTrue(result.raw is not None)
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
@@ -284,7 +286,9 @@ class BingTestCase(_BackendTestCase):
     def test_reverse(self):
         known_addr = '1067 6th Ave, New York, NY 10018, United States'
         known_coords = (40.75376406311989, -73.98489005863667)
-        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071))
+        result = self.geocoder.reverse(Point(40.753898, -73.985071))
+        addr, coords = result
+        self.assertTrue(result.raw is not None)
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
@@ -328,7 +332,9 @@ class ArcGISTestCase(_BackendTestCase):
         """
         known_addr = '1065 6th Ave, New York, New York 10018, USA'
         known_coords = (40.75376406311989, -73.98489005863667)
-        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071))
+        result = self.geocoder.reverse(Point(40.753898, -73.985071))
+        addr, coords = result
+        self.assertTrue(result.raw is not None)
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
@@ -454,10 +460,12 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         known_addr = "Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond "\
             "District, Hell's Kitchen, NYC, New York, 10020, United States of America"
         known_coords = (40.75376406311989, -73.98489005863667)
-        addr, coords = self.geocoder.reverse(
+        result = self.geocoder.reverse(
             "40.75376406311989, -73.98489005863667",
             exactly_one=True
         )
+        self.assertTrue(result.raw is not None)
+        addr, coords = result
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)

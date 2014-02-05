@@ -191,7 +191,9 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         address = "%(Address)s, %(City)s, %(Region)s %(Postal)s, %(CountryCode)s" % \
             response['address']
         return Location(
-            address, (response['location']['y'], response['location']['x'])
+            address,
+            (response['location']['y'], response['location']['x']),
+            response['address']
         )
 
     def _refresh_authentication_token(self):
