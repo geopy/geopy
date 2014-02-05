@@ -77,7 +77,8 @@ class PointTestCase(unittest.TestCase): # pylint: disable=R0904
         Point.__ne__
         """
         self.assertTrue(
-            Point(self.lat, self.lon, self.alt) != Point(self.lat+10, self.lon-10, self.alt)
+            Point(self.lat, self.lon, self.alt) !=
+            Point(self.lat+10, self.lon-10, self.alt)
         )
 
 

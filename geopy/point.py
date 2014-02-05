@@ -9,6 +9,35 @@ from geopy import util, units, format # pylint: disable=W0622
 from geopy.compat import string_compare
 
 
+POINT_PATTERN = re.compile(r"""
+    .*?
+    (?P<latitude>
+      (?P<latitude_direction_front>[NS])?[ ]*
+        (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+        (?:(?P<latitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
+        (?:(?P<latitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
+        )?(?P<latitude_direction_back>[NS])?)
+    %(SEP)s
+    (?P<longitude>
+      (?P<longitude_direction_front>[EW])?[ ]*
+      (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+      (?:(?P<longitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
+      (?:(?P<longitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
+      )?(?P<longitude_direction_back>[EW])?)(?:
+    %(SEP)s
+      (?P<altitude>
+        (?P<altitude_distance>-?%(FLOAT)s)[ ]*
+        (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
+    .*?$
+""" % {
+    "FLOAT": r'\d+(?:\.\d+)?',
+    "DEGREE": format.DEGREE,
+    "PRIME": format.PRIME,
+    "DOUBLE_PRIME": format.DOUBLE_PRIME,
+    "SEP": r'\s*[,;/\s]\s*',
+}, re.X)
+
+
 class Point(object):
     """
     A geodetic point with latitude, longitude, and altitude.
@@ -62,34 +91,10 @@ class Point(object):
         >>> latitude, longitude, altitude = p
 
     """
-    UTIL_PATTERNS = dict(
-        FLOAT=r'\d+(?:\.\d+)?',
-        DEGREE=format.DEGREE,
-        PRIME=format.PRIME,
-        DOUBLE_PRIME=format.DOUBLE_PRIME,
-        SEP=r'\s*[,;/\s]\s*'
-    )
-    POINT_PATTERN = re.compile(r"""
-        .*?
-        (?P<latitude>
-          (?P<latitude_direction_front>[NS])?[ ]*
-            (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
-            (?:(?P<latitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
-            (?:(?P<latitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
-            )?(?P<latitude_direction_back>[NS])?)
-        %(SEP)s
-        (?P<longitude>
-          (?P<longitude_direction_front>[EW])?[ ]*
-          (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
-          (?:(?P<longitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
-          (?:(?P<longitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
-          )?(?P<longitude_direction_back>[EW])?)(?:
-        %(SEP)s
-          (?P<altitude>
-            (?P<altitude_distance>-?%(FLOAT)s)[ ]*
-            (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
-        .*?$
-    """ % UTIL_PATTERNS, re.X)
+
+    __slots__ = ("latitude", "longitude", "altitude", "_items")
+
+    POINT_PATTERN = POINT_PATTERN
 
     def __new__(cls, latitude=None, longitude=None, altitude=None):
         """
@@ -130,23 +135,20 @@ class Point(object):
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
+        self._items = [self.latitude, self.longitude, self.altitude]
         return self
 
     def __getitem__(self, index):
-        return (self.latitude, self.longitude, self.altitude)[index]
+        return self._items[index]
 
     def __setitem__(self, index, value):
-        point = [self.latitude, self.longitude, self.altitude]
-        point[index] = value
-        self.latitude, self.longitude, self.altitude = point
+        self._items[index] = value
 
     def __iter__(self):
         return iter((self.latitude, self.longitude, self.altitude))
 
     def __repr__(self):
-        return "Point(%r, %r, %r)" % (
-            self.latitude, self.longitude, self.altitude
-        )
+        return "Point(%r, %r, %r)" % (self._items)
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         latitude = "%s %s" % (
@@ -173,13 +175,11 @@ class Point(object):
         return ", ".join(coordinates)
 
     def format_decimal(self, altitude=None):
-        latitude = "%s" % self.latitude
-        longitude = "%s" % self.longitude
-        coordinates = [latitude, longitude]
+        coordinates = [str(self.latitude), str(self.longitude)]
 
         if altitude is None:
             altitude = bool(self.altitude)
-        if altitude:
+        if altitude is True:
             if not isinstance(altitude, string_compare):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
