@@ -75,7 +75,9 @@ class Nominatim(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout), exactly_one
+        )
 
     def reverse(self, query, exactly_one=True, timeout=None):
         """
@@ -96,7 +98,10 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.97
         """
-        lat, lon = [x.strip() for x in self._coerce_point_to_string(query).split(',')] # doh
+        lat, lon = [
+            x.strip() for x in
+            self._coerce_point_to_string(query).split(',')
+        ] # doh
         params = {
             'lat': lat,
             'lon' : lon,
@@ -104,29 +109,31 @@ class Nominatim(Geocoder):
         }
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout), exactly_one
+        )
+
+    @staticmethod
+    def parse_code(place):
+        """
+        Parse each resource.
+        """
+        latitude = place.get('lat', None)
+        longitude = place.get('lon', None)
+        placename = place.get('display_name', None)
+        if latitude and longitude:
+            latitude = float(latitude)
+            longitude = float(longitude)
+        return Location(placename, (latitude, longitude), place)
 
     def _parse_json(self, places, exactly_one):
+        if places is None:
+            return None
         if not isinstance(places, list):
             places = [places]
         if not len(places):
             return None
-
-        def parse_code(place):
-            """
-            Parse each resource.
-            """
-            latitude = place.get('lat', None)
-            longitude = place.get('lon', None)
-            placename = place.get('display_name', None)
-            if latitude and longitude:
-                latitude = float(latitude)
-                longitude = float(longitude)
-            else:
-                return None
-            return Location(placename, (latitude, longitude), place)
-
-        if exactly_one:
-            return parse_code(places[0])
+        if exactly_one is True:
+            return self.parse_code(places[0])
         else:
-            return [parse_code(place) for place in places]
+            return [self.parse_code(place) for place in places]

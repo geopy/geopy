@@ -153,7 +153,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 
     geocoder = None
     delta_exact = 0.002
-    delta_placename = 0.02
+    delta_inexact = 0.02
 
     def skip_known_failure(self, classes):
         """
@@ -195,7 +195,9 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -87.624, delta=self.delta_exact)
 
     def test_intersection(self):
-        self.skip_known_failure(('OpenMapQuest', 'GeoNames', 'LiveAddress', 'Nominatim'))
+        self.skip_known_failure(
+            ('OpenMapQuest', 'GeoNames', 'LiveAddress', 'Nominatim')
+        )
 
         address = 'e. 161st st and river ave, new york, ny'
         try:
@@ -224,8 +226,8 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
 
         clean_address, latlon = result # pylint: disable=W0612
         self.assertTrue(result.raw is not None)
-        self.assertAlmostEqual(latlon[0], 46.1912, delta=self.delta_placename)
-        self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_placename)
+        self.assertAlmostEqual(latlon[0], 46.1912, delta=self.delta_inexact)
+        self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_inexact)
 
 
 class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
@@ -242,7 +244,7 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertIsNone(result)
 
         known_coords = (28.4636296, -16.2518467)
-        addr, coords = self.geocoder.geocode(known_addr, components={
+        _, coords = self.geocoder.geocode(known_addr, components={
             'country': 'ES',
         })
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
@@ -339,8 +341,8 @@ class ArcGISTestCase(_BackendTestCase):
         known_coords = (4976084.454557315, -8235967.638346817)
         addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071), wkid=102100)
         self.assertEqual(str_coerce(addr), known_addr)
-        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
-        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_inexact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_inexact)
 
 
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
@@ -407,7 +409,7 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
         self.geocoder = OpenMapQuest(scheme='http', timeout=3)
         self.delta_exact = 0.04
-        self.delta_placename = 0.04
+        self.delta_inexact = 0.04
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
@@ -417,7 +419,7 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 class MapQuestTestCase(_BackendTestCase):
     def setUp(self):
         self.geocoder = MapQuest(env['MAPQUEST_KEY'], scheme='http', timeout=3)
-        self.delta_placename = 0.04
+        self.delta_inexact = 0.04
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
@@ -427,7 +429,7 @@ class MapQuestTestCase(_BackendTestCase):
 class GeoNamesTestCase(_BackendTestCase):
     def setUp(self):
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
-        self.delta_placename = 0.04
+        self.delta_inexact = 0.04
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
@@ -440,7 +442,7 @@ class LiveAddressTestCase(_BackendTestCase):
             auth_token=env['LIVESTREETS_AUTH_KEY'],
             scheme='http'
         )
-        self.delta_placename = 0.04
+        self.delta_inexact = 0.04
 
 
 class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111

@@ -1,21 +1,18 @@
 0.98dev
 =======
 
-CHANGED: Geocoders' `geocode` and `reverse` method return values have changed
+CHANGED: Geocoders' `geocode` and `reverse` method return types have changed
          from None, a tuple, or a list of tuples, to None, a `geopy.Location`
          object, or a list of `geopy.Location` objects.
 
-        `geopy.Location` objects can be iterated over the same as
+        `Location` objects can be iterated over the same as
         the previous tuples for backwards compatibility, returning
         (address<String>, (latitude<float>, longitude<Float)).
+
         `geopy.Location` objects also make returned data available as
         properties. Existing attributes are `address`, `longitude`, and
         `latitude`. Now available are the geocoder's raw response as `raw`,
         and the location's altitude as `altitude`.
-
-        This is only a breaking change if consumers check the type
-        of the returned data other than not `None`, as, again, the
-        `geopy.Location` object can be iterated over for the same values.
 
 
 0.97.1 - February 1, 2014

@@ -20,6 +20,20 @@ DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
 DEFAULT_WKID = 4326
 
+ERROR_CODE_MAP = {
+    400: GeocoderQueryError,
+    401: GeocoderAuthenticationFailure,
+    402: GeocoderQuotaExceeded,
+    403: GeocoderInsufficientPrivileges,
+    407: GeocoderAuthenticationFailure,
+    412: GeocoderQueryError,
+    413: GeocoderQueryError,
+    414: GeocoderQueryError,
+    502: GeocoderServiceError,
+    503: GeocoderTimedOut,
+    504: GeocoderTimedOut
+}
+
 
 class Geocoder(object): # pylint: disable=R0921
     """
@@ -35,7 +49,9 @@ class Geocoder(object): # pylint: disable=R0921
         self.format_string = format_string
         self.scheme = scheme
         if self.scheme not in ('http', 'https'): # pragma: no cover
-            raise ConfigurationError('Supported schemes are `http` and `https`.')
+            raise ConfigurationError(
+                'Supported schemes are `http` and `https`.'
+            )
         self.proxies = proxies
         self.timeout = timeout
 
@@ -75,27 +91,20 @@ class Geocoder(object): # pylint: disable=R0921
         try:
             page = self.urlopen(url, timeout=timeout or self.timeout)
         except Exception as error: # pylint: disable=W0703
-            message = str(error) if not py3k else \
-                        (str(error.args[0] if len(error.args) else str(error)))
+            message = (
+                str(error) if not py3k
+                else (
+                    str(error.args[0])
+                    if len(error.args)
+                    else str(error)
+                )
+            )
             if hasattr(self, '_geocoder_exception_handler'):
                 self._geocoder_exception_handler(error, message) # pylint: disable=E1101
             if isinstance(error, HTTPError):
                 code = error.getcode()
-                error_code_map = {
-                    400: GeocoderQueryError,
-                    401: GeocoderAuthenticationFailure,
-                    402: GeocoderQuotaExceeded,
-                    403: GeocoderInsufficientPrivileges,
-                    407: GeocoderAuthenticationFailure,
-                    412: GeocoderQueryError,
-                    413: GeocoderQueryError,
-                    414: GeocoderQueryError,
-                    502: GeocoderServiceError,
-                    503: GeocoderTimedOut,
-                    504: GeocoderTimedOut
-                }
                 try:
-                    raise error_code_map[code](message)
+                    raise ERROR_CODE_MAP[code](message)
                 except KeyError:
                     raise GeocoderServiceError(message)
             elif isinstance(error, URLError):
