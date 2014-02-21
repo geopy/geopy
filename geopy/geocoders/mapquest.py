@@ -72,7 +72,7 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             .. versionadded:: 0.97
         """
         params = {
-            'location' : query
+            'location' : self.format_string % query
         }
         if exactly_one:
             params['maxResults'] = 1
