@@ -113,7 +113,7 @@ class Geocoder(object): # pylint: disable=R0921
             elif isinstance(error, SocketTimeout):
                 raise GeocoderTimedOut('Service timed out')
             elif isinstance(error, SSLError):
-                if "timed out in message":
+                if "timed out" in message:
                     raise GeocoderTimedOut('Service timed out')
             if not py3k:
                 err = GeocoderServiceError(message)
