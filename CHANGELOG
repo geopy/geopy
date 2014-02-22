@@ -1,3 +1,13 @@
+0.98.1 - February 22, 2014
+==========================
+
+FIXED:  Mapquest geocoder did not use format_string in the creation
+        of its queries. Contributed by Danny Finkelstein.
+
+FIXED:  Geocoders' incorrectly raised a GeocoderTimedOut exception for all
+        `SSLError` exceptions. Contributed by David Gilman.
+
+
 0.98 - February 5, 2014
 =======================
 
