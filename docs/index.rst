@@ -66,16 +66,23 @@ Data
 Exceptions
 ~~~~~~~~~~
 
+.. autoclass:: geopy.exc.GeopyError
+
 .. autoclass:: geopy.exc.ConfigurationError
 
+.. autoclass:: geopy.exc.GeocoderServiceError
+
 .. autoclass:: geopy.exc.GeocoderQueryError
+
+.. autoclass:: geopy.exc.GeocoderQuotaExceeded
 
 .. autoclass:: geopy.exc.GeocoderAuthenticationFailure
 
 .. autoclass:: geopy.exc.GeocoderInsufficientPrivileges
 
-.. autoclass:: geopy.exc.GeocoderServiceError
+.. autoclass:: geopy.exc.GeocoderTimedOut
 
+.. autoclass:: geopy.exc.GeocoderParseError
 
 Logging
 ~~~~~~~

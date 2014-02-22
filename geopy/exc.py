@@ -4,7 +4,7 @@ Exceptions raised by geopy.
 
 class GeopyError(Exception):
     """
-    Catch-all geopy exception.
+    Geopy-specific exceptions are all inherited from GeopyError.
     """
 
 class ConfigurationError(GeopyError):
@@ -20,8 +20,18 @@ class GeocoderServiceError(GeopyError):
     geocoders' `geocode` or `reverse` methods, this is the most general
     exception that can be raised, and any non-geopy exception will be caught
     and turned into this. The exception's message will be that of the
-    original exception, and the original exception may be available as
-    `__traceback__`.
+    original exception.
+    """
+
+class GeocoderQueryError(GeocoderServiceError):
+    """
+    The remote geocoding service raised a bad request over the user's input.
+    """
+
+class GeocoderQuotaExceeded(GeocoderServiceError):
+    """
+    The remote geocoding service refused to fulfill the request
+    because the client has used its quota.
     """
 
 class GeocoderAuthenticationFailure(GeocoderServiceError):
@@ -34,17 +44,6 @@ class GeocoderInsufficientPrivileges(GeocoderServiceError):
     """
     The remote geocoding service refused to fulfill a request using the
     account credentials given.
-    """
-
-class GeocoderQueryError(GeocoderServiceError):
-    """
-    The remote geocoding service raised a bad request over the user's input.
-    """
-
-class GeocoderQuotaExceeded(GeocoderServiceError):
-    """
-    The remote geocoding service refused to fulfill the request
-    because the client has used its quota.
     """
 
 class GeocoderTimedOut(GeocoderServiceError):
