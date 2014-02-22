@@ -4,7 +4,7 @@
 FIXED:  Mapquest geocoder did not use format_string in the creation
         of its queries. Contributed by Danny Finkelstein.
 
-FIXED:  Geocoders' incorrectly raised a GeocoderTimedOut exception for all
+FIXED:  Geocoders incorrectly raised a GeocoderTimedOut exception for all
         `SSLError` exceptions. Contributed by David Gilman.
 
 
