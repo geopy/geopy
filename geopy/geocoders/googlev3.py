@@ -24,13 +24,19 @@ class GoogleV3(Geocoder):
         https://developers.google.com/maps/documentation/geocoding/
     """
 
-    def __init__(self, domain='maps.googleapis.com', scheme=DEFAULT_SCHEME, # pylint: disable=R0913
+    def __init__(self, api_key=None, domain='maps.googleapis.com', scheme=DEFAULT_SCHEME, # pylint: disable=R0913
                  client_id=None, secret_key=None, timeout=DEFAULT_TIMEOUT,
                  proxies=None, protocol=None):
         """
         Initialize a customized Google geocoder.
 
         API authentication is only required for Google Maps Premier customers.
+
+        :param string api_key: The API key required by Google to perform 
+            Geocoding requests. API keys are managed through the Google APIs 
+            console ('https://code.google.com/apis/console').
+
+            .. versionadded:: 0.98
 
         :param string domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.google.com', but if you're
@@ -64,15 +70,18 @@ class GoogleV3(Geocoder):
         super(GoogleV3, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies
         )
+        if not api_key:
+            warn('You should provide a valid API key to enable per-key instead of per-IP-address quota limits.')
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')
         if secret_key and not client_id:
             raise ConfigurationError('Must provide client_id with secret_key.')
 
+        self.api_key = api_key
         self.domain = domain.strip('/')
         self.scheme = scheme
         self.doc = {}
-
+        
         if client_id and secret_key:
             self.premier = True
             self.client_id = client_id
@@ -151,6 +160,8 @@ class GoogleV3(Geocoder):
             'address': self.format_string % query,
             'sensor': str(sensor).lower()
         }
+        if self.api_key:
+            params['key'] = self.api_key
         if bounds:
             params['bounds'] = bounds
         if region:
