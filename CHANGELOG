@@ -1,7 +1,7 @@
 0.98.2 - February 28, 2014
 ==========================
 
-ADDED:  GoogleV3 now accepts a positional `api_key` parameter. Contributed
+ADDED:  GoogleV3 now accepts an `api_key` parameter. Contributed
         by Andrea Tosatto.
 
 CHANGED: GoogleV3's deprecated `protocol` argument has been removed.
