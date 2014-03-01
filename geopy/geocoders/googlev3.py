@@ -31,8 +31,8 @@ class GoogleV3(Geocoder):
         API authentication is only required for Google Maps Premier customers.
 
         :param string api_key: The API key required by Google to perform
-            Geocoding requests. API keys are managed through the Google APIs
-            console ('https://code.google.com/apis/console').
+            geocoding requests. API keys are managed through the Google APIs
+            console (https://code.google.com/apis/console).
 
             .. versionadded:: 0.98.2
 
@@ -46,9 +46,6 @@ class GoogleV3(Geocoder):
             verified.
 
             .. versionadded:: 0.97
-
-        :param string protocol: Deprecated version of `scheme` argument.
-            Override scheme, if present.
 
         :param string client_id: If using premier, the account client id.
 
