@@ -11,3 +11,4 @@ docs/_build
 .tox
 *.config
 .DS_Store
+.idea/
