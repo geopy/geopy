@@ -229,6 +229,22 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[0], 46.1912, delta=self.delta_inexact)
         self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_inexact)
 
+    def test_unicode_name(self):
+        # The Forbidden City in Beijing
+        address = u'\u6545\u5bab'
+
+        try:
+            result = self.geocoder.geocode(address, exactly_one=True)
+        except exc.GeocoderQuotaExceeded:
+            raise unittest.SkipTest("Quota exceeded")
+        if result is None:
+            self.fail('No result found')
+        clean_address, latlon = result # pylint: disable=W0612
+
+        self.assertTrue(result.raw is not None)
+        self.assertAlmostEqual(latlon[0], 39.916, delta=self.delta_inexact)
+        self.assertAlmostEqual(latlon[1], 116.390, delta=self.delta_inexact)
+
 
 class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
