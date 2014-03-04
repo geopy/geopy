@@ -65,7 +65,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         if reverse is True:
             params['gflags'] = 'R'
         if exactly_one is True:
-            params['count'] = 1
+            params['count'] = '1'
 
         auth = requests_oauthlib.OAuth1(
             self.consumer_key, self.consumer_secret)
