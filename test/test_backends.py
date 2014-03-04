@@ -230,6 +230,7 @@ class _BackendTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertAlmostEqual(latlon[1], -122.1944, delta=self.delta_inexact)
 
     def test_unicode_name(self):
+        self.skip_known_failure(('GeoNames', 'LiveAddress', 'MapQuest'))
         # The Forbidden City in Beijing
         address = u'\u6545\u5bab'
 
