@@ -32,12 +32,12 @@ class GoogleV3(Geocoder):
 
         :param string api_key: The API key required by Google to perform
             geocoding requests. API keys are managed through the Google APIs
-            console ('https://code.google.com/apis/console').
+            console (https://code.google.com/apis/console).
 
             .. versionadded:: 0.98.2
 
         :param string domain: Should be the localized Google Maps domain to
-            connect to. The default is 'maps.googleapis.com', but if you're
+            connect to. The default is 'maps.google.com', but if you're
             geocoding address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
 
