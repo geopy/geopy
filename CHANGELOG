@@ -1,3 +1,14 @@
+0.98.3 - March 7,, 2014
+==========================
+
+ADDED:  Queries are encoded as unicode in Python 2.7 by the geocoder.
+        Contributed by Rocky Meza.
+
+FIXED:  YahooPlaceFinder `count` parameter fixed.
+
+FIXED: Point.__repr__ fixed. Contributed by Paweł Mandera.
+
+
 0.98.2 - February 28, 2014
 ==========================
 
