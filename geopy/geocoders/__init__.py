@@ -72,3 +72,4 @@ from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.osm import Nominatim
+from geopy.geocoders.mgrs import MGRS
