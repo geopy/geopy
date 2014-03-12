@@ -6,12 +6,15 @@ import os
 import unittest
 import json
 import base64
+import types
 
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.geocoders import * # pylint: disable=W0401
 from geopy import exc
 from geopy.point import Point
 from geopy.compat import py3k
+from geopy.exc import GeocoderAuthenticationFailure, GeocoderQuotaExceeded, \
+    GeocoderServiceError
 from collections import defaultdict
 
 if py3k:
@@ -33,6 +36,7 @@ except IOError:
         'LIVESTREETS_AUTH_KEY',
         'GEOCODERDOTUS_USERNAME',
         'GEOCODERDOTUS_PASSWORD',
+        'GEOCODEFARM_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 
@@ -495,3 +499,66 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
         self.geocoder = YahooPlaceFinder(env['YAHOO_KEY'], env['YAHOO_SECRET'])
+
+
+@unittest.skipUnless( # pylint: disable=R0904,C0111
+    env['GEOCODEFARM_KEY'] is not None,
+    "GEOCODEFARM_KEY env variables not set"
+)
+class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
+    def setUp(self):
+        self.delta_exact = 0.04
+        self.geocoder = GeocodeFarm(api_key=env['GEOCODEFARM_KEY'], format_string="%s US")
+
+    def test_reverse(self):
+        known_addr = '1075 6 Avenue, New York, NY 10018, USA'
+        known_coords = (40.75376406311989, -73.98489005863667)
+        try:
+            result = self.geocoder.reverse(Point(40.753898, -73.985071))
+        except exc.GeocoderQuotaExceeded:
+            raise unittest.SkipTest("Quota exceeded")
+        addr, coords = result
+        self.assertTrue(result.raw is not None)
+        self.assertEqual(str_coerce(addr), known_addr)
+        self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
+        self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+
+    def test_GeocoderAuthenticationFailure(self):
+        self.geocoder = GeocodeFarm(api_key="Failbear", format_string="%s US")
+        with self.assertRaises(GeocoderAuthenticationFailure):
+            address = '435 north michigan ave, chicago il 60611'
+            self.geocoder.geocode(address)
+
+    def test_GeocoderQuotaExceeded(self):
+        # mock API call to return bad response
+        def mock_call_geocoder(self, url, timeout=None, raw=False):
+            return {
+                "geocoding_results": {
+                    "STATUS": {
+                        "access": "OVER_QUERY_LIMIT",
+                        "status": "FAILED, ACCESS_DENIED"
+                    }
+                }
+            }
+        self.geocoder._call_geocoder = types.MethodType(mock_call_geocoder, self.geocoder)
+
+        with self.assertRaises(GeocoderQuotaExceeded):
+            address = '435 north michigan ave, chicago il 60611'
+            self.geocoder.geocode(address)
+
+    def test_unhandled_api_error(self):
+        # mock API call to return bad response
+        def mock_call_geocoder(self, url, timeout=None, raw=False):
+            return {
+                "geocoding_results": {
+                    "STATUS": {
+                        "access": "BILL_PAST_DUE",
+                        "status": "FAILED, ACCESS_DENIED"
+                    }
+                }
+            }
+        self.geocoder._call_geocoder = types.MethodType(mock_call_geocoder, self.geocoder)
+
+        with self.assertRaises(GeocoderServiceError):
+            address = '435 north michigan ave, chicago il 60611'
+            self.geocoder.geocode(address)
