@@ -42,6 +42,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.YahooPlaceFinder
     :members: __init__, geocode
 
+.. autoclass:: geopy.geocoders.GeocodeFarm
+    :members: __init__, geocode, reverse
+
 Calculating Distance
 ~~~~~~~~~~~~~~~~~~~~
 
