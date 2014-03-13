@@ -6,7 +6,7 @@ addresses, cities, countries, and landmarks across the globe using third-party
 geocoders and other data sources.
 
 geopy includes geocoder classes for the [ESRI ArcGIS][arcgis], [OpenStreetMap Nominatim][nominatim], [Google Geocoding API (V3)][google_v3],
-[Yahoo! BOSS][yahoo], [geocoder.us][geocoderus], and [Bing Maps API][bing]
+[Yahoo! BOSS][yahoo], [geocoder.us][geocoderus], [GeocodeFarm][geocodefarm], and [Bing Maps API][bing]
 geocoder services, as well as several other. The various geocoder classes are located in
 [geopy.geocoders][geocoders_src].
 
@@ -16,6 +16,7 @@ geocoder services, as well as several other. The various geocoder classes are lo
 [yahoo]: http://developer.yahoo.com/maps/rest/V1/geocode.html
 [bing]: http://www.microsoft.com/maps/developers/web.aspx
 [geocoderus]: http://geocoder.us/
+[geocodefarm]: https://www.geocodefarm.com/
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
 © GeoPy Project and individual contributors under the
