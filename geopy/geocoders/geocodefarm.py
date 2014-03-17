@@ -49,8 +49,8 @@ class GeocodeFarm(Geocoder):
 
         :param string query: The address or query you wish to geocode.
 
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
+        :param bool exactly_one: This flag has no effect in this geocoder,
+            since GeocodeFarm's API will always return only one result.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -72,8 +72,8 @@ class GeocodeFarm(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
+        :param bool exactly_one: This flag has no effect in this geocoder,
+            since GeocodeFarm's API will always return only one result.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
