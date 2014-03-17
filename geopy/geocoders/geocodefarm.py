@@ -80,10 +80,7 @@ class GeocodeFarm(Geocoder):
             exception. Set this only if you wish to override, on this call only,
             the value set during the geocoder's initialization.
         """
-        lat, lon = [
-            x.strip() for x in
-            self._coerce_point_to_string(query).split(',')
-        ]
+        lat, lon = self._coerce_point_to_string(query).split(',')
         url = self.reverse_api + urllib.quote(("%s/%s" % (lat, lon)).encode('utf8'))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
