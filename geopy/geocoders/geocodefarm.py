@@ -40,14 +40,8 @@ class GeocodeFarm(Geocoder):
         super(GeocodeFarm, self).__init__(format_string, 'http', timeout, proxies)
         self.api_key = api_key
         self.format_string = format_string
-
-    @property
-    def api(self):
-        return "%s://www.geocodefarm.com/api/forward/json/%s/" % (self.scheme, self.api_key)
-
-    @property
-    def reverse_api(self):
-        return "%s://www.geocodefarm.com/api/reverse/json/%s/" % (self.scheme, self.api_key)
+        self.api = "%s://www.geocodefarm.com/api/forward/json/%s/" % (self.scheme, self.api_key)
+        self.reverse_api = "%s://www.geocodefarm.com/api/reverse/json/%s/" % (self.scheme, self.api_key)
 
     def geocode(self, query, exactly_one=True, timeout=None):
         """

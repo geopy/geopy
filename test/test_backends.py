@@ -525,7 +525,7 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
     def test_GeocoderAuthenticationFailure(self):
-        self.geocoder.api_key = "Failbear"
+        self.geocoder = GeocodeFarm(api_key="Failbear", format_string="%s US")
         with self.assertRaises(GeocoderAuthenticationFailure):
             address = '435 north michigan ave, chicago il 60611'
             self.geocoder.geocode(address)
