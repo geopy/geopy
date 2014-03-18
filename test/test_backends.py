@@ -15,7 +15,6 @@ from geopy.point import Point
 from geopy.compat import py3k
 from geopy.exc import GeocoderAuthenticationFailure, GeocoderQuotaExceeded, \
     GeocoderServiceError
-from . import mock_data
 from collections import defaultdict
 
 if py3k:
@@ -533,7 +532,14 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def test_GeocoderQuotaExceeded(self):
         # mock API call to return bad response
         def mock_call_geocoder(self, url, timeout=None, raw=False):
-            return mock_data.geocodefarm_quote_exceeded_failure
+            return {
+                "geocoding_results": {
+                    "STATUS": {
+                        "access": "OVER_QUERY_LIMIT",
+                        "status": "FAILED, ACCESS_DENIED"
+                    }
+                }
+            }
         self.geocoder._call_geocoder = types.MethodType(mock_call_geocoder, self.geocoder)
 
         with self.assertRaises(GeocoderQuotaExceeded):
@@ -543,7 +549,14 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def test_unhandled_api_error(self):
         # mock API call to return bad response
         def mock_call_geocoder(self, url, timeout=None, raw=False):
-            return mock_data.geocodefarm_bill_past_due_failure
+            return {
+                "geocoding_results": {
+                    "STATUS": {
+                        "access": "BILL_PAST_DUE",
+                        "status": "FAILED, ACCESS_DENIED"
+                    }
+                }
+            }
         self.geocoder._call_geocoder = types.MethodType(mock_call_geocoder, self.geocoder)
 
         with self.assertRaises(GeocoderServiceError):
