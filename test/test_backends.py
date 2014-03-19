@@ -503,7 +503,7 @@ class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['GEOCODEFARM_KEY'] is not None,
-    "GEOCODEFARM_KEY env variables not set"
+    "GEOCODEFARM_KEY env variable not set"
 )
 class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):

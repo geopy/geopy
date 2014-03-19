@@ -1,7 +1,5 @@
 """
-GeocodeFarm.com geocoder, contributed by Eric Palakovich Carr.
-Register for a free account here: https://www.geocodefarm.com/dashboard/register/
-Afterwards, check documentation here: https://www.geocodefarm.com/dashboard/documentation/
+:class:`.GeocodeFarm` geocoder.
 """
 
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
@@ -10,22 +8,24 @@ from geopy.location import Location
 from geopy.util import logger
 from geopy.exc import GeocoderAuthenticationFailure, GeocoderQuotaExceeded, \
     GeocoderServiceError
-import urllib
+from geopy.compat import quote
 
 
-# TODO: Determine what to put for `.. versionadded:: X.XX` strings throughout code
 class GeocodeFarm(Geocoder):
     """
-    GeocodeFarm geocoder. Documentation at (requires login, but free accounts are available):
+    Geocoder using the GeocodeFarm API. Documentation at:
         https://www.geocodefarm.com/dashboard/documentation/
     """
 
-    def __init__(self, api_key=None, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
+    def __init__(self, api_key, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
                         timeout=DEFAULT_TIMEOUT, proxies=None):
         """
+        Create a geocoder for GeocodeFarm.
+
+            .. versionadded:: 0.99
+
         :param string api_key: The API key required by GeocodeFarm to perform
-            geocoding requests. API keys are managed the user Dashboard
-            (https://www.geocodefarm.com/dashboard/).
+            geocoding requests.
 
         :param string format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
@@ -36,12 +36,20 @@ class GeocodeFarm(Geocoder):
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+
+        Note that the GeocodeFarm geocoder does not support SSL.
         """
         super(GeocodeFarm, self).__init__(format_string, 'http', timeout, proxies)
         self.api_key = api_key
         self.format_string = format_string
-        self.api = "%s://www.geocodefarm.com/api/forward/json/%s/" % (self.scheme, self.api_key)
-        self.reverse_api = "%s://www.geocodefarm.com/api/reverse/json/%s/" % (self.scheme, self.api_key)
+        self.api = (
+            "%s://www.geocodefarm.com/api/forward/json/%s/" %
+            (self.scheme, self.api_key)
+        )
+        self.reverse_api = (
+            "%s://www.geocodefarm.com/api/reverse/json/%s/" %
+            (self.scheme, self.api_key)
+        )
 
     def geocode(self, query, exactly_one=True, timeout=None):
         """
@@ -49,15 +57,19 @@ class GeocodeFarm(Geocoder):
 
         :param string query: The address or query you wish to geocode.
 
-        :param bool exactly_one: This flag has no effect in this geocoder,
-            since GeocodeFarm's API will always return only one result.
+        :param bool exactly_one: Return one result or a list of results, if
+            available. GeocodeFarm's API will always return at most one
+            result.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call only,
             the value set during the geocoder's initialization.
         """
-        url = self.api + urllib.quote((self.format_string % query).encode('utf8'))
+        url = "".join((
+            self.api,
+            quote((self.format_string % query).encode('utf8'))
+        ))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
@@ -72,8 +84,9 @@ class GeocodeFarm(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param bool exactly_one: This flag has no effect in this geocoder,
-            since GeocodeFarm's API will always return only one result.
+        :param bool exactly_one: Return one result or a list of results, if
+            available. GeocodeFarm's API will always return at most one
+            result.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -81,7 +94,10 @@ class GeocodeFarm(Geocoder):
             the value set during the geocoder's initialization.
         """
         lat, lon = self._coerce_point_to_string(query).split(',')
-        url = self.reverse_api + urllib.quote(("%s/%s" % (lat, lon)).encode('utf8'))
+        url = "".join((
+            self.reverse_api,
+            quote(("%s/%s" % (lat, lon)).encode('utf8'))
+        ))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
@@ -118,8 +134,10 @@ class GeocodeFarm(Geocoder):
 
     @staticmethod
     def _check_for_api_errors(geocoding_results):
-        # Raise any exceptions if there were problems reported
-        # in the api response
+        """
+        Raise any exceptions if there were problems reported
+        in the api response.
+        """
         status_result = geocoding_results.get("STATUS", {})
         api_call_success = status_result.get("status", "") == "SUCCESS"
         if not api_call_success:
@@ -129,5 +147,6 @@ class GeocodeFarm(Geocoder):
                 'OVER_QUERY_LIMIT': GeocoderQuotaExceeded,
             }
             exception_cls = access_error_to_exception.get(
-                access_error, GeocoderServiceError)
+                access_error, GeocoderServiceError
+            )
             raise exception_cls(access_error)

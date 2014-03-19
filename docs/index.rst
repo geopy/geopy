@@ -21,7 +21,7 @@ Geocoders
 .. autoclass:: geopy.geocoders.Bing
     :members: __init__, geocode, reverse
 
-.. autoclass:: geopy.geocoders.GoogleV3
+.. autoclass:: geopy.geocoders.GeocodeFarm
     :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.GeocoderDotUS
@@ -29,6 +29,9 @@ Geocoders
 
 .. autoclass:: geopy.geocoders.GeoNames
     :members: __init__, geocode
+
+.. autoclass:: geopy.geocoders.GoogleV3
+    :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.MapQuest
     :members: __init__, geocode
@@ -41,9 +44,6 @@ Geocoders
 
 .. autoclass:: geopy.geocoders.YahooPlaceFinder
     :members: __init__, geocode
-
-.. autoclass:: geopy.geocoders.GeocodeFarm
-    :members: __init__, geocode, reverse
 
 Calculating Distance
 ~~~~~~~~~~~~~~~~~~~~

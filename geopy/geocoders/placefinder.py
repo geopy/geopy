@@ -4,7 +4,6 @@ support.
 """
 
 import json
-import urllib
 
 try:
     import requests
@@ -16,7 +15,7 @@ except ImportError:
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 from geopy.location import Location
-
+from geopy.compat import quote
 
 
 class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
@@ -60,7 +59,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         # we quote the location, because spaces must be encoded as "%20"
         # instead of "+". this also means we can't later call urlencode on
         # this value.
-        params = {'location': urllib.quote(query), 'flags': 'J'}
+        params = {'location': quote(query), 'flags': 'J'}
 
         if reverse is True:
             params['gflags'] = 'R'

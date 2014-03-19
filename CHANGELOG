@@ -1,4 +1,11 @@
-0.98.3 - March 7,, 2014
+master
+======
+
+ADDED:  GeocodeFarm geocoder added with support for geocoding and reverse
+        geocoding. Contributed by Eric Palakovich Carr.
+
+
+0.98.3 - March 7, 2014
 ==========================
 
 ADDED:  Queries are encoded as unicode in Python 2.7 by the geocoder.
