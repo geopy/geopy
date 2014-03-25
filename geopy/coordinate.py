@@ -154,6 +154,9 @@ class GCSCoordinate(Coordinate):
     lat = None
     lon = None
 
+    # TODO: Would be nice to have DMS parsing support someday?
+    # Problem is there are so many disparate variations.
+    # Still would like to look into this on a rainy day.
     def __init__(self, lat, lon):
         """
         Create GCSCoordinate from digital lat/lon.
