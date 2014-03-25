@@ -28,7 +28,8 @@ class Coordinate(object):
             self._NSminbound[self._NSzones[i]] = -80 + (8 * i)
 
         #  id, Ellipsoid name, Equatorial Radius, square of eccentricity
-        # first once is a placeholder only, To allow array indices to match id numbers
+        # Since we don't currently support non-WGS84 MGRS this is really only useful for UTM.
+        # TODO: Add srs support for UTM.. low priority
         self._ellipsoid = {
             'Airy': (6377563, 0.00667054),
             'Australian National': (6378160, 0.006694542),
@@ -115,7 +116,7 @@ class Coordinate(object):
         Note that it does not use a regexp to parse this, but rather uses the spaces as delimiters and the fact that the last token of the first part will always be alphabetic
         @param string: The UTM string to parse. Only supports the zone letter convention, not hemisphere e.g. 17T 630084 4833438
         @param delimiter: Optional delimiter to override default space
-        @rtype: UTMCoordinate
+        @rtype UTMCoordinate
         @raise Exception:
         """
         string = string.strip()
