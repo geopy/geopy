@@ -1,5 +1,5 @@
 from math import pi, sqrt, pow, sin, degrees, tan, cos, radians
-
+from string import split, upper
 from geopy.location import Location
 from geopy.geocoders.base import Geocoder
 
@@ -9,8 +9,33 @@ class MGRS(Geocoder):
         super(MGRS, self).__init__()
 
     def geocode(self, query, *args):
+        """
+        Geocoder that will take MGRS and return digital lat/lon
+        @param query: MGRS String
+        @param args: Not used
+        @return: Location containing original MGRS string and lat/lon
+        @rtype: Location
+        """
         mgrs = Coordinate.parse_mgrs(query)
         latlon = mgrs.as_gcs()
+        output = Location(query, (latlon.lat, latlon.lon))
+        return output
+
+
+class UTM(Geocoder):
+    def __init__(self):
+        super(UTM, self).__init__()
+
+    def geocode(self, query, *args):
+        """
+        Geocode UTM string to digital lat/lon
+        @param query: UTM string
+        @param args: Not used
+        @return: Location containing original UTM string and lat/lon
+        @rtype: Location
+        """
+        utm = Coordinate.parse_utm(query)
+        latlon = utm.as_gcs()
         output = Location(query, (latlon.lat, latlon.lon))
         return output
 
@@ -18,6 +43,10 @@ class MGRS(Geocoder):
 class Coordinate(object):
     def __init__(self):
         # Datum
+        """
+        Base Coordinate class. Not intended to used directly. Holds useful constants and the parse_mgrs static method.
+
+        """
         ellipsoid = 'WGS-84'
         self.datum = ellipsoid
 
@@ -67,6 +96,13 @@ class Coordinate(object):
 
     @staticmethod
     def parse_mgrs(string):
+        """
+        Static method that parses an MGRS string and returns an MGRSCoordinate which can then be converted to UTM or LatLon using that instance's methods.
+        The easting/northing must be balanced (equal number of digits) else it can't differentiate where one ends and other begins.
+        @param string: The MGRS string to parse
+        @rtype: MGRSCoordinate
+        @raise Exception:
+        """
         string = string.strip()
         # slice out zone, will be either 1 or 2 digits
         try:
@@ -84,6 +120,13 @@ class Coordinate(object):
         string = string[2:]
         # get digits
         coord_length = len(string)
+        if coord_length > 10 or coord_length < 2:
+            raise Exception('coordinates too short or too long, expected 2 to 10 digits, got %s' % coord_length)
+
+        # easting/northing units (decameter, km, etc.. based on precision given (coord length)
+        # figure out how far to push it up the numberline
+        numberline_delta = 5-(coord_length/2)
+        multiplier = pow(10, numberline_delta)
 
         def _isodd(num):
             return num & 0x1
@@ -93,11 +136,44 @@ class Coordinate(object):
         else:
             midpoint = coord_length / 2
             try:
-                easting = int(string[:midpoint])
-                northing = int(string[midpoint:])
+                easting = int(string[:midpoint]) * multiplier
+                northing = int(string[midpoint:]) * multiplier
             except:
                 raise Exception('Encountered problem parsing grid digits, probably found a non-numeric value')
         return MGRSCoordinate(zone, utm_letter, square, easting, northing)
+
+    @staticmethod
+    def parse_utm(string, delimiter=' '):
+        """
+        Static method that parses a UTM string and returns a UTMCoordinate which can then be converted to MGRS or LatLon using that instance's methods.
+        Input must be of the form [0-9]{1,2}[A-Za-z] [0-9]+ [0-9]+
+        That is, 1 or 2 digits for the zone, followed by UTM zone letter, space, then easting in meters, space, then northing in meters
+        Note that it does not use a regexp to parse this, but rather uses the spaces as delimiters and the fact that the last token of the first part will always be alphabetic
+        @param string: The UTM string to parse. Only supports the zone letter convention, not hemisphere e.g. 17T 630084 4833438
+        @param delimiter: Optional delimiter to override default space
+        @rtype: UTMCoordinate
+        @raise Exception:
+        """
+        string = string.strip()
+        zone_str, easting, northing = split(string, delimiter)
+        # slice out zone, will be either 1 or 2 digits, expecting something like 4N or 12S or 02S, etc..
+        try:
+            zone = int(zone_str[0] + zone_str[1])
+            utm_letter = upper(zone_str[2:])  # hemisphere should be the last bit
+        except:
+            try:
+                zone = int(zone_str[0])
+                utm_letter = upper(zone_str[1:])  # hemisphere should be the last bit
+            except:
+                raise Exception("Couldn't parse out zone, expected [0-9]{1,2}[A-Za-z], got %s" % string[0:2])
+        # int-ify easting/northing
+        try:
+            easting = int(easting)
+            northing = int(northing)
+        except:
+            raise Exception('Encountered problem parsing grid digits, probably found a non-numeric value')
+
+        return UTMCoordinate(zone=zone, utm_letter=utm_letter, easting=easting, northing=northing)
 
     def _get_utm_letter(self, lat):
         """ Returns the main letter designator for a latitude given in decimal Lat.
@@ -114,11 +190,22 @@ class GCSCoordinate(Coordinate):
     lon = None
 
     def __init__(self, lat, lon):
+        """
+        Create GCSCoordinate from digital lat/lon.
+        @param lat: Latitude in digital degrees, + for northern hemisphere, - for south
+        @param lon: Longitude in digital degrees, + for eastern hemisphere, - for west
+        """
         super(GCSCoordinate, self).__init__()
         self.lat = lat
         self.lon = lon
 
     def __repr__(self):
+        """
+        String representation of GCS as DD. Does not display DMS
+
+        @return: String representation of GCS
+        @rtype: str
+        """
         return str("Lat " + str(self.lat) + ", Lon " + str(self.lon))
 
     def as_utm(self):
@@ -181,7 +268,8 @@ class GCSCoordinate(Coordinate):
 
         utm_northing = (self.k0 * (M + N * tan(lat_radians) *
                                    (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * (A ** 4)
-                                    / 24+ (61- 58 * T+ T * T+ 600 * C- 330 * self.eccPrimeSquared) * (A ** 6) / 720)))
+                                    / 24 + (61 - 58 * T + T * T + 600 * C - 330 * self.eccPrimeSquared) * (
+                                       A ** 6) / 720)))
 
         if lat < 0:
             utm_northing += 10000000.0  # 10000000 meter offset for southern hemisphere
@@ -199,6 +287,14 @@ class UTMCoordinate(Coordinate):
     northing = None
 
     def __init__(self, zone, utm_letter, easting, northing):
+        """
+        Create a UTMCoordinate instance
+        @param zone: UTM Zone, numeric string
+        @param utm_letter: Letter for UTM zone
+        @param easting: Easting in meters
+        @param northing: Northing in meters
+        @rtype: UTMCoordinate
+        """
         super(UTMCoordinate, self).__init__()
         self.zone = zone
         self.utm_letter = utm_letter
@@ -252,10 +348,13 @@ class UTMCoordinate(Coordinate):
 
         lat = phi1Rad - (N1 * tan(phi1Rad) / R1) * (
             D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * self.eccPrimeSquared) * D * D * D * D / 24
-            + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * self.eccPrimeSquared - 3 * C1 * C1) * D * D * D * D * D * D / 720)
+            + (
+                  61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * self.eccPrimeSquared - 3 * C1 * C1) * D * D * D * D * D * D / 720)
         lat = degrees(lat)
 
-        lon = (D - (1 + 2 * T1 + C1) * D * D * D / 6 + ( 5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * self.eccPrimeSquared + 24 * T1 * T1) * D * D * D * D * D / 120) / cos(phi1Rad)
+        lon = (D - (1 + 2 * T1 + C1) * D * D * D / 6 + (
+                                                           5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * self.eccPrimeSquared + 24 * T1 * T1) * D * D * D * D * D / 120) / cos(
+            phi1Rad)
         lon = lon_origin + degrees(lon)
 
         # Remove extraneous precision
@@ -273,6 +372,14 @@ class MGRSCoordinate(Coordinate):
     northing = None
 
     def __init__(self, zone, utm_letter, square, easting, northing):
+        """
+
+        @param zone: UTM Zone
+        @param utm_letter: UTM Letter
+        @param square: 100k Square
+        @param easting: Easting in meters
+        @param northing: Northing in meters
+        """
         super(MGRSCoordinate, self).__init__()
         self.zone = zone
         self.utm_letter = utm_letter
@@ -281,14 +388,26 @@ class MGRSCoordinate(Coordinate):
         self.northing = northing
 
     def __repr__(self):
+        """
+        Output the MGRS coordinate in the typical format.
+        @return: string representation of coordinate
+        @rtype: str
+        """
         return str(self.zone) + str(self.utm_letter) + str(self.square) + str(self.easting) + str(self.northing)
 
     def as_gcs(self):
+        """
+        Convert MGRS directly to GCSCoordinate. Converts it to UTM internally, then UTM to Lat/Lon.
+        @return: A GCSCoordinate (Lat/Lon)
+        @rtype: GCSCoordinate
+        """
         utm = self.as_utm()
         return utm.as_gcs()
 
     def as_utm(self):
-        """ Conversion from MGRS component list to UTM list.
+        """
+        Convert MGRS to UTM. Used by as_gcs()
+        @return: a UTMCoordinate
         @rtype : UTMCoordinate
         """
         # Zone keys
@@ -340,6 +459,12 @@ class MGRSCoordinate(Coordinate):
         return utm
 
     def _northing_helper(self, Lat):
+        """
+        I don't really know what this does. Does anyone? Seems to be correct..
+        @param Lat:
+        @return: max northing (meters) for a given latitude.
+        @rtype: int
+        """
         Long = 0
 
         #Make sure the longitude is between -180.00 .. 179.9
@@ -400,6 +525,9 @@ class MGRSCoordinate(Coordinate):
     def _AllowedNorthingFromZone(self, zone):
         """  Returns a list of min and max UTM Northing for a given Zone.
              This is a utility function for MGRStoUTM.
+        @param zone: UTM zone
+        @return: Min/Max UTM Northing for a given UTM zone
+        @rtype: tuple
         """
         mn = self._NSminbound[zone]
         mx = mn + 8

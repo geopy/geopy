@@ -38,7 +38,6 @@ except IOError:
 
 
 class BaseLocalTestCase(unittest.TestCase):
-
     def test_init(self):
         """
         Geocoder()
@@ -64,10 +63,48 @@ class BaseLocalTestCase(unittest.TestCase):
         coords = (40.74113, -73.989656)
         geocoder = Geocoder()
         self.assertEqual(geocoder._coerce_point_to_string(coords), ok) # pylint: disable=W0212
-        self.assertEqual(geocoder._coerce_point_to_string( # pylint: disable=W0212
+        self.assertEqual(geocoder._coerce_point_to_string(# pylint: disable=W0212
             Point(*coords)),
-            ok
+                         ok
         )
+
+
+class UTMLocalTestCase(unittest.TestCase):
+    delta_exact = 0.002
+    delta_inexact = 0.02
+
+    def setUp(self):
+        self.geocoder = UTM()
+
+    def test_known_utm(self):
+        address = '17T 630084 4833438'
+        result = self.geocoder.geocode(address)
+        if result is None:
+            self.fail('No result found')
+        clean_address, latlon = result
+
+        #self.assertTrue(result[0].raw is not None)
+        self.assertAlmostEqual(latlon[0], 43.642567, delta=self.delta_exact)
+        self.assertAlmostEqual(latlon[1], -79.387139, delta=self.delta_exact)
+
+
+class MGRSLocalTestCase(unittest.TestCase):
+    delta_exact = 0.002
+    delta_inexact = 0.02
+
+    def setUp(self):
+        self.geocoder = MGRS()
+
+    def test_known_mgrs(self):
+        address = '4QFJ12345678'
+        result = self.geocoder.geocode(address)
+        if result is None:
+            self.fail('No result found')
+        clean_address, latlon = result
+
+        #self.assertTrue(result[0].raw is not None)
+        self.assertAlmostEqual(latlon[0], 21.30943, delta=self.delta_exact)
+        self.assertAlmostEqual(latlon[1], -157.91687, delta=self.delta_exact)
 
 
 class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
@@ -111,12 +148,12 @@ class GoogleV3LocalTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         # its own hash
         self.assertTrue(
             geocoder._get_signed_url({'address': '1 5th Ave New York, NY'}) in (
-            "https://maps.googleapis.com/maps/api/geocode/json?"
-            "address=1+5th+Ave+New+York%2C+NY&client=my_client_id&"
-            "signature=Z_1zMBa3Xu0W4VmQfaBR8OQMnDM=",
-            "https://maps.googleapis.com/maps/api/geocode/json?"
-            "client=my_client_id&address=1+5th+Ave+New+York%2C+NY&"
-            "signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
+                "https://maps.googleapis.com/maps/api/geocode/json?"
+                "address=1+5th+Ave+New+York%2C+NY&client=my_client_id&"
+                "signature=Z_1zMBa3Xu0W4VmQfaBR8OQMnDM=",
+                "https://maps.googleapis.com/maps/api/geocode/json?"
+                "client=my_client_id&address=1+5th+Ave+New+York%2C+NY&"
+                "signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
             )
         )
 
@@ -271,9 +308,9 @@ class GoogleV3TestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertIsNone(result)
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['BING_KEY'] is not None,
-    "No BING_KEY env variable set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env['BING_KEY'] is not None,
+                     "No BING_KEY env variable set"
 )
 class BingTestCase(_BackendTestCase):
     def setUp(self):
@@ -345,20 +382,19 @@ class ArcGISTestCase(_BackendTestCase):
         """
         known_addr = '1065 6th Ave, New York, New York 10018, USA'
         known_coords = (4976084.454557315, -8235967.638346817)
-        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071), wkid=102100)
+        addr, coords = self.geocoder.reverse(Point(40.753898, -73.985071), wkid="102100")
         self.assertEqual(str_coerce(addr), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_inexact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_inexact)
 
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
-    env.get('ARCGIS_USERNAME') is not None \
-    or env.get('ARCGIS_PASSWORD') is not None\
-    or env.get('ARCGIS_REFERER') is not None,
-    "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env.get('ARCGIS_USERNAME') is not None \
+                         or env.get('ARCGIS_PASSWORD') is not None \
+                         or env.get('ARCGIS_REFERER') is not None,
+                     "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
 )
 class ArcGISAuthenticatedTestCase(unittest.TestCase):
-
     delta_exact = 0.002
 
     def setUp(self):
@@ -377,11 +413,10 @@ class ArcGISAuthenticatedTestCase(unittest.TestCase):
         self.assertAlmostEqual(latlon[1], -117.426, delta=self.delta_exact)
 
 
-
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['GEOCODERDOTUS_USERNAME'] is not None and \
-    env['GEOCODERDOTUS_PASSWORD'] is not None,
-    "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env['GEOCODERDOTUS_USERNAME'] is not None and \
+                     env['GEOCODERDOTUS_PASSWORD'] is not None,
+                     "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
 )
 class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
@@ -400,6 +435,7 @@ class GeocoderDotUSTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         # just get the Request obj
         def _print_call_geocoder(query, timeout, raw):
             raise Exception(query)
+
         geocoder._call_geocoder = _print_call_geocoder
         exc_raised = False
         try:
@@ -418,9 +454,9 @@ class OpenMapQuestTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.delta_inexact = 0.04
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['MAPQUEST_KEY'] is not None,
-    "No MAPQUEST_KEY env variable set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env['MAPQUEST_KEY'] is not None,
+                     "No MAPQUEST_KEY env variable set"
 )
 class MapQuestTestCase(_BackendTestCase):
     def setUp(self):
@@ -428,9 +464,9 @@ class MapQuestTestCase(_BackendTestCase):
         self.delta_inexact = 0.04
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['GEONAMES_USERNAME'] is not None,
-    "No GEONAMES_USERNAME env variable set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env['GEONAMES_USERNAME'] is not None,
+                     "No GEONAMES_USERNAME env variable set"
 )
 class GeoNamesTestCase(_BackendTestCase):
     def setUp(self):
@@ -438,9 +474,9 @@ class GeoNamesTestCase(_BackendTestCase):
         self.delta_inexact = 0.04
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['LIVESTREETS_AUTH_KEY'] is not None,
-    "No LIVESTREETS_AUTH_KEY env variable set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env['LIVESTREETS_AUTH_KEY'] is not None,
+                     "No LIVESTREETS_AUTH_KEY env variable set"
 )
 class LiveAddressTestCase(_BackendTestCase):
     def setUp(self):
@@ -457,8 +493,8 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.geocoder = Nominatim()
 
     def test_reverse(self):
-        known_addr = "Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond "\
-            "District, Hell's Kitchen, NYC, New York, 10020, United States of America"
+        known_addr = "Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond " \
+                     "District, Hell's Kitchen, NYC, New York, 10020, United States of America"
         known_coords = (40.75376406311989, -73.98489005863667)
         result = self.geocoder.reverse(
             "40.75376406311989, -73.98489005863667",
@@ -471,9 +507,9 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['YAHOO_KEY'] is not None and env['YAHOO_SECRET'] is not None,
-    "YAHOO_KEY and YAHOO_SECRET env variables not set"
+@unittest.skipUnless(# pylint: disable=R0904,C0111
+                     env['YAHOO_KEY'] is not None and env['YAHOO_SECRET'] is not None,
+                     "YAHOO_KEY and YAHOO_SECRET env variables not set"
 )
 class YahooPlaceFinderTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
     def setUp(self):
