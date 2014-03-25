@@ -8,7 +8,7 @@ class Coordinate(object):
     def __init__(self):
         # Datum
         """
-        Base Coordinate class. Not intended to used directly. Holds useful constants and the parse_mgrs static method.
+        Base Coordinate class. Not intended to be used directly. Holds useful constants and the parse_mgrs/parse_utm static method.
 
         """
         ellipsoid = 'WGS-84'
