@@ -15,13 +15,17 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
     More information regarding the LiveAddress API can be found here:
         https://smartystreets.com/products/liveaddress-api
     """
-    def __init__(self, auth_token, candidates=1, scheme=DEFAULT_SCHEME, # pylint: disable=R0913
+    def __init__(self, auth_token, auth_id, candidates=1, scheme=DEFAULT_SCHEME, # pylint: disable=R0913
                         timeout=DEFAULT_TIMEOUT, proxies=None):
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
 
         :param string auth_token: Valid authentication token. Tokens can be
+            administered here:
+                https://smartystreets.com/account/keys/secret
+                
+        :param string auth_id: Valid authentication id. Ids can be
             administered here:
                 https://smartystreets.com/account/keys/secret
 
@@ -50,22 +54,56 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         """
         super(LiveAddress, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
         self.auth_token = auth_token
+        self.auth_id = auth_id
         if candidates:
             if not 1 <= candidates <= 10:
                 raise ValueError('candidates must be between 1 and 10')
         self.candidates = candidates
-        self.api = '%s://api.qualifiedaddress.com/street-address' % self.scheme
+        self.api = '%s://api.smartystreets.com/street-address' % self.scheme
 
-    def geocode(self, query, exactly_one=True):
+    def geocode(self, street, city=None, state=None, zipcode=None, lastline=None, exactly_one=True):
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param string street: street address OR SINGLE LINE FREEFORM ADDRESS
+        :param string city: city name if using component address
+        :param string state: state name or initials if using component address
+        :param string zipcode: ZIP code if using component address
+        :param string lastline: combination of city/state/zip if using component address
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        url = self._compose_url(query)
+        
+       
+        self.street = street
+        if city is None:
+            self.city = ''
+        else:
+            self.city = city
+            
+        if state is None:
+            self.state =' '
+        else:
+            self.state = state
+        
+        if zipcode is None:
+            self.zipcode = ''
+        else:
+            self.zipcode = zipcode
+
+        if lastline is None:
+            self.lastline = ''
+        else:
+            self.lastline = lastline
+            
+        if zipcode is None and ((state is not None and city is None) or (state is None and city is not None)):
+            print "Incorrect formatting, did not try to geocode"
+            return None
+
+        
+        
+        url = self._compose_url(self.street, self.city, self.state, self.zipcode, self.l
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
@@ -76,21 +114,25 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         if "no active subscriptions found" in message.lower():
             raise GeocoderQuotaExceeded(message)
 
-    def _compose_url(self, location):
-        """
-        Generate API URL.
-        """
-        query = {
-            'street': location,
-            'candidates': self.candidates
-        }
+    def _compose_url(self, street, city, state, zipcode, lastline):
+        query = (
+            ('street', street),
+            ('city', city),
+            ('state', state),
+            ('zipcode', zipcode),
+            ('lastline', lastline),
+            ('candidates', self.candidates)
+        )
+        
         # don't urlencode the api token
         return '?'.join((
             self.api,
-            "&".join(("=".join((
-                'auth-token', self.auth_token)), urlencode(query)
+            "&".join(("&".join((
+                "=".join(('auth-id', self.auth_id)),
+                "=".join(('auth-token', self.auth_token))
+                )), urlencode(query)
             ))
-    ))
+        ))
 
     def _parse_json(self, response, exactly_one=True):
         """
