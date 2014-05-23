@@ -103,7 +103,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
 
         
         
-        url = self._compose_url(self.street, self.city, self.state, self.zipcode, self.l
+        url = self._compose_url(self.street, self.city, self.state, self.zipcode, self.lastline)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
