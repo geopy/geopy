@@ -55,7 +55,36 @@ class Nominatim(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param query: The address, query or structured query to geocode
+            you wish to geocode.
+
+            Example extracted from
+            https://wiki.openstreetmap.org/wiki/Nominatim#Search :
+
+                street=<housenumber> <streetname>
+
+                city=<city>
+
+                county=<county>
+
+                state=<state>
+
+                country=<country>
+
+                postalcode=<postalcode>
+
+              **EXPERIMENTAL** Alternative query string format for structured
+              requests.
+
+              Structured requests are **faster** and require **less** server
+              resources.
+
+              **DO NOT COMBINE WITH q=<query> PARAMETER.**
+        :type query: dict or string
+
+        :param addressdetails: If you want in *Location.raw* to include
+            addressdetails such as city_district, etc set it to True
+        :type addressdetails: bool
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
