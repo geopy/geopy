@@ -44,11 +44,14 @@ class Nominatim(Geocoder):
         self.format_string = format_string
         self.view_box = view_box
         self.country_bias = country_bias
+        self.structured_query_params = set(('street', 'city', 'county', 'state',
+                                           'country', 'postalcode'))
 
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
         self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, timeout=None,
+                addressdetails=False):
         """
         Geocode a location query.
 
@@ -64,14 +67,27 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.97
         """
-        params = {
-            'q': self.format_string % query,
-            'view_box' : self.view_box,
-            'format' : 'json',
-        }
+
+        if isinstance(query, dict):
+            # Remove not allowed structured parameters
+            query_params = set(query.keys())
+            diff = query_params - self.structured_query_params
+            for element in diff:
+                query.pop(element, None)
+            params = query
+        else:
+            params = {'q': self.format_string % query}
+
+        params.update({
+            'view_box': self.view_box,
+            'format': 'json'
+        })
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
+
+        if addressdetails:
+            params['addressdetails'] = 1
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
