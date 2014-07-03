@@ -1,5 +1,5 @@
 """
-:class:`.GoogleV3` is the Google Maps V3 geocoder.
+:class:`.Baidu` is the Baidu Maps geocoder.
 """
 
 import base64
@@ -25,9 +25,9 @@ class Baidu(Geocoder):
     def __init__(self, ak=None, scheme='http', timeout=DEFAULT_TIMEOUT,
                   proxies=None):
         """
-        Initialize a customized Google geocoder.
+        Initialize a customized Baidu geocoder.
 
-        API authentication is only required for Google Maps Premier customers.
+        API authentication is only required for Baidu Maps Premier customers.
 
         :param string ak: The API key required by Baidu Map to perform
             geocoding requests. API keys are managed through the Baidu APIs
@@ -35,15 +35,13 @@ class Baidu(Geocoder):
 
 
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is http. 
+            Default is http and only http support.
 
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
-
-            .. versionadded:: 0.96
         """
         super(Baidu, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies
@@ -59,7 +57,7 @@ class Baidu(Geocoder):
     @staticmethod
     def _format_components_param(components):
         """
-        Format the components dict to something Google understands.
+        Format the components dict to something Baidu understands.
         """
         return "|".join(
             (":".join(item)
@@ -85,8 +83,6 @@ class Baidu(Geocoder):
         :param dict components: Restricts to an area. Can use any combination
             of: route, locality, administrative_area, postal_code, country.
 
-            .. versionadded:: 0.97.1
-
         :param string language: The language in which to return results.
 
         :param bool sensor: Whether the geocoding request comes from a
@@ -100,7 +96,6 @@ class Baidu(Geocoder):
             exception. Set this only if you wish to override, on this call only,
             the value set during the geocoder's initialization.
 
-            .. versionadded:: 0.97
         """
         params = {
             'address': self.format_string % query,
@@ -136,7 +131,6 @@ class Baidu(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
 
-            .. versionadded:: 0.97
         """
         params = {
             'ak': self.ak,
@@ -193,16 +187,40 @@ class Baidu(Geocoder):
             # When there are no results, just return.
             return
         if status == '1':
-            raise GeocoderQuotaExceeded(
-                'The given key has gone over the requests limit in the 24'
-                ' hour period or has submitted too many requests in too'
-                ' short a period of time.'
+            raise GeocoderQueryError(
+                'Internal server error.'
             )
-        elif status == 'REQUEST_DENIED':
+        elif status == '2':
+            raise GeocoderQueryError(
+                'Invalid request.'
+            )
+        elif status == '3':
+            raise GeocoderAuthenticationFailure(
+                'Authentication failure.'
+            )
+        elif status == '4':
+            raise GeocoderQuotaExceeded(
+                'Quota validate failure.'
+            )
+        elif status == '5':
+            raise GeocoderQueryError(
+                'AK Illegal or Not Exist.'
+            )
+        elif status == '101':
             raise GeocoderQueryError(
                 'Your request was denied.'
             )
-        elif status == 'INVALID_REQUEST':
-            raise GeocoderQueryError('Probably missing address or latlng.')
+        elif status == '102':
+            raise GeocoderQueryError(
+                'Whitelist denied.'
+            )
+        elif status == '2xx':
+            raise GeocoderQueryError(
+                'Has No Privilleges.'
+            )
+        elif status == '3xx':
+            raise GeocoderQuotaExceeded(
+                'Quota Error.'
+            )
         else:
-            raise GeocoderQueryError('Unknown error 123 %s.' % status)
+            raise GeocoderQueryError('Unknown error')
