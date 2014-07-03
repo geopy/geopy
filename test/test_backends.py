@@ -564,6 +564,11 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
             address = '435 north michigan ave, chicago il 60611'
             self.geocoder.geocode(address)
 
+@unittest.skipUnless( # pylint: disable=R0904,C0111
+    env['BAIDU_AK'] is not None,
+    "No BAIDU_AK env variable set"
+)
+
 class BaiduTestCase(unittest.TestCase):
     delta_exact = 0.002
     delta_inexact = 0.02
