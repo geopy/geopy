@@ -212,7 +212,7 @@ class Baidu(Geocoder):
             )
         elif status == '102':
             raise GeocoderQueryError(
-                'Whitelist denied.'
+                'IP/SN/SCODE/REFERER Illegal:'
             )
         elif status == '2xx':
             raise GeocoderQueryError(
