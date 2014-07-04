@@ -205,10 +205,16 @@ class Point(object):
 
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):
-        degrees = float(degrees)
+        match = re.search('^(?P<degrees>\d{2,3})(?P<arcminutes>\d\d)(?P<arcseconds>\d\d(\.\d\d){0,1})$', degrees)
+        if match:
+            degrees = float(match.group('degrees'))
+            arcminutes = float(match.group('arcminutes'))
+            arcseconds = float(match.group('arcseconds'))
+        else:
+            degrees = float(degrees)
+            arcminutes = float(arcminutes)
+            arcseconds = float(arcseconds)
         negative = degrees < 0
-        arcminutes = float(arcminutes)
-        arcseconds = float(arcseconds)
 
         if arcminutes or arcseconds:
             more = units.degrees(arcminutes=arcminutes, arcseconds=arcseconds)
