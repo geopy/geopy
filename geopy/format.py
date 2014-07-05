@@ -67,7 +67,7 @@ def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=None):
     TODO docs.
     """
     symbols = symbols or ASCII_SYMBOLS
-    arcminutes = round(units.arcminutes(degrees=degrees - int(degrees)))
+    arcminutes = units.arcminutes(degrees=degrees - int(degrees))
     arcseconds = units.arcseconds(arcminutes=arcminutes - int(arcminutes))
     format_dict = dict(
         symbols,
