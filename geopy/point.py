@@ -185,6 +185,20 @@ class Point(object):
             coordinates.append(self.format_altitude(altitude))
 
         return ", ".join(coordinates)
+    
+    def format_ddmmss(self, prefix=False):
+        FORMAT_LATITUDE = "%(degrees)02d%(minutes)02d%(seconds)05.2f"
+        FORMAT_LONGITUDE = "%(degrees)03d%(minutes)02d%(seconds)05.2f"
+        
+        latitude = format.format_degrees(abs(self.latitude), fmt=FORMAT_LATITUDE)
+        longitude = format.format_degrees(abs(self.longitude), fmt=FORMAT_LONGITUDE)
+        
+        if prefix:
+            return "%s%s %s%s" % (self.latitude >= 0 and 'N' or 'S', latitude,
+                                  self.longitude >= 0 and 'E' or 'W', longitude)
+        else:
+            return "%s%s %s%s" % (latitude, self.latitude >= 0 and 'N' or 'S',
+                                  longitude, self.longitude >= 0 and 'E' or 'W')
 
     def format_altitude(self, unit='km'):
         return format.format_distance(self.altitude, unit)
@@ -205,10 +219,16 @@ class Point(object):
 
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):
-        degrees = float(degrees)
+        match = re.search('^(?P<degrees>\d{2,3})(?P<arcminutes>\d\d)(?P<arcseconds>\d\d(\.\d\d){0,1})$', degrees)
+        if match:
+            degrees = float(match.group('degrees'))
+            arcminutes = float(match.group('arcminutes'))
+            arcseconds = float(match.group('arcseconds'))
+        else:
+            degrees = float(degrees)
+            arcminutes = float(arcminutes)
+            arcseconds = float(arcseconds)
         negative = degrees < 0
-        arcminutes = float(arcminutes)
-        arcseconds = float(arcseconds)
 
         if arcminutes or arcseconds:
             more = units.degrees(arcminutes=arcminutes, arcseconds=arcseconds)
