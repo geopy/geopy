@@ -17,6 +17,15 @@ class Nominatim(Geocoder):
     Note that Nominatim does not support SSL.
     """
 
+    structured_query_params = {
+        'street',
+        'city',
+        'county',
+        'state',
+        'country',
+        'postalcode',
+    }
+
     def __init__(self, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
                         view_box=(-180, -90, 180, 90), country_bias=None,
                         timeout=DEFAULT_TIMEOUT, proxies=None):
@@ -44,8 +53,6 @@ class Nominatim(Geocoder):
         self.format_string = format_string
         self.view_box = view_box
         self.country_bias = country_bias
-        self.structured_query_params = set(('street', 'city', 'county', 'state',
-                                           'country', 'postalcode'))
 
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
         self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
@@ -57,7 +64,17 @@ class Nominatim(Geocoder):
 
         :param query: The address, query or structured query to geocode
             you wish to geocode.
+
+            For a structured query, provide a dictionary whose keys
+            are one of: `street`, `city`, `county`, `state`, `country`, or
+            `postalcode`. For more information, see Nominatim's
+            documentation for "structured requests":
+
+                https://wiki.openstreetmap.org/wiki/Nominatim
+
         :type query: dict or string
+
+            .. versionchanged:: 1.0.0
 
         :param addressdetails: If you want in *Location.raw* to include
             addressdetails such as city_district, etc set it to True
@@ -75,12 +92,12 @@ class Nominatim(Geocoder):
         """
 
         if isinstance(query, dict):
-            # Remove not allowed structured parameters
-            query_params = set(query.keys())
-            diff = query_params - self.structured_query_params
-            for element in diff:
-                query.pop(element, None)
-            params = query
+            params = {
+                key: val 
+                for key, val 
+                in query.items() 
+                if key in self.structured_query_params
+            }
         else:
             params = {'q': self.format_string % query}
 
