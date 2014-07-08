@@ -491,6 +491,12 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
 
+    def test_city_district_with_dict_query(self):
+        geocoder = Nominatim(country_bias='DE')
+        query = {'postalcode': 10117}
+        result = geocoder.geocode(query, addressdetails=True)
+        self.assertEqual(result.raw['address']['city_district'], u'Mitte')
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['YAHOO_KEY'] is not None and env['YAHOO_SECRET'] is not None,

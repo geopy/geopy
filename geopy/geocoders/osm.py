@@ -44,15 +44,47 @@ class Nominatim(Geocoder):
         self.format_string = format_string
         self.view_box = view_box
         self.country_bias = country_bias
+        self.structured_query_params = set(('street', 'city', 'county', 'state',
+                                           'country', 'postalcode'))
 
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
         self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, timeout=None,
+                addressdetails=False):
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param query: The address, query or structured query to geocode
+            you wish to geocode.
+
+            Example extracted from
+            https://wiki.openstreetmap.org/wiki/Nominatim#Search :
+
+                street=<housenumber> <streetname>
+
+                city=<city>
+
+                county=<county>
+
+                state=<state>
+
+                country=<country>
+
+                postalcode=<postalcode>
+
+              **EXPERIMENTAL** Alternative query string format for structured
+              requests.
+
+              Structured requests are **faster** and require **less** server
+              resources.
+
+              **DO NOT COMBINE WITH q=<query> PARAMETER.**
+        :type query: dict or string
+
+        :param addressdetails: If you want in *Location.raw* to include
+            addressdetails such as city_district, etc set it to True
+        :type addressdetails: bool
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -64,14 +96,27 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.97
         """
-        params = {
-            'q': self.format_string % query,
-            'view_box' : self.view_box,
-            'format' : 'json',
-        }
+
+        if isinstance(query, dict):
+            # Remove not allowed structured parameters
+            query_params = set(query.keys())
+            diff = query_params - self.structured_query_params
+            for element in diff:
+                query.pop(element, None)
+            params = query
+        else:
+            params = {'q': self.format_string % query}
+
+        params.update({
+            'view_box': self.view_box,
+            'format': 'json'
+        })
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
+
+        if addressdetails:
+            params['addressdetails'] = 1
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
