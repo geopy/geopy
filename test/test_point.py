@@ -43,6 +43,13 @@ class PointTestCase(unittest.TestCase): # pylint: disable=R0904
         self.assertEqual(point.longitude, -74.58333333333333)
         self.assertEqual(point.altitude, 0)
 
+    def test_point_format(self):
+        """
+        Point.format()
+        """
+        point = Point("51 19m 12.9s N, 0 1m 24.95s E")
+        self.assertEqual(point.format(), "51 19m 12.9s N, 0 1m 24.95s E")
+
     def test_point_getitem(self):
         """
         Point.__getitem__
