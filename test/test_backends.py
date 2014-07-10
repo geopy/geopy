@@ -564,20 +564,18 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
             address = '435 north michigan ave, chicago il 60611'
             self.geocoder.geocode(address)
 
+
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['BAIDU_AK'] is not None,
     "No BAIDU_AK env variable set"
 )
-
 class BaiduTestCase(unittest.TestCase):
     delta_exact = 0.002
     delta_inexact = 0.02
 
     def setUp(self):
-        self.geocoder = Baidu(
-            scheme='http',
-            ak=env['BAIDU_AK']
-        )
+        self.geocoder = Baidu(ak=env['BAIDU_AK'])
+
     def skip_known_failure(self, classes):
         """
         When a Geocoder gives no value for a query, skip the test.
@@ -585,13 +583,12 @@ class BaiduTestCase(unittest.TestCase):
         if self.geocoder.__class__.__name__ in classes:
             raise unittest.SkipTest("Known no result")
 
-        
     def test_basic_address(self):
         self.skip_known_failure(('GeoNames', ))
 
         address = u'\u5317\u4eac\u5e02\u6d77\u6dc0\u533a\u4e2d\u5173\u6751\u5927\u885727\u53f7'
         try:
-            result = self.geocoder.geocode(address, exactly_one=True)
+            result = self.geocoder.geocode(address)
         except exc.GeocoderQuotaExceeded:
             raise unittest.SkipTest("Quota exceeded")
         if result is None:

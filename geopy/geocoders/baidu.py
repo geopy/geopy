@@ -22,7 +22,7 @@ class Baidu(Geocoder):
         http://developer.baidu.com/map/webservice-geocoding.htm
     """
 
-    def __init__(self, ak=None, scheme='http', timeout=DEFAULT_TIMEOUT,
+    def __init__(self, ak=None, timeout=DEFAULT_TIMEOUT,
                   proxies=None):
         """
         Initialize a customized Baidu geocoder.
@@ -33,63 +33,23 @@ class Baidu(Geocoder):
             geocoding requests. API keys are managed through the Baidu APIs
             console (http://lbsyun.baidu.com/apiconsole/key).
 
-
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is http and only http support.
-
-
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
         """
-        super(Baidu, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
-        )
+        super(Baidu, self).__init__(timeout=timeout, proxies=proxies)
         if not ak:
             raise ConfigurationError('Must provide ak.')
         self.ak = ak
-        self.scheme = scheme
         self.doc = {}
         self.api = 'http://api.map.baidu.com/geocoder/v2/'
 
-
-    @staticmethod
-    def _format_components_param(components):
-        """
-        Format the components dict to something Baidu understands.
-        """
-        return "|".join(
-            (":".join(item)
-             for item in components.items()
-            )
-        )
-
-    def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
-                components=None,
-                language=None, sensor=False, exactly_one=True, timeout=None):
+    def geocode(self, query, timeout=None):
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
-
-        :param bounds: The bounding box of the viewport within which
-            to bias geocode results more prominently.
-        :type bounds: list or tuple
-
-        :param string region: The region code, specified as a ccTLD
-            ("top-level domain") two-character value.
-
-        :param dict components: Restricts to an area. Can use any combination
-            of: route, locality, administrative_area, postal_code, country.
-
-        :param string language: The language in which to return results.
-
-        :param bool sensor: Whether the geocoding request comes from a
-            device with a location sensor.
-
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -105,12 +65,9 @@ class Baidu(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        return self._parse_json(self._call_geocoder(url, timeout=timeout))
 
-    def reverse(self, query, language=None, # pylint: disable=W0221,R0913
-                    sensor=False, exactly_one=False, timeout=None):
+    def reverse(self, query, timeout=None):
         """
         Given a point, find an address.
 
@@ -118,14 +75,6 @@ class Baidu(Geocoder):
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
-
-        :param string language: The language in which to return results.
-
-        :param boolean sensor: Whether the geocoding request comes from a
-            device with a location sensor.
-
-        :param boolean exactly_one: Return one result or a list of results, if
-            available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -156,7 +105,7 @@ class Baidu(Geocoder):
         return Location(location, (latitude, longitude), place)
 
 
-    def _parse_json(self, page, exactly_one=True):
+    def _parse_json(self, page):
         '''Returns location, (latitude, longitude) from json feed.'''
 
         place = page.get('result', None)
@@ -172,10 +121,7 @@ class Baidu(Geocoder):
             longitude = place['location']['lng']
             return Location(location, (latitude, longitude), place)
 
-        if exactly_one:
-            return parse_place(place)
-        else:
-            return [parse_place(place) for place in places]
+        return parse_place(place)
 
     @staticmethod
     def _check_status(status):
