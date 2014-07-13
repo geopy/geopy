@@ -121,11 +121,8 @@ class OpenCage(Geocoder):
 
             .. versionadded:: 0.97
         """
-        latlng = self._coerce_point_to_string(query).split(',')
-        latlng.reverse()
-        #print latlng
         params = {
-            'q': self._coerce_point_to_string(query) #','.join(latlng),
+            'q': self._coerce_point_to_string(query),
             
         }
         if self.api_key:
