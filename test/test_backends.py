@@ -38,6 +38,7 @@ except IOError:
         'GEOCODERDOTUS_PASSWORD',
         'GEOCODEFARM_KEY',
         'BAIDU_KEY',
+        'OPENCAGE_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 
@@ -624,3 +625,18 @@ class BaiduTestCase(unittest.TestCase):
         self.assertEqual(addr.decode('utf-8'), known_addr)
         self.assertAlmostEqual(coords[0], known_coords[0], delta=self.delta_exact)
         self.assertAlmostEqual(coords[1], known_coords[1], delta=self.delta_exact)
+
+
+@unittest.skipUnless( # pylint: disable=R0904,C0111
+    env['OPENCAGE_KEY'] is not None,
+    "No OPENCAGE_KEY env variables set"
+)
+class TestOpenCage(_BackendTestCase):
+
+    def test_opencage(self):
+        api = env['OPENCAGE_KEY']
+        c = opencage.OpenCage(api_key=api, timeout=5)
+        l = c.geocode('Mount View Road, London')
+        self.assertEqual(51.5864774, l.latitude)
+        rl = c.reverse(l.point)
+        self.assertTrue('London Borough of Brent' in rl[0].address)
