@@ -57,7 +57,7 @@ class Nominatim(Geocoder):
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
         self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
 
-    def geocode(self, query, exactly_one=True, timeout=None,
+    def geocode(self, query, language=False, exactly_one=True, timeout=None,
                 addressdetails=False):
         """
         Geocode a location query.
@@ -79,6 +79,11 @@ class Nominatim(Geocoder):
         :param addressdetails: If you want in *Location.raw* to include
             addressdetails such as city_district, etc set it to True
         :type addressdetails: bool
+
+        :param string language: Preferred language in which to return results.
+            Either uses standard rfc2616 accept-language string or
+            a simple comma separated list of language codes.
+        :type addressdetails: string
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -112,13 +117,16 @@ class Nominatim(Geocoder):
         if addressdetails:
             params['addressdetails'] = 1
 
+        if language:
+            params['accept-language'] = language
+
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, language=False, exactly_one=True, timeout=None):
         """
         Returns a reverse geocoded location.
 
@@ -126,6 +134,11 @@ class Nominatim(Geocoder):
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
+
+        :param string language: Preferred language in which to return results.
+            Either uses standard rfc2616 accept-language string or
+            a simple comma separated list of language codes.
+        :type addressdetails: string
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -146,6 +159,8 @@ class Nominatim(Geocoder):
             'lon' : lon,
             'format' : 'json',
         }
+        if language:
+            params['accept-language'] = language
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
