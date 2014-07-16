@@ -498,6 +498,22 @@ class NominatimTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         result = geocoder.geocode(query, addressdetails=True)
         self.assertEqual(result.raw['address']['city_district'], u'Mitte')
 
+    def test_language_parameter(self):
+        known_state_de = u"Verwaltungsregion Ionische Inseln"
+        known_state_en = u"Ionian Islands Periphery"
+        result_reverse_de = self.geocoder.reverse("37.78250, 20.89506",
+            exactly_one=True, language="de")
+        result_reverse_en = self.geocoder.reverse("37.78250, 20.89506",
+            exactly_one=True, language="en")
+        self.assertEqual(result_reverse_de.raw['address']['state'],
+            known_state_de)
+        self.assertEqual(result_reverse_en.raw['address']['state'],
+            known_state_en)
+        result_geocode = self.geocoder.geocode(known_state_en,
+            addressdetails=True, language="de")
+        self.assertEqual(result_geocode.raw['address']['state'],
+            known_state_de)
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['YAHOO_KEY'] is not None and env['YAHOO_SECRET'] is not None,
