@@ -1,3 +1,22 @@
+1.0.0 - July 23rd, 2014
+=======================
+
+ADDED:  Baidu Maps geocoder added. Contributed by Risent.
+
+ADDED:  Nominatim geocoder now supports structured queries. Contributed 
+        by kpanic.
+
+ADDED:  Nominatim geocoder now supports a `language` parameter. Contributed
+        by Benjamin Henne.
+
+CHANGED:    GoogleV3's `geocode` and `reverse` methods have different 
+            orders for keyword argument parameters. Geocoders are now 
+            standardized on `(query, exactly_one, timeout, ...)`.
+
+FIXED:  Removed rounding of minutes which was causing a formatted point 
+        to always have zero seconds. Contributed by Jonathan Batchelor.
+
+
 0.99 - March 18, 2014
 =====================
 
