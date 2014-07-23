@@ -63,6 +63,7 @@ geocode locations in Cleveland, Ohio, you could do::
 """
 
 from geopy.geocoders.arcgis import ArcGIS
+from geopy.geocoders.baidu import Baidu
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.dot_us import GeocoderDotUS
@@ -73,4 +74,3 @@ from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.geocodefarm import GeocodeFarm
-from geopy.geocoders.baidu import Baidu

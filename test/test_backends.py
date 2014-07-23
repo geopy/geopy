@@ -37,7 +37,7 @@ except IOError:
         'GEOCODERDOTUS_USERNAME',
         'GEOCODERDOTUS_PASSWORD',
         'GEOCODEFARM_KEY',
-        'BAIDU_AK',
+        'BAIDU_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 
@@ -571,30 +571,21 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
             self.geocoder.geocode(address)
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['BAIDU_AK'] is not None,
-    "No BAIDU_AK env variable set"
+    env['BAIDU_KEY'] is not None,
+    "No BAIDU_KEY env variable set"
 )
-
 class BaiduTestCase(unittest.TestCase):
     delta_exact = 0.002
     delta_inexact = 0.02
 
-    def setUp(self):
-        self.geocoder = Baidu(
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = Baidu(
             scheme='http',
-            ak=env['BAIDU_AK']
+            api_key=env['BAIDU_KEY']
         )
-    def skip_known_failure(self, classes):
-        """
-        When a Geocoder gives no value for a query, skip the test.
-        """
-        if self.geocoder.__class__.__name__ in classes:
-            raise unittest.SkipTest("Known no result")
 
-        
     def test_basic_address(self):
-        self.skip_known_failure(('GeoNames', ))
-
         address = u'\u5317\u4eac\u5e02\u6d77\u6dc0\u533a\u4e2d\u5173\u6751\u5927\u885727\u53f7'
         try:
             result = self.geocoder.geocode(address, exactly_one=True)

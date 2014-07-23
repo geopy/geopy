@@ -18,6 +18,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.ArcGIS
     :members: __init__, geocode, reverse
 
+.. autoclass:: geopy.geocoders.Baidu
+    :members: __init__, geocode, reverse
+
 .. autoclass:: geopy.geocoders.Bing
     :members: __init__, geocode, reverse
 

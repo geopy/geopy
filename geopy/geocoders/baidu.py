@@ -2,15 +2,12 @@
 :class:`.Baidu` is the Baidu Maps geocoder.
 """
 
-import base64
-import hashlib
-import hmac
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
-    ConfigurationError
+    GeocoderAuthenticationFailure,
 )
 from geopy.location import Location
 from geopy.util import logger
@@ -22,21 +19,19 @@ class Baidu(Geocoder):
         http://developer.baidu.com/map/webservice-geocoding.htm
     """
 
-    def __init__(self, ak=None, scheme='http', timeout=DEFAULT_TIMEOUT,
+    def __init__(self, api_key, scheme='http', timeout=DEFAULT_TIMEOUT,
                   proxies=None):
         """
-        Initialize a customized Baidu geocoder.
+        Initialize a customized Baidu geocoder using the v2 API.
 
-        API authentication is only required for Baidu Maps Premier customers.
+        .. versionadded:: 1.0.0
 
-        :param string ak: The API key required by Baidu Map to perform
+        :param string api_key: The API key required by Baidu Map to perform
             geocoding requests. API keys are managed through the Baidu APIs
             console (http://lbsyun.baidu.com/apiconsole/key).
 
-
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is http and only http support.
-
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -46,9 +41,7 @@ class Baidu(Geocoder):
         super(Baidu, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies
         )
-        if not ak:
-            raise ConfigurationError('Must provide ak.')
-        self.ak = ak
+        self.api_key = api_key
         self.scheme = scheme
         self.doc = {}
         self.api = 'http://api.map.baidu.com/geocoder/v2/'
@@ -65,28 +58,12 @@ class Baidu(Geocoder):
             )
         )
 
-    def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
-                components=None,
-                language=None, sensor=False, exactly_one=True, timeout=None):
+    def geocode(self, query, # pylint: disable=W0221,R0913
+                exactly_one=True, timeout=None):
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
-
-        :param bounds: The bounding box of the viewport within which
-            to bias geocode results more prominently.
-        :type bounds: list or tuple
-
-        :param string region: The region code, specified as a ccTLD
-            ("top-level domain") two-character value.
-
-        :param dict components: Restricts to an area. Can use any combination
-            of: route, locality, administrative_area, postal_code, country.
-
-        :param string language: The language in which to return results.
-
-        :param bool sensor: Whether the geocoding request comes from a
-            device with a location sensor.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -98,19 +75,19 @@ class Baidu(Geocoder):
 
         """
         params = {
-            'address': self.format_string % query,
+            'ak': self.api_key,
             'output': 'json',
-            'ak': self.ak
+            'address': self.format_string % query,
         }
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
+            self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    def reverse(self, query, language=None, # pylint: disable=W0221,R0913
-                    sensor=False, exactly_one=False, timeout=None):
+    def reverse(self, query, # pylint: disable=W0221,R0913
+                    timeout=None):
         """
         Given a point, find an address.
 
@@ -119,23 +96,15 @@ class Baidu(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param string language: The language in which to return results.
-
-        :param boolean sensor: Whether the geocoding request comes from a
-            device with a location sensor.
-
-        :param boolean exactly_one: Return one result or a list of results, if
-            available.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
 
         """
         params = {
-            'ak': self.ak,
+            'ak': self.api_key,
+            'output': 'json',
             'location': self._coerce_point_to_string(query),
-            'output': 'json'
         }
 
         url = "?".join((self.api, urlencode(params)))
@@ -146,7 +115,11 @@ class Baidu(Geocoder):
         )
 
 
-    def _parse_reverse_json(self, page):
+    @staticmethod
+    def _parse_reverse_json(page):
+        """
+        Parses a location from a single-result reverse API call.
+        """
         place = page.get('result')
 
         location = place.get('formatted_address').encode('utf-8')
@@ -157,7 +130,9 @@ class Baidu(Geocoder):
 
 
     def _parse_json(self, page, exactly_one=True):
-        '''Returns location, (latitude, longitude) from json feed.'''
+        """
+        Returns location, (latitude, longitude) from JSON feed.
+        """
 
         place = page.get('result', None)
 
@@ -166,7 +141,9 @@ class Baidu(Geocoder):
             return None
 
         def parse_place(place):
-            '''Get the location, lat, lng from a single json place.'''
+            """
+            Get the location, lat, lng from a single JSON place.
+            """
             location = place.get('level')
             latitude = place['location']['lat']
             longitude = place['location']['lng']
@@ -175,7 +152,7 @@ class Baidu(Geocoder):
         if exactly_one:
             return parse_place(place)
         else:
-            return [parse_place(place) for place in places]
+            return [parse_place(item) for item in place]
 
     @staticmethod
     def _check_status(status):
