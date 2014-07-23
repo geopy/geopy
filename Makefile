@@ -7,7 +7,8 @@
 
 develop:
 	virtualenv .venv --distribute
-	. .venv/bin/activate && python setup.py develop && python setup.py test
+	. .venv/bin/activate
+	python setup.py develop && python setup.py test
 
 lint:
 	pylint --rcfile .pylintrc geopy
@@ -25,6 +26,7 @@ docs:
 dist:
 	rm -rf dist
 	pandoc -f markdown -t rst README.markdown > README
+	python setup.py bdist_wheel
 	python setup.py sdist --format=gztar
 	rm README
 	rm -rf *.egg-info
