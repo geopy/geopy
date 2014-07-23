@@ -57,8 +57,8 @@ class Nominatim(Geocoder):
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
         self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
 
-    def geocode(self, query, language=False, exactly_one=True, timeout=None,
-                addressdetails=False):
+    def geocode(self, query, exactly_one=True, timeout=None,
+                addressdetails=False, language=False):
         """
         Geocode a location query.
 
@@ -76,15 +76,6 @@ class Nominatim(Geocoder):
 
             .. versionchanged:: 1.0.0
 
-        :param addressdetails: If you want in *Location.raw* to include
-            addressdetails such as city_district, etc set it to True
-        :type addressdetails: bool
-
-        :param string language: Preferred language in which to return results.
-            Either uses standard rfc2616 accept-language string or
-            a simple comma separated list of language codes.
-        :type addressdetails: string
-
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
@@ -94,6 +85,20 @@ class Nominatim(Geocoder):
             the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+
+        :param addressdetails: If you want in *Location.raw* to include
+            addressdetails such as city_district, etc set it to True
+        :type addressdetails: bool
+
+        :param string language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
+        :type addressdetails: string
+
+            .. versionadded:: 1.0.0
+
         """
 
         if isinstance(query, dict):
@@ -126,7 +131,7 @@ class Nominatim(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, language=False, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None, language=False):
         """
         Returns a reverse geocoded location.
 
@@ -134,11 +139,6 @@ class Nominatim(Geocoder):
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
-
-        :param string language: Preferred language in which to return results.
-            Either uses standard rfc2616 accept-language string or
-            a simple comma separated list of language codes.
-        :type addressdetails: string
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -149,6 +149,16 @@ class Nominatim(Geocoder):
             the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+
+        :param string language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
+        :type addressdetails: string
+
+            .. versionadded:: 1.0.0
+
         """
         lat, lon = [
             x.strip() for x in
