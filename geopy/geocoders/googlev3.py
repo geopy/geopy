@@ -22,9 +22,16 @@ class GoogleV3(Geocoder):
         https://developers.google.com/maps/documentation/geocoding/
     """
 
-    def __init__(self, api_key=None, domain='maps.googleapis.com', scheme=DEFAULT_SCHEME, # pylint: disable=R0913
-                 client_id=None, secret_key=None, timeout=DEFAULT_TIMEOUT,
-                 proxies=None):
+    def __init__(
+            self,
+            api_key=None,
+            domain='maps.googleapis.com',
+            scheme=DEFAULT_SCHEME,
+            client_id=None,
+            secret_key=None,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None
+        ):  # pylint: disable=R0913
         """
         Initialize a customized Google geocoder.
 
@@ -110,13 +117,31 @@ class GoogleV3(Geocoder):
             )
         )
 
-    def geocode(self, query, bounds=None, region=None, # pylint: disable=W0221,R0913
-                components=None,
-                language=None, sensor=False, exactly_one=True, timeout=None):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            bounds=None,
+            region=None,
+            components=None,
+            language=None,
+            sensor=False,
+        ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call only,
+            the value set during the geocoder's initialization.
+
+            .. versionadded:: 0.97
 
         :param bounds: The bounding box of the viewport within which
             to bias geocode results more prominently.
@@ -134,16 +159,6 @@ class GoogleV3(Geocoder):
 
         :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor.
-
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
-
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
-
-            .. versionadded:: 0.97
         """
         params = {
             'address': self.format_string % query,
@@ -170,8 +185,14 @@ class GoogleV3(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, language=None, # pylint: disable=W0221,R0913
-                    sensor=False, exactly_one=False, timeout=None):
+    def reverse(
+            self,
+            query,
+            exactly_one=False,
+            timeout=None,
+            language=None,
+            sensor=False,
+        ):  # pylint: disable=W0221,R0913
         """
         Given a point, find an address.
 
@@ -179,11 +200,6 @@ class GoogleV3(Geocoder):
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
-
-        :param string language: The language in which to return results.
-
-        :param boolean sensor: Whether the geocoding request comes from a
-            device with a location sensor.
 
         :param boolean exactly_one: Return one result or a list of results, if
             available.
@@ -193,6 +209,11 @@ class GoogleV3(Geocoder):
             exception.
 
             .. versionadded:: 0.97
+
+        :param string language: The language in which to return results.
+
+        :param boolean sensor: Whether the geocoding request comes from a
+            device with a location sensor.
         """
         params = {
             'latlng': self._coerce_point_to_string(query),
