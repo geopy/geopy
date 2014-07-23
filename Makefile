@@ -26,8 +26,8 @@ docs:
 dist:
 	rm -rf dist
 	pandoc -f markdown -t rst README.markdown > README
-	python setup.py bdist_wheel
 	python setup.py sdist --format=gztar
+	pip wheel --no-index --no-deps --wheel-dir dist dist/*.tar.gz
 	rm README
 	rm -rf *.egg-info
 
