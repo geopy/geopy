@@ -1,3 +1,10 @@
+1.0.1 - July 24th, 2014
+=======================
+
+FIXED:  The Baidu Maps geocoder's `_check_status` method used a Python 
+        2-specific print statement.
+
+
 1.0.0 - July 23rd, 2014
 =======================
 
