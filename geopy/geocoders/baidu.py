@@ -159,7 +159,6 @@ class Baidu(Geocoder):
         """
         Validates error statuses.
         """
-        print status
         if status == '0':
             # When there are no results, just return.
             return
