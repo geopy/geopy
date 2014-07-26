@@ -17,6 +17,7 @@ geocoder services, as well as several other. The various geocoder classes are lo
 [bing]: http://www.microsoft.com/maps/developers/web.aspx
 [geocoderus]: http://geocoder.us/
 [geocodefarm]: https://www.geocodefarm.com/
+[opencage]: http://geocoder.opencagedata.com/api.html
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
 © GeoPy Project and individual contributors under the
