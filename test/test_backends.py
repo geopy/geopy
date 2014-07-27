@@ -631,12 +631,13 @@ class BaiduTestCase(unittest.TestCase):
     env['OPENCAGE_KEY'] is not None,
     "No OPENCAGE_KEY env variables set"
 )
-class TestOpenCage(_BackendTestCase):
+class OpenCageTestCase(_BackendTestCase):
+    delta_exact = 0.1
+    delta_inexact = 0.2
 
-    def test_opencage(self):
-        api = env['OPENCAGE_KEY']
-        c = opencage.OpenCage(api_key=api, timeout=5)
-        l = c.geocode('Mount View Road, London')
-        self.assertEqual(51.5864774, l.latitude)
-        rl = c.reverse(l.point)
-        self.assertTrue('London Borough of Brent' in rl[0].address)
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = OpenCage(
+            api_key=env['OPENCAGE_KEY'],
+            timeout=20,
+        )

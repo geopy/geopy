@@ -50,9 +50,9 @@ If a service is unavailable or otherwise returns a non-OK response, or doesn't
 receive a response in the allotted timeout, you will receive one of the
 `Exceptions`_ detailed below.
 
-Every geocoder accepts an argument ``format_string`` that defaults to '%s' where
-the input string to geocode is interpolated. For example, if you only need to
-geocode locations in Cleveland, Ohio, you could do::
+Every geocoder accepts an argument ``format_string`` that defaults to '%s'
+where the input string to geocode is interpolated. For example, if you only
+need to geocode locations in Cleveland, Ohio, you could do::
 
     >>> from geopy.geocoders import GeocoderDotUS
     >>> geolocator = GeocoderDotUS(format_string="%s, Cleveland OH")
@@ -69,6 +69,7 @@ from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.placefinder import YahooPlaceFinder
+from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.smartystreets import LiveAddress
