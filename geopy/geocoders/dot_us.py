@@ -5,14 +5,17 @@
 import csv
 from base64 import encodestring
 from geopy.compat import urlencode, py3k, Request
-from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
-    DEFAULT_TIMEOUT
+from geopy.geocoders.base import (
+    Geocoder,
+    DEFAULT_FORMAT_STRING,
+    DEFAULT_TIMEOUT,
+)
 from geopy.location import Location
 from geopy.exc import ConfigurationError
 from geopy.util import logger, join_filter
 
 
-class GeocoderDotUS(Geocoder): # pylint: disable=W0223
+class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
     """
     GeocoderDotUS geocoder, documentation at:
         http://geocoder.us/
@@ -20,9 +23,14 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
     Note that GeocoderDotUS does not support SSL.
     """
 
-    def __init__(self, username=None, password=None, # pylint: disable=R0913
-                        format_string=DEFAULT_FORMAT_STRING,
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            username=None,
+            password=None,
+            format_string=DEFAULT_FORMAT_STRING,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):  # pylint: disable=R0913
         """
         :param string username:
 
@@ -62,7 +70,7 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         self.username = username
         self.password = password
 
-    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0613,W0221
+    def geocode(self, query, exactly_one=True, timeout=None):
         """
         Geocode a location query.
 
@@ -73,8 +81,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
         """
@@ -112,7 +120,8 @@ class GeocoderDotUS(Geocoder): # pylint: disable=W0223
         """
         Parse individual results. Different, but lazy actually, so... ok.
         """
-        # turn x=y pairs ("lat=47.6", "long=-117.426") into dict key/value pairs:
+        # turn x=y pairs ("lat=47.6", "long=-117.426")
+        # into dict key/value pairs:
         place = dict(
             [x.split('=') for x in result if len(x.split('=')) > 1]
         )

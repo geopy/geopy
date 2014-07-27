@@ -16,7 +16,7 @@ from geopy.location import Location
 from geopy.util import logger
 
 
-class GoogleV3(Geocoder):
+class GoogleV3(Geocoder):  # pylint: disable=R0902
     """
     Geocoder using the Google Maps v3 API. Documentation at:
         https://developers.google.com/maps/documentation/geocoding/
@@ -92,7 +92,7 @@ class GoogleV3(Geocoder):
     def _get_signed_url(self, params):
         """
         Returns a Premier account signed url. Docs on signature:
-        https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
+            https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
         """
         params['client'] = self.client_id
         path = "?".join(('/maps/api/geocode/json', urlencode(params)))
@@ -101,7 +101,9 @@ class GoogleV3(Geocoder):
             path.encode('utf-8'),
             hashlib.sha1
         )
-        signature = base64.urlsafe_b64encode(signature.digest()).decode('utf-8')
+        signature = base64.urlsafe_b64encode(
+            signature.digest()
+        ).decode('utf-8')
         return '%s://%s%s&signature=%s' % (
             self.scheme, self.domain, path, signature
         )
@@ -138,8 +140,8 @@ class GoogleV3(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
 

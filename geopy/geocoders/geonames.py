@@ -19,11 +19,18 @@ class GeoNames(Geocoder): # pylint: disable=W0223
     GeoNames geocoder, documentation at:
         http://www.geonames.org/export/geonames-search.html
 
-    Reverse geocoding also available, but not yet implemented. Documentation at:
+    Reverse geocoding also available, but not yet implemented. Documentation
+    at:
         http://www.geonames.org/maps/us-reverse-geocoder.html
     """
 
-    def __init__(self, country_bias=None, username=None, timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            country_bias=None,
+            username=None,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None
+        ):
         """
         :param string country_bias:
 
@@ -42,7 +49,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
         """
-        super(GeoNames, self).__init__(scheme='http', timeout=timeout, proxies=proxies)
+        super(GeoNames, self).__init__(
+            scheme='http', timeout=timeout, proxies=proxies
+        )
         if username == None:
             raise ConfigurationError(
                 'No username given, required for api access.  If you do not '
@@ -64,8 +73,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
         """
@@ -79,7 +88,10 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             params['maxRows'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one
+        )
 
     def _parse_json(self, doc, exactly_one):
         """

@@ -148,7 +148,7 @@ class Point(object):
         return iter((self.latitude, self.longitude, self.altitude))
 
     def __repr__(self):
-        return "Point(%r, %r, %r)" % (tuple(self._items))
+        return "Point(%r, %r, %r)" % self._items
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         latitude = "%s %s" % (
@@ -240,7 +240,8 @@ class Point(object):
                 return CONVERTERS[unit](distance)
             except KeyError: # pragma: no cover
                 raise NotImplementedError(
-                    'Bad distance unit specified, valid are: %r' % CONVERTERS.keys()
+                    'Bad distance unit specified, valid are: %r' %
+                    CONVERTERS.keys()
                 )
         else:
             return distance
@@ -248,8 +249,8 @@ class Point(object):
     @classmethod
     def from_string(cls, string):
         """
-        Create and return a ``Point`` instance from a string containing latitude
-        and longitude, and optionally, altitude.
+        Create and return a ``Point`` instance from a string containing
+        latitude and longitude, and optionally, altitude.
 
         Latitude and longitude must be in degrees and may be in decimal form
         or indicate arcminutes and arcseconds (labeled with Unicode prime and
@@ -332,6 +333,7 @@ class Point(object):
     @classmethod
     def from_point(cls, point):
         """
-        Create and return a new ``Point`` instance from another ``Point`` instance.
+        Create and return a new ``Point`` instance from another ``Point``
+        instance.
         """
         return cls(point.latitude, point.longitude, point.altitude)

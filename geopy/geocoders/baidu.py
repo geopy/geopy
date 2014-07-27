@@ -19,8 +19,13 @@ class Baidu(Geocoder):
         http://developer.baidu.com/map/webservice-geocoding.htm
     """
 
-    def __init__(self, api_key, scheme='http', timeout=DEFAULT_TIMEOUT,
-                  proxies=None):
+    def __init__(
+            self,
+            api_key,
+            scheme='http',
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):
         """
         Initialize a customized Baidu geocoder using the v2 API.
 
@@ -58,8 +63,12 @@ class Baidu(Geocoder):
             )
         )
 
-    def geocode(self, query, # pylint: disable=W0221,R0913
-                exactly_one=True, timeout=None):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None
+        ):
         """
         Geocode a location query.
 
@@ -70,8 +79,8 @@ class Baidu(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         """
         params = {
@@ -86,8 +95,7 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    def reverse(self, query, # pylint: disable=W0221,R0913
-                    timeout=None):
+    def reverse(self, query, timeout=None):  # pylint: disable=W0221
         """
         Given a point, find an address.
 
@@ -98,7 +106,8 @@ class Baidu(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         """
         params = {

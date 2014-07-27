@@ -17,8 +17,13 @@ class GeocodeFarm(Geocoder):
         https://www.geocodefarm.com/dashboard/documentation/
     """
 
-    def __init__(self, api_key, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            api_key,
+            format_string=DEFAULT_FORMAT_STRING,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):  # pylint: disable=R0913
         """
         Create a geocoder for GeocodeFarm.
 
@@ -39,7 +44,9 @@ class GeocodeFarm(Geocoder):
 
         Note that the GeocodeFarm geocoder does not support SSL.
         """
-        super(GeocodeFarm, self).__init__(format_string, 'http', timeout, proxies)
+        super(GeocodeFarm, self).__init__(
+            format_string, 'http', timeout, proxies
+        )
         self.api_key = api_key
         self.format_string = format_string
         self.api = (
@@ -63,8 +70,8 @@ class GeocodeFarm(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
         """
         url = "".join((
             self.api,
@@ -90,8 +97,8 @@ class GeocodeFarm(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
         """
         lat, lon = self._coerce_point_to_string(query).split(',')
         url = "".join((

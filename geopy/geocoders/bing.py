@@ -15,8 +15,14 @@ class Bing(Geocoder):
         https://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
-    def __init__(self, api_key, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
-                        scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            api_key,
+            format_string=DEFAULT_FORMAT_STRING,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):  # pylint: disable=R0913
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
@@ -50,7 +56,13 @@ class Bing(Geocoder):
         self.api_key = api_key
         self.api = "%s://dev.virtualearth.net/REST/v1/Locations" % self.scheme
 
-    def geocode(self, query, exactly_one=True, user_location=None, timeout=None):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            user_location=None,
+            timeout=None,
+            ):  # pylint: disable=W0221
         """
         Geocode an address.
 
@@ -68,8 +80,8 @@ class Bing(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
         """
@@ -86,9 +98,12 @@ class Bing(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one
+        )
 
-    def reverse(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
+    def reverse(self, query, exactly_one=True, timeout=None):
         """
         Reverse geocode a point.
 
@@ -101,8 +116,8 @@ class Bing(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
         """
@@ -112,10 +127,13 @@ class Bing(Geocoder):
             self.api, point, urlencode(params))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one
+        )
 
     @staticmethod
-    def _parse_json(doc, exactly_one=True): # pylint: disable=W0221
+    def _parse_json(doc, exactly_one=True):  # pylint: disable=W0221
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """

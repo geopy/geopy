@@ -47,7 +47,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             raise ImportError(
                 'requests-oauthlib is needed for YahooPlaceFinder'
             )
-        super(YahooPlaceFinder, self).__init__(timeout=timeout, proxies=proxies)
+        super(YahooPlaceFinder, self).__init__(
+            timeout=timeout, proxies=proxies
+        )
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
         self.api = 'https://yboss.yahooapis.com/geo/placefinder'
@@ -103,7 +105,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         Returns the parsed result of a PlaceFinder API call.
         """
         try:
-            placefinder = json.loads(response.content)['bossresponse']['placefinder']
+            placefinder = (
+                json.loads(response.content)['bossresponse']['placefinder']
+            )
             if not len(placefinder) or not len(placefinder.get('results', [])):
                 return None
             results = [

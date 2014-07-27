@@ -9,14 +9,20 @@ from geopy.exc import GeocoderQuotaExceeded
 from geopy.util import logger
 
 
-class LiveAddress(Geocoder): # pylint: disable=W0223
+class LiveAddress(Geocoder):  # pylint: disable=W0223
     """
     Initialize a customized LiveAddress geocoder provided by SmartyStreets.
     More information regarding the LiveAddress API can be found here:
         https://smartystreets.com/products/liveaddress-api
     """
-    def __init__(self, auth_token, candidates=1, scheme=DEFAULT_SCHEME, # pylint: disable=R0913
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            auth_token,
+            candidates=1,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None
+        ):  # pylint: disable=R0913
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
@@ -48,7 +54,9 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
         """
-        super(LiveAddress, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
+        super(LiveAddress, self).__init__(
+            scheme=scheme, timeout=timeout, proxies=proxies
+        )
         self.auth_token = auth_token
         if candidates:
             if not 1 <= candidates <= 10:
@@ -56,7 +64,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         self.candidates = candidates
         self.api = '%s://api.qualifiedaddress.com/street-address' % self.scheme
 
-    def geocode(self, query, exactly_one=True):
+    def geocode(self, query, exactly_one=True):  # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -69,7 +77,7 @@ class LiveAddress(Geocoder): # pylint: disable=W0223
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url), exactly_one)
 
-    def _geocoder_exception_handler(self, error, message): # pylint: disable=R0201
+    def _geocoder_exception_handler(self, error, message): # pylint: disable=R0201,W0613
         """
         LiveStreets-specific exceptions.
         """

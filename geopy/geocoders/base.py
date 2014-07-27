@@ -15,6 +15,7 @@ from geopy.exc import (GeocoderServiceError, ConfigurationError,
     GeocoderQueryError, GeocoderInsufficientPrivileges)
 from geopy.util import decode_page
 
+
 DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
@@ -40,8 +41,13 @@ class Geocoder(object): # pylint: disable=R0921
     Template object for geocoders.
     """
 
-    def __init__(self, format_string=DEFAULT_FORMAT_STRING, scheme=DEFAULT_SCHEME,
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            format_string=DEFAULT_FORMAT_STRING,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None
+        ):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
         specify format_string and such.
@@ -120,13 +126,13 @@ class Geocoder(object): # pylint: disable=R0921
             return page
         return json.loads(decode_page(page))
 
-    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=R0201,W0613
+    def geocode(self, query, exactly_one=True, timeout=None):
         """
         Implemented in subclasses.
         """
         raise NotImplementedError()
 
-    def reverse(self, query, exactly_one=True, timeout=None): # pragma: no cover
+    def reverse(self, query, exactly_one=True, timeout=None):
         """
         Implemented in subclasses.
         """

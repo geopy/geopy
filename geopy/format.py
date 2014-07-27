@@ -29,7 +29,9 @@ ABBR_DEGREE = 'deg'
 ABBR_ARCMIN = 'arcmin'
 ABBR_ARCSEC = 'arcsec'
 
-DEGREES_FORMAT = "%(degrees)d%(deg)s %(minutes)d%(arcmin)s %(seconds)s%(arcsec)s"
+DEGREES_FORMAT = (
+    "%(degrees)d%(deg)s %(minutes)d%(arcmin)s %(seconds)s%(arcsec)s"
+)
 
 UNICODE_SYMBOLS = {
     'deg': DEGREE,
@@ -86,6 +88,7 @@ DISTANCE_UNITS = {
     'nm': lambda d: units.nautical(kilometers=d),
     'nmi': lambda d: units.nautical(kilometers=d)
 }
+
 def format_distance(kilometers, fmt=DISTANCE_FORMAT, unit='km'):
     """
     TODO docs.
@@ -109,6 +112,15 @@ _DIRECTIONS = [
     ('southeast', 'SE'),
     ('southeast by south', 'SEbS'),
 ]
+
 DIRECTIONS, DIRECTIONS_ABBR = zip(*_DIRECTIONS)
-ANGLE_DIRECTIONS = dict((n * 11.25, d) for n, d in enumerate(DIRECTIONS))
-ANGLE_DIRECTIONS_ABBR = dict((n * 11.25, d) for n, d in enumerate(DIRECTIONS_ABBR))
+ANGLE_DIRECTIONS = {
+    n * 11.25: d
+    for n, d
+    in enumerate(DIRECTIONS)
+}
+ANGLE_DIRECTIONS_ABBR = {
+    n * 11.25: d
+    for n, d
+    in enumerate(DIRECTIONS_ABBR)
+}

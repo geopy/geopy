@@ -2,8 +2,11 @@
 OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
 """
 
-from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
-    DEFAULT_TIMEOUT
+from geopy.geocoders.base import (
+    Geocoder,
+    DEFAULT_FORMAT_STRING,
+    DEFAULT_TIMEOUT,
+)
 from geopy.compat import urlencode
 from geopy.location import Location
 from geopy.util import logger
@@ -26,9 +29,14 @@ class Nominatim(Geocoder):
         'postalcode',
     }
 
-    def __init__(self, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
-                        view_box=(-180, -90, 180, 90), country_bias=None,
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            format_string=DEFAULT_FORMAT_STRING,
+            view_box=(-180, -90, 180, 90),
+            country_bias=None,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
@@ -46,7 +54,9 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.96
         """
-        super(Nominatim, self).__init__(format_string, 'http', timeout, proxies)
+        super(Nominatim, self).__init__(
+            format_string, 'http', timeout, proxies
+        )
         # XML needs all sorts of conditionals because of API differences
         # between geocode and reverse, so only implementing JSON format
         self.country_bias = country_bias
@@ -55,10 +65,18 @@ class Nominatim(Geocoder):
         self.country_bias = country_bias
 
         self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
-        self.reverse_api = "%s://nominatim.openstreetmap.org/reverse" % self.scheme
+        self.reverse_api = (
+            "%s://nominatim.openstreetmap.org/reverse" % self.scheme
+        )
 
-    def geocode(self, query, exactly_one=True, timeout=None,
-                addressdetails=False, language=False):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            addressdetails=False,
+            language=False
+        ):  # pylint: disable=R0913,W0221
         """
         Geocode a location query.
 
@@ -81,8 +99,8 @@ class Nominatim(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
 
@@ -103,9 +121,9 @@ class Nominatim(Geocoder):
 
         if isinstance(query, dict):
             params = {
-                key: val 
-                for key, val 
-                in query.items() 
+                key: val
+                for key, val
+                in query.items()
                 if key in self.structured_query_params
             }
         else:
@@ -131,7 +149,13 @@ class Nominatim(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=None, language=False):
+    def reverse(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            language=False,
+        ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
 
@@ -145,8 +169,8 @@ class Nominatim(Geocoder):
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
 

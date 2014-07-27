@@ -14,7 +14,7 @@ from geopy.location import Location
 from geopy.util import logger
 
 
-class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
+class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     """
     Geocoder using the ERSI ArcGIS API. Documentation at:
         http://resources.arcgis.com/en/help/arcgis-rest-api
@@ -59,11 +59,14 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
         """
-        super(ArcGIS, self).__init__(scheme=scheme, timeout=timeout, proxies=proxies)
-        if (username or password or referer):
+        super(ArcGIS, self).__init__(
+            scheme=scheme, timeout=timeout, proxies=proxies
+        )
+        if username or password or referer:
             if not (username and password and referer):
                 raise ConfigurationError(
-                    "Authenticated mode requires username, password, and referer"
+                    "Authenticated mode requires username,"
+                    " password, and referer"
                 )
             if self.scheme != 'https':
                 raise ConfigurationError(
@@ -81,10 +84,14 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         self.token_expiry = None
         self.retry = 1
 
-        self.api = '%s://geocode.arcgis.com' \
-                    '/arcgis/rest/services/World/GeocodeServer/find' % self.scheme
-        self.reverse_api = '%s://geocode.arcgis.com' \
-                    '/arcgis/rest/services/World/GeocodeServer/reverseGeocode' % self.scheme
+        self.api = (
+            '%s://geocode.arcgis.com/arcgis/rest/services/'
+            'World/GeocodeServer/find' % self.scheme
+        )
+        self.reverse_api = (
+            '%s://geocode.arcgis.com/arcgis/rest/services/'
+            'World/GeocodeServer/reverseGeocode' % self.scheme
+        )
 
     def _authenticated_call_geocoder(self, url, timeout=None):
         """
@@ -109,8 +116,8 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
         """
         # TODO: dict as query for parameterized query
         # TODO: SRID
@@ -126,7 +133,9 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
             if response['error']['code'] == self._TOKEN_EXPIRED:
                 self.retry += 1
                 self._refresh_authentication_token()
-                return self.geocode(query, exactly_one=exactly_one, timeout=timeout)
+                return self.geocode(
+                    query, exactly_one=exactly_one, timeout=timeout
+                )
             raise GeocoderServiceError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
@@ -158,8 +167,8 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         :param int distance: Distance from the query location, in meters,
             within which to search. ArcGIS has a default of 100 meters, if not
@@ -188,8 +197,10 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
                 return self.reverse(query, exactly_one=exactly_one,
                         timeout=timeout, distance=distance, wkid=wkid)
             raise GeocoderServiceError(str(response['error']))
-        address = "%(Address)s, %(City)s, %(Region)s %(Postal)s, %(CountryCode)s" % \
-            response['address']
+        address = (
+            "%(Address)s, %(City)s, %(Region)s %(Postal)s,"
+            " %(CountryCode)s" % response['address']
+        )
         return Location(
             address,
             (response['location']['y'], response['location']['x']),
@@ -201,7 +212,6 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
         POST to ArcGIS requesting a new token.
         """
         if self.retry == self._MAX_RETRIES:
-            logger.debug('Maximum retries (%s) reached; giving up.', self._MAX_RETRIES)
             raise GeocoderAuthenticationFailure(
                 'Too many retries for auth: %s' % self.retry
             )
@@ -211,15 +221,18 @@ class ArcGIS(Geocoder): # pylint: disable=R0921,R0902
             'expiration': self.token_lifetime,
             'f': 'json'
         }
-        token_request_arguments = "&".join(
-            ["%s=%s" % (key, val) for key, val in token_request_arguments.items()]
-        )
+        token_request_arguments = "&".join([
+            "%s=%s" % (key, val)
+            for key, val
+            in token_request_arguments.items()
+        ])
         url = "&".join((
             "?".join((self.auth_api, token_request_arguments)),
             urlencode({'referer': self.referer})
         ))
         logger.debug(
-            "%s._refresh_authentication_token: %s", self.__class__.__name__, url
+            "%s._refresh_authentication_token: %s",
+            self.__class__.__name__, url
         )
         self.token_expiry = int(time()) + self.token_lifetime
         response = self._base_call_geocoder(url)

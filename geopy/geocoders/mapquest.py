@@ -20,9 +20,14 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         http://www.mapquestapi.com/geocoding/
     """
 
-    def __init__(self, api_key, format_string=DEFAULT_FORMAT_STRING, # pylint: disable=R0913
-                        scheme=DEFAULT_SCHEME,
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            api_key,
+            format_string=DEFAULT_FORMAT_STRING,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):  # pylint: disable=R0913
         """
         Initialize a MapQuest geocoder with address information and
         MapQuest API key.
@@ -53,7 +58,9 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         """
         super(MapQuest, self).__init__(format_string, scheme, timeout, proxies)
         self.api_key = api_key
-        self.api = "%s://www.mapquestapi.com/geocoding/v1/address" % self.scheme
+        self.api = (
+            "%s://www.mapquestapi.com/geocoding/v1/address" % self.scheme
+        )
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
@@ -66,9 +73,8 @@ class MapQuest(Geocoder): # pylint: disable=W0223
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call only,
-            the value set during the geocoder's initialization.
-
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
             .. versionadded:: 0.97
         """
         params = {
@@ -82,7 +88,10 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             "&".join(("=".join(('key', self.api_key)), urlencode(params)))
         ))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url, timeout=timeout), exactly_one)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one
+        )
 
     def _parse_json(self, resources, exactly_one=True):
         """
