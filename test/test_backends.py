@@ -572,7 +572,7 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['OPENCAGE_KEY'] is not None,
-    "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
+    "No OPENCAGE_KEY env variables set"
 )
 class TestOpenCage(_BackendTestCase):
 
