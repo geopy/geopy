@@ -19,7 +19,7 @@ class OpenCage(Geocoder):
         http://geocoder.opencagedata.com/api.html
     """
 
-    def __init__(self, api_key=None, domain='api.opencagedata.com', scheme=DEFAULT_SCHEME,  # pylint: disable=R0913
+    def __init__(self, api_key, domain='api.opencagedata.com', scheme=DEFAULT_SCHEME,  # pylint: disable=R0913
                 timeout=DEFAULT_TIMEOUT,
                  proxies=None):
         """
@@ -33,10 +33,6 @@ class OpenCage(Geocoder):
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
-
-        :param string client_id: If using premier, the account client id.
-
-        :param string secret_key: If using premier, the account secret key.
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -63,14 +59,14 @@ class OpenCage(Geocoder):
 
         Required Parameters
 
-        :param string q - the query string to be geocoded; this must be URL encoded
-        :param string key - a pre-authorised application key
+        :param string q: the query string to be geocoded; this must be URL encoded
+        :param string key: a pre-authorised application key
         
         Optional Parameters
 
-        :param string language - an IETF format language code (such as es for Spanish or pt-BR for Brazilian Portuguese); if this is omitted a code of en (English) will be assumed
-        :param bounds - Provides the geocoder with a hint to the region that the query resides in. This value will help the geocoder but will not restrict the possible results to the supplied region. The bounds parameter should be specified as 4 coordinate points forming the south-west and north-east corners of a bounding box. For example bounds=-0.563160,51.280430,0.278970,51.683979.
-        :param string country - Provides the geocoder with a hint to the country that the query resides in. This value will help the geocoder but will not restrict the possible results to the supplied country. The country code is a 3 character code as defined by the ISO 3166-1 Alpha 3 standard.
+        :param string language: an IETF format language code (such as es for Spanish or pt-BR for Brazilian Portuguese); if this is omitted a code of en (English) will be assumed
+        :param bounds: Provides the geocoder with a hint to the region that the query resides in. This value will help the geocoder but will not restrict the possible results to the supplied region. The bounds parameter should be specified as 4 coordinate points forming the south-west and north-east corners of a bounding box. For example bounds=-0.563160,51.280430,0.278970,51.683979.
+        :param string country: Provides the geocoder with a hint to the country that the query resides in. This value will help the geocoder but will not restrict the possible results to the supplied country. The country code is a 3 character code as defined by the ISO 3166-1 Alpha 3 standard.
         
         :param bool exactly_one: Return one result or a list of results, if
             available.

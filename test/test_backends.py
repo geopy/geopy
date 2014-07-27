@@ -37,6 +37,7 @@ except IOError:
         'GEOCODERDOTUS_USERNAME',
         'GEOCODERDOTUS_PASSWORD',
         'GEOCODEFARM_KEY',
+        'OPENCAGE_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 
@@ -568,3 +569,17 @@ class GeocodeFarmTestCase(_BackendTestCase): # pylint: disable=R0904,C0111
         with self.assertRaises(GeocoderServiceError):
             address = '435 north michigan ave, chicago il 60611'
             self.geocoder.geocode(address)
+
+@unittest.skipUnless( # pylint: disable=R0904,C0111
+    env['OPENCAGE_KEY'] is not None,
+    "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
+)
+class TestOpenCage(_BackendTestCase):
+
+    def test_opencage(self):
+        api = env['OPENCAGE_KEY']
+        c = opencage.OpenCage(api_key=api, timeout=5)
+        l = c.geocode('Mount View Road, London')
+        self.assertEqual(51.5864774, l.latitude)
+        rl = c.reverse(l.point)
+        self.assertTrue('London Borough of Brent' in rl[0].address)
