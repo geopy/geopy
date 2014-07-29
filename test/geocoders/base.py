@@ -5,7 +5,7 @@ from geopy.point import Point
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 
 
-class BaseTestCase(unittest.TestCase):
+class GeocoderTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
