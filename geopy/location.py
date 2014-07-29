@@ -3,7 +3,7 @@
 """
 
 from geopy.point import Point
-from geopy.compat import string_compare
+from geopy.compat import string_compare, py3k
 
 
 class Location(object): # pylint: disable=R0903,R0921
@@ -18,7 +18,7 @@ class Location(object): # pylint: disable=R0903,R0921
 
     __slots__ = ("_address", "_point", "_tuple", "_raw")
 
-    def __init__(self, address="", point=None, raw=None):
+    def __init__(self, address=u"", point=None, raw=None):
         self._address = address
         if point is None:
             self._point = (None, None, None)
@@ -99,15 +99,23 @@ class Location(object): # pylint: disable=R0903,R0921
         """
         return self._tuple[index]
 
-    def __str__(self):
+    def __unicode__(self):
         return self._address
 
-    __unicode__ = __str__
+    __str__ = __unicode__
 
-    def __repr__(self): # pragma: no cover
-        return "".join((
-            "Location(", self._address, " ", str(self._point), ")"
-        ))
+    def __repr__(self):
+        if py3k:
+            return u"Location(%s, (%s, %s, %s))" % (
+                self._address, self.latitude, self.longitude, self.altitude
+            )
+        else:
+            # Python 2 should not return unicode in __repr__:
+            # http://bugs.python.org/issue5876
+            return "Location((%s, %s, %s))" % (
+                self.latitude, self.longitude, self.altitude
+            )
+
 
     def __iter__(self):
         return iter(self._tuple)

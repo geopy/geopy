@@ -4,6 +4,7 @@ Test Location.
 """
 
 import unittest
+from geopy.compat import py3k
 from geopy.location import Location
 from geopy.point import Point
 
@@ -148,3 +149,26 @@ class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
         loc1 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
         loc2 = Location(GRAND_CENTRAL_STR, None)
         self.assertNotEqual(loc1, loc2)
+
+    def test_location_repr(self):
+        """
+        Location.__repr__ string and unicode
+        """
+        address = (
+            u"22, Ksi\u0119dza Paw\u0142a Po\u015bpiecha, "
+            u"Centrum Po\u0142udnie, Zabrze, wojew\xf3dztwo "
+            u"\u015bl\u0105skie, 41-800, Polska"
+        )
+        point = (0.0, 0.0, 0.0)
+        loc = Location(address, point)
+        if py3k:
+            self.assertEqual(
+                repr(loc),
+                u"Location(%s, %r" % (address, point)
+            )
+        else:
+            self.assertEqual(
+                repr(loc),
+                u"Location((%s, %s, %s))" % point
+            )
+
