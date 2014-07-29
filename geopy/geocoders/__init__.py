@@ -7,21 +7,30 @@ pair of coordinates to an address. Each Geocoder accepts any credentials
 or settings needed to interact with its service, e.g., an API key or
 locale, during its initialization.
 
-To geolocate a query to an address and coordinates::
+To geolocate a query to an address and coordinates:
 
-    >>> from geopy.geocoders import GoogleV3
-    >>> geolocator = GoogleV3()
-    >>> address, (latitude, longitude) = geolocator.geocode("175 5th Avenue NYC")
-    >>> print(address, latitude, longitude)
-    175 5th Avenue, New York, NY 10010, USA 40.7410262 -73.9897806
+    >>> from geopy.geocoders import Nominatim
+    >>> geolocator = Nominatim()
+    >>> location = geolocator.geocode("175 5th Avenue NYC")
+    >>> print(location.address)
+    Flatiron Building, 175, 5th Avenue, Flatiron, New York, NYC, New York, ...
+    >>> print(location.latitude, location.longitude)
+    (40.7410861, -73.9896297241625)
+    >>> print(location.raw)
+    {u'place_id': u'9167009604', u'type': u'attraction', ...}
 
-To find the address corresponding to a set of coordinates::
 
-    >>> from geopy.geocoders import GoogleV3
-    >>> geolocator = GoogleV3()
-    >>> address, (latitude, longitude) = geolocator.reverse("40.752067, -73.977578")
-    >>> print(address, latitude, longitude)
-    77 East 42nd Street, New York, NY 10017, USA 40.7520802 -73.9775683
+To find the address corresponding to a set of coordinates:
+
+    >>> from geopy.geocoders import Nominatim
+    >>> geolocator = Nominatim()
+    >>> location = geolocator.reverse("52.509669, 13.376294")
+    >>> print(location.address)
+    Potsdamer Platz, Mitte, Berlin, 10117, Deutschland, European Union
+    >>> print(location.latitude, location.longitude)
+    (52.5094982, 13.3765983)
+    >>> print(location.raw)
+    {u'place_id': u'654513', u'osm_type': u'node', ...}
 
 Locators' ``geolocate`` and ``reverse`` methods require the argument ``query``,
 and also accept at least the argument ``exactly_one``, which is ``True``.
