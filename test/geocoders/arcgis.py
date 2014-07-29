@@ -4,10 +4,10 @@ import unittest
 from geopy import exc
 from geopy.point import Point
 from geopy.geocoders import ArcGIS
-from test.geocoders.util import GeocoderTestBase, CommonTestMixin, env
+from test.geocoders.util import GeocoderTestBase, env
 
 
-class ArcGISTestCase(GeocoderTestBase, CommonTestMixin):
+class ArcGISTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
@@ -32,13 +32,22 @@ class ArcGISTestCase(GeocoderTestBase, CommonTestMixin):
                 scheme='http'
             )
 
-    def test_reverse_address(self):
+    def test_geocode(self):
         """
-        ArcGIS.reverse using address
+        ArcGIS.geocode
         """
-        self.reverse_run(
-            {"query": u"1065 6th Ave, New York, NY 10018, United States"},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        self.geocode_run(
+            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )
+
+    def test_unicode_name(self):
+        """
+        ArcGIS.geocode unicode
+        """
+        self.geocode_run(
+            {"query": u"\u6545\u5bab"},
+            {"latitude": 39.916, "longitude": 116.390},
         )
 
     def test_reverse_point(self):

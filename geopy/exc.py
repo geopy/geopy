@@ -54,6 +54,13 @@ class GeocoderTimedOut(GeocoderServiceError):
     slow, and a higher timeout may be needed to use them.
     """
 
+class GeocoderUnavailable(GeocoderServiceError):
+    """
+    Either it was not possible to establish a connection to the remote
+    geocoding service, or the service responded with a code indicating
+    it was unavailable.
+    """
+
 class GeocoderParseError(GeocoderServiceError):
     """
     Geopy could not parse the service's response. This is a bug in geopy.

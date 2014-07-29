@@ -2,14 +2,14 @@
 import unittest
 
 from geopy.geocoders import LiveAddress
-from test.geocoders.util import GeocoderTestBase, CommonTestMixin, env
+from test.geocoders.util import GeocoderTestBase, env
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['LIVESTREETS_AUTH_KEY'] is not None,
     "No LIVESTREETS_AUTH_KEY env variable set"
 )
-class LiveAddressTestCase(GeocoderTestBase, CommonTestMixin):
+class LiveAddressTestCase(GeocoderTestBase):
     def setUp(self):
         self.geocoder = LiveAddress(
             auth_token=env['LIVESTREETS_AUTH_KEY'],
@@ -17,3 +17,11 @@ class LiveAddressTestCase(GeocoderTestBase, CommonTestMixin):
         )
         self.delta = 0.04
 
+    def test_geocode(self):
+        """
+        LiveAddress.geocode
+        """
+        self.geocode_run(
+            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )

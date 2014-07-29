@@ -3,14 +3,14 @@ import unittest
 
 from geopy.compat import py3k
 from geopy.geocoders import GeocoderDotUS
-from test.geocoders.util import GeocoderTestBase, CommonTestMixin, env
+from test.geocoders.util import GeocoderTestBase, env
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['GEOCODERDOTUS_USERNAME'] is not None and \
     env['GEOCODERDOTUS_PASSWORD'] is not None,
     "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
 )
-class GeocoderDotUSTestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R0904,C0111
+class GeocoderDotUSTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
@@ -44,3 +44,21 @@ class GeocoderDotUSTestCase(GeocoderTestBase, CommonTestMixin): # pylint: disabl
                 'Basic dXNlcm5hbWU6cGFzc3dvcmQ='
             )
         self.assertTrue(exc_raised)
+
+    def test_geocode(self):
+        """
+        GeocoderDotUS.geocode
+        """
+        self.geocode_run(
+            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )
+
+    def test_unicode_name(self):
+        """
+        GeocoderDotUS.geocode unicode
+        """
+        self.geocode_run(
+            {"query": u"\u6545\u5bab"},
+            {"latitude": 39.916, "longitude": 116.390},
+        )

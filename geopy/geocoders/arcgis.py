@@ -17,7 +17,7 @@ from geopy.util import logger
 class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     """
     Geocoder using the ERSI ArcGIS API. Documentation at:
-        http://resources.arcgis.com/en/help/arcgis-rest-api
+        https://developers.arcgis.com/rest/geocode/api-reference/overview-world-geocoding-service.htm
     """
 
     _TOKEN_EXPIRED = 498
@@ -176,7 +176,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
         :param string wkid: WKID to use for both input and output coordinates.
         """
-         # ArcGIS is lon,lat; maintain lat,lon convention of geopy
+        # ArcGIS is lon,lat; maintain lat,lon convention of geopy
         point = self._coerce_point_to_string(query).split(",")
         if wkid != DEFAULT_WKID:
             location = {"x": point[1], "y": point[0], "spatialReference": wkid}

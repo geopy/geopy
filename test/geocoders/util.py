@@ -87,6 +87,8 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             raise unittest.SkipTest("Quota exceeded")
         except exc.GeocoderTimedOut:
             raise unittest.SkipTest("Service timed out")
+        except exc.GeocoderUnavailable:
+            raise unittest.SkipTest("Service unavailable")
         return result
 
     def _verify_request(
@@ -111,59 +113,3 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             self.assertAlmostEqual(
                 item.longitude, longitude, delta=self.delta
             )
-
-
-class CommonTestMixin(object):
-
-    def test_basic_address(self):
-        self.skip_known_failure(('GeoNames', ))
-
-        self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611"},
-            {"latitude": 41.890, "longitude": -87.624},
-        )
-
-    def test_partial_address(self):
-        """
-        """
-        self.skip_known_failure(('GeoNames', 'GeocoderDotUS', 'Nominatim'))
-
-        address = '435 north michigan, chicago 60611'
-
-        result = self._make_request(
-            self.geocoder.geocode,
-            address,
-            exactly_one=False,
-        )
-
-        self._verify_request(
-            result,
-            latitude=41.890,
-            longitude=-87.624,
-        )
-
-    def test_intersection(self):
-        self.skip_known_failure(
-            ('OpenMapQuest', 'GeoNames', 'LiveAddress', 'Nominatim')
-        )
-
-        self.geocode_run(
-            {"query": u"e. 161st st and river ave, new york, ny"},
-            {"latitude": 40.828, "longitude": -73.926}
-        )
-
-    def test_placename(self):
-        self.skip_known_failure(('GeocoderDotUS', 'LiveAddress'))
-
-        self.geocode_run(
-            {"query": u"Mount St. Helens"},
-            {"latitude": 46.1912, "longitude": -122.1944}
-        )
-
-    def test_unicode_name(self):
-        self.skip_known_failure(('GeoNames', 'LiveAddress', 'MapQuest'))
-
-        self.geocode_run(
-            {"query": u"\u6545\u5bab"}, # The Forbidden City in Beijing
-            {"latitude": 39.916, "longitude": 116.390},
-        )

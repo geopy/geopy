@@ -6,13 +6,28 @@ from ssl import SSLError
 from socket import timeout as SocketTimeout
 import json
 
-from geopy.compat import string_compare, HTTPError, py3k, \
-    urlopen as urllib_urlopen, build_opener, ProxyHandler, URLError, \
-    install_opener
+from geopy.compat import (
+    string_compare,
+    HTTPError,
+    py3k,
+    urlopen as urllib_urlopen,
+    build_opener,
+    ProxyHandler,
+    URLError,
+    install_opener,
+)
 from geopy.point import Point
-from geopy.exc import (GeocoderServiceError, ConfigurationError,
-    GeocoderTimedOut, GeocoderAuthenticationFailure, GeocoderQuotaExceeded,
-    GeocoderQueryError, GeocoderInsufficientPrivileges)
+from geopy.exc import (
+    GeocoderServiceError,
+    ConfigurationError,
+    GeocoderTimedOut,
+    GeocoderAuthenticationFailure,
+    GeocoderQuotaExceeded,
+    GeocoderQueryError,
+    GeocoderInsufficientPrivileges,
+    GeocoderUnavailable,
+    GeocoderParseError,
+)
 from geopy.util import decode_page
 
 
@@ -116,6 +131,8 @@ class Geocoder(object): # pylint: disable=R0921
             elif isinstance(error, URLError):
                 if "timed out" in message:
                     raise GeocoderTimedOut('Service timed out')
+                elif "unreachable" in message:
+                    raise GeocoderUnavailable('Service not available')
             elif isinstance(error, SocketTimeout):
                 raise GeocoderTimedOut('Service timed out')
             elif isinstance(error, SSLError):
@@ -124,7 +141,10 @@ class Geocoder(object): # pylint: disable=R0921
             raise GeocoderServiceError(message)
         if raw:
             return page
-        return json.loads(decode_page(page))
+        try:
+            return json.loads(decode_page(page))
+        except ValueError:
+            raise GeocoderParseError("Could not deserialize from JSON")
 
     def geocode(self, query, exactly_one=True, timeout=None):
         """

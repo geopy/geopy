@@ -4,10 +4,10 @@ import base64
 from geopy import exc
 from geopy.point import Point
 from geopy.geocoders import GoogleV3
-from test.geocoders.util import GeocoderTestBase, CommonTestMixin
+from test.geocoders.util import GeocoderTestBase
 
 
-class GoogleV3TestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R0904,C0111
+class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
@@ -86,6 +86,24 @@ class GoogleV3TestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R09
         with self.assertRaises(AttributeError):
             f('administrative_area:CA|country:FR')
 
+    def test_geocode(self):
+        """
+        GoogleV3.geocode
+        """
+        self.geocode_run(
+            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )
+
+    def test_unicode_name(self):
+        """
+        GoogleV3.geocode unicode
+        """
+        self.geocode_run(
+            {"query": u"\u6545\u5bab"},
+            {"latitude": 39.916, "longitude": 116.390},
+        )
+
     def test_geocode_components(self):
         """
         GoogleV3.geocode returns None on conflicting components
@@ -116,9 +134,9 @@ class GoogleV3TestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R09
             {"latitude": 28.4636296, "longitude": -16.2518467},
         )
 
-    def test_reverse_address(self):
+    def test_reverse_string(self):
         """
-        GoogleV3.reverse
+        GoogleV3.reverse string
         """
         self.reverse_run(
             {"query": u"40.75376406311989, -73.98489005863667"},
@@ -127,7 +145,7 @@ class GoogleV3TestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R09
 
     def test_reverse_point(self):
         """
-        GoogleV3.reverse
+        GoogleV3.reverse Point
         """
         self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},

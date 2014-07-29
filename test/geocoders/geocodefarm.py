@@ -3,15 +3,16 @@ import unittest
 import types
 
 from geopy import exc
+from geopy.point import Point
 from geopy.geocoders import GeocodeFarm
-from test.geocoders.util import GeocoderTestBase, CommonTestMixin, env
+from test.geocoders.util import GeocoderTestBase, env
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     env['GEOCODEFARM_KEY'] is not None,
     "GEOCODEFARM_KEY env variable not set"
 )
-class GeocodeFarmTestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R0904,C0111
+class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
@@ -21,12 +22,30 @@ class GeocodeFarmTestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=
             format_string="%s US"
         )
 
-    def test_reverse(self):
+    def test_geocode(self):
         """
-        GeocodeFarm.reverse
+        OpenCage.geocode
+        """
+        self.geocode_run(
+            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )
+
+    def test_reverse_string(self):
+        """
+        GeocodeFarm.reverse string
         """
         self.reverse_run(
-            {"query": u"1065 6th Ave, New York, NY 10018, United States"},
+            {"query": u"40.75376406311989,-73.98489005863667"},
+            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        )
+
+    def test_reverse_point(self):
+        """
+        GeocodeFarm.reverse Point
+        """
+        self.reverse_run(
+            {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 

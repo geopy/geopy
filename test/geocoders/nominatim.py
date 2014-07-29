@@ -1,9 +1,10 @@
 
 from geopy.point import Point
 from geopy.geocoders import Nominatim
-from test.geocoders.util import GeocoderTestBase, CommonTestMixin
+from test.geocoders.util import GeocoderTestBase
 
-class NominatimTestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R0904,C0111
+
+class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     delta = 0.04
 
@@ -13,18 +14,23 @@ class NominatimTestCase(GeocoderTestBase, CommonTestMixin): # pylint: disable=R0
         cls.known_state_de = u"Verwaltungsregion Ionische Inseln"
         cls.known_state_en = u"Ionian Islands Periphery"
 
-    # def test_reverse_address(self):
-    #     """
-    #     Nominatim.reverse address
-    #     """
-    #     self.reverse_run(
-    #         {"query": (
-    #             u"Jose Bonifacio de Andrada e Silva, 6th Avenue, Diamond "
-    #             u"District, Hell's Kitchen, NYC, New York, 10020, "
-    #             u"United States of America"
-    #         )},
-    #         {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
-    #     )
+    def test_geocode(self):
+        """
+        Nominatim.geocode
+        """
+        self.geocode_run(
+            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )
+
+    def test_unicode_name(self):
+        """
+        Nominatim.geocode unicode
+        """
+        self.geocode_run(
+            {"query": u"\u6545\u5bab"},
+            {"latitude": 39.916, "longitude": 116.390},
+        )
 
     def test_reverse_string(self):
         """
