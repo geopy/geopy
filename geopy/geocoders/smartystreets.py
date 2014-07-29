@@ -62,7 +62,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             if not 1 <= candidates <= 10:
                 raise ValueError('candidates must be between 1 and 10')
         self.candidates = candidates
-        self.api = '%s://api.qualifiedaddress.com/street-address' % self.scheme
+        self.api = '%s://api.smartystreets.com/street-address' % self.scheme
 
     def geocode(self, query, exactly_one=True):  # pylint: disable=W0221
         """
