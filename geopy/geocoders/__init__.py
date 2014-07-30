@@ -137,7 +137,7 @@ def get_geocoder_for_service(service):
 
     """
     try:
-        return SERVICE_TO_GEOCODER[service]
+        return SERVICE_TO_GEOCODER[service.lower()]
     except KeyError:
         raise GeocoderNotFound(
             "Unknown geocoder '%s'; options are: %s" %

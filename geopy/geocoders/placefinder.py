@@ -1,9 +1,6 @@
 """
 :class:`.YahooPlaceFinder` geocoder.
-support.
 """
-
-import json
 
 try:
     import requests
@@ -15,7 +12,8 @@ except ImportError:
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 from geopy.location import Location
-from geopy.compat import quote
+from geopy.compat import urlencode, string_compare
+from geopy.util import logger
 
 
 __all__ = ("YahooPlaceFinder", )
@@ -27,8 +25,13 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         https://developer.yahoo.com/boss/geo/docs/
     """
 
-    def __init__(self, consumer_key, consumer_secret, # pylint: disable=R0913
-                        timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(
+            self,
+            consumer_key,
+            consumer_secret,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None
+        ):  # pylint: disable=R0913
         """
         :param string consumer_key: Key provided by Yahoo.
 
@@ -39,7 +42,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
 
-        :param dict proxies: If specified, routes this geocoder's requests
+        :param dict proxies: If specified, routes this geocoder"s requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
@@ -48,38 +51,21 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         if requests_missing:
             raise ImportError(
-                'requests-oauthlib is needed for YahooPlaceFinder'
+                "requests-oauthlib is needed for YahooPlaceFinder"
             )
         super(YahooPlaceFinder, self).__init__(
             timeout=timeout, proxies=proxies
         )
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
-        self.api = 'https://yboss.yahooapis.com/geo/placefinder'
-
-    def _call_yahoo(self, query, reverse, exactly_one, timeout):
-        """
-        Returns a response for the given query
-        """
-        # we quote the location, because spaces must be encoded as "%20"
-        # instead of "+". this also means we can't later call urlencode on
-        # this value.
-        params = {'location': quote(query), 'flags': 'J'}
-
-        if reverse is True:
-            params['gflags'] = 'R'
-        if exactly_one is True:
-            params['count'] = '1'
-
-        auth = requests_oauthlib.OAuth1(
-            self.consumer_key, self.consumer_secret)
-
-        url = u'?'.join((
-            self.api,
-            u'&'.join(u'='.join(item) for item in params.items())
-        ))
-
-        return requests.get(url, auth=auth, timeout=timeout)
+        self.auth = requests_oauthlib.OAuth1(
+            client_key=self.consumer_key,
+            client_secret=self.consumer_secret,
+            signature_method=u"HMAC-SHA1",
+            signature_type=u"AUTH_HEADER",
+            encoding=None # already UTF-8
+        )
+        self.api = "https://yboss.yahooapis.com/geo/placefinder"
 
     @staticmethod
     def _filtered_results(results, min_quality, valid_country_codes):
@@ -87,42 +73,42 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         Returns only the results that meet the minimum quality threshold
         and are located in expected countries.
         """
-        results = [
-            (place, point)
-            for (place, point) in results
-            if int(place['quality']) > min_quality
-        ]
+        if min_quality:
+            results = [
+                loc
+                for loc in results
+                if int(loc.raw["quality"]) > min_quality
+            ]
 
         if valid_country_codes:
             results = [
-                (place, point)
-                for (place, point) in results
-                if place['countrycode'] in valid_country_codes
+                loc
+                for loc in results
+                if loc.raw["countrycode"] in valid_country_codes
             ]
 
         return results
 
-    @staticmethod
-    def _parse_response(response):
+    def _parse_response(self, content):
         """
         Returns the parsed result of a PlaceFinder API call.
         """
         try:
             placefinder = (
-                json.loads(response.content)['bossresponse']['placefinder']
+                content["bossresponse"]["placefinder"]
             )
-            if not len(placefinder) or not len(placefinder.get('results', [])):
+            if not len(placefinder) or not len(placefinder.get("results", [])):
                 return None
             results = [
                 Location(
-                    place['name'],
-                    (float(place['latitude']), float(place['longitude'])),
-                    place
+                    self.humanize(place),
+                    (float(place["latitude"]), float(place["longitude"])),
+                    raw=place
                 )
-                for place in placefinder['results']
+                for place in placefinder["results"]
             ]
         except (KeyError, ValueError):
-            raise GeocoderParseError('Error parsing PlaceFinder result')
+            raise GeocoderParseError("Error parsing PlaceFinder result")
 
         return results
 
@@ -131,15 +117,21 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         Returns a human readable representation of a raw PlaceFinder location
         """
-        return ', '.join([
+        return ", ".join([
             location[line]
-            for line in ['line1', 'line2', 'line3', 'line4']
+            for line in ["line1", "line2", "line3", "line4"]
             if location[line]
         ])
 
-    def geocode(self, query, exactly_one=True, timeout=None, # pylint: disable=W0221,R0913
-                        min_quality=0, raw=False,
-                        reverse=False, valid_country_codes=None):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            min_quality=0,
+            reverse=False,
+            valid_country_codes=None,
+        ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
 
@@ -150,14 +142,29 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
         :param int min_quality:
 
-        :param bool raw:
-
         :param bool reverse:
 
         :param valid_country_codes:
         :type valid_country_codes: list or tuple
         """
-        response = self._call_yahoo(query, reverse, exactly_one, timeout)
+        params = {
+            "location": query,
+            "flags": "J", # JSON
+        }
+
+        if reverse is True:
+            params["gflags"] = "R"
+        if exactly_one is True:
+            params["count"] = "1"
+
+        response = self._call_geocoder(
+            self.api,
+            timeout=timeout,
+            requester=requests.get,
+            params=params,
+            auth=self.auth,
+        )
+        print(response)
         results = self._parse_response(response)
         if results is None:
             return None
@@ -168,12 +175,6 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             valid_country_codes,
         )
 
-        if not raw:
-            results = [
-                (self.humanize(place), point)
-                for (place, point) in results
-            ]
-
         if exactly_one:
             return results[0]
         else:
@@ -181,7 +182,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
     def reverse(self, query, exactly_one=True, timeout=None):
         """
-        Returns a reverse geocoded location using Yahoo's PlaceFinder API.
+        Returns a reverse geocoded location using Yahoo"s PlaceFinder API.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -191,8 +192,11 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
+        query = self._coerce_point_to_string(query)
+        if isinstance(query, string_compare):
+            query = query.replace(" ", "") # oauth signature failure; todo
         return self.geocode(
-            self._coerce_point_to_string(query),
+            query,
             exactly_one=exactly_one,
             timeout=timeout,
             reverse=True

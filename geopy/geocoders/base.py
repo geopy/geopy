@@ -114,12 +114,21 @@ class Geocoder(object): # pylint: disable=R0921
         """
         raise NotImplementedError()
 
-    def _call_geocoder(self, url, timeout=None, raw=False):
+    def _call_geocoder(
+            self,
+            url,
+            timeout=None,
+            raw=False,
+            requester=None,
+            **kwargs
+        ):
         """
         For a generated query URL, get the results.
         """
+        requester = requester or self.urlopen
+
         try:
-            page = self.urlopen(url, timeout=timeout or self.timeout)
+            page = requester(url, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
                 str(error) if not py3k
@@ -148,12 +157,26 @@ class Geocoder(object): # pylint: disable=R0921
                 if "timed out" in message:
                     raise GeocoderTimedOut('Service timed out')
             raise GeocoderServiceError(message)
+
+        if hasattr(page, 'getcode'):
+            status_code = page.getcode()
+        elif hasattr(page, 'status_code'):
+            status_code = page.status_code
+        else:
+            status_code = None
+        if status_code in ERROR_CODE_MAP:
+            raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
+
         if raw:
             return page
+
+        page = decode_page(page)
         try:
-            return json.loads(decode_page(page))
+            return json.loads(page)
         except ValueError:
-            raise GeocoderParseError("Could not deserialize from JSON")
+            raise GeocoderParseError(
+                "Could not deserialize from JSON:\n%s" % page
+            )
 
     def geocode(self, query, exactly_one=True, timeout=None):
         """

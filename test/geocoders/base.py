@@ -18,7 +18,7 @@ class GetGeocoderTestCase(unittest.TestCase):
 
     def test_fail(self):
         """
-        get_geocoder_for_service
+        get_geocoder_for_service unknown service
         """
         with self.assertRaises(GeocoderNotFound):
             get_geocoder_for_service("")

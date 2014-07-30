@@ -25,7 +25,7 @@ docs:
 
 dist:
 	rm -rf dist
-	pandoc -f markdown -t rst README.markdown > README
+	pandoc -f markdown -t rst README.md > README
 	python setup.py sdist --format=gztar
 	pip wheel --no-index --no-deps --wheel-dir dist dist/*.tar.gz
 	rm README

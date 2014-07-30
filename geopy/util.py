@@ -25,6 +25,7 @@ class NullHandler(logging.Handler):
         pass
 
 logger = logging.getLogger('geopy') # pylint: disable=C0103
+logger.setLevel(logging.CRITICAL)
 
 
 def pairwise(seq):
@@ -54,12 +55,20 @@ if not py3k:
         """
         Return unicode string of geocoder results.
         """
-        encoding = page.headers.getparam("charset") or "iso-8859-1"
-        return unicode(page.read(), encoding=encoding).encode('utf-8')
+        if hasattr(page.headers, "getparam"): # urllib
+            encoding = page.headers.getparam("charset") or "iso-8859-1"
+            return unicode(page.read(), encoding=encoding).encode('utf-8')
+        else: # requests?
+            encoding = page.headers.get("charset") or "iso-8859-1"
+            return unicode(page.content, encoding=encoding).encode('utf-8')
 else:
     def decode_page(page):
         """
         Return unicode string of geocoder results.
         """
-        encoding = page.headers.get_param("charset") or "iso-8859-1"
-        return str(page.read(), encoding=encoding)
+        if hasattr(page.headers, "getparam"): # urllib
+            encoding = page.headers.getparam("charset") or "iso-8859-1"
+            return unicode(page.read(), encoding=encoding).encode('utf-8')
+        else: # requests?
+            encoding = page.headers.get("charset") or "iso-8859-1"
+            return unicode(page.content, encoding=encoding).encode('utf-8')
