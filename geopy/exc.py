@@ -65,3 +65,9 @@ class GeocoderParseError(GeocoderServiceError):
     """
     Geopy could not parse the service's response. This is a bug in geopy.
     """
+
+class GeocoderNotFound(GeopyError):
+    """
+    Caller requested the geocoder matching a string, e.g.,
+    "google" > GoogleV3, but no geocoder could be found.
+    """

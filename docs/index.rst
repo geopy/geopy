@@ -15,6 +15,8 @@ Geocoders
 .. automodule:: geopy.geocoders
    :members: __doc__
 
+.. autofunction:: geopy.geocoders.get_geocoder_for_service
+
 .. autoclass:: geopy.geocoders.ArcGIS
     :members: __init__, geocode, reverse
 
@@ -92,6 +94,10 @@ Exceptions
 .. autoclass:: geopy.exc.GeocoderTimedOut
 
 .. autoclass:: geopy.exc.GeocoderParseError
+
+.. autoclass:: geopy.exc.GeocoderNotFound
+
+
 
 Logging
 ~~~~~~~

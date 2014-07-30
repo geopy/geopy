@@ -16,6 +16,9 @@ from geopy.location import Location
 from geopy.util import logger
 
 
+__all__ = ("GoogleV3", )
+
+
 class GoogleV3(Geocoder):  # pylint: disable=R0902
     """
     Geocoder using the Google Maps v3 API. Documentation at:

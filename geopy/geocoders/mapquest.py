@@ -14,6 +14,9 @@ from geopy.util import logger, join_filter
 from geopy import exc
 
 
+__all__ = ("MapQuest", )
+
+
 class MapQuest(Geocoder): # pylint: disable=W0223
     """
     MapQuest geocoder, documentation at:

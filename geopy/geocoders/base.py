@@ -31,6 +31,15 @@ from geopy.exc import (
 from geopy.util import decode_page
 
 
+__all__ = (
+    "Geocoder",
+    "DEFAULT_FORMAT_STRING",
+    "DEFAULT_SCHEME",
+    "DEFAULT_TIMEOUT",
+    "DEFAULT_WKID",
+)
+
+
 DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1

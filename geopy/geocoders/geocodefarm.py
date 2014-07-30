@@ -11,6 +11,9 @@ from geopy.exc import GeocoderAuthenticationFailure, GeocoderQuotaExceeded, \
 from geopy.compat import quote
 
 
+__all__ = ("GeocodeFarm", )
+
+
 class GeocodeFarm(Geocoder):
     """
     Geocoder using the GeocodeFarm API. Documentation at:

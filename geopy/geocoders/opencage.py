@@ -12,6 +12,9 @@ from geopy.location import Location
 from geopy.util import logger
 
 
+__all__ = ("OpenCage", )
+
+
 class OpenCage(Geocoder):
     """
     Geocoder using the Open Cage Data API. Documentation at:

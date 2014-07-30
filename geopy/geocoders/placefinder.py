@@ -18,6 +18,9 @@ from geopy.location import Location
 from geopy.compat import quote
 
 
+__all__ = ("YahooPlaceFinder", )
+
+
 class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
     """
     Geocoder that utilizes the Yahoo! BOSS PlaceFinder API. Documentation at:

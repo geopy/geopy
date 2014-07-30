@@ -15,6 +15,9 @@ from geopy.exc import ConfigurationError
 from geopy.util import logger, join_filter
 
 
+__all__ = ("GeocoderDotUS", )
+
+
 class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
     """
     GeocoderDotUS geocoder, documentation at:

@@ -9,6 +9,9 @@ from geopy.location import Location
 from geopy.util import logger, join_filter
 
 
+__all__ = ("Bing", )
+
+
 class Bing(Geocoder):
     """
     Geocoder using the Bing Maps Locations API. Documentation at:

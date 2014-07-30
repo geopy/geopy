@@ -12,6 +12,9 @@ from geopy.location import Location
 from geopy.util import logger
 
 
+__all__ = ("Nominatim", )
+
+
 class Nominatim(Geocoder):
     """
     Nominatim geocoder for OpenStreetMap servers. Documentation at:

@@ -9,6 +9,9 @@ from geopy.exc import GeocoderQuotaExceeded
 from geopy.util import logger
 
 
+__all__ = ("LiveAddress", )
+
+
 class LiveAddress(Geocoder):  # pylint: disable=W0223
     """
     Initialize a customized LiveAddress geocoder provided by SmartyStreets.

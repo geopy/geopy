@@ -2,7 +2,26 @@
 import unittest
 
 from geopy.point import Point
+from geopy.exc import GeocoderNotFound
+from geopy.geocoders import get_geocoder_for_service, GoogleV3
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+
+
+class GetGeocoderTestCase(unittest.TestCase):
+
+    def test_ok(self):
+        """
+        get_geocoder_for_service
+        """
+        self.assertEqual(get_geocoder_for_service("google"), GoogleV3)
+        self.assertEqual(get_geocoder_for_service("googlev3"), GoogleV3)
+
+    def test_fail(self):
+        """
+        get_geocoder_for_service
+        """
+        with self.assertRaises(GeocoderNotFound):
+            get_geocoder_for_service("")
 
 
 class GeocoderTestCase(unittest.TestCase):

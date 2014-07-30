@@ -71,16 +71,76 @@ need to geocode locations in Cleveland, Ohio, you could do::
 
 """
 
+__all__ = (
+    "get_geocoder_for_service",
+    "ArcGIS",
+    "Baidu",
+    "Bing",
+    "GeocoderDotUS",
+    "GeocodeFarm",
+    "GeoNames",
+    "GoogleV3",
+    "MapQuest",
+    "OpenCage",
+    "OpenMapQuest",
+    "Nominatim",
+    "YahooPlaceFinder",
+    "LiveAddress",
+)
+
+
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.baidu import Baidu
 from geopy.geocoders.bing import Bing
-from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.dot_us import GeocoderDotUS
+from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
-from geopy.geocoders.placefinder import YahooPlaceFinder
+from geopy.geocoders.googlev3 import GoogleV3
+from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
-from geopy.geocoders.mapquest import MapQuest
-from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.osm import Nominatim
-from geopy.geocoders.geocodefarm import GeocodeFarm
+from geopy.geocoders.placefinder import YahooPlaceFinder
+from geopy.geocoders.smartystreets import LiveAddress
+
+from geopy.exc import GeocoderNotFound
+
+
+SERVICE_TO_GEOCODER = {
+    "arcgis": ArcGIS,
+    "baidu": Baidu,
+    "google": GoogleV3,
+    "googlev3": GoogleV3,
+    "geocoderdotus": GeocoderDotUS,
+    "geonames": GeoNames,
+    "yahoo": YahooPlaceFinder,
+    "placefinder": YahooPlaceFinder,
+    "opencage": OpenCage,
+    "openmapquest": OpenMapQuest,
+    "mapquest": MapQuest,
+    "liveaddress": LiveAddress,
+    "nominatim": Nominatim,
+    "geocodefarm": GeocodeFarm,
+}
+
+
+def get_geocoder_for_service(service):
+    """
+    For the service provided, try to return a geocoder class.
+
+    >>> from geopy.geocoders import get_geocoder_for_service
+    >>> get_geocoder_for_service("nominatim")
+    geopy.geocoders.osm.Nominatim
+
+    If the string given is not recognized, a
+    :class:`geopy.exc.GeocoderNotFound` exception is raised.
+
+    """
+    try:
+        return SERVICE_TO_GEOCODER[service]
+    except KeyError:
+        raise GeocoderNotFound(
+            "Unknown geocoder '%s'; options are: %s" %
+            (service, SERVICE_TO_GEOCODER.keys())
+        )
+

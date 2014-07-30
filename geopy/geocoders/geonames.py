@@ -14,6 +14,9 @@ from geopy.exc import (
 from geopy.util import logger
 
 
+__all__ = ("GeoNames", )
+
+
 class GeoNames(Geocoder): # pylint: disable=W0223
     """
     GeoNames geocoder, documentation at:

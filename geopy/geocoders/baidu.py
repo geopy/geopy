@@ -13,6 +13,9 @@ from geopy.location import Location
 from geopy.util import logger
 
 
+__all__ = ("Baidu", )
+
+
 class Baidu(Geocoder):
     """
     Geocoder using the Baidu Maps v2 API. Documentation at:
