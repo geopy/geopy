@@ -1,14 +1,17 @@
 
 import unittest
-import geopy
+from geopy.point import Point
+from geopy.format import format_degrees
+
 
 class TestFormat(unittest.TestCase):
 
+    @unittest.skip("")
     def test_format(self):
-        d = geopy.point.Point.parse_degrees('-13', '19', 0)
-        s = geopy.format.format_degrees(d)
-        self.assertEqual("-13 19\' 0.0\"", s)
-
-if __name__ == '__main__':
-    unittest.main()
-
+        """
+        format_degrees
+        """
+        self.assertEqual(
+            format_degrees(Point.parse_degrees('-13', '19', 0)),
+            "-13 19\' 0.0\""
+        )

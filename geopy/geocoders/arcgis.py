@@ -122,8 +122,6 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        # TODO: dict as query for parameterized query
-        # TODO: SRID
         params = {'text': query, 'f': 'json'}
         if exactly_one is True:
             params['maxLocations'] = 1

@@ -123,8 +123,8 @@ class Location(object): # pylint: disable=R0903,R0921
     def __eq__(self, other):
         return (
             isinstance(other, Location) and
-            self._address == other._address and
-            self._point == other._point and
+            self._address == other._address and  # pylint: disable=W0212
+            self._point == other._point and  # pylint: disable=W0212
             self.raw == other.raw
         )
 

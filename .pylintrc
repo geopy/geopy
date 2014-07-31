@@ -1,16 +1,11 @@
 [MASTER]
 
 [MESSAGES CONTROL]
-disable=C0103,R0401,W0142,I0011,I0012
+disable=C0103,R0401,W0142,I0011,I0012,R0801
 
 [REPORTS]
 include-ids=yes
 output-format=colorized
-
-[SIMILARITIES]
-min-similarity-lines=6
-ignore-comments=yes
-ignore-docstrings=yes
 
 [FORMAT]
 indent-string='    '

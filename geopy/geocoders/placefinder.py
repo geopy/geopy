@@ -12,8 +12,7 @@ except ImportError:
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 from geopy.location import Location
-from geopy.compat import urlencode, string_compare
-from geopy.util import logger
+from geopy.compat import string_compare
 
 
 __all__ = ("YahooPlaceFinder", )
@@ -51,7 +50,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         if requests_missing:
             raise ImportError(
-                "requests-oauthlib is needed for YahooPlaceFinder"
+                'requests-oauthlib is needed for YahooPlaceFinder.'
+                ' Install with `pip install geopy -e ".[placefinder]"`.'
             )
         super(YahooPlaceFinder, self).__init__(
             timeout=timeout, proxies=proxies
@@ -164,7 +164,6 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             params=params,
             auth=self.auth,
         )
-        print(response)
         results = self._parse_response(response)
         if results is None:
             return None

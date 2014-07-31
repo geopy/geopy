@@ -27,7 +27,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRES,
     extras_require={
-        "Yahoo BOSS": ["requests_oauthlib>=0.4.0"],
+        "placefinder": ["requests_oauthlib>=0.4.0"],
     },
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',
