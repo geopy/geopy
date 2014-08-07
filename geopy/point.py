@@ -5,7 +5,14 @@
 
 import re
 from itertools import islice
-from geopy import util, units, format # pylint: disable=W0622
+from geopy import util, units
+from geopy.format import (
+    DEGREE,
+    PRIME,
+    DOUBLE_PRIME,
+    format_degrees,
+    format_distance,
+)
 from geopy.compat import string_compare
 
 
@@ -31,9 +38,9 @@ POINT_PATTERN = re.compile(r"""
     .*?$
 """ % {
     "FLOAT": r'\d+(?:\.\d+)?',
-    "DEGREE": format.DEGREE,
-    "PRIME": format.PRIME,
-    "DOUBLE_PRIME": format.DOUBLE_PRIME,
+    "DEGREE": DEGREE,
+    "PRIME": PRIME,
+    "DOUBLE_PRIME": DOUBLE_PRIME,
     "SEP": r'\s*[,;/\s]\s*',
 }, re.X)
 
@@ -152,13 +159,13 @@ class Point(object):
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         latitude = "%s %s" % (
-            format.format_degrees(abs(self.latitude), symbols={
+            format_degrees(abs(self.latitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
             }),
             self.latitude >= 0 and 'N' or 'S'
         )
         longitude = "%s %s" % (
-            format.format_degrees(abs(self.longitude), symbols={
+            format_degrees(abs(self.longitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
             }),
             self.longitude >= 0 and 'E' or 'W'
@@ -187,14 +194,14 @@ class Point(object):
         return ", ".join(coordinates)
 
     def format_altitude(self, unit='km'):
-        return format.format_distance(self.altitude, unit)
+        return format_distance(self.altitude, unit)
 
     def __str__(self):
         return self.format()
 
     def __unicode__(self):
         return self.format(
-            None, format.DEGREE, format.PRIME, format.DOUBLE_PRIME
+            None, DEGREE, PRIME, DOUBLE_PRIME
         )
 
     def __eq__(self, other):

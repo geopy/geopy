@@ -164,7 +164,7 @@ class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
         if py3k:
             self.assertEqual(
                 repr(loc),
-                u"Location(%s, %r" % (address, point)
+                u"Location(%s, %r)" % (address, point)
             )
         else:
             self.assertEqual(
