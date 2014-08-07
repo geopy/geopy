@@ -54,21 +54,29 @@ if not py3k:
     def decode_page(page):
         """
         Return unicode string of geocoder results.
+
+        Nearly all services use JSON, so assume UTF8 encoding unless the
+        response specifies otherwise.
         """
-        if hasattr(page.headers, "getparam"): # urllib
-            encoding = page.headers.getparam("charset") or "iso-8859-1"
-            return unicode(page.read(), encoding=encoding).encode('utf-8')
+        if hasattr(page, 'read'): # urllib
+            # note getparam in py2
+            encoding = page.headers.getparam("charset") or "utf-8"
+            return unicode(page.read(), encoding=encoding)
         else: # requests?
-            encoding = page.headers.get("charset") or "iso-8859-1"
-            return unicode(page.content, encoding=encoding).encode('utf-8')
+            encoding = page.headers.get("charset", "utf-8")
+            return unicode(page.content, encoding=encoding)
 else:
     def decode_page(page):
         """
         Return unicode string of geocoder results.
+
+        Nearly all services use JSON, so assume UTF8 encoding unless the
+        response specifies otherwise.
         """
-        if hasattr(page.headers, "getparam"): # urllib
-            encoding = page.headers.getparam("charset") or "iso-8859-1"
-            return unicode(page.read(), encoding=encoding).encode('utf-8')
+        if hasattr(page, 'read'): # urllib
+            # note get_param in py3
+            encoding = page.headers.get_param("charset") or "utf-8"
+            return str(page.read(), encoding=encoding)
         else: # requests?
-            encoding = page.headers.get("charset") or "iso-8859-1"
-            return unicode(page.content, encoding=encoding).encode('utf-8')
+            encoding = page.headers.get("charset") or "utf-8"
+            return str(page.content, encoding=encoding)
