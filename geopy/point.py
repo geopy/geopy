@@ -155,7 +155,7 @@ class Point(object):
         return iter((self.latitude, self.longitude, self.altitude))
 
     def __repr__(self):
-        return "Point(%r, %r, %r)" % self._items
+        return "Point(%r, %r, %r)" % tuple(self._items)
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         latitude = "%s %s" % (
