@@ -11,7 +11,7 @@ TESTS_REQUIRES = [
     'tox'
 ]
 
-version = "1.1.1"  # pylint: disable=C0103
+version = "1.1.2"  # pylint: disable=C0103
 
 setup(
     name='geopy',
