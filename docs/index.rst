@@ -95,7 +95,6 @@ Exceptions
 .. autoclass:: geopy.exc.GeocoderNotFound
 
 
-
 Logging
 ~~~~~~~
 
@@ -104,6 +103,15 @@ and for some geocoders, these URLs will include authentication information.
 If this is a concern, one can disable this logging by specifying a logging
 level of `NOTSET` or a level greater than `DEBUG` for logger name `geopy`.
 geopy does no logging above DEBUG.
+
+
+Changelog
+~~~~~~~~~
+
+.. include:: changelog_1xx.rst
+
+For changes in the 0.9 series, see the
+:doc:`0.9x changelog <changelog_09x>`.
 
 
 Indices and search
