@@ -30,7 +30,7 @@ class OpenCage(Geocoder):
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-        ):  # pylint: disable=R0913
+    ):  # pylint: disable=R0913
         """
         Initialize a customized Open Cage Data geocoder.
 
@@ -60,7 +60,6 @@ class OpenCage(Geocoder):
         self.scheme = scheme
         self.api = '%s://%s/geocode/v1/json' % (self.scheme, self.domain)
 
-
     def geocode(
             self,
             query,
@@ -69,7 +68,7 @@ class OpenCage(Geocoder):
             language=None,
             exactly_one=True,
             timeout=None,
-        ):  # pylint: disable=W0221,R0913
+    ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
 
@@ -128,7 +127,7 @@ class OpenCage(Geocoder):
             language=None,
             exactly_one=False,
             timeout=None,
-        ):  # pylint: disable=W0221,R0913
+    ):  # pylint: disable=W0221,R0913
         """
         Given a point, find an address.
 
@@ -186,21 +185,21 @@ class OpenCage(Geocoder):
         """
         Validates error statuses.
         """
-        if status.code == 429:
+        status_code = status['code']
+        if status_code == 429:
             # Rate limit exceeded
             raise GeocoderQuotaExceeded(
                 'The given key has gone over the requests limit in the 24'
                 ' hour period or has submitted too many requests in too'
                 ' short a period of time.'
             )
-        if status.code == 200:
+        if status_code == 200:
             # When there are no results, just return.
             return
 
-        if status.code == 403:
+        if status_code == 403:
             raise GeocoderQueryError(
                 'Your request was denied.'
             )
         else:
             raise GeocoderQueryError('Unknown error.')
-
