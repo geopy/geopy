@@ -36,3 +36,15 @@ class OpenCageTestCase(GeocoderTestBase):
             {"query": u"\u6545\u5bab"},
             {"latitude": 39.916, "longitude": 116.390},
         )
+
+    def test_geocode_empty_result(self):
+        """
+        Empty OpenCage.geocode results should be graciously handled.
+        """
+        self.geocode_run(
+            {
+                "query": u"xqj37",
+            },
+            {},
+            expect_failure=True
+        )
