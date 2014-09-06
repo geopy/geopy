@@ -34,3 +34,6 @@ dist:
 release:
 	make dist
 	git tag -a $(version)
+
+remote-docs:
+	curl -X POST http://readthedocs.org/build/geopy
