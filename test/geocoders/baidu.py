@@ -6,8 +6,8 @@ from geopy.geocoders import Baidu
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['BAIDU_KEY'] is not None,
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('BAIDU_KEY')),
     "No BAIDU_KEY env variable set"
 )
 class BaiduTestCase(GeocoderTestBase):

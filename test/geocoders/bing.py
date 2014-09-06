@@ -6,8 +6,8 @@ from geopy.geocoders import Bing
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['BING_KEY'] is not None,
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('BING_KEY')),
     "No BING_KEY env variable set"
 )
 class BingTestCase(GeocoderTestBase):

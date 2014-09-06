@@ -5,8 +5,8 @@ from geopy.geocoders import OpenCage
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['OPENCAGE_KEY'] is not None,
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('OPENCAGE_KEY')),
     "No OPENCAGE_KEY env variables set"
 )
 class OpenCageTestCase(GeocoderTestBase):

@@ -5,9 +5,9 @@ from geopy.compat import py3k
 from geopy.geocoders import GeocoderDotUS
 from test.geocoders.util import GeocoderTestBase, env
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['GEOCODERDOTUS_USERNAME'] is not None and \
-    env['GEOCODERDOTUS_PASSWORD'] is not None,
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('GEOCODERDOTUS_USERNAME')) and \
+    bool(env.get('GEOCODERDOTUS_PASSWORD')),
     "No GEOCODERDOTUS_USERNAME and GEOCODERDOTUS_PASSWORD env variables set"
 )
 class GeocoderDotUSTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111

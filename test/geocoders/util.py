@@ -12,6 +12,9 @@ try:
         env.update(json.loads(fp.read()))
 except IOError:
     keys = (
+        'ARCGIS_USERNAME',
+        'ARCGIS_PASSWORD',
+        'ARCGIS_REFERER',
         'YAHOO_KEY',
         'YAHOO_SECRET',
         'BING_KEY',

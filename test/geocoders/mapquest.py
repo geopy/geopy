@@ -5,8 +5,8 @@ from geopy.geocoders import MapQuest
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['MAPQUEST_KEY'] is not None,
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('MAPQUEST_KEY')),
     "No MAPQUEST_KEY env variable set"
 )
 class MapQuestTestCase(GeocoderTestBase):

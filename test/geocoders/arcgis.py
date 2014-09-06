@@ -7,6 +7,10 @@ from geopy.geocoders import ArcGIS
 from test.geocoders.util import GeocoderTestBase, env
 
 
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('ARCGIS_USERNAME')),
+    "No ARCGIS_USERNAME env variable set"
+)
 class ArcGISTestCase(GeocoderTestBase):
 
     @classmethod

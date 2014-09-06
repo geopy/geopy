@@ -8,8 +8,8 @@ from geopy.geocoders import GeocodeFarm
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    env['GEOCODEFARM_KEY'] is not None,
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    bool(env.get('GEOCODEFARM_KEY')),
     "GEOCODEFARM_KEY env variable not set"
 )
 class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
