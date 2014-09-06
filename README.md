@@ -1,4 +1,7 @@
 # geopy
+
+[![Build Status](https://travis-ci.org/geopy/geopy.svg?branch=master)](https://travis-ci.org/geopy/geopy)
+
 geopy is a Python 2 and 3 client for several popular geocoding web services.
 
 geopy makes it easy for Python developers to locate the coordinates of
