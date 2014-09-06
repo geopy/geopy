@@ -30,7 +30,7 @@ ABBR_ARCMIN = 'arcmin'
 ABBR_ARCSEC = 'arcsec'
 
 DEGREES_FORMAT = (
-    "%(degrees)d%(deg)s %(minutes)d%(arcmin)s %(seconds)s%(arcsec)s"
+    "%(degrees)d%(deg)s %(minutes)d%(arcmin)s %(seconds)g%(arcsec)s"
 )
 
 UNICODE_SYMBOLS = {
