@@ -1,3 +1,10 @@
+1.1.4
+-----
+2014-09-06
+
+*   FIXED: Point.format() seconds precision in Python 3.
+
+
 1.1.3
 -----
 2014-08-30

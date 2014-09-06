@@ -33,4 +33,4 @@ dist:
 
 release:
 	make dist
-	git tag -a $(version) -m "Release $(version)"
+	git tag -a $(version)
