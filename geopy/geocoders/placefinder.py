@@ -71,7 +71,6 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             client_secret=self.consumer_secret,
             signature_method=u"HMAC-SHA1",
             signature_type=u"AUTH_HEADER",
-            encoding=None # already UTF-8
         )
         self.api = "https://yboss.yahooapis.com/geo/placefinder"
 
