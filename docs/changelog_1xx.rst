@@ -1,3 +1,11 @@
+1.1.5
+-----
+2014-09-07
+
+*   FIXED: YahooPlaceFinder is now compatible with the older
+    requests_oauthlib version 0.4.0.
+
+
 1.1.4
 -----
 2014-09-06

@@ -3,6 +3,7 @@ geopy
 """
 
 from setuptools import setup, find_packages
+from geopy import __version__ as version
 
 INSTALL_REQUIRES = []
 TESTS_REQUIRES = [
@@ -11,7 +12,6 @@ TESTS_REQUIRES = [
     'tox'
 ]
 
-version = "1.1.4"  # pylint: disable=C0103
 
 setup(
     name='geopy',
