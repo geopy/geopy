@@ -56,17 +56,22 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         geocoder = Nominatim(country_bias='DE')
         query = {'postalcode': 10117}
-        result = geocoder.geocode(query, addressdetails=True)
+        result = self._make_request(
+            geocoder.geocode,
+            query,
+            addressdetails=True,
+        )
         self.assertEqual(result.raw['address']['city_district'], u'Mitte')
 
     def test_geocode_language_parameter(self):
         """
         Nominatim.geocode using `language`
         """
-        result_geocode = self.geocoder.geocode(
+        result_geocode = self._make_request(
+            self.geocoder.geocode,
             self.known_state_en,
             addressdetails=True,
-            language="de"
+            language="de",
         )
         self.assertEqual(
             result_geocode.raw['address']['state'],
@@ -77,17 +82,19 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         Nominatim.reverse using `language`
         """
-        result_reverse_de = self.geocoder.reverse(
+        result_reverse_de = self._make_request(
+            self.geocoder.reverse,
             "37.78250, 20.89506",
             exactly_one=True,
-            language="de"
+            language="de",
         )
         self.assertEqual(
             result_reverse_de.raw['address']['state'],
             self.known_state_de
         )
 
-        result_reverse_en = self.geocoder.reverse(
+        result_reverse_en = self._make_request(
+            self.geocoder.reverse,
             "37.78250, 20.89506",
             exactly_one=True,
             language="en"
