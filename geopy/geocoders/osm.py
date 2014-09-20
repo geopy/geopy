@@ -156,8 +156,10 @@ class Nominatim(Geocoder):
             params['polygon_kml'] = 1
         elif geometry == 'geojson':
             params['polygon_geojson'] = 1
-        #else:
-        #    raise GeocoderQueryError("Invalid geometry format. Must be one of WKT, svg, kml, geojson.")
+        elif geometry is None:
+            pass
+        else:
+            raise GeocoderQueryError("Invalid geometry format. Must be one of WKT, svg, kml, geojson.")
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

@@ -60,6 +60,7 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             geocoder.geocode,
             query,
             addressdetails=True,
+
         )
         self.assertEqual(result.raw['address']['city_district'], u'Mitte')
 
