@@ -78,7 +78,8 @@ class Nominatim(Geocoder):
             exactly_one=True,
             timeout=None,
             addressdetails=False,
-            language=False
+            language=False,
+            geometry=''
         ):  # pylint: disable=R0913,W0221
         """
         Geocode a location query.
@@ -145,6 +146,18 @@ class Nominatim(Geocoder):
 
         if language:
             params['accept-language'] = language
+
+        if geometry=='WKT':
+            params['polygon_text'] = 1
+
+        if geometry=='svg':
+            params['polygon_svg'] = 1
+
+        if geometry=='kml':
+            params['polygon_kml'] = 1
+
+        if geometry=='geojson':
+            params['polygon_geojson'] = 1
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
