@@ -10,6 +10,7 @@ from geopy.geocoders.base import (
 from geopy.compat import urlencode
 from geopy.location import Location
 from geopy.util import logger
+from geopy.exc import GeocoderQueryError
 
 
 __all__ = ("Nominatim", )
@@ -39,7 +40,7 @@ class Nominatim(Geocoder):
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-        ):  # pylint: disable=R0913
+    ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
@@ -79,8 +80,8 @@ class Nominatim(Geocoder):
             timeout=None,
             addressdetails=False,
             language=False,
-            geometry=''
-        ):  # pylint: disable=R0913,W0221
+            geometry=None
+    ):  # pylint: disable=R0913,W0221
         """
         Geocode a location query.
 
@@ -147,17 +148,16 @@ class Nominatim(Geocoder):
         if language:
             params['accept-language'] = language
 
-        if geometry=='WKT':
+        if geometry == 'WKT':
             params['polygon_text'] = 1
-
-        if geometry=='svg':
+        elif geometry == 'svg':
             params['polygon_svg'] = 1
-
-        if geometry=='kml':
+        elif geometry == 'kml':
             params['polygon_kml'] = 1
-
-        if geometry=='geojson':
+        elif geometry == 'geojson':
             params['polygon_geojson'] = 1
+        #else:
+        #    raise GeocoderQueryError("Invalid geometry format. Must be one of WKT, svg, kml, geojson.")
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -171,7 +171,7 @@ class Nominatim(Geocoder):
             exactly_one=True,
             timeout=None,
             language=False,
-        ):  # pylint: disable=W0221
+    ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
 
@@ -204,13 +204,13 @@ class Nominatim(Geocoder):
             lat, lon = [
                 x.strip() for x in
                 self._coerce_point_to_string(query).split(',')
-            ] # doh
+            ]  # doh
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
         params = {
             'lat': lat,
-            'lon' : lon,
-            'format' : 'json',
+            'lon': lon,
+            'format': 'json',
         }
         if language:
             params['accept-language'] = language
