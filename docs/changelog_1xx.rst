@@ -1,3 +1,13 @@
+1.2.0
+-----
+
+*   ADDED: GeoNames.reverse() added. Contributed by Emile Aben.
+
+*   ADDED: GoogleV3.timezone() added. This returns a pytz object
+    giving the timezone in effect for a given location at a time
+    (defaulting to now).
+
+
 1.1.5
 -----
 2014-09-07
