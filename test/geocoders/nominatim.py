@@ -60,6 +60,7 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             geocoder.geocode,
             query,
             addressdetails=True,
+
         )
         self.assertEqual(result.raw['address']['city_district'], u'Mitte')
 
@@ -102,4 +103,64 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         self.assertEqual(
             result_reverse_en.raw['address']['state'],
             self.known_state_en
+        )
+
+    def test_geocode_geometry_wkt(self):
+        """
+        Nominatim.geocode with full geometry (response in WKT format)
+        """
+        result_geocode = self._make_request(
+            self.geocoder.geocode,
+            self.known_state_en,
+            geometry='WKT',
+
+        )
+        self.assertEqual(
+            result_geocode.raw['geotext'].startswith('MULTIPOLYGON((('),
+            True
+        )
+
+    def test_geocode_geometry_svg(self):
+        """
+        Nominatim.geocode with full geometry (response in svg format)
+        """
+        result_geocode = self._make_request(
+            self.geocoder.geocode,
+            self.known_state_en,
+            geometry='svg',
+
+        )
+        self.assertEqual(
+            result_geocode.raw['svg'].startswith('M 19.'),
+            True
+        )
+
+    def test_geocode_geometry_svg(self):
+        """
+        Nominatim.geocode with full geometry (response in kml format)
+        """
+        result_geocode = self._make_request(
+            self.geocoder.geocode,
+            self.known_state_en,
+            geometry='kml',
+
+        )
+        self.assertEqual(
+            result_geocode.raw['geokml'].startswith('<MultiGeometry>'),
+            True
+        )
+
+    def test_geocode_geometry_geojson(self):
+        """
+        Nominatim.geocode with full geometry (response in geojson format)
+        """
+        result_geocode = self._make_request(
+            self.geocoder.geocode,
+            self.known_state_en,
+            geometry='geojson',
+
+        )
+        self.assertEqual(
+            result_geocode.raw['geojson'].get('type'),
+            'MultiPolygon'
         )
