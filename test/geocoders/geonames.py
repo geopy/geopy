@@ -26,4 +26,13 @@ class GeoNamesTestCase(GeocoderTestBase):
             {"latitude": 30.90097, "longitude": 118.49436},
         )
 
-
+    def test_unicode_name(self):
+        """
+        GeoNames.reverse
+        """
+        # work around ConfigurationError raised in GeoNames init
+        self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
+        self.reverse_run(
+            {"query": u"40.75376406311989, -73.98489005863667"},
+            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        )
