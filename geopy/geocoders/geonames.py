@@ -22,8 +22,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
     GeoNames geocoder, documentation at:
         http://www.geonames.org/export/geonames-search.html
 
-    Reverse geocoding also available, but not yet implemented. Documentation
-    at:
+    Reverse geocoding documentation at:
         http://www.geonames.org/maps/us-reverse-geocoder.html
     """
 
@@ -64,6 +63,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         self.username = username
         self.country_bias = country_bias
         self.api = "%s://api.geonames.org/searchJSON" % self.scheme
+        self.api_reverse = "%s://api.geonames.org/findNearbyPlaceNameJSON" % self.scheme
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
@@ -91,6 +91,45 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             params['maxRows'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one,
+            raw=True
+        )
+
+    def reverse(
+            self,
+            query,
+            exactly_one=False,
+            timeout=None,
+        ):
+        """
+        Given a point, find an address.
+
+        :param string query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
+
+        :param boolean exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+            .. versionadded:: @@@
+
+        """
+# http://api.geonames.org/findNearbyPlaceNameJSON?lat=47.3&lng=9&username=emileaben
+        (lat,lng) = query.split(',')
+        params = {
+            'lat': lat,
+            'lng': lng,
+             'username': self.username
+        }
+        url = "?".join((self.api_reverse, urlencode(params)))
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
             exactly_one
