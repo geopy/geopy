@@ -1,5 +1,7 @@
 
 import base64
+from datetime import datetime
+from pytz import timezone
 
 from geopy import exc
 from geopy.point import Point
@@ -11,7 +13,9 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = GoogleV3(scheme='http')
+        cls.geocoder = GoogleV3()
+        cls.new_york_point = Point(40.75376406311989, -73.98489005863667)
+        cls.america_new_york = timezone("America/New_York")
 
     def test_configuration_error(self):
         """
@@ -148,7 +152,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GoogleV3.reverse Point
         """
         self.reverse_run(
-            {"query": Point(40.75376406311989, -73.98489005863667)},
+            {"query": self.new_york_point},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
@@ -156,5 +160,45 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         GoogleV3.geocode returns None for no result
         """
-        result = self.geocoder.geocode('')
+        result = self._make_request(self.geocoder.geocode, '')
         self.assertIsNone(result)
+
+    def test_timezone_datetime(self):
+        """
+        GoogleV3.timezone returns pytz object from datetime
+        """
+        tz = self._make_request(
+            self.geocoder.timezone,
+            self.new_york_point,
+            datetime.utcfromtimestamp(0)
+        )
+        self.assertEqual(tz, self.america_new_york)
+
+    def test_timezone_integer(self):
+        """
+        GoogleV3.timezone returns pytz object from epoch integer
+        """
+        tz = self._make_request(
+            self.geocoder.timezone,
+            self.new_york_point,
+            0
+        )
+        self.assertEqual(tz, self.america_new_york)
+
+    def test_timezone_no_date(self):
+        """
+        GoogleV3.timezone defaults `at_time`
+        """
+        tz = self._make_request(
+            self.geocoder.timezone,
+            self.new_york_point,
+        )
+        self.assertEqual(tz, self.america_new_york)
+
+    def test_timezone_invalid_at_time(self):
+        """
+        GoogleV3.timezone invalid `at_time`
+        """
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocoder.timezone(self.new_york_point, "eek")
+

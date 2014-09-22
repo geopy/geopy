@@ -10,10 +10,21 @@ from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
-    ConfigurationError
+    ConfigurationError,
+    GeocoderParseError,
+    GeocoderQueryError,
 )
 from geopy.location import Location
 from geopy.util import logger
+
+try:
+    from pytz import timezone, UnknownTimeZoneError
+    from calendar import timegm
+    from datetime import datetime
+    from numbers import Number
+    pytz_available = True
+except ImportError:
+    pytz_available = False
 
 
 __all__ = ("GoogleV3", )
@@ -91,6 +102,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             self.secret_key = None
 
         self.api = '%s://%s/maps/api/geocode/json' % (self.scheme, self.domain)
+        self.tz_api = '%s://%s/maps/api/timezone/json' % (
+            self.scheme,
+            self.domain
+        )
 
     def _get_signed_url(self, params):
         """
@@ -236,6 +251,68 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
+
+    def timezone(self, location, at_time=None, timeout=None):
+        """
+        **This is an unstable API.**
+
+        Finds the timezone a `location` was in for a specified `at_time`,
+        and returns a pytz timezone object.
+
+            .. versionadded:: 1.2.0
+
+        :param location: The coordinates for which you want a timezone.
+        :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
+
+        :param at_time: The time at which you want the timezone of this
+            location. This is optional, and defaults to the time that the
+            function is called in UTC.
+        :type at_time integer, long, float, datetime:
+
+        :rtype: pytz timezone
+        """
+        if not pytz_available:
+            raise ImportError(
+                u'pytz must be installed in order to locate timezones. '
+                u' Install with `pip install geopy -e ".[timezone]"`.'
+            )
+        location = self._coerce_point_to_string(location)
+
+        if isinstance(at_time, Number):
+            timestamp = at_time
+        elif isinstance(at_time, datetime):
+            timestamp = timegm(at_time.utctimetuple())
+        elif at_time is None:
+            timestamp = timegm(datetime.utcnow().utctimetuple())
+        else:
+            raise GeocoderQueryError(
+                u"`at_time` must be an epoch integer or "
+                u"datetime.datetime object"
+            )
+
+        params = {
+            u"location": location,
+            u"timestamp": timestamp,
+        }
+        url = u"?".join((self.tz_api, urlencode(params)))
+
+        logger.debug("%s.timezone: %s", self.__class__.__name__, url)
+        response = self._call_geocoder(url, timeout=timeout)
+
+        try:
+            tz = timezone(response["timeZoneId"])
+        except UnknownTimeZoneError:
+            raise GeocoderParseError(
+                u"pytz could not parse the timezone identifier (%s) "
+                u"returned by the service." % response["timeZoneId"]
+            )
+        except KeyError:
+            raise GeocoderParseError(
+                u"geopy could not find a timezone in this response: %s" %
+                response
+            )
+        return tz
 
     def _parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
