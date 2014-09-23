@@ -1,5 +1,15 @@
+1.3.0
+-----
+2014-09-23
+
+*   ADDED: Nominatim.geocode() accepts a `geometry` argument for
+    retrieving `wkt`, `svg`,`kml`, or `geojson` formatted geometries
+    in results. Contributed by spatialbitz.
+
+
 1.2.0
 -----
+2014-09-22
 
 *   ADDED: GeoNames.reverse() added. Contributed by Emile Aben.
 
