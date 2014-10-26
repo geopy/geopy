@@ -61,8 +61,6 @@ class Nominatim(Geocoder):
         super(Nominatim, self).__init__(
             format_string, 'http', timeout, proxies
         )
-        # XML needs all sorts of conditionals because of API differences
-        # between geocode and reverse, so only implementing JSON format
         self.country_bias = country_bias
         self.format_string = format_string
         self.view_box = view_box
@@ -122,6 +120,14 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.0.0
 
+        :param string geometry: If present, specifies whether the geocoding
+            service should return the result's geometry in `wkt`, `svg`,
+            `kml`, or `geojson` formats. This is available via the
+            `raw` attribute on the returned :class:`geopy.location.Location`
+            object.
+
+            .. versionadded:: 1.3.0
+
         """
 
         if isinstance(query, dict):
@@ -148,18 +154,21 @@ class Nominatim(Geocoder):
         if language:
             params['accept-language'] = language
 
-        if geometry == 'WKT':
-            params['polygon_text'] = 1
-        elif geometry == 'svg':
-            params['polygon_svg'] = 1
-        elif geometry == 'kml':
-            params['polygon_kml'] = 1
-        elif geometry == 'geojson':
-            params['polygon_geojson'] = 1
-        elif geometry is None:
-            pass
-        else:
-            raise GeocoderQueryError("Invalid geometry format. Must be one of WKT, svg, kml, geojson.")
+        if geometry is not None:
+            geometry = geometry.lower()
+            if geometry == 'wkt':
+                params['polygon_text'] = 1
+            elif geometry == 'svg':
+                params['polygon_svg'] = 1
+            elif geometry == 'kml':
+                params['polygon_kml'] = 1
+            elif geometry == 'geojson':
+                params['polygon_geojson'] = 1
+            else:
+                raise GeocoderQueryError(
+                    "Invalid geometry format. Must be one of: "
+                    "wkt, svg, kml, geojson."
+                )
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

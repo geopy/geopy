@@ -28,6 +28,7 @@ setup(
     tests_require=TESTS_REQUIRES,
     extras_require={
         "placefinder": ["requests_oauthlib>=0.4.0"],
+        "timezone": ["pytz"],
     },
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',

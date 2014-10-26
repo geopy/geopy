@@ -25,7 +25,9 @@ class GeocoderServiceError(GeopyError):
 
 class GeocoderQueryError(GeocoderServiceError):
     """
-    The remote geocoding service raised a bad request over the user's input.
+    Either geopy detected input that would cause a request to fail,
+    or a request was made and the remote geocoding service responded
+    that the request was bad.
     """
 
 class GeocoderQuotaExceeded(GeocoderServiceError):
