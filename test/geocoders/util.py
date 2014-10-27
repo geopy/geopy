@@ -26,6 +26,7 @@ except IOError:
         'GEOCODEFARM_KEY',
         'BAIDU_KEY',
         'OPENCAGE_KEY',
+        'WHAT3WORDS_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 

@@ -1,0 +1,163 @@
+"""
+:class:`.What3Words` geocoder.
+"""
+
+from geopy.compat import urlencode
+from geopy.geocoders.base import (
+    Geocoder,
+    DEFAULT_FORMAT_STRING,
+    DEFAULT_TIMEOUT,
+    DEFAULT_SCHEME
+)
+from geopy.location import Location
+from geopy.util import logger, join_filter
+from geopy import exc
+from re import compile, match
+
+
+__all__ = ("What3Words", )
+
+
+class What3Words(Geocoder):
+    """
+    What3Words geocoder, documentation at:
+        http://what3words.com/api/reference
+    """
+
+    def __init__(
+            self,
+            api_key,
+            format_string=DEFAULT_FORMAT_STRING,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+        ):
+        """
+        Initialize a What3Words geocoder with 3-word or OneWord-address and
+        What3Words API key.
+
+        :param string api_key: Key provided by What3Words.
+
+        :param string format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, piped.gains.jungle'. The default
+            is just '%s'.
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception.
+
+
+        :param dict proxies: If specified, routes this geocoder's requests
+            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
+            more information, see documentation on
+            :class:`urllib2.ProxyHandler`.
+        """
+        super(What3Words, self).__init__(format_string, scheme, timeout, proxies)
+        self.api_key = api_key
+        self.api = (
+            "%s://api.what3words.com/" % self.scheme
+        )
+
+    def geocode(self,
+                query,
+                lang='EN',
+                exactly_one=True,
+                timeout=None):
+
+        """
+        Geocode a "3 words" or "OneWord" query.
+
+        :param string query: The 3-word or OneWord-address you wish to geocode.
+
+        :param string lang: two character language codes as supported by the API (http://what3words.com/api/reference/languages)
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+            .. versionadded:: 0.97
+        """
+
+        if not (compile("^\*{1,1}[a-zA-Z]+$").match(query) or compile("[a-zA-Z]+\.{1,1}[a-zA-Z]+\.{1,1}[a-zA-Z]+$").match(query)):
+            raise exc.GeocoderQueryError("Search string must be either like 'word.word.word' or '*word' ")
+
+        lang = lang.lower()
+
+        params = {
+            'string'     : self.format_string % query,
+            'lang'   :     self.format_string % lang
+
+        }
+
+        url = "?".join((
+            (self.api + "w3w"),
+            "&".join(("=".join(('key', self.api_key)), urlencode(params)))
+        ))
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one
+        )
+
+    def _parse_json(self, resources, exactly_one=True):
+        """
+        Parse type, words, latitude, and longitude and language from a JSON response.
+        """
+        if resources.get('error') == "X1":
+            raise exc.GeocoderAuthenticationFailure()
+
+        if resources.get('error') == "11":
+            raise exc.GeocoderQueryError("Address (Word(s)) not recognised by What3Words.")
+
+
+        def parse_resource(resource):
+            """
+            Parse record.
+            """
+
+            if resource['type'] == '3 words':
+                words = resource['words']
+                words = join_filter(".", [words[0], words[1], words[2]])
+                position = resource['position']
+                latitude, longitude = position[0], position[1]
+
+                if latitude and longitude:
+                    latitude = float(latitude)
+                    longitude = float(longitude)
+
+                return Location(words, (latitude, longitude), resource)
+            elif resource['type'] == 'OneWord':
+                words = resource['words']
+                words = join_filter(".", [words[0], words[1], words[2]])
+                oneword = resource['oneword']
+                info =  resource['info']
+
+                address = join_filter(", ", [oneword, words, info['name'], info['address1'], info['address2'], info['address3'], info['city'], info['county'],  info['postcode'], info['country_id']])
+
+                position = resource['position']
+                latitude, longitude = position[0], position[1]
+
+                if latitude and longitude:
+                    latitude = float(latitude)
+                    longitude = float(longitude)
+
+                return Location(address, (latitude, longitude), resource)
+            else: exc.GeocoderParseError('Error parsing result.')
+
+
+        return parse_resource(resources)
+
+
+
+
+
+
