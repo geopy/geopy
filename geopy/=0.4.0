@@ -1,0 +1,11 @@
+Downloading/unpacking requests-oauthlib
+  Downloading requests_oauthlib-0.4.2-py2.py3-none-any.whl
+Downloading/unpacking oauthlib>=0.6.2 (from requests-oauthlib)
+  Running setup.py (path:/Users/pavlushka/.virtualenvs/geopy/build/oauthlib/setup.py) egg_info for package oauthlib
+    
+Downloading/unpacking requests>=2.0.0 (from requests-oauthlib)
+Installing collected packages: requests-oauthlib, oauthlib, requests
+  Running setup.py install for oauthlib
+    
+Successfully installed requests-oauthlib oauthlib requests
+Cleaning up...

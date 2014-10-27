@@ -13,3 +13,4 @@ from .opencage import OpenCageTestCase
 from .openmapquest import OpenMapQuestTestCase
 from .placefinder import YahooPlaceFinderTestCase
 from .smartystreets import LiveAddressTestCase
+from .yandex import YandexTestCase
