@@ -24,10 +24,18 @@ class Yandex(Geocoder): # pylint: disable=W0223
 
     def __init__(
             self,
+            key=None,
+            lang=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None
         ):
         """
+        :param string key: Yandex API key (not obligatory)
+            http://api.yandex.ru/maps/form.xml
+
+        :param string lang: response locale, the following locales are supported:
+            "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
+
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
@@ -40,6 +48,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
         super(Yandex, self).__init__(
             scheme='http', timeout=timeout, proxies=proxies
         )
+        self.key = key
+        self.lang = lang
         self.api = 'http://geocode-maps.yandex.ru/1.x/'
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
@@ -60,6 +70,10 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': query,
             'format': 'json'
         }
+        if not self.key is None:
+            params['key'] = self.key
+        if not self.lang is None:
+            params['lang'] = self.lang
         if exactly_one is True:
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
@@ -102,8 +116,11 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': '{0},{1}'.format(lng, lat),
             'format': 'json'
         }
+        if not self.key is None:
+            params['key'] = self.key
+        if not self.lang is None:
+            params['lang'] = self.lang
         url = "?".join((self.api, urlencode(params)))
-        print url
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
