@@ -1,4 +1,3 @@
-# encoding: utf-8
 """
 Test Point.
 """
@@ -40,7 +39,7 @@ class PointTestCase(unittest.TestCase): # pylint: disable=R0904
         """
         Point() str degrees, minutes &c
         """
-        point = Point(u("UT: N 39°20' 0'' / W 74°35' 0''"))
+        point = Point(u("UT: N 39\xb020' 0'' / W 74\xb035' 0''"))
         self.assertEqual(point.latitude, 39.333333333333336)
         self.assertEqual(point.longitude, -74.58333333333333)
         self.assertEqual(point.altitude, 0)
