@@ -1,4 +1,5 @@
 
+from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import Nominatim
 from test.geocoders.util import GeocoderTestBase
@@ -11,15 +12,15 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Nominatim()
-        cls.known_state_de = u"Verwaltungsregion Ionische Inseln"
-        cls.known_state_en = u"Ionian Islands Periphery"
+        cls.known_state_de = "Verwaltungsregion Ionische Inseln"
+        cls.known_state_en = "Ionian Islands Periphery"
 
     def test_geocode(self):
         """
         Nominatim.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -28,7 +29,7 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         Nominatim.geocode unicode
         """
         self.geocode_run(
-            {"query": u"\u6545\u5bab"},
+            {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
@@ -37,7 +38,7 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         Nominatim.reverse string
         """
         self.reverse_run(
-            {"query": u"40.75376406311989, -73.98489005863667"},
+            {"query": "40.75376406311989, -73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
         )
 
@@ -62,7 +63,7 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             addressdetails=True,
 
         )
-        self.assertEqual(result.raw['address']['city_district'], u'Mitte')
+        self.assertEqual(result.raw['address']['city_district'], 'Mitte')
 
     def test_geocode_language_parameter(self):
         """

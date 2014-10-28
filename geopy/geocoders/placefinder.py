@@ -69,8 +69,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         self.auth = OAuth1(
             client_key=self.consumer_key,
             client_secret=self.consumer_secret,
-            signature_method=u"HMAC-SHA1",
-            signature_type=u"AUTH_HEADER",
+            signature_method="HMAC-SHA1",
+            signature_type="AUTH_HEADER",
         )
         self.api = "https://yboss.yahooapis.com/geo/placefinder"
 

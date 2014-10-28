@@ -2,6 +2,7 @@
 import unittest
 
 from geopy import exc
+from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import ArcGIS
 from test.geocoders.util import GeocoderTestBase, env
@@ -41,7 +42,7 @@ class ArcGISTestCase(GeocoderTestBase):
         ArcGIS.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -50,7 +51,7 @@ class ArcGISTestCase(GeocoderTestBase):
         ArcGIS.geocode unicode
         """
         self.geocode_run(
-            {"query": u"\u6545\u5bab"},
+            {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
@@ -86,6 +87,6 @@ class ArcGISAuthenticatedTestCase(GeocoderTestBase):
         ArcGIS.geocode using authentication
         """
         self.geocode_run(
-            {"query": u"Potsdamer Platz, Berlin, Deutschland"},
+            {"query": "Potsdamer Platz, Berlin, Deutschland"},
             {"latitude": 52.5094982, "longitude": 13.3765983},
         )

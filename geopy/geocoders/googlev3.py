@@ -274,8 +274,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         """
         if not pytz_available:
             raise ImportError(
-                u'pytz must be installed in order to locate timezones. '
-                u' Install with `pip install geopy -e ".[timezone]"`.'
+                'pytz must be installed in order to locate timezones. '
+                ' Install with `pip install geopy -e ".[timezone]"`.'
             )
         location = self._coerce_point_to_string(location)
 
@@ -287,15 +287,15 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             timestamp = timegm(datetime.utcnow().utctimetuple())
         else:
             raise GeocoderQueryError(
-                u"`at_time` must be an epoch integer or "
-                u"datetime.datetime object"
+                "`at_time` must be an epoch integer or "
+                "datetime.datetime object"
             )
 
         params = {
-            u"location": location,
-            u"timestamp": timestamp,
+            "location": location,
+            "timestamp": timestamp,
         }
-        url = u"?".join((self.tz_api, urlencode(params)))
+        url = "?".join((self.tz_api, urlencode(params)))
 
         logger.debug("%s.timezone: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
@@ -304,12 +304,12 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             tz = timezone(response["timeZoneId"])
         except UnknownTimeZoneError:
             raise GeocoderParseError(
-                u"pytz could not parse the timezone identifier (%s) "
-                u"returned by the service." % response["timeZoneId"]
+                "pytz could not parse the timezone identifier (%s) "
+                "returned by the service." % response["timeZoneId"]
             )
         except KeyError:
             raise GeocoderParseError(
-                u"geopy could not find a timezone in this response: %s" %
+                "geopy could not find a timezone in this response: %s" %
                 response
             )
         return tz

@@ -11,6 +11,14 @@ if py3k: # pragma: no cover
 else: # pragma: no cover
     string_compare = (str, unicode)
 
+# Unicode compatibility, borrowed from 'six'
+if py3k: # pragma: no cover
+    def u(s):
+        return s
+else: # pragma: no cover
+    def u(s):
+        return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')
+
 if py3k: # pragma: no cover
     from urllib.parse import urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
     from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611

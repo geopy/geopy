@@ -27,7 +27,7 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         OpenCage.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -36,7 +36,7 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GeocodeFarm.reverse string
         """
         self.reverse_run(
-            {"query": u"40.75376406311989,-73.98489005863667"},
+            {"query": "40.75376406311989,-73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
@@ -81,7 +81,7 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         )
 
         with self.assertRaises(exc.GeocoderQuotaExceeded):
-            self.geocoder.geocode(u'435 north michigan ave, chicago il 60611')
+            self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
     def test_unhandled_api_error(self):
         """
@@ -106,4 +106,4 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         )
 
         with self.assertRaises(exc.GeocoderServiceError):
-            self.geocoder.geocode(u'435 north michigan ave, chicago il 60611')
+            self.geocoder.geocode('435 north michigan ave, chicago il 60611')

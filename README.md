@@ -54,7 +54,7 @@ To geolocate a query to an address and coordinates:
     >>> print(location.latitude, location.longitude)
     (40.7410861, -73.9896297241625)
     >>> print(location.raw)
-    {u'place_id': u'9167009604', u'type': u'attraction', ...}
+    {'place_id': '9167009604', 'type': 'attraction', ...}
 
 
 To find the address corresponding to a set of coordinates:
@@ -67,7 +67,7 @@ To find the address corresponding to a set of coordinates:
     >>> print(location.latitude, location.longitude)
     (52.5094982, 13.3765983)
     >>> print(location.raw)
-    {u'place_id': u'654513', u'osm_type': u'node', ...}
+    {'place_id': '654513', 'osm_type': 'node', ...}
 
 
 ## Measuring Distance
