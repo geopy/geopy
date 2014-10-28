@@ -1,6 +1,7 @@
 
 import unittest
 
+from geopy.compat import u
 from geopy.compat import py3k
 from geopy.geocoders import GeocoderDotUS
 from test.geocoders.util import GeocoderTestBase, env
@@ -50,7 +51,7 @@ class GeocoderDotUSTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GeocoderDotUS.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -59,6 +60,6 @@ class GeocoderDotUSTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GeocoderDotUS.geocode unicode
         """
         self.geocode_run(
-            {"query": u"\u6545\u5bab"},
+            {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )

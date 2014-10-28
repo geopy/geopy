@@ -1,6 +1,7 @@
 
 import unittest
 
+from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import Bing
 from test.geocoders.util import GeocoderTestBase, env
@@ -25,7 +26,7 @@ class BingTestCase(GeocoderTestBase):
         Bing.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -34,7 +35,7 @@ class BingTestCase(GeocoderTestBase):
         Bing.geocode unicode
         """
         self.geocode_run(
-            {"query": u"\u6545\u5bab"},
+            {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 

@@ -1,9 +1,9 @@
-
 import base64
 from datetime import datetime
 from pytz import timezone
 
 from geopy import exc
+from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import GoogleV3
 from test.geocoders.util import GeocoderTestBase
@@ -95,7 +95,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GoogleV3.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -104,7 +104,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GoogleV3.geocode unicode
         """
         self.geocode_run(
-            {"query": u"\u6545\u5bab"},
+            {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
@@ -114,7 +114,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         self.geocode_run(
             {
-                "query": u"santa cruz",
+                "query": "santa cruz",
                 "components": {
                     "administrative_area": "CA",
                     "country": "FR"
@@ -130,7 +130,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         self.geocode_run(
             {
-                "query": u"santa cruz",
+                "query": "santa cruz",
                 "components": {
                     "country": "ES"
                 }
@@ -143,7 +143,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GoogleV3.reverse string
         """
         self.reverse_run(
-            {"query": u"40.75376406311989, -73.98489005863667"},
+            {"query": "40.75376406311989, -73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 

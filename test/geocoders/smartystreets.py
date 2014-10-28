@@ -25,6 +25,6 @@ class LiveAddressTestCase(GeocoderTestBase):
         LiveAddress.geocode
         """
         self.geocode_run(
-            {"query": u"435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )

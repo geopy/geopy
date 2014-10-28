@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import unittest
 
+from geopy.compat import u
 from geopy.geocoders import GeoNames
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -22,7 +23,7 @@ class GeoNamesTestCase(GeocoderTestBase):
         # work around ConfigurationError raised in GeoNames init
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.geocode_run(
-            {"query": u"Musée du Louvre"},
+            {"query": u("Musée du Louvre")},
             {"latitude": 48.8610, "longitude": 2.335},
         )
 
@@ -33,6 +34,6 @@ class GeoNamesTestCase(GeocoderTestBase):
         # work around ConfigurationError raised in GeoNames init
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.reverse_run(
-            {"query": u"40.75376406311989, -73.98489005863667"},
+            {"query": "40.75376406311989, -73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )

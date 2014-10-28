@@ -1,5 +1,6 @@
 import unittest
 
+from geopy.compat import u
 from geopy.geocoders import What3Words
 from test.geocoders.util import GeocoderTestBase, env
 

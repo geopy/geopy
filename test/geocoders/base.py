@@ -30,8 +30,8 @@ class GeocoderTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.geocoder = Geocoder()
         cls.coordinates = (40.74113, -73.989656)
-        cls.coordinates_str = u"40.74113,-73.989656"
-        cls.coordinates_address = u"175 5th Avenue, NYC, USA"
+        cls.coordinates_str = "40.74113,-73.989656"
+        cls.coordinates_address = "175 5th Avenue, NYC, USA"
 
     def test_init(self):
         """

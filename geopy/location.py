@@ -18,7 +18,7 @@ class Location(object): # pylint: disable=R0903,R0921
 
     __slots__ = ("_address", "_point", "_tuple", "_raw")
 
-    def __init__(self, address=u"", point=None, raw=None):
+    def __init__(self, address="", point=None, raw=None):
         self._address = address
         if point is None:
             self._point = (None, None, None)
@@ -106,7 +106,7 @@ class Location(object): # pylint: disable=R0903,R0921
 
     def __repr__(self):
         if py3k:
-            return u"Location(%s, (%s, %s, %s))" % (
+            return "Location(%s, (%s, %s, %s))" % (
                 self._address, self.latitude, self.longitude, self.altitude
             )
         else:
