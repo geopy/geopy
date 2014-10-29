@@ -1,6 +1,7 @@
 
 import unittest
 
+from geopy.point import Point
 from geopy.geocoders import MapQuest
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -38,4 +39,11 @@ class MapQuestTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-
+    def test_reverse_point(self):
+        """
+        MapQuest.reverse using point
+        """
+        self.reverse_run(
+            {"query": Point(40.753898, -73.985071)},
+            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        )
