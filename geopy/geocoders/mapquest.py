@@ -100,6 +100,8 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         """
         Reverse geocode a point.
 
+            .. versionadded:: 1.4.0
+
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,

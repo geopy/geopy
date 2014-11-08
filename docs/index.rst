@@ -34,7 +34,7 @@ Geocoders
     :members: __init__, geocode, reverse, timezone
 
 .. autoclass:: geopy.geocoders.MapQuest
-    :members: __init__, geocode
+    :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.Nominatim
     :members: __init__, geocode, reverse

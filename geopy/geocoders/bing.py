@@ -90,12 +90,22 @@ class Bing(Geocoder):
             only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+
         :param string culture: Affects the language of the response,
             must be a two-letter country code.
+
+            .. versionadded:: 1.4.0
+
         :param boolean include_neighborhood: Sets whether to include the
             neighborhood field in the response.
-        :param boolean include_country_code: Sets whether to include the two-letter ISO code
-            of the country in the response (field name 'countryRegionIso2').
+
+            .. versionadded:: 1.4.0
+
+        :param boolean include_country_code: Sets whether to include the
+            two-letter ISO code of the country in the response (field name
+            'countryRegionIso2').
+
+            .. versionadded:: 1.4.0
         """
         params = {
             'query': self.format_string % query,
