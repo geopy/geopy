@@ -65,6 +65,9 @@ class Bing(Geocoder):
             exactly_one=True,
             user_location=None,
             timeout=None,
+            culture=None,
+            include_neighborhood=None,
+            include_country_code=False
             ):  # pylint: disable=W0221
         """
         Geocode an address.
@@ -87,6 +90,12 @@ class Bing(Geocoder):
             only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+        :param string culture: Affects the language of the response,
+            must be a two-letter country code.
+        :param boolean include_neighborhood: Sets whether to include the
+            neighborhood field in the response.
+        :param boolean include_country_code: Sets whether to include the two-letter ISO code
+            of the country in the response (field name 'countryRegionIso2').
         """
         params = {
             'query': self.format_string % query,
@@ -98,6 +107,12 @@ class Bing(Geocoder):
             )
         if exactly_one is True:
             params['maxResults'] = 1
+        if culture:
+            params['culture'] = culture
+        if include_neighborhood is not None:
+            params['includeNeighborhood'] = include_neighborhood
+        if include_country_code:
+            params['include'] = 'ciso2'  # the only acceptable value
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
