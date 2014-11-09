@@ -24,13 +24,13 @@ class Yandex(Geocoder): # pylint: disable=W0223
 
     def __init__(
             self,
-            key=None,
+            api_key=None,
             lang=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None
         ):
         """
-        :param string key: Yandex API key (not obligatory)
+        :param string api_key: Yandex API key (not obligatory)
             http://api.yandex.ru/maps/form.xml
 
         :param string lang: response locale, the following locales are supported:
@@ -48,7 +48,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
         super(Yandex, self).__init__(
             scheme='http', timeout=timeout, proxies=proxies
         )
-        self.key = key
+        self.api_key = api_key
         self.lang = lang
         self.api = 'http://geocode-maps.yandex.ru/1.x/'
 
@@ -70,13 +70,14 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': query,
             'format': 'json'
         }
-        if not self.key is None:
-            params['key'] = self.key
+        if not self.api_key is None:
+            params['key'] = self.api_key
         if not self.lang is None:
             params['lang'] = self.lang
         if exactly_one is True:
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
+        # raise RuntimeError(url)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -116,8 +117,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': '{0},{1}'.format(lng, lat),
             'format': 'json'
         }
-        if not self.key is None:
-            params['key'] = self.key
+        if not self.api_key is None:
+            params['key'] = self.api_key
         if not self.lang is None:
             params['lang'] = self.lang
         url = "?".join((self.api, urlencode(params)))
