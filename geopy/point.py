@@ -334,7 +334,7 @@ class Point(object):
         3 elements.  The elements, if present, must be latitude, longitude,
         and altitude, respectively.
         """
-        args = tuple(islice(seq, 4))
+        args = tuple(islice(seq, 3))
         return cls(*args)
 
     @classmethod
