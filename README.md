@@ -31,6 +31,8 @@ The various geocoder classes are located in [geopy.geocoders][geocoders_src].
 [smartystreets]: https://smartystreets.com/products/liveaddress-api
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
+geopy is tested against CPython 2.7, CPython 3.4, and PyPy.
+
 © GeoPy Project and individual contributors under the
 [MIT License](https://github.com/geopy/geopy/blob/master/LICENSE).
 
