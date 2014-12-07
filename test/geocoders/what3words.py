@@ -37,10 +37,6 @@ class What3WordsTestCase(GeocoderTestBase):
         """
         What3Words.reverse - '3 Words'
         """
-        # self.reverse_run(
-        # {"query": u"53.037611,11.565012"},
-        #     {"address": "piped.gains.jangle"},
-        # )
         result_reverse = self._make_request(
             self.geocoder.reverse,
             "53.037611,11.565012",
@@ -59,13 +55,22 @@ class What3WordsTestCase(GeocoderTestBase):
         """
         self.geocode_run(
             {
-                "query": u"\u0070\u0069\u0070\u0065\u0064\u002e\u0067\u0061\u0069\u006e\u0073\u002e\u006a\u0061\u006e\u0067\u006c\u0065"},
+                "query": (
+                    u"\u0070\u0069\u0070\u0065\u0064\u002e\u0067"
+                    u"\u0061\u0069\u006e\u0073\u002e\u006a\u0061"
+                    u"\u006e\u0067\u006c\u0065"
+                )
+            },
             {"latitude": 53.037611, "longitude": 11.565012},
         )
 
         self.geocode_run(
             {
-                "query": u"\u002a\u004c\u0069\u0062\u0065\u0072\u0074\u0079\u0054\u0065\u0063\u0068"},
+                "query": (
+                    u"\u002a\u004c\u0069\u0062\u0065\u0072\u0074"
+                    u"\u0079\u0054\u0065\u0063\u0068"
+                )
+            },
             {"latitude": 51.512573, "longitude": -0.144879},
         )
 

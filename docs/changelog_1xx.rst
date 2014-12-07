@@ -4,6 +4,8 @@
 
 * ADDED: Yandex geocoder added. Contributed by htch.
 
+* ADDED: What3Words geocoder added. Contributed by spatialbitz.
+
 
 1.4.0
 -----

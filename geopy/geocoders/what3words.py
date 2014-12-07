@@ -2,6 +2,7 @@
 :class:`.What3Words` geocoder.
 """
 
+import re
 from geopy.compat import urlencode
 from geopy.geocoders.base import (
     Geocoder,
@@ -12,7 +13,6 @@ from geopy.geocoders.base import (
 from geopy.location import Location
 from geopy.util import logger, join_filter
 from geopy import exc
-from re import compile, match
 
 
 __all__ = ("What3Words", )
@@ -23,6 +23,11 @@ class What3Words(Geocoder):
     What3Words geocoder, documentation at:
         http://what3words.com/api/reference
     """
+
+    word_re = re.compile(r"^\*{1,1}[a-zA-Z]+$")
+    multiple_word_re = re.compile(
+        r"[a-zA-Z]+\.{1,1}[a-zA-Z]+\.{1,1}[a-zA-Z]+$"
+    )
 
     def __init__(
             self,
@@ -35,6 +40,8 @@ class What3Words(Geocoder):
         """
         Initialize a What3Words geocoder with 3-word or OneWord-address and
         What3Words API key.
+
+            .. versionadded:: 1.5.0
 
         :param string api_key: Key provided by What3Words.
 
@@ -58,7 +65,12 @@ class What3Words(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
         """
-        super(What3Words, self).__init__(format_string, scheme, timeout, proxies)
+        super(What3Words, self).__init__(
+            format_string,
+            scheme,
+            timeout,
+            proxies
+        )
         self.api_key = api_key
         self.api = (
             "%s://api.what3words.com/" % self.scheme
@@ -66,7 +78,7 @@ class What3Words(Geocoder):
 
     def geocode(self,
                 query,
-                lang='EN',
+                lang='en',
                 exactly_one=True,
                 timeout=None):
 
@@ -75,9 +87,11 @@ class What3Words(Geocoder):
 
         :param string query: The 3-word or OneWord-address you wish to geocode.
 
-        :param string lang: two character language codes as supported by the API (http://what3words.com/api/reference/languages)
+        :param string lang: two character language codes as supported by
+            the API (http://what3words.com/api/reference/languages).
 
-        :param bool exactly_one: Parameter has no effect for this geocoder. Due to the address scheme there is always exactly one result
+        :param bool exactly_one: Parameter has no effect for this geocoder.
+            Due to the address scheme there is always exactly one result.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -87,15 +101,17 @@ class What3Words(Geocoder):
         """
 
         if not (
-            compile("^\*{1,1}[a-zA-Z]+$").match(query) or compile("[a-zA-Z]+\.{1,1}[a-zA-Z]+\.{1,1}[a-zA-Z]+$").match(
-                query)):
-            raise exc.GeocoderQueryError("Search string must be either like 'word.word.word' or '*word' ")
-
-        lang = lang.lower()
+            self.word_re.match(query) or
+            self.multiple_word_re.match(query)
+            ):
+            raise exc.GeocoderQueryError(
+                "Search string must be either like "
+                "'word.word.word' or '*word' "
+            )
 
         params = {
             'string': self.format_string % query,
-            'lang': self.format_string % lang
+            'lang': self.format_string % lang.lower()
 
         }
 
@@ -111,14 +127,16 @@ class What3Words(Geocoder):
 
     def _parse_json(self, resources, exactly_one=True):
         """
-        Parse type, words, latitude, and longitude and language from a JSON response.
+        Parse type, words, latitude, and longitude and language from a
+        JSON response.
         """
         if resources.get('error') == "X1":
             raise exc.GeocoderAuthenticationFailure()
 
         if resources.get('error') == "11":
-            raise exc.GeocoderQueryError("Address (Word(s)) not recognised by What3Words.")
-
+            raise exc.GeocoderQueryError(
+                "Address (Word(s)) not recognised by What3Words."
+            )
 
         def parse_resource(resource):
             """
@@ -142,9 +160,18 @@ class What3Words(Geocoder):
                 oneword = resource['oneword']
                 info = resource['info']
 
-                address = join_filter(", ", [oneword, words, info['name'], info['address1'], info['address2'],
-                                             info['address3'], info['city'], info['county'], info['postcode'],
-                                             info['country_id']])
+                address = join_filter(", ", [
+                    oneword,
+                    words,
+                    info['name'],
+                    info['address1'],
+                    info['address2'],
+                    info['address3'],
+                    info['city'],
+                    info['county'],
+                    info['postcode'],
+                    info['country_id']
+                ])
 
                 position = resource['position']
                 latitude, longitude = position[0], position[1]
@@ -155,22 +182,27 @@ class What3Words(Geocoder):
 
                 return Location(address, (latitude, longitude), resource)
             else:
-                exc.GeocoderParseError('Error parsing result.')
+                raise exc.GeocoderParseError('Error parsing result.')
 
 
         return parse_resource(resources)
 
 
-    def reverse(self, query, lang='EN', timeout=None):
+    def reverse(self, query, lang='en', exactly_one=True, timeout=None):
         """
         Given a point, find the 3 word address.
 
-        :param query: The coordinates for which you wish to obtain the 3 word address.
+        :param query: The coordinates for which you wish to obtain the 3 word
+            address.
 
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param string lang: two character language codes as supported by the API (http://what3words.com/api/reference/languages)
+        :param string lang: two character language codes as supported by the
+            API (http://what3words.com/api/reference/languages).
+
+        :param bool exactly_one: Parameter has no effect for this geocoder.
+            Due to the address scheme there is always exactly one result.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -218,7 +250,6 @@ class What3Words(Geocoder):
                 longitude = float(longitude)
 
             return Location(words, (latitude, longitude), resource)
-
 
         return parse_resource(resources)
 
