@@ -6,6 +6,10 @@
 
 * ADDED: What3Words geocoder added. Contributed by spatialbitz.
 
+* FIXED: LiveAddress geocoder made compatible with a change in the service's
+    authentication. An `auth_id` parameter was added to the geocoder's
+    initialization. Contributed by Arsen Mamikonyan.
+
 
 1.4.0
 -----

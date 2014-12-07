@@ -30,10 +30,11 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
+        :param string auth_id: Valid `Auth ID` from SmartyStreets.
 
-        :param string auth_token: Valid authentication token. Tokens can be
-            administered here:
-                https://smartystreets.com/account/keys/secret
+            .. versionadded:: 1.5.0
+
+        :param string auth_token: Valid `Auth Token` from SmartyStreets.
 
         :param int candidates: An integer between 1 and 10 indicating the max
             number of candidate addresses to return if a valid address
