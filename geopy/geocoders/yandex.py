@@ -30,11 +30,15 @@ class Yandex(Geocoder): # pylint: disable=W0223
             proxies=None
         ):
         """
+        Create a Yandex-based geocoder.
+
+            .. versionadded:: 1.5.0
+
         :param string api_key: Yandex API key (not obligatory)
             http://api.yandex.ru/maps/form.xml
 
-        :param string lang: response locale, the following locales are supported:
-            "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
+        :param string lang: response locale, the following locales are
+            supported: "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -77,7 +81,6 @@ class Yandex(Geocoder): # pylint: disable=W0223
         if exactly_one is True:
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
-        # raise RuntimeError(url)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -117,9 +120,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': '{0},{1}'.format(lng, lat),
             'format': 'json'
         }
-        if not self.api_key is None:
+        if self.api_key is not None:
             params['key'] = self.api_key
-        if not self.lang is None:
+        if self.lang is not None:
             params['lang'] = self.lang
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
@@ -150,7 +153,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
                 raise GeocoderParseError('Failed to parse server response')
 
             longitude, latitude = map(float, place['Point']['pos'].split(' '))
-            
+
             location = place.get('description')
 
             return Location(location, (latitude, longitude), place)

@@ -1,3 +1,10 @@
+1.5.0
+-----
+2014-12-07
+
+* ADDED: Yandex geocoder added. Contributed by htch.
+
+
 1.4.0
 -----
 2014-11-08
@@ -6,6 +13,7 @@
 
 *   ADDED: Bing's geocoder now accepts the optional arguments "culture",
     "includeNeighborhood", and "include". Contributed by oskholl.
+
 
 1.3.0
 -----
