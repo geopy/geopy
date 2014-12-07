@@ -1,6 +1,7 @@
 
 import unittest
 
+from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import YahooPlaceFinder
 from test.geocoders.util import GeocoderTestBase, env
@@ -24,7 +25,7 @@ class YahooPlaceFinderTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         YahooPlaceFinder.geocode
         """
         self.geocode_run(
-            {"query": u"nyc"},
+            {"query": "nyc"},
             {"latitude": 40.71455, "longitude": -74.00712},
         )
 
@@ -33,7 +34,7 @@ class YahooPlaceFinderTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         YahooPlaceFinder.geocode unicode
         """
         self.geocode_run(
-            {"query": u"\u6545\u5bab"},
+            {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
@@ -42,7 +43,7 @@ class YahooPlaceFinderTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         YahooPlaceFinder.reverse string
         """
         self.reverse_run(
-            {"query": u"40.75376406311989, -73.98489005863667"},
+            {"query": "40.75376406311989, -73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
         )
 
