@@ -11,7 +11,8 @@ geocoders and other data sources.
 geopy includes geocoder classes for the [OpenStreetMap Nominatim][osm],
 [ESRI ArcGIS][arcgis], [Google Geocoding API (V3)][googlev3],
 [Baidu Maps][baidu], [Bing Maps API][bing], [Yahoo! PlaceFinder][placefinder],
-[GeoNames][geonames], [MapQuest][mapquest], [OpenMapQuest][openmapquest],
+[Yandex][yandex], [GeoNames][geonames], [MapQuest][mapquest],
+[OpenMapQuest][openmapquest], [What3Words][what3words],
 [OpenCage][opencage], [SmartyStreets][smartystreets], [geocoder.us][dot_us],
 and [GeocodeFarm][geocodefarm] geocoder services.
 The various geocoder classes are located in [geopy.geocoders][geocoders_src].
@@ -29,6 +30,8 @@ The various geocoder classes are located in [geopy.geocoders][geocoders_src].
 [osm]: https://wiki.openstreetmap.org/wiki/Nominatim
 [placefinder]: https://developer.yahoo.com/boss/geo/docs/
 [smartystreets]: https://smartystreets.com/products/liveaddress-api
+[what3words]: http://what3words.com/api/reference
+[yandex]: http://api.yandex.com/maps/doc/intro/concepts/intro.xml
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
 geopy is tested against CPython 2.7, CPython 3.4, and PyPy.
