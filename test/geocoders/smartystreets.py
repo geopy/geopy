@@ -6,15 +6,16 @@ from test.geocoders.util import GeocoderTestBase, env
 
 
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
-    bool(env.get('LIVESTREETS_AUTH_KEY')),
-    "No LIVESTREETS_AUTH_KEY env variable set"
+    'LIVESTREETS_AUTH_ID' in env and 'LIVESTREETS_AUTH_KEY' in env,
+    "No LIVESTREETS_AUTH_KEY and LIVESTREETS_AUTH_ID env variables set"
 )
 class LiveAddressTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
         cls.geocoder = LiveAddress(
-            auth_token=env['LIVESTREETS_AUTH_KEY'],
+            auth_id=env.get('LIVESTREETS_AUTH_ID'),
+            auth_token=env.get('LIVESTREETS_AUTH_KEY'),
             scheme='http'
         )
         cls.delta = 0.04
