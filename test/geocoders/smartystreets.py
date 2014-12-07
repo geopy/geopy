@@ -6,10 +6,7 @@ from test.geocoders.util import GeocoderTestBase, env
 
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
-    (
-        env['LIVESTREETS_AUTH_ID'] is not None and
-        env['LIVESTREETS_AUTH_TOKEN'] is not None
-    ),
+    'LIVESTREETS_AUTH_ID' in env and 'LIVESTREETS_AUTH_TOKEN' in env,
     "No LIVESTREETS_AUTH_ID AND LIVESTREETS_AUTH_TOKEN env variables set"
 )
 class LiveAddressTestCase(GeocoderTestBase):
