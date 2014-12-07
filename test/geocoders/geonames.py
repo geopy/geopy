@@ -1,4 +1,4 @@
-
+# -*- coding: UTF-8 -*-
 import unittest
 
 from geopy.compat import u
@@ -23,8 +23,8 @@ class GeoNamesTestCase(GeocoderTestBase):
         # work around ConfigurationError raised in GeoNames init
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.geocode_run(
-            {"query": u("\u6545\u5bab")},
-            {"latitude": 30.90097, "longitude": 118.49436},
+            {"query": u("Mus\xe9e du Louvre")},
+            {"latitude": 48.8610, "longitude": 2.335},
         )
 
     def test_reverse(self):

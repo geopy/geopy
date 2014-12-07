@@ -62,7 +62,7 @@ class MapQuest(Geocoder): # pylint: disable=W0223
         super(MapQuest, self).__init__(format_string, scheme, timeout, proxies)
         self.api_key = api_key
         self.api = (
-            "%s://www.mapquestapi.com/geocoding/v1/address" % self.scheme
+            "%s://www.mapquestapi.com/geocoding/v1" % self.scheme
         )
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
@@ -87,10 +87,40 @@ class MapQuest(Geocoder): # pylint: disable=W0223
             params['maxResults'] = 1
         # don't urlencode MapQuest API keys
         url = "?".join((
-            self.api,
+            self.api + '/address',
             "&".join(("=".join(('key', self.api_key)), urlencode(params)))
         ))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout),
+            exactly_one
+        )
+
+    def reverse(self, query, exactly_one=True, timeout=None):
+        """
+        Reverse geocode a point.
+
+            .. versionadded:: 1.4.0
+
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s".
+
+        :param bool exactly_one: Return one result, or a list?
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+
+        """
+        point = self._coerce_point_to_string(query)
+        # don't urlencode MapQuest API keys
+        url = "%s/reverse?key=%s&location=%s" % (
+            self.api, self.api_key, point)
+
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
             exactly_one

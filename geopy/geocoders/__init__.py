@@ -86,6 +86,8 @@ __all__ = (
     "Nominatim",
     "YahooPlaceFinder",
     "LiveAddress",
+    'Yandex',
+    "What3Words",
 )
 
 
@@ -102,6 +104,8 @@ from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
+from geopy.geocoders.what3words import What3Words
+from geopy.geocoders.yandex import Yandex
 
 from geopy.exc import GeocoderNotFound
 
@@ -121,6 +125,8 @@ SERVICE_TO_GEOCODER = {
     "liveaddress": LiveAddress,
     "nominatim": Nominatim,
     "geocodefarm": GeocodeFarm,
+    "what3words": What3Words,
+    "yandex": Yandex,
 }
 
 

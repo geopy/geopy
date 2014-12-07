@@ -1,3 +1,26 @@
+1.5.0
+-----
+2014-12-07
+
+* ADDED: Yandex geocoder added. Contributed by htch.
+
+* ADDED: What3Words geocoder added. Contributed by spatialbitz.
+
+* FIXED: LiveAddress geocoder made compatible with a change in the service's
+    authentication. An `auth_id` parameter was added to the geocoder's
+    initialization. Contributed by Arsen Mamikonyan.
+
+
+1.4.0
+-----
+2014-11-08
+
+*   ADDED: Mapquest.reverse() method added. Contributed by Dody Suria Wijaya.
+
+*   ADDED: Bing's geocoder now accepts the optional arguments "culture",
+    "includeNeighborhood", and "include". Contributed by oskholl.
+
+
 1.3.0
 -----
 2014-09-23

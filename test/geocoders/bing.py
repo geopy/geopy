@@ -67,3 +67,17 @@ class BingTestCase(GeocoderTestBase):
                 )[0],
                 each[0]
             )
+    
+    def test_optional_params(self):
+        address_string = "Badeniho 1, Prague, Czech Republic"
+        
+        address = self._make_request(
+            self.geocoder.geocode,
+            query=address_string,
+            culture='cs', 
+            include_neighborhood=True,
+            include_country_code=True
+        ).raw['address']
+
+        self.assertEqual(address['neighborhood'], "Praha 6")
+        self.assertEqual(address['countryRegionIso2'], "CZ")

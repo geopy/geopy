@@ -20,6 +20,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
     """
     def __init__(
             self,
+            auth_id,
             auth_token,
             candidates=1,
             scheme=DEFAULT_SCHEME,
@@ -29,10 +30,11 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
+        :param string auth_id: Valid `Auth ID` from SmartyStreets.
 
-        :param string auth_token: Valid authentication token. Tokens can be
-            administered here:
-                https://smartystreets.com/account/keys/secret
+            .. versionadded:: 1.5.0
+
+        :param string auth_token: Valid `Auth Token` from SmartyStreets.
 
         :param int candidates: An integer between 1 and 10 indicating the max
             number of candidate addresses to return if a valid address
@@ -60,6 +62,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         super(LiveAddress, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies
         )
+        self.auth_id = auth_id
         self.auth_token = auth_token
         if candidates:
             if not 1 <= candidates <= 10:
@@ -67,7 +70,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         self.candidates = candidates
         self.api = '%s://api.smartystreets.com/street-address' % self.scheme
 
-    def geocode(self, query, exactly_one=True):  # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=None):  # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -78,7 +81,8 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         """
         url = self._compose_url(query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(self._call_geocoder(url), exactly_one)
+        return self._parse_json(self._call_geocoder(url, timeout=timeout),
+                                exactly_one)
 
     def _geocoder_exception_handler(self, error, message): # pylint: disable=R0201,W0613
         """
@@ -92,16 +96,12 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         Generate API URL.
         """
         query = {
+            'auth-id': self.auth_id,
+            'auth-token': self.auth_token,
             'street': location,
             'candidates': self.candidates
         }
-        # don't urlencode the api token
-        return '?'.join((
-            self.api,
-            "&".join(("=".join((
-                'auth-token', self.auth_token)), urlencode(query)
-            ))
-    ))
+        return '{url}?{query}'.format(url=self.api, query=urlencode(query))
 
     def _parse_json(self, response, exactly_one=True):
         """

@@ -20,12 +20,14 @@ except IOError:
         'BING_KEY',
         'MAPQUEST_KEY',
         'GEONAMES_USERNAME',
-        'LIVESTREETS_AUTH_KEY',
+        'LIVESTREETS_AUTH_ID',
+        'LIVESTREETS_AUTH_TOKEN',
         'GEOCODERDOTUS_USERNAME',
         'GEOCODERDOTUS_PASSWORD',
         'GEOCODEFARM_KEY',
         'BAIDU_KEY',
         'OPENCAGE_KEY',
+        'WHAT3WORDS_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 
