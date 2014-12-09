@@ -23,8 +23,8 @@ class GeoNamesTestCase(GeocoderTestBase):
         # work around ConfigurationError raised in GeoNames init
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.geocode_run(
-            {"query": u("Musée du Louvre")},
-            {"latitude": 48.8610, "longitude": 2.335},
+            {"query": "Mount Everest, Nepal"},
+            {"latitude": 27.987, "longitude": 86.925},
         )
 
     def test_reverse(self):

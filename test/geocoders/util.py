@@ -50,13 +50,6 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
     geocoder = None
     delta = 0.5
 
-    def skip_known_failure(self, classes):
-        """
-        When a Geocoder gives no value for a query, skip the test.
-        """
-        if self.geocoder.__class__.__name__ in classes:
-            raise unittest.SkipTest("Known no result")
-
     def geocode_run(self, payload, expected, expect_failure=False):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
