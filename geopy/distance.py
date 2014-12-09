@@ -35,7 +35,7 @@ Here's an example usage of distance.vincenty::
     >>> from geopy.distance import vincenty
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
-    >>> vincenty(newport_ri, cleveland_oh).miles
+    >>> print(vincenty(newport_ri, cleveland_oh).miles)
     538.3904451566326
 
 Using great-circle distance::
@@ -43,15 +43,16 @@ Using great-circle distance::
     >>> from geopy.distance import great_circle
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
-    >>> great_circle(newport_ri, cleveland_oh).miles
+    >>> print(great_circle(newport_ri, cleveland_oh).miles)
     537.1485284062816
 
 You can change the ellipsoid model used by the Vincenty formula like so::
 
     >>> distance.vincenty(ne, cl, ellipsoid='GRS-80').miles
 
-The above model name will automatically be retrieved from the ELLIPSOIDS dictionary.
-Alternatively, you can specify the model values directly::
+The above model name will automatically be retrieved from the
+ELLIPSOIDS dictionary. Alternatively, you can specify the model values
+directly::
 
     >>> distance.vincenty(ne, cl, ellipsoid=(6377., 6356., 1 / 297.)).miles
 
@@ -61,7 +62,7 @@ calculate the length of a path::
     >>> d = distance.distance
     >>> _, wa = g.geocode('Washington, DC')
     >>> _, pa = g.geocode('Palo Alto, CA')
-    >>> (d(ne, cl) + d(cl, wa) + d(wa, pa)).miles
+    >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
     3276.157156868931
 
 """
@@ -294,7 +295,7 @@ class vincenty(Distance):
         >>> from geopy.distance import vincenty
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
-        >>> vincenty(newport_ri, cleveland_oh).miles
+        >>> print(vincenty(newport_ri, cleveland_oh).miles)
         538.3904451566326
 
     Note: This implementation of Vincenty distance fails to converge for

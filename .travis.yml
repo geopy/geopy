@@ -4,6 +4,7 @@ python:
     - "3.2"
     - "3.4"
     - "pypy"
+    - "pypy3"
 script:
     - pip install nose-cov requests-oauthlib pytz
     - make test

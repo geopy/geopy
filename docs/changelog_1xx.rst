@@ -1,3 +1,10 @@
+1.6.0
+-----
+2014-12-08
+
+* ADDED: Python 3.2 and PyPy3 compatibility. Contributed by Mike Toews.
+
+
 1.5.0
 -----
 2014-12-07

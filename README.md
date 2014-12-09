@@ -34,7 +34,7 @@ The various geocoder classes are located in [geopy.geocoders][geocoders_src].
 [yandex]: http://api.yandex.com/maps/doc/intro/concepts/intro.xml
 [geocoders_src]: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
-geopy is tested against CPython 2.7, CPython 3.4, and PyPy.
+geopy is tested against CPython 2.7, CPython 3.2, CPython 3.4, PyPy, and PyPy3.
 
 © GeoPy Project and individual contributors under the
 [MIT License](https://github.com/geopy/geopy/blob/master/LICENSE).
