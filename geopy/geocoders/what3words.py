@@ -24,10 +24,10 @@ class What3Words(Geocoder):
         http://what3words.com/api/reference
     """
 
-    word_re = re.compile(r"^\*{1,1}[a-zA-Z]+$")
+    word_re = re.compile(r"^\*{1,1}[^\W\d\_]+$", re.U)
     multiple_word_re = re.compile(
-        r"[a-zA-Z]+\.{1,1}[a-zA-Z]+\.{1,1}[a-zA-Z]+$"
-    )
+        r"[^\W\d\_]+\.{1,1}[^\W\d\_]+\.{1,1}[^\W\d\_]+$", re.U
+        )
 
     def __init__(
             self,
