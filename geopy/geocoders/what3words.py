@@ -76,6 +76,15 @@ class What3Words(Geocoder):
             "%s://api.what3words.com/" % self.scheme
         )
 
+    def check_query(self,
+                    query):
+        if not (self.word_re.match(query) or self.multiple_word_re.match(query)):
+
+            return False
+
+        else:
+            return True
+
     def geocode(self,
                 query,
                 lang='en',
@@ -101,8 +110,7 @@ class What3Words(Geocoder):
         """
 
         if not (
-            self.word_re.match(query) or
-            self.multiple_word_re.match(query)
+            self.check_query(query)
             ):
             raise exc.GeocoderQueryError(
                 "Search string must be either like "
