@@ -90,6 +90,19 @@ class What3WordsTestCase(GeocoderTestBase):
             'unwesen.voll.schnitt'
         )
 
+    def test_check_query(self):
+        """
+        What3Wors.check_query - 'OneWord' and '3 Words' regex
+        """
+        result_check_oneword_query = self.geocoder.check_query("*LibertyTech")
+        result_check_threeword_query = self.geocoder.check_query(u("\u0066\u0061\u0068\u0072\u0070\u0072"
+                                                                   "\u0065\u0069\u0073\u002e\u006c\u00fc"
+                                                                   "\u0067\u006e\u0065\u0072\u002e\u006b"
+                                                                   "\u0075\u0074\u0073\u0063\u0068\u0065"))
+
+        self.assertTrue(result_check_oneword_query)
+        self.assertTrue(result_check_threeword_query)
+
 
 
 
