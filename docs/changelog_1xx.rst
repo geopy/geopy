@@ -1,3 +1,12 @@
+1.6.1
+-----
+2014-12-12
+
+* FIXED: What3Words validation loosened. Contributed by spatialbitz.
+
+* FIXED: Point.format() includes altitude.
+
+
 1.6.0
 -----
 2014-12-08
