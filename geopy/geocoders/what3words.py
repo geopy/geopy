@@ -76,12 +76,12 @@ class What3Words(Geocoder):
             "%s://api.what3words.com/" % self.scheme
         )
 
-    def check_query(self,
-                    query):
-        if not (self.word_re.match(query) or self.multiple_word_re.match(query)):
-
+    def _check_query(self, query):
+        if not (
+            self.word_re.match(query) or
+            self.multiple_word_re.match(query)
+            ):
             return False
-
         else:
             return True
 
@@ -109,9 +109,7 @@ class What3Words(Geocoder):
             .. versionadded:: 0.97
         """
 
-        if not (
-            self.check_query(query)
-            ):
+        if not self._check_query(query):
             raise exc.GeocoderQueryError(
                 "Search string must be either like "
                 "'word.word.word' or '*word' "
