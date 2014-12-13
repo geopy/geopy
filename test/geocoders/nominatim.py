@@ -136,7 +136,7 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             True
         )
 
-    def test_geocode_geometry_svg(self):
+    def test_geocode_geometry_kml(self):
         """
         Nominatim.geocode with full geometry (response in kml format)
         """

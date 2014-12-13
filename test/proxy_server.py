@@ -7,9 +7,11 @@ except ImportError:
 
 import urllib
 
+
 class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
         self.copyfile(urllib.urlopen(self.path), self.wfile)
+
 
 class ProxyServer():
     '''Class used to invoke a simple test HTTP Proxy server'''
@@ -22,16 +24,22 @@ class ProxyServer():
     def run_proxy(self):
         '''Starts Instance of Proxy in a TCPServer'''
         #Setup Proxy in thread
-        self.proxyd = SocketServer.TCPServer((self.proxy_host, self.proxy_port), Proxy).serve_forever()
+        self.proxyd = SocketServer.TCPServer(
+            (self.proxy_host, self.proxy_port),
+            Proxy
+        ).serve_forever()
         # Start Proxy Process
-        print("serving at port %s on PID %s " % (self.proxy_port, self.proxyd.pid))
+        print(
+            "serving at port %s on PID %s " %
+            (self.proxy_port, self.proxyd.pid)
+        )
 
     def get_proxy_url(self):
         return "http://%s:%s" % (self.proxy_host, self.proxy_port)
 
 
 if __name__ == '__main__':
-    import daemon
+    from test import daemon
 
     daemon.daemonize()
     daemon.createPid()

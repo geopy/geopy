@@ -20,6 +20,9 @@ FIJI = Point(-16.1333333, 180.0) # Vunikondi, Fiji
 
 
 class CommonDistanceComputationCases:
+
+    cls = None
+
     def test_zero_measure(self):
         self.cls(
             (40.753152999999998, -73.982275999999999),
@@ -58,6 +61,9 @@ class CommonDistanceComputationCases:
 
 
 class CommonMathematicalOperatorCases:
+
+    cls = None
+
     def test_should_be_able_to_add_distances(self):
         added = self.cls(1.0) + self.cls(1.0)
         assert_almost_equal(added.kilometers, 2.0)
@@ -106,6 +112,9 @@ class CommonMathematicalOperatorCases:
 
 
 class CommonConversionCases:
+
+    cls = None
+
     def test_should_convert_to_kilometers(self):
         assert self.cls(1.0).kilometers == 1.0
 
@@ -163,6 +172,7 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases):
 
 
 class TestWhenComputingVincentyDistance(CommonDistanceCases):
+
     cls = VincentyDistance
 
     def setup(self):

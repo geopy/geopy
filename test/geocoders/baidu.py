@@ -33,7 +33,7 @@ class BaiduTestCase(GeocoderTestBase):
             {"latitude": 39.983615544507, "longitude": 116.32295155093},
         )
 
-    def test_reverse(self):
+    def test_reverse_address(self):
         """
         Baidu.reverse address
         """
@@ -45,7 +45,7 @@ class BaiduTestCase(GeocoderTestBase):
             {"latitude": 39.983615544507, "longitude": 116.32295155093},
         )
 
-    def test_reverse(self):
+    def test_reverse_point(self):
         """
         Baidu.reverse Point
         """
