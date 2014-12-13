@@ -11,9 +11,13 @@ develop:
 	python setup.py develop && python setup.py test
 
 lint:
+	./lint.sh
+
+pylint:
 	pylint --rcfile .pylintrc geopy
 
 test:
+	make lint
 	nosetests --verbose --with-cover --cover-erase --cover-package=geopy
 
 clean:
