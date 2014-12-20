@@ -54,9 +54,12 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GeocodeFarm authentication failure
         """
         self.geocoder = GeocodeFarm(api_key="invalid")
-        with self.assertRaises(exc.GeocoderAuthenticationFailure):
-            address = '435 north michigan ave, chicago il 60611'
-            self.geocoder.geocode(address)
+        try:
+            with self.assertRaises(exc.GeocoderAuthenticationFailure):
+                address = '435 north michigan ave, chicago il 60611'
+                self.geocoder.geocode(address)
+        except exc.GeocoderTimedOut:
+            raise unittest.SkipTest("GeocodeFarm timed out")
 
     def test_quota_exceeded(self):
         """
