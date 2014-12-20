@@ -61,23 +61,33 @@ class BingTestCase(GeocoderTestBase):
                 (pensylvania, pennsylvania_bias),
                 (colorado, colorado_bias)
             ):
-            self.assertEqual(
-                self.geocoder.geocode(
-                    "20 Main Street", user_location=Point(each[1])
-                )[0],
-                each[0]
+            res = self._make_request(
+                self.geocoder.geocode,
+                "20 Main Street",
+                user_location=Point(each[1]),
             )
-    
+            if res is None:
+                unittest.SkipTest("Bing sometimes returns no result")
+            else:
+                self.assertEqual(res[0], each[0])
+
     def test_optional_params(self):
+        """
+        Bing.geocode using optional params
+        """
         address_string = "Badeniho 1, Prague, Czech Republic"
-        
-        address = self._make_request(
+
+        res = self._make_request(
             self.geocoder.geocode,
             query=address_string,
-            culture='cs', 
+            culture='cs',
             include_neighborhood=True,
             include_country_code=True
-        ).raw['address']
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            address = res.raw['address']
 
         self.assertEqual(address['neighborhood'], "Praha 6")
         self.assertEqual(address['countryRegionIso2'], "CZ")
