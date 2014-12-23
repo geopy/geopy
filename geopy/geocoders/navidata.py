@@ -17,12 +17,9 @@ __all__ = ("NaviData", )
 
 
 
-class OpenCage(Geocoder):
+class NaviData(Geocoder):
     """
-    Geocoder using the Open Cage Data API. Documentation at:
-        http://geocoder.opencagedata.com/api.html
-
-    ..versionadded:: 1.1.0
+    Geocoder using the NaviData  API.
     """
 
     def __init__(
@@ -54,8 +51,8 @@ class OpenCage(Geocoder):
         self.api_key = api_key
         self.domain = domain.strip('/')
         #self.scheme = scheme
-        self.geocode_api = 'http://%s/geocode/' % (self.domain)
-        self.reverse_geocode_api = 'http://%s/revGeo/' % (self.domain)
+        self.geocode_api = 'http://%s/geocode' % (self.domain)
+        self.reverse_geocode_api = 'http://%s/revGeo' % (self.domain)
 
     def geocode(
             self,
@@ -143,8 +140,8 @@ class OpenCage(Geocoder):
         def parse_place(place):
             '''Get the location, lat, lon from a single json result.'''
             location = place.get('description')
-            latitude = place.get['lat']
-            longitude = place.get['lon']
+            latitude = place.get('lat')
+            longitude = place.get('lon')
             return Location(location, (latitude, longitude), place)
 
         if exactly_one:

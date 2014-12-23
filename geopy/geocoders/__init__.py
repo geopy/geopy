@@ -84,7 +84,7 @@ __all__ = (
     "OpenCage",
     "OpenMapQuest",
     "Nominatim",
-    "Navidata",
+    "NaviData",
     "YahooPlaceFinder",
     "LiveAddress",
     'Yandex',
@@ -107,6 +107,7 @@ from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
+from geopy.geocoders.navidata import NaviData
 
 from geopy.exc import GeocoderNotFound
 
@@ -128,6 +129,7 @@ SERVICE_TO_GEOCODER = {
     "geocodefarm": GeocodeFarm,
     "what3words": What3Words,
     "yandex": Yandex,
+    "navidata": NaviData
 }
 
 
