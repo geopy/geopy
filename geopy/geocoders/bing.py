@@ -68,7 +68,7 @@ class Bing(Geocoder):
             culture=None,
             include_neighborhood=None,
             include_country_code=False
-            ):  # pylint: disable=W0221
+        ):  # pylint: disable=W0221
         """
         Geocode an address.
 

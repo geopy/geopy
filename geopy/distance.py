@@ -22,9 +22,12 @@ accurate. geopy includes a few other
 models in the distance.ELLIPSOIDS dictionary::
 
                   model             major (km)   minor (km)     flattening
-    ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / 298.257223563),
-                  'GRS-80':        (6378.137,    6356.7523141,  1 / 298.257222101),
-                  'Airy (1830)':   (6377.563396, 6356.256909,   1 / 299.3249646),
+    ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / \
+                                                                298.257223563),
+                  'GRS-80':        (6378.137,    6356.7523141,  1 / \
+                                                                298.257222101),
+                  'Airy (1830)':   (6377.563396, 6356.256909,   1 / \
+                                                                299.3249646),
                   'Intl 1924':     (6378.388,    6356.911946,   1 / 297.0),
                   'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
@@ -148,6 +151,9 @@ class Distance(object):
     __bool__ = __nonzero__
 
     def measure(self, a, b):
+        """
+        Abstract method for measure
+        """
         raise NotImplementedError()
 
     def __repr__(self): # pragma: no cover
@@ -475,7 +481,8 @@ class vincenty(Distance):
                     cos_sigma * (
                         -1 + 2 * cos2_sigma_m
                     ) - B / 6. * cos2_sigma_m * (
-                        -3 + 4 * sin_sigma ** 2) * (
+                        -3 + 4 * sin_sigma ** 2
+                    ) * (
                         -3 + 4 * cos2_sigma_m ** 2
                     )
                 )

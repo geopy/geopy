@@ -155,7 +155,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         return geocoded
 
     def reverse(self, query, exactly_one=True, timeout=None, # pylint: disable=R0913,W0221
-                        distance=None, wkid=DEFAULT_WKID):
+                distance=None, wkid=DEFAULT_WKID):
         """
         Given a point, find an address.
 
@@ -196,7 +196,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
                 self.retry += 1
                 self._refresh_authentication_token()
                 return self.reverse(query, exactly_one=exactly_one,
-                        timeout=timeout, distance=distance, wkid=wkid)
+                                    timeout=timeout, distance=distance,
+                                    wkid=wkid)
             raise GeocoderServiceError(str(response['error']))
         address = (
             "%(Address)s, %(City)s, %(Region)s %(Postal)s,"

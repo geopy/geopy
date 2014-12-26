@@ -111,8 +111,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
         """
         try:
             lat, lng = [
-              x.strip() for x in
-              self._coerce_point_to_string(query).split(',')
+                x.strip() for x in
+                self._coerce_point_to_string(query).split(',')
             ]
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
