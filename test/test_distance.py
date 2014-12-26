@@ -3,7 +3,7 @@ Test distance formulas
 """
 import math
 
-from nose.tools import assert_raises, assert_almost_equal
+from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E0611
 
 from geopy.point import Point
 from geopy.distance import (Distance,
