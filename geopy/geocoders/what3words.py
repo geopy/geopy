@@ -77,10 +77,11 @@ class What3Words(Geocoder):
         )
 
     def _check_query(self, query):
-        if not (
-            self.word_re.match(query) or
-            self.multiple_word_re.match(query)
-            ):
+        """
+        Check query validity with regex
+        """
+        if not (self.word_re.match(query) or
+                self.multiple_word_re.match(query)):
             return False
         else:
             return True
@@ -245,7 +246,9 @@ class What3Words(Geocoder):
             raise exc.GeocoderQueryError("Invalid coordinates")
 
         def parse_resource(resource):
-
+            """
+            Parse resource to return Geopy Location object
+            """
             words = resource['words']
             words = join_filter(".", [words[0], words[1], words[2]])
             position = resource['position']

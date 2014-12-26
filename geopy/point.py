@@ -158,6 +158,9 @@ class Point(object):
         return "Point(%r, %r, %r)" % tuple(self._items)
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
+        """
+        Format decimal degrees (DD) to degrees minutes seconds (DMS)
+        """
         latitude = "%s %s" % (
             format_degrees(abs(self.latitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
@@ -182,6 +185,9 @@ class Point(object):
         return ", ".join(coordinates)
 
     def format_decimal(self, altitude=None):
+        """
+        Format decimal degrees with altitude
+        """
         coordinates = [str(self.latitude), str(self.longitude)]
 
         if altitude is None:
@@ -194,6 +200,9 @@ class Point(object):
         return ", ".join(coordinates)
 
     def format_altitude(self, unit='km'):
+        """
+        Foamt altitude with unit
+        """
         return format_distance(self.altitude, unit=unit)
 
     def __str__(self):
@@ -212,6 +221,9 @@ class Point(object):
 
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):
+        """
+        Parse degrees minutes seconds including direction (N, S, E, W)
+        """
         degrees = float(degrees)
         negative = degrees < 0
         arcminutes = float(arcminutes)
@@ -233,6 +245,9 @@ class Point(object):
 
     @classmethod
     def parse_altitude(cls, distance, unit):
+        """
+        Parse altitude managing units conversion
+        """
         if distance is not None:
             distance = float(distance)
             CONVERTERS = {
