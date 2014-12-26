@@ -4,7 +4,6 @@
 disable=C0103,R0401,W0142,I0011,I0012,R0801
 
 [REPORTS]
-include-ids=yes
 output-format=colorized
 
 [FORMAT]
