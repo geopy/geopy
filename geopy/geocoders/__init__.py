@@ -84,6 +84,7 @@ __all__ = (
     "OpenCage",
     "OpenMapQuest",
     "Nominatim",
+    "Navidata",
     "YahooPlaceFinder",
     "LiveAddress",
     'Yandex',
