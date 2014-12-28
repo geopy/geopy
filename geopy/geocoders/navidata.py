@@ -121,6 +121,7 @@ class OpenCage(Geocoder):
             'q': self._coerce_point_to_string(query),
         }
 
+
         if self.api_key is not None:
             params["api_key"] = self.api_key
 
