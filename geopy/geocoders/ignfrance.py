@@ -378,7 +378,7 @@ class IGNFrance(Geocoder):
         and transform to json
         """
         # Parse the page
-        tree = ET.fromstring(u(page))
+        tree = ET.fromstring(page.encode('utf-8'))
 
         # Clean tree from namespace to facilitate XML manipulation
         def remove_namespace(doc, namespace):
