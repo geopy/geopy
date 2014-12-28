@@ -5,7 +5,7 @@
 import xml.etree.ElementTree as ET
 
 from geopy.compat import (urlencode, HTTPPasswordMgrWithDefaultRealm,
-                          HTTPBasicAuthHandler, build_opener,
+                          HTTPBasicAuthHandler, build_opener, u,
                           install_opener, iteritems, Request)
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
@@ -378,20 +378,21 @@ class IGNFrance(Geocoder):
         and transform to json
         """
         # Parse the page
-        tree = ET.fromstring(page)
+        tree = ET.fromstring(page.encode('utf-8'))
 
         # Clean tree from namespace to facilitate XML manipulation
         def remove_namespace(doc, namespace):
             """Remove namespace in the document in place."""
-            ns = u'{%s}' % namespace
+            ns = '{%s}' % namespace
+            ns = u(ns)
             nsl = len(ns)
             for elem in doc.getiterator():
                 if elem.tag.startswith(ns):
                     elem.tag = elem.tag[nsl:]
 
-        remove_namespace(tree, u'http://www.opengis.net/gml')
-        remove_namespace(tree, u'http://www.opengis.net/xls')
-        remove_namespace(tree, u'http://www.opengis.net/xlsext')
+        remove_namespace(tree, 'http://www.opengis.net/gml')
+        remove_namespace(tree, 'http://www.opengis.net/xls')
+        remove_namespace(tree, 'http://www.opengis.net/xlsext')
 
         # Return places as json instead of XML
         places = self._xml_to_json_places(tree, is_reverse=is_reverse)
