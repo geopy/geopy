@@ -170,13 +170,22 @@ class Geocoder(object): # pylint: disable=R0921
         if raw:
             return page
 
-        page = decode_page(page)
-        try:
-            return json.loads(page)
-        except ValueError:
-            raise GeocoderParseError(
-                "Could not deserialize from JSON:\n%s" % page
-            )
+        if hasattr(page.headers, 'get_content_type'):
+            content_type = page.headers.get_content_type()
+        else:
+            content_type = page.headers.type
+
+        if 'application/xml' in content_type:
+            page = decode_page(page)
+            return page
+        else:
+            try:
+                page = decode_page(page)
+                return json.loads(page)
+            except ValueError:
+                raise GeocoderParseError(
+                    "Could not deserialize from JSON:\n%s" % page
+                )
 
     def geocode(self, query, exactly_one=True, timeout=None):
         """
