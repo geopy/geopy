@@ -120,6 +120,7 @@ class Geocoder(object): # pylint: disable=R0921
             timeout=None,
             raw=False,
             requester=None,
+            deserializer=json.loads,
             **kwargs
         ):
         """
@@ -171,12 +172,16 @@ class Geocoder(object): # pylint: disable=R0921
             return page
 
         page = decode_page(page)
-        try:
-            return json.loads(page)
-        except ValueError:
-            raise GeocoderParseError(
-                "Could not deserialize from JSON:\n%s" % page
-            )
+
+        if deserializer is not None:
+            try:
+                return deserializer(page)
+            except ValueError:
+                raise GeocoderParseError(
+                    "Could not deserialize using deserializer:\n%s" % page
+                )
+        else:
+            return page
 
     def geocode(self, query, exactly_one=True, timeout=None):
         """

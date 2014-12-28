@@ -88,6 +88,7 @@ __all__ = (
     "LiveAddress",
     'Yandex',
     "What3Words",
+    "IGNFrance",
 )
 
 
@@ -106,6 +107,7 @@ from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
+from geopy.geocoders.ignfrance import IGNFrance
 
 from geopy.exc import GeocoderNotFound
 
@@ -127,6 +129,7 @@ SERVICE_TO_GEOCODER = {
     "geocodefarm": GeocodeFarm,
     "what3words": What3Words,
     "yandex": Yandex,
+    "ignfrance": IGNFrance,
 }
 
 
