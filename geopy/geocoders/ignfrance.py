@@ -5,7 +5,7 @@
 import xml.etree.ElementTree as ET
 
 from geopy.compat import (urlencode, HTTPPasswordMgrWithDefaultRealm,
-                          HTTPBasicAuthHandler, build_opener,
+                          HTTPBasicAuthHandler, build_opener, u,
                           install_opener, iteritems, Request)
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
@@ -378,7 +378,7 @@ class IGNFrance(Geocoder):
         and transform to json
         """
         # Parse the page
-        tree = ET.fromstring(page)
+        tree = ET.fromstring(u(page))
 
         # Clean tree from namespace to facilitate XML manipulation
         def remove_namespace(doc, namespace):
