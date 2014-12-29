@@ -25,10 +25,10 @@ class IGNFrance(Geocoder):
 
     def __init__(
             self,
-            api_key='',
-            username='',
-            password='',
-            referer='',
+            api_key,
+            username=None,
+            password=None,
+            referer=None,
             domain='wxs.ign.fr',
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
@@ -102,7 +102,7 @@ class IGNFrance(Geocoder):
             query_type='StreetAddress',
             maximum_responses=25,
             is_freeform=False,
-            filtering='',
+            filtering=None,
             exactly_one=True,
             timeout=None,
     ):  # pylint: disable=W0221,R0913
@@ -183,6 +183,10 @@ class IGNFrance(Geocoder):
         else:
             is_freeform = 'false'
 
+        # Manage filtering value
+        if filtering is None:
+            filtering = ''
+
         # Create query using parameters
         request_string = xml_request.format(
             maximum_responses=maximum_responses,
@@ -223,7 +227,7 @@ class IGNFrance(Geocoder):
             reverse_geocode_preference=None,
             maximum_responses=25,
             is_freeform=False,
-            filtering='',
+            filtering=None,
             exactly_one=False,
             timeout=None,
     ):  # pylint: disable=W0221,R0913
@@ -283,6 +287,10 @@ class IGNFrance(Geocoder):
             is_freeform = 'true'
         else:
             is_freeform = 'false'
+
+        # Manage filtering value
+        if filtering is None:
+            filtering = ''
 
         reverse_geocode_preference = [
             ('<ReverseGeocodePreference>' +
