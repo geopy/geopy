@@ -23,6 +23,22 @@ class IGNFrance(Geocoder):
         http://api.ign.fr/tech-docs-js/fr/developpeur/search.html
     """
 
+    xml_request = """<?xml version="1.0" encoding="UTF-8"?>
+    <XLS version="1.2"
+        xmlns="http://www.opengis.net/xls"
+        xmlns:gml="http://www.opengis.net/gml"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.opengis.net/xls 
+        http://schemas.opengis.net/ols/1.2/olsAll.xsd">
+        <RequestHeader srsName="epsg:4326"/>
+        <Request methodName="{method_name}"
+                 maximumResponses="{maximum_responses}"
+                 requestID=""
+                 version="1.2">
+            {sub_request}
+        </Request>
+    </XLS>"""
+
     def __init__(
             self,
             api_key,
@@ -154,23 +170,20 @@ class IGNFrance(Geocoder):
             raise GeocoderQueryError("""You must send a string of fourteen
                 characters long to match the cadastre required code""")
 
-        xml_request = """<?xml version="1.0" encoding="UTF-8"?>
-            <XLS version="1.2"
-                 xmlns="http://www.opengis.net/xls"
-                 xmlns:gml="http://www.opengis.net/gml"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://www.opengis.net/xls 
-                 http://schemas.opengis.net/ols/1.2/olsAll.xsd">
-            <RequestHeader srsName="" sessionID=""/>
-            <Request methodName="LocationUtilityService" version="1.2"
-                     requestID="" maximumResponses="{maximum_responses}">
+        sub_request = """
                 <GeocodeRequest returnFreeForm="{is_freeform}">
                     <Address countryCode="{query_type}">
                         <freeFormAddress>{query}</freeFormAddress>
                         {filtering}
                     </Address>
                 </GeocodeRequest>
-            </Request></XLS>"""
+        """
+
+        xml_request = self.xml_request.format(
+            method_name='LocationUtilityService',
+            sub_request=sub_request,
+            maximum_responses=maximum_responses
+        )
 
         # Manage type change for xml case sensitive
         if is_freeform:
@@ -184,7 +197,6 @@ class IGNFrance(Geocoder):
 
         # Create query using parameters
         request_string = xml_request.format(
-            maximum_responses=maximum_responses,
             is_freeform=is_freeform,
             query=query,
             query_type=query_type,
@@ -237,28 +249,23 @@ class IGNFrance(Geocoder):
 
         """
 
-        xml_request = """<?xml version="1.0" encoding="UTF-8"?>
-            <XLS version="1.2"
-                 xmlns="http://www.opengis.net/xls"
-                 xmlns:gml="http://www.opengis.net/gml"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://www.opengis.net/xls 
-                 http://schemas.opengis.net/ols/1.2/olsAll.xsd">
-                <RequestHeader/>
-                <Request methodName="ReverseGeocodeRequest"
-                  maximumResponses="{maximum_responses}" requestID=""
-                  version="1.2">
-                <ReverseGeocodeRequest returnFreeForm="{is_freeform}">
-                    {reverse_geocode_preference}
-                    <Position>
-                      <gml:Point>
-                        <gml:pos>{query}</gml:pos>
-                      </gml:Point>
-                      {filtering}
-                    </Position>
-                  </ReverseGeocodeRequest>
-                </Request>
-            </XLS>"""
+        sub_request = """
+            <ReverseGeocodeRequest returnFreeForm="{is_freeform}">
+                {reverse_geocode_preference}
+                <Position>
+                  <gml:Point>
+                    <gml:pos>{query}</gml:pos>
+                  </gml:Point>
+                  {filtering}
+                </Position>
+            </ReverseGeocodeRequest>
+        """
+
+        xml_request = self.xml_request.format(
+            method_name='ReverseGeocodeRequest',
+            sub_request=sub_request,
+            maximum_responses=maximum_responses
+        )
 
         if reverse_geocode_preference is None:
             reverse_geocode_preference = ['StreetAddress']
@@ -295,7 +302,7 @@ class IGNFrance(Geocoder):
             filtering=filtering
         )
 
-        logger.debug("Request geocode: \n %s", request_string)
+        logger.debug("Request reverse geocode: \n %s", request_string)
 
         params = {
             'xls': request_string
@@ -318,23 +325,29 @@ class IGNFrance(Geocoder):
         """
         Create Urllib request object embedding HTTP simple authentication
         """
+        sub_request = """
+        <GeocodeRequest returnFreeForm="{is_freeform}">
+            <Address countryCode="{query_type}">
+                <freeFormAddress>{query}</freeFormAddress>
+            </Address>
+        </GeocodeRequest>
+        """
+
+        xml_request = self.xml_request.format(
+            method_name='LocationUtilityService',
+            sub_request=sub_request,
+            maximum_responses=1
+        )
+
+        # Create query using parameters
+        request_string = xml_request.format(
+            is_freeform='false',
+            query='rennes',
+            query_type='PositionOfInterest'
+        )
+
         params = {
-            'xls':  """<?xml version="1.0" encoding="UTF-8"?>
-                    <XLS version="1.2"
-                        xmlns="http://www.opengis.net/xls"
-                        xmlns:gml="http://www.opengis.net/gml"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xsi:schemaLocation="http://www.opengis.net/xls 
-                        http://schemas.opengis.net/ols/1.2/olsAll.xsd">
-                    <RequestHeader srsName="" sessionID=""/>
-                    <Request methodName="LocationUtilityService" version="1.2"
-                            requestID="" maximumResponses="1">
-                        <GeocodeRequest returnFreeForm="false">
-                            <Address countryCode="PositionOfInterest">
-                                <freeFormAddress>rennes</freeFormAddress>
-                            </Address>
-                        </GeocodeRequest>
-                    </Request></XLS>"""
+            'xls':  request_string
         }
 
         top_level_url = "?".join((self.api, urlencode(params)))
@@ -444,8 +457,8 @@ class IGNFrance(Geocoder):
                 """
                 return selector.attrib.get(
                     key,
-                    ''
-                ) if selector is not None else ''
+                    None
+                ) if selector is not None else None
 
             place['accuracy'] = testContentAttrib(
                 adr.find('.//GeocodeMatchCode'), 'accuracy')
@@ -463,9 +476,9 @@ class IGNFrance(Geocoder):
                 if value is not None:
                     place[key] = value.text
                     if value.text == None:
-                        place[key] = ''
+                        place[key] = None
                 else:
-                    place[key] = ''
+                    place[key] = None
 
             # We check if lat lng is not empty and unpack accordingly
             if place['pos']:
@@ -473,7 +486,7 @@ class IGNFrance(Geocoder):
                 place['lat'] = lat.strip()
                 place['lng'] = lng.strip()
             else:
-                place['lat'] = place['lng'] = ''
+                place['lat'] = place['lng'] = None
 
             # We removed the unused key
             place.pop("pos", None)
