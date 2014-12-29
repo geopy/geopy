@@ -93,7 +93,7 @@ class IGNFrance(Geocoder):
             api_key=self.api_key,
             domain=self.domain
         )
-        if not referer:
+        if referer is not None:
             self.addSimpleHTTPAuthHeader()
 
     def geocode(
