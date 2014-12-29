@@ -75,6 +75,11 @@ class IGNFrance(Geocoder):
             Default is https. Note that SSL connections' certificates are not
             verified.
 
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
@@ -138,14 +143,9 @@ class IGNFrance(Geocoder):
             freeform structure or a more structured returned.
             By default, value is False.
 
-        :param string filtering : TODO update
-            Provides the geocoder with a hint to the region
-            that the query resides in. This value will help the geocoder
-            but will not restrict the possible results to the supplied
-            region. The bounds parameter should be specified as 4
-            coordinate points forming the south-west and north-east
-            corners of a bounding box. For example,
-            `bounds=-0.563160,51.280430,0.278970,51.683979`.
+        :param string filtering : Provide string that help setting geocoder
+            filter. It contains an XML string. See examples in documentation
+            and ignfrance.py file in directory tests.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -226,7 +226,6 @@ class IGNFrance(Geocoder):
             query,
             reverse_geocode_preference=None,
             maximum_responses=25,
-            is_freeform=False,
             filtering=None,
             exactly_one=False,
             timeout=None
@@ -239,6 +238,17 @@ class IGNFrance(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
+        :param list reverse_geocode_preference: Enable to set expected results
+            type. It can be StreetAddress or PositionOfInterest.
+            Default is set to StreetAddress
+
+        :param int maximum_responses: The maximum number of responses
+            to ask to the API in the query body.
+
+        :param string filtering : Provide string that help setting geocoder
+            filter. It contains an XML string. See examples in documentation
+            and ignfrance.py file in directory tests.
+
         :param boolean exactly_one: Return one result or a list of results, if
             available.
 
@@ -250,7 +260,7 @@ class IGNFrance(Geocoder):
         """
 
         sub_request = """
-            <ReverseGeocodeRequest returnFreeForm="{is_freeform}">
+            <ReverseGeocodeRequest>
                 {reverse_geocode_preference}
                 <Position>
                   <gml:Point>
@@ -278,12 +288,6 @@ class IGNFrance(Geocoder):
         point = self._coerce_point_to_string(query)
         point = point.replace(',', ' ')
 
-        # Manage type change for xml case sensitive
-        if is_freeform:
-            is_freeform = 'true'
-        else:
-            is_freeform = 'false'
-
         # Manage filtering value
         if filtering is None:
             filtering = ''
@@ -296,7 +300,6 @@ class IGNFrance(Geocoder):
         reverse_geocode_preference = '\n'.join(reverse_geocode_preference)
         request_string = xml_request.format(
             maximum_responses=maximum_responses,
-            is_freeform=is_freeform,
             query=point,
             reverse_geocode_preference=reverse_geocode_preference,
             filtering=filtering
@@ -318,7 +321,7 @@ class IGNFrance(Geocoder):
             raw_xml,
             exactly_one=exactly_one,
             is_reverse=True,
-            is_freeform=is_freeform
+            is_freeform='false'
         )
 
     def addSimpleHTTPAuthHeader(self):
