@@ -409,31 +409,27 @@ class IGNFrance(Geocoder):
 
         adresses = tree.findall('.//' + select_multi)
         places = []
-        def sel_pl_attr(attrib_name):
-            """
-            Return the string for xpath selection for places with a particular
-            attribute
-            """
-            return './/Address/Place[@type="' + attrib_name + '"]'
+
+        sel_pl = './/Address/Place[@type="{}"]'
         for adr in adresses:
             el = {}
             el['pos'] = adr.find('./Point/pos')
             el['street'] = adr.find('.//Address/StreetAddress/Street')
             el['freeformaddress'] = adr.find('.//Address/freeFormAddress')
-            el['municipality'] = adr.find(sel_pl_attr('Municipality'))
-            el['numero'] = adr.find(sel_pl_attr('Numero'))
-            el['feuille'] = adr.find(sel_pl_attr('Feuille'))
-            el['section'] = adr.find(sel_pl_attr('Section'))
-            el['departement'] = adr.find(sel_pl_attr('Departement'))
-            el['commune_absorbee'] = adr.find(sel_pl_attr('CommuneAbsorbee'))
-            el['commune'] = adr.find(sel_pl_attr('Commune'))
-            el['insee'] = adr.find(sel_pl_attr('INSEE'))
-            el['qualite'] = adr.find(sel_pl_attr('Qualite'))
-            el['territoire'] = adr.find(sel_pl_attr('Territoire'))
-            el['id'] = adr.find(sel_pl_attr('ID'))
-            el['id_tr'] = adr.find(sel_pl_attr('ID_TR'))
-            el['bbox'] = adr.find(sel_pl_attr('Bbox'))
-            el['nature'] = adr.find(sel_pl_attr('Nature'))
+            el['municipality'] = adr.find(sel_pl.format('Municipality'))
+            el['numero'] = adr.find(sel_pl.format('Numero'))
+            el['feuille'] = adr.find(sel_pl.format('Feuille'))
+            el['section'] = adr.find(sel_pl.format('Section'))
+            el['departement'] = adr.find(sel_pl.format('Departement'))
+            el['commune_absorbee'] = adr.find(sel_pl.format('CommuneAbsorbee'))
+            el['commune'] = adr.find(sel_pl.format('Commune'))
+            el['insee'] = adr.find(sel_pl.format('INSEE'))
+            el['qualite'] = adr.find(sel_pl.format('Qualite'))
+            el['territoire'] = adr.find(sel_pl.format('Territoire'))
+            el['id'] = adr.find(sel_pl.format('ID'))
+            el['id_tr'] = adr.find(sel_pl.format('ID_TR'))
+            el['bbox'] = adr.find(sel_pl.format('Bbox'))
+            el['nature'] = adr.find(sel_pl.format('Nature'))
             el['postal_code'] = adr.find('.//Address/PostalCode')
             el['extended_geocode_match_code'] = adr.find(
                 './/ExtendedGeocodeMatchCode'
