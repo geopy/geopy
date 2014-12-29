@@ -87,7 +87,6 @@ class IGNFrance(Geocoder):
         self.password = password
         self.referer = referer
         self.domain = domain.strip('/')
-        self.scheme = scheme
         self.api = "{scheme}://{domain}/{api_key}/geoportail/ols".format(
             scheme=self.scheme,
             api_key=self.api_key,
