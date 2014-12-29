@@ -98,13 +98,13 @@ class IGNFrance(Geocoder):
 
     def geocode(
             self,
-            query=None,
+            query,
             query_type='StreetAddress',
             maximum_responses=25,
             is_freeform=False,
             filtering=None,
             exactly_one=True,
-            timeout=None,
+            timeout=None
     ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
@@ -141,10 +141,6 @@ class IGNFrance(Geocoder):
             only, the value set during the geocoder's initialization.
 
         """
-
-        # Catch empty query
-        if not query:
-            raise GeocoderQueryError('Your provided query is empty!')
 
         # Check if acceptable query type
         if query_type not in ['PositionOfInterest',
@@ -206,14 +202,7 @@ class IGNFrance(Geocoder):
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        request = Request(url)
-
-        if self.referer:
-            request.add_header('Referer', self.referer)
-
-        raw_xml = self._call_geocoder(request, timeout=timeout)
-
-        logger.debug("Returned geocode: \n %s", raw_xml)
+        raw_xml = self.request_raw_content(url, timeout)
 
         return self._parse_xml(
             raw_xml,
@@ -223,13 +212,13 @@ class IGNFrance(Geocoder):
 
     def reverse(
             self,
-            query=None,
+            query,
             reverse_geocode_preference=None,
             maximum_responses=25,
             is_freeform=False,
             filtering=None,
             exactly_one=False,
-            timeout=None,
+            timeout=None
     ):  # pylint: disable=W0221,R0913
         """
         Given a point, find an address.
@@ -248,6 +237,7 @@ class IGNFrance(Geocoder):
             only, the value set during the geocoder's initialization.
 
         """
+
         xml_request = """<?xml version="1.0" encoding="UTF-8"?>
             <XLS version="1.2"
                  xmlns="http://www.opengis.net/xls"
@@ -316,14 +306,7 @@ class IGNFrance(Geocoder):
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
 
-        request = Request(url)
-
-        if self.referer:
-            request.add_header('Referer', self.referer)
-
-        raw_xml = self._call_geocoder(request, timeout=timeout)
-
-        logger.debug("Returned geocode: \n %s", raw_xml)
+        raw_xml = self.request_raw_content(url, timeout)
 
         return self._parse_xml(
             raw_xml,
@@ -502,6 +485,27 @@ class IGNFrance(Geocoder):
             places.append(place)
 
         return places
+
+    def request_raw_content(self, url, timeout):
+        """
+        Send the request to get raw content.
+        """
+
+        request = Request(url)
+
+        if self.referer:
+            request.add_header('Referer', self.referer)
+
+        raw_xml = self._call_geocoder(
+            request,
+            timeout=timeout,
+            deserializer=None
+        )
+
+        logger.debug("Returned geocode: \n %s", raw_xml)
+
+        return raw_xml
+
 
     @staticmethod
     def parse_place(place, is_freeform=None):
