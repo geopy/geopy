@@ -153,7 +153,7 @@ class NaviData(Geocoder):
 
 
 
-    def _coerce_point_to_string(point, type):
+    def _coerce_point_to_string(self, point, type):
         """
         Do the right thing on "point" input.
         """
