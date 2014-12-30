@@ -17,7 +17,6 @@ pylint:
 	pylint --rcfile .pylintrc geopy
 
 test:
-	make lint
 	nosetests --verbose --with-cover --cover-erase --cover-package=geopy
 
 clean:

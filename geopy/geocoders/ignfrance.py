@@ -17,7 +17,8 @@ from geopy.util import logger
 
 __all__ = ("IGNFrance", )
 
-class IGNFrance(Geocoder):
+
+class IGNFrance(Geocoder):   # pylint: disable=W0223
     """
     Geocoder using the IGN France GeoCoder OpenLS API. Documentation at:
         http://api.ign.fr/tech-docs-js/fr/developpeur/search.html
@@ -28,7 +29,7 @@ class IGNFrance(Geocoder):
         xmlns="http://www.opengis.net/xls"
         xmlns:gml="http://www.opengis.net/gml"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.opengis.net/xls 
+        xsi:schemaLocation="http://www.opengis.net/xls
         http://schemas.opengis.net/ols/1.2/olsAll.xsd">
         <RequestHeader srsName="epsg:4326"/>
         <Request methodName="{method_name}"
@@ -90,18 +91,22 @@ class IGNFrance(Geocoder):
             scheme=scheme, timeout=timeout, proxies=proxies
         )
 
-        # Catch if no api key  with username and password
+        # Catch if no api key with username and password
         # or no api key with referer
-        if not (api_key and password and username) \
+        if not (api_key and username and password) \
             and not (api_key and referer):
             raise ConfigurationError('You should provide an api key and a '
                                      'username with a password or an api '
                                      'key with a referer depending on '
                                      'created api key')
-        if password and username and referer:
+        if (username and password) and referer:
             raise ConfigurationError('You can\'t set username/password and '
                                      'referer together. The API key always '
                                      'differs depending on both scenarios')
+        if username and not password:
+            raise ConfigurationError(
+                'username and password must be set together'
+            )
 
         self.api_key = api_key
         self.username = username
@@ -202,8 +207,6 @@ class IGNFrance(Geocoder):
             filtering=filtering
         )
 
-        logger.debug("Request geocode: \n %s", request_string)
-
         params = {
             'xls': request_string
         }
@@ -212,7 +215,7 @@ class IGNFrance(Geocoder):
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
-        raw_xml = self.request_raw_content(url, timeout)
+        raw_xml = self._request_raw_content(url, timeout)
 
         return self._parse_xml(
             raw_xml,
@@ -223,9 +226,9 @@ class IGNFrance(Geocoder):
     def reverse(
             self,
             query,
-            reverse_geocode_preference=None,
+            reverse_geocode_preference=('StreetAddress', ),
             maximum_responses=25,
-            filtering=None,
+            filtering='',
             exactly_one=False,
             timeout=None
     ):  # pylint: disable=W0221,R0913
@@ -276,27 +279,20 @@ class IGNFrance(Geocoder):
             maximum_responses=maximum_responses
         )
 
-        if reverse_geocode_preference is None:
-            reverse_geocode_preference = ['StreetAddress']
+        for pref in reverse_geocode_preference:
+            if pref not in ('StreetAddress', 'PositionOfInterest'):
+                raise GeocoderQueryError(
+                    '`reverse_geocode_preference` must contain '
+                    'one or more of: StreetAddress, PositionOfInterest'
+                )
 
-        if not ('StreetAddress' in reverse_geocode_preference or
-                'PositionOfInterest' in reverse_geocode_preference):
-            raise GeocoderQueryError("""You must provide a list with
-            StreetAddress, PositionOfInterest or both for the request""")
+        point = self._coerce_point_to_string(query).replace(',', ' ')
+        reverse_geocode_preference = '\n'.join((
+            '<ReverseGeocodePreference>%s</ReverseGeocodePreference>' % pref
+            for pref
+            in reverse_geocode_preference
+        ))
 
-        point = self._coerce_point_to_string(query)
-        point = point.replace(',', ' ')
-
-        # Manage filtering value
-        if filtering is None:
-            filtering = ''
-
-        reverse_geocode_preference = [
-            ('<ReverseGeocodePreference>' +
-             pref +
-             '</ReverseGeocodePreference>')
-            for pref in reverse_geocode_preference]
-        reverse_geocode_preference = '\n'.join(reverse_geocode_preference)
         request_string = xml_request.format(
             maximum_responses=maximum_responses,
             query=point,
@@ -304,17 +300,11 @@ class IGNFrance(Geocoder):
             filtering=filtering
         )
 
-        logger.debug("Request reverse geocode: \n %s", request_string)
-
-        params = {
-            'xls': request_string
-        }
-
-        url = "?".join((self.api, urlencode(params)))
+        url = "?".join((self.api, urlencode({'xls': request_string})))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
 
-        raw_xml = self.request_raw_content(url, timeout)
+        raw_xml = self._request_raw_content(url, timeout)
 
         return self._parse_xml(
             raw_xml,
@@ -403,10 +393,10 @@ class IGNFrance(Geocoder):
         places = self._xml_to_json_places(tree, is_reverse=is_reverse)
 
         if exactly_one:
-            return self.parse_place(places[0], is_freeform=is_freeform)
+            return self._parse_place(places[0], is_freeform=is_freeform)
         else:
             return [
-                self.parse_place(
+                self._parse_place(
                     place,
                     is_freeform=is_freeform
                 ) for place in places
@@ -418,9 +408,11 @@ class IGNFrance(Geocoder):
         Transform the xml ElementTree due to XML webservice return to json
         """
 
-        select_multi = 'GeocodedAddress'
-        if is_reverse:
-            select_multi = 'ReverseGeocodedLocation'
+        select_multi = (
+            'GeocodedAddress'
+            if not is_reverse
+            else 'ReverseGeocodedLocation'
+        )
 
         adresses = tree.findall('.//' + select_multi)
         places = []
@@ -496,7 +488,7 @@ class IGNFrance(Geocoder):
 
         return places
 
-    def request_raw_content(self, url, timeout):
+    def _request_raw_content(self, url, timeout):
         """
         Send the request to get raw content.
         """
@@ -512,13 +504,11 @@ class IGNFrance(Geocoder):
             deserializer=None
         )
 
-        logger.debug("Returned geocode: \n %s", raw_xml)
-
         return raw_xml
 
 
     @staticmethod
-    def parse_place(place, is_freeform=None):
+    def _parse_place(place, is_freeform=None):
         """
         Get the location, lat, lng and place from a single json place.
         """
@@ -528,38 +518,38 @@ class IGNFrance(Geocoder):
         else:
             # When classic geocoding
             if place.get('match_type'):
-                location = place.get('postal_code') + ' ' + \
-                               place.get('commune')
+                location = "%s %s" % (
+                    place.get('postal_code', ''),
+                    place.get('commune', ''),
+                )
                 if place.get('match_type') in ['Street number',
                                                'Street enhanced']:
-                    location = place.get('building') + ' ' + \
-                               place.get('street') + ', ' + \
-                               location
+                    location = "%s %s, %s" % (
+                        place.get('building', ''),
+                        place.get('street', ''),
+                        location,
+                    )
                 elif place.get('match_type') == 'Street':
-                    location = place.get('street') + ', ' + \
-                               location
+                    location = "%s, %s" % (place.get('street', ''), location)
             else:
                 # For parcelle
                 if place.get('numero'):
                     location = place.get('street')
                 else:
                     # When reverse geocoding
-                    location = place.get('postal_code') + ' ' + \
-                               place.get('commune')
+                    location = "%s %s" % (
+                        place.get('postal_code', ''),
+                        place.get('commune', ''),
+                    )
                     if place.get('street'):
-                        location = place.get('street') + ', ' + \
-                                   location
+                        location = "%s, %s" % (
+                            place.get('street', ''),
+                            location,
+                        )
                     if place.get('building'):
-                        location = place.get('building') + ' ' + \
-                                   location
+                        location = "%s %s" % (
+                            place.get('building', ''),
+                            location,
+                        )
 
-        latitude = place.get('lat')
-        longitude = place.get('lng')
-
-        return Location(location, (latitude, longitude), place)
-
-    def _parse_json(self, page, exactly_one=True):
-        """
-        Returns location, (latitude, longitude) from json feed
-        """
-        return page
+        return Location(location, (place.get('lat'), place.get('lng')), place)

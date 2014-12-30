@@ -33,6 +33,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.GoogleV3
     :members: __init__, geocode, reverse, timezone
 
+.. autoclass:: geopy.geocoders.IGNFrance
+    :members: __init__, geocode, reverse
+
 .. autoclass:: geopy.geocoders.LiveAddress
     :members: __init__, geocode
 

@@ -101,7 +101,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
             ))
             url = Request(url, headers={"Authorization": auth})
         page = self._call_geocoder(url, timeout=timeout, raw=True)
-        content = page.read().decode("utf-8") if py3k else page.read() # pylint: disable=E1101
+        content = page.read().decode("utf-8") if py3k else page.read() # pylint: disable=E1101,E1103
         places = [
             r for r in csv.reader(
                 [content, ] if not isinstance(content, list)
