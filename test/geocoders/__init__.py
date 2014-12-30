@@ -15,3 +15,4 @@ from .placefinder import YahooPlaceFinderTestCase
 from .smartystreets import LiveAddressTestCase
 from .what3words import What3WordsTestCase
 from .yandex import YandexTestCase
+from .navidata import NaviDataTestCase

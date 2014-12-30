@@ -1,50 +1,45 @@
 """
-:class:`.OpenCage` is the Opencagedata geocoder.
+:class:`.NaviData` is the NaviData.pl geocoder.
 """
 
-from geopy.compat import urlencode
+from geopy.compat import urlencode, string_compare
+from geopy.location import Location
 from geopy.point import Point
+from geopy.util import logger
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
 )
-from geopy.location import Location
-from geopy.util import logger
 
 
-__all__ = ("OpenCage", )
+__all__ = ("NaviData", )
 
 
-class OpenCage(Geocoder):
+
+class NaviData(Geocoder):
     """
-    Geocoder using the Open Cage Data API. Documentation at:
-        http://geocoder.opencagedata.com/api.html
-
-    ..versionadded:: 1.1.0
+    Geocoder using the NaviData  API.
+    See http://www.navidata.pl
     """
 
     def __init__(
             self,
-            api_key,
-            domain='api.opencagedata.com',
-            scheme=DEFAULT_SCHEME,
+            api_key=None,
+            domain='api.navidata.pl',
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-    ):  # pylint: disable=R0913
+    ):
         """
-        Initialize a customized Open Cage Data geocoder.
+        Initialize NaviData geocoder. Please note that 'scheme' parameter is not supported - at present state, all
+        NaviData traffic use plain http.
 
-        :param string api_key: The API key required by Open Cage Data
-            to perform geocoding requests. You can get your key here:
-            https://developer.opencagedata.com/
+        :param string api_key: The commercial API key for service. None required if you
+            use this API for non-commercial puproses
 
-        :param string domain: Currently it is 'api.opencagedata.com', can
+        :param string domain: Currently it is 'api.navidata.pl', can
             be changed for testing purposes.
-
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -52,48 +47,27 @@ class OpenCage(Geocoder):
             :class:`urllib2.ProxyHandler`.
 
         """
-        super(OpenCage, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+        super(NaviData, self).__init__(
+            scheme="http", timeout=timeout, proxies=proxies
         )
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.scheme = scheme
-        self.api = '%s://%s/geocode/v1/json' % (self.scheme, self.domain)
+        #self.scheme = scheme
+        self.geocode_api = 'http://%s/geocode' % (self.domain)
+        self.reverse_geocode_api = 'http://%s/revGeo' % (self.domain)
 
     def geocode(
             self,
             query,
-            bounds=None,
-            country=None,
-            language=None,
             exactly_one=True,
             timeout=None,
-    ):  # pylint: disable=W0221,R0913
+    ):
         """
         Geocode a location query.
 
         :param string query: The query string to be geocoded; this must
             be URL encoded.
-
-        :param string language: an IETF format language code (such as `es`
-            for Spanish or pt-BR for Brazilian Portuguese); if this is
-            omitted a code of `en` (English) will be assumed by the remote
-            service.
-
-        :param string bounds: Provides the geocoder with a hint to the region
-            that the query resides in. This value will help the geocoder
-            but will not restrict the possible results to the supplied
-            region. The bounds parameter should be specified as 4
-            coordinate points forming the south-west and north-east
-            corners of a bounding box. For example,
-            `bounds=-0.563160,51.280430,0.278970,51.683979`.
-
-        :param string country: Provides the geocoder with a hint to the
-            country that the query resides in. This value will help the
-            geocoder but will not restrict the possible results to the
-            supplied country. The country code is a 3 character code as
-            defined by the ISO 3166-1 Alpha 3 standard.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -105,30 +79,27 @@ class OpenCage(Geocoder):
 
         """
         params = {
-            'key': self.api_key,
             'q': self.format_string % query,
         }
-        if bounds:
-            params['bounds'] = bounds
-        if bounds:
-            params['language'] = language
-        if bounds:
-            params['country'] = country
 
-        url = "?".join((self.api, urlencode(params)))
+
+        if self.api_key is not None:
+            params["api_key"] = self.api_key
+
+        url = "?".join((self.geocode_api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
+        return self._parse_json_geocode(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
     def reverse(
             self,
             query,
-            language=None,
             exactly_one=False,
             timeout=None,
-    ):  # pylint: disable=W0221,R0913
+    ):
+
         """
         Given a point, find an address.
 
@@ -137,10 +108,8 @@ class OpenCage(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param string language: The language in which to return results.
-
         :param boolean exactly_one: Return one result or a list of results, if
-            available.
+            available. Currently this has no effect (only one address is returned by API)
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -149,37 +118,57 @@ class OpenCage(Geocoder):
 
         """
         params = {
-            'key': self.api_key,
-            'q': self._coerce_point_to_string(query),
+            'lat': self._coerce_point_to_string(query).split(',')[0],
+            'lon': self._coerce_point_to_string(query).split(',')[1]
         }
-        if language:
-            params['language'] = language
 
-        url = "?".join((self.api, urlencode(params)))
+
+        if self.api_key is not None:
+            params["api_key"] = self.api_key
+
+        url = "?".join((self.reverse_geocode_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
+        return self._parse_json_revgeocode(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def _parse_json(self, page, exactly_one=True):
+    def _parse_json_geocode(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
 
-        places = page.get('results', [])
+        places = page
+
         if not len(places):
             self._check_status(page.get('status'))
             return None
 
         def parse_place(place):
-            '''Get the location, lat, lng from a single json place.'''
-            location = place.get('formatted')
-            latitude = place['geometry']['lat']
-            longitude = place['geometry']['lng']
+            '''Get the location, lat, lon from a single json result.'''
+            location = place.get('description')
+            latitude = place.get('lat')
+            longitude = place.get('lon')
             return Location(location, (latitude, longitude), place)
 
         if exactly_one:
             return parse_place(places[0])
         else:
             return [parse_place(place) for place in places]
+
+
+    def _parse_json_revgeocode(self, page, exactly_one=True):
+        '''Returns location, (latitude, longitude) from json feed.'''
+
+
+        result = page
+
+        if result.get('description', None) is None:
+            return None
+
+        location = result.get('description')
+        latitude = result.get('lat')
+        longitude = result.get('lon')
+
+        return Location(location, (latitude, longitude), result)
+
 
     @staticmethod
     def _check_status(status):
@@ -203,4 +192,4 @@ class OpenCage(Geocoder):
                 'Your request was denied.'
             )
         else:
-            raise GeocoderQueryError('Unknown error.')
+            raise GeocoderQueryError('Unknown error: ' + str(status_code))
