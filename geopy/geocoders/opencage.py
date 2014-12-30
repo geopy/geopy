@@ -3,6 +3,7 @@
 """
 
 from geopy.compat import urlencode
+from geopy.point import Point
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
     GeocoderQueryError,

@@ -2,8 +2,9 @@
 :class:`.NaviData` is the NaviData.pl geocoder.
 """
 
-from geopy.compat import urlencode
+from geopy.compat import urlencode, string_compare
 from geopy.location import Location
+from geopy.point import Point
 from geopy.util import logger
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 
@@ -115,7 +116,8 @@ class NaviData(Geocoder):
 
         """
         params = {
-            'q': self._coerce_point_to_string(query),
+            'lat': self._coerce_point_to_string(query, 'lat'),
+            'lon': self._coerce_point_to_string(query, 'lon')
         }
 
 
@@ -148,6 +150,38 @@ class NaviData(Geocoder):
             return parse_place(places[0])
         else:
             return [parse_place(place) for place in places]
+
+
+
+    def _coerce_point_to_string(point, type):
+        """
+        Do the right thing on "point" input.
+        """
+
+        if isinstance(point, Point):
+
+            if type == "lat":
+                return str(point.latitude)
+            else:
+                return str(point.longitude)
+
+        elif isinstance(point, (list, tuple)):
+
+            if type == "lat":
+                return str(point[0])
+            else:
+                return str(point[1])
+
+
+        elif isinstance(point, string_compare):
+
+            if type == "lat":
+                return point.split(',')[0]
+            else:
+                return point.split(',')[1]
+
+        else:
+            raise ValueError("Invalid point")
 
     @staticmethod
     def _check_status(status):
