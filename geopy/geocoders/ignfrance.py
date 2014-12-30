@@ -129,8 +129,7 @@ class IGNFrance(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The query string to be geocoded; this must
-            be URL encoded.
+        :param string query: The query string to be geocoded.
 
         :param string query_type: The type to provide for geocoding. It can be
             PositionOfInterest, StreetAddress or CadastralParcel.
