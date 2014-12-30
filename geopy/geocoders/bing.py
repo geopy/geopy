@@ -6,6 +6,13 @@ from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
     DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.location import Location
+from geopy.exc import (
+    GeocoderAuthenticationFailure,
+    GeocoderQuotaExceeded,
+    GeocoderInsufficientPrivileges,
+    GeocoderUnavailable,
+    GeocoderServiceError,
+)
 from geopy.util import logger, join_filter
 
 
@@ -165,6 +172,20 @@ class Bing(Geocoder):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """
+        status_code = doc.get("statusCode", 200)
+        if status_code != 200:
+            err = doc.get("errorDetails", "")
+            if status_code == 401:
+                raise GeocoderAuthenticationFailure(err)
+            elif status_code == 403:
+                raise GeocoderInsufficientPrivileges(err)
+            elif status_code == 429:
+                raise GeocoderQuotaExceeded(err)
+            elif status_code == 503:
+                raise GeocoderUnavailable(err)
+            else:
+                raise GeocoderServiceError(err)
+
         resources = doc['resourceSets'][0]['resources']
         if resources is None or not len(resources): # pragma: no cover
             return None
