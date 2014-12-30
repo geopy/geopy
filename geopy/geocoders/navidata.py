@@ -87,7 +87,7 @@ class NaviData(Geocoder):
         url = "?".join((self.geocode_api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
+        return self._parse_json_geocode(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
@@ -126,11 +126,11 @@ class NaviData(Geocoder):
 
         url = "?".join((self.reverse_geocode_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
+        return self._parse_json_revgeocode(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def _parse_json(self, page, exactly_one=True):
+    def _parse_json_geocode(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
 
         places = page
@@ -151,6 +151,21 @@ class NaviData(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
+
+    def _parse_json_revgeocode(self, page, exactly_one=True):
+        '''Returns location, (latitude, longitude) from json feed.'''
+
+
+        result = page
+
+        if result.get('description', None) is None:
+            return None
+
+        location = result.get('description')
+        latitude = result.get('lat')
+        longitude = result.get('lon')
+
+        return Location(location, (latitude, longitude), result)
 
 
     def _coerce_point_to_string(self, point, type):
