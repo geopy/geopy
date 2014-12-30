@@ -147,7 +147,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             freeform structure or a more structured returned.
             By default, value is False.
 
-        :param string filtering : Provide string that help setting geocoder
+        :param string filtering: Provide string that help setting geocoder
             filter. It contains an XML string. See examples in documentation
             and ignfrance.py file in directory tests.
 
@@ -247,7 +247,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         :param int maximum_responses: The maximum number of responses
             to ask to the API in the query body.
 
-        :param string filtering : Provide string that help setting geocoder
+        :param string filtering: Provide string that help setting geocoder
             filter. It contains an XML string. See examples in documentation
             and ignfrance.py file in directory tests.
 
