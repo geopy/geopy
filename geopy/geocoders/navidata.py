@@ -32,7 +32,8 @@ class NaviData(Geocoder):
             proxies=None,
     ):
         """
-        Initialize NaviData geocoder.
+        Initialize NaviData geocoder. Please note that 'scheme' parameter is not supported - at present state, all
+        NaviData traffic use plain http.
 
         :param string api_key: The commercial API key for service. None required if you
             use this API for non-commercial puproses
@@ -117,8 +118,8 @@ class NaviData(Geocoder):
 
         """
         params = {
-            'lat': self._coerce_point_to_string(query, 'lat'),
-            'lon': self._coerce_point_to_string(query, 'lon')
+            'lat': self._coerce_point_to_string(query).split(',')[0],
+            'lon': self._coerce_point_to_string(query).split(',')[1]
         }
 
 
@@ -169,36 +170,6 @@ class NaviData(Geocoder):
         return Location(location, (latitude, longitude), result)
 
 
-    def _coerce_point_to_string(self, point, type):
-        """
-        Do the right thing on "point" input.
-        """
-
-        if isinstance(point, Point):
-
-            if type == "lat":
-                return str(point.latitude)
-            else:
-                return str(point.longitude)
-
-        elif isinstance(point, (list, tuple)):
-
-            if type == "lat":
-                return str(point[0])
-            else:
-                return str(point[1])
-
-
-        elif isinstance(point, string_compare):
-
-            if type == "lat":
-                return point.split(',')[0]
-            else:
-                return point.split(',')[1]
-
-        else:
-            raise ValueError("Invalid point")
-
     @staticmethod
     def _check_status(status):
         """
@@ -221,4 +192,4 @@ class NaviData(Geocoder):
                 'Your request was denied.'
             )
         else:
-            raise GeocoderQueryError('Unknown error.')
+            raise GeocoderQueryError('Unknown error: ' + str(status_code))

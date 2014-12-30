@@ -25,6 +25,18 @@ class NaviDataTestCase(GeocoderTestBase):
         )
 
 
+    def test_api_key(self):
+        """
+        NaviData.geocode - test API key parameter. Given API key is bogus - but invalid keys are silently discarded by geocoding service so
+        for testing purposes this is fine
+        """
+
+        self.geocoder = NaviData(api_key='geopy_test')
+        self.geocode_run(
+            {"query": "Warszawa, mazowieckie"},
+            {"latitude": 52.231, "longitude": 21.006},
+        )
+
     def test_reverse(self):
         """
         NaviData.reverse
