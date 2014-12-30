@@ -21,6 +21,7 @@ __all__ = ("NaviData", )
 class NaviData(Geocoder):
     """
     Geocoder using the NaviData  API.
+    See http://www.navidata.pl
     """
 
     def __init__(
@@ -31,7 +32,7 @@ class NaviData(Geocoder):
             proxies=None,
     ):
         """
-        Initialize a customized NaviData geocoder.
+        Initialize NaviData geocoder.
 
         :param string api_key: The commercial API key for service. None required if you
             use this API for non-commercial puproses
@@ -107,7 +108,7 @@ class NaviData(Geocoder):
             longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param boolean exactly_one: Return one result or a list of results, if
-            available.
+            available. Currently this has no effect (only one address is returned by API)
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
