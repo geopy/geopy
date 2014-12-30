@@ -1,3 +1,12 @@
+1.7.0
+-----
+2014-12-30
+
+* ADDED: IGNFrance geocoder. Contributed by Thomas Gratier.
+
+* FIXED: Bing checks the response body for error codes.
+
+
 1.6.1
 -----
 2014-12-12
@@ -42,7 +51,7 @@
 2014-09-23
 
 *   ADDED: Nominatim.geocode() accepts a `geometry` argument for
-    retrieving `wkt`, `svg`,`kml`, or `geojson` formatted geometries
+    retrieving `wkt`, `svg`, `kml`, or `geojson` formatted geometries
     in results. Contributed by spatialbitz.
 
 
