@@ -113,7 +113,7 @@ class IGNFrance(Geocoder):
             api_key=self.api_key,
             domain=self.domain
         )
-        if referer is not None:
+        if username and password and referer is None:
             self.addSimpleHTTPAuthHeader()
 
     def geocode(
@@ -503,7 +503,7 @@ class IGNFrance(Geocoder):
 
         request = Request(url)
 
-        if self.referer:
+        if self.referer is not None:
             request.add_header('Referer', self.referer)
 
         raw_xml = self._call_geocoder(
