@@ -2,6 +2,7 @@
 import unittest
 
 from geopy.geocoders import LiveAddress
+from geopy.exc import GeocoderAuthenticationFailure
 from test.geocoders.util import GeocoderTestBase, env
 
 
@@ -24,7 +25,13 @@ class LiveAddressTestCase(GeocoderTestBase):
         """
         LiveAddress.geocode
         """
-        self.geocode_run(
-            {"query": "435 north michigan ave, chicago il 60611 usa"},
-            {"latitude": 41.890, "longitude": -87.624},
-        )
+        try:
+            self.geocode_run(
+                {"query": "435 north michigan ave, chicago il 60611 usa"},
+                {"latitude": 41.890, "longitude": -87.624},
+            )
+        except GeocoderAuthenticationFailure:
+            raise unittest.SkipTest(
+                "Non-geopy/geopy branches fail on this in CI due to an "
+                "encrypted keys issue"  # TODO
+            )
