@@ -28,6 +28,10 @@ except IOError:
         'BAIDU_KEY',
         'OPENCAGE_KEY',
         'WHAT3WORDS_KEY',
+        'IGNFRANCE_KEY',
+        'IGNFRANCE_USERNAME',
+        'IGNFRANCE_PASSWORD',
+        'IGNFRANCE_REFERER',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 
