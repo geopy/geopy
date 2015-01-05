@@ -77,6 +77,20 @@ class IGNFranceTestCase(GeocoderTestBase):
             {"latitude": 47.222482, "longitude": -1.556303},
         )
 
+    def test_geocode_with_address(self):
+        """
+        IGNFrance.geocode Adress
+        """
+        self.geocode_run(
+            {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER",
+             "query_type": "StreetAddress",
+             "exactly_one": True},
+            {"latitude": 47.293048,
+             "longitude": 1.718985,
+             "address": "le camp des landes, 41200 Villefranche-sur-Cher"
+            },
+        )
+
     def test_geocode_freeform(self):
         """
         IGNFrance.geocode with freeform and StreetAddress
