@@ -99,6 +99,7 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             raw=EMPTY,
             latitude=EMPTY,
             longitude=EMPTY,
+            address=EMPTY
         ):
         """
         Verifies that a a result matches the kwargs given.
@@ -114,4 +115,8 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
         if longitude != EMPTY:
             self.assertAlmostEqual(
                 item.longitude, longitude, delta=self.delta
+            )
+        if address != EMPTY:
+            self.assertEqual(
+                item.address, address
             )

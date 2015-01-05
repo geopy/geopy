@@ -516,40 +516,25 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         if is_freeform == 'true':
             location = place.get('freeformaddress')
         else:
-            # When classic geocoding
-            if place.get('match_type'):
+            # For parcelle
+            if place.get('numero'):
+                location = place.get('street')
+            else:
+                # When classic geocoding
+                # or when reverse geocoding
                 location = "%s %s" % (
                     place.get('postal_code', ''),
                     place.get('commune', ''),
                 )
-                if place.get('match_type') in ['Street number',
-                                               'Street enhanced']:
-                    location = "%s %s, %s" % (
-                        place.get('building', ''),
+                if place.get('street'):
+                    location = "%s, %s" % (
                         place.get('street', ''),
                         location,
                     )
-                elif place.get('match_type') == 'Street':
-                    location = "%s, %s" % (place.get('street', ''), location)
-            else:
-                # For parcelle
-                if place.get('numero'):
-                    location = place.get('street')
-                else:
-                    # When reverse geocoding
+                if place.get('building'):
                     location = "%s %s" % (
-                        place.get('postal_code', ''),
-                        place.get('commune', ''),
+                        place.get('building', ''),
+                        location,
                     )
-                    if place.get('street'):
-                        location = "%s, %s" % (
-                            place.get('street', ''),
-                            location,
-                        )
-                    if place.get('building'):
-                        location = "%s %s" % (
-                            place.get('building', ''),
-                            location,
-                        )
 
         return Location(location, (place.get('lat'), place.get('lng')), place)
