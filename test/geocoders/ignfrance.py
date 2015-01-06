@@ -79,7 +79,7 @@ class IGNFranceTestCase(GeocoderTestBase):
 
     def test_geocode_with_address(self):
         """
-        IGNFrance.geocode Adress
+        IGNFrance.geocode Address
         """
         self.geocode_run(
             {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER",

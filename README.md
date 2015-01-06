@@ -11,7 +11,7 @@ geocoders and other data sources.
 geopy includes geocoder classes for the [OpenStreetMap Nominatim][osm],
 [ESRI ArcGIS][arcgis], [Google Geocoding API (V3)][googlev3],
 [Baidu Maps][baidu], [Bing Maps API][bing], [Yahoo! PlaceFinder][placefinder],
-[Yandex][yandex], [IGNFrance][ignfrance], [GeoNames][geonames],
+[Yandex][yandex], [IGN France][ignfrance], [GeoNames][geonames],
 [MapQuest][mapquest], [OpenMapQuest][openmapquest], [What3Words][what3words],
 [OpenCage][opencage], [SmartyStreets][smartystreets], [geocoder.us][dot_us],
 and [GeocodeFarm][geocodefarm] geocoder services.

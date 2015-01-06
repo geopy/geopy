@@ -13,4 +13,4 @@ from geopy.location import Location
 from geopy.geocoders import * # pylint: disable=W0401
 
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"

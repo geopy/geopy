@@ -1,8 +1,16 @@
+1.7.1
+-----
+2014-01-05
+
+* FIXED: IGN France geocoder's address formatting better handles results
+    that do not have a building number. Contributed by Thomas Gratier.
+
+
 1.7.0
 -----
 2014-12-30
 
-* ADDED: IGNFrance geocoder. Contributed by Thomas Gratier.
+* ADDED: IGN France geocoder. Contributed by Thomas Gratier.
 
 * FIXED: Bing checks the response body for error codes.
 
