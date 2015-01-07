@@ -36,7 +36,7 @@ class NaviData(Geocoder):
         NaviData traffic use plain http.
 
         :param string api_key: The commercial API key for service. None required if you
-            use this API for non-commercial puproses
+            use this API for non-commercial purposes
 
         :param string domain: Currently it is 'api.navidata.pl', can
             be changed for testing purposes.
@@ -53,7 +53,6 @@ class NaviData(Geocoder):
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        #self.scheme = scheme
         self.geocode_api = 'http://%s/geocode' % (self.domain)
         self.reverse_geocode_api = 'http://%s/revGeo' % (self.domain)
 
