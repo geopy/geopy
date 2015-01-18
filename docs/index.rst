@@ -42,6 +42,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.MapQuest
     :members: __init__, geocode, reverse
 
+.. autoclass:: geopy.geocoders.NaviData
+    :members: __init__, geocode, reverse
+
 .. autoclass:: geopy.geocoders.Nominatim
     :members: __init__, geocode, reverse
 

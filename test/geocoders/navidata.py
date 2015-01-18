@@ -17,20 +17,16 @@ class NaviDataTestCase(GeocoderTestBase):
         """
         NaviData.geocode unicode
         """
-
         self.geocoder = NaviData()
         self.geocode_run(
             {"query": "Warszawa, mazowieckie"},
             {"latitude": 52.231, "longitude": 21.006},
         )
 
-
-
     def test_unicode_name_exactly_one_false(self):
         """
         NaviData.geocode unicode
         """
-
         self.geocoder = NaviData()
         self.geocode_run(
             {"query": "Warszawa, mazowieckie", "exactly_one" : False},
@@ -39,10 +35,8 @@ class NaviDataTestCase(GeocoderTestBase):
 
     def test_api_key(self):
         """
-        NaviData.geocode - test API key parameter. Given API key is bogus - but invalid keys are silently discarded by geocoding service so
-        for testing purposes this is fine
+        NaviData.geocode test API key parameter
         """
-
         self.geocoder = NaviData(api_key='geopy_test')
         self.geocode_run(
             {"query": "Warszawa, mazowieckie"},
@@ -53,7 +47,6 @@ class NaviDataTestCase(GeocoderTestBase):
         """
         NaviData.reverse
         """
-
         self.geocoder = NaviData()
         self.reverse_run(
             {"query": "51.036963, 16.755802"},
@@ -64,7 +57,6 @@ class NaviDataTestCase(GeocoderTestBase):
         """
         NaviData.reverse
         """
-
         self.geocoder = NaviData(api_key='geopy_test')
         self.reverse_run(
             {"query": "51.036963, 16.755802"},

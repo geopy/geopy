@@ -80,15 +80,16 @@ __all__ = (
     "GeocodeFarm",
     "GeoNames",
     "GoogleV3",
+    "IGNFrance",
     "MapQuest",
     "OpenCage",
     "OpenMapQuest",
+    "NaviData",
     "Nominatim",
     "YahooPlaceFinder",
     "LiveAddress",
     'Yandex',
     "What3Words",
-    "IGNFrance",
 )
 
 
@@ -102,13 +103,13 @@ from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
+from geopy.geocoders.navidata import NaviData
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 from geopy.geocoders.ignfrance import IGNFrance
-from geopy.geocoders.navidata import NaviData
 
 
 from geopy.exc import GeocoderNotFound
@@ -127,12 +128,12 @@ SERVICE_TO_GEOCODER = {
     "openmapquest": OpenMapQuest,
     "mapquest": MapQuest,
     "liveaddress": LiveAddress,
+    "navidata": NaviData,
     "nominatim": Nominatim,
     "geocodefarm": GeocodeFarm,
     "what3words": What3Words,
     "yandex": Yandex,
     "ignfrance": IGNFrance,
-    "navidata": NaviData
 }
 
 

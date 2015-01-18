@@ -2,11 +2,10 @@
 :class:`.NaviData` is the NaviData.pl geocoder.
 """
 
-from geopy.compat import urlencode, string_compare
+from geopy.compat import urlencode
 from geopy.location import Location
-from geopy.point import Point
 from geopy.util import logger
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 
 from geopy.exc import (
     GeocoderQueryError,
@@ -14,16 +13,14 @@ from geopy.exc import (
 )
 
 
-
-
 __all__ = ("NaviData", )
 
 
-
-class NaviData(Geocoder):
+class NaviData(Geocoder):  # pylint: disable=W0223
     """
-    Geocoder using the NaviData  API.
-    See http://www.navidata.pl
+    Geocoder using the NaviData API. Documentation at:
+
+        http://www.navidata.pl
     """
 
     def __init__(
@@ -34,11 +31,13 @@ class NaviData(Geocoder):
             proxies=None,
     ):
         """
-        Initialize NaviData geocoder. Please note that 'scheme' parameter is not supported - at present state, all
-        NaviData traffic use plain http.
+            .. versionadded:: 1.8.0
 
-        :param string api_key: The commercial API key for service. None required if you
-            use this API for non-commercial purposes
+        Initialize NaviData geocoder. Please note that 'scheme' parameter is
+        not supported: at present state, all NaviData traffic use plain http.
+
+        :param string api_key: The commercial API key for service. None
+            required if you use the API for non-commercial purposes.
 
         :param string domain: Currently it is 'api.navidata.pl', can
             be changed for testing purposes.
@@ -63,7 +62,7 @@ class NaviData(Geocoder):
             query,
             exactly_one=True,
             timeout=None,
-    ):
+        ):
         """
         Geocode a location query.
 
@@ -83,7 +82,6 @@ class NaviData(Geocoder):
             'q': self.format_string % query,
         }
 
-
         if self.api_key is not None:
             params["api_key"] = self.api_key
 
@@ -99,8 +97,7 @@ class NaviData(Geocoder):
             query,
             exactly_one=True,
             timeout=None,
-    ):
-
+        ):
         """
         Given a point, find an address.
 
@@ -110,7 +107,8 @@ class NaviData(Geocoder):
             longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param boolean exactly_one: Return one result or a list of results, if
-            available. Currently this has no effect (only one address is returned by API)
+            available. Currently this has no effect
+            (only one address is returned by API).
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -126,23 +124,22 @@ class NaviData(Geocoder):
             'lon': lon
         }
 
-
         if self.api_key is not None:
             params["api_key"] = self.api_key
 
         url = "?".join((self.reverse_geocode_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json_revgeocode(
-            self._call_geocoder(url, timeout=timeout), exactly_one
+            self._call_geocoder(url, timeout=timeout)
         )
 
-    def _parse_json_geocode(self, page, exactly_one=True):
+    @staticmethod
+    def _parse_json_geocode(page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
 
         places = page
 
         if not len(places):
-            #self._check_status(page.get('status'))
             return None
 
         def parse_place(place):
@@ -157,11 +154,9 @@ class NaviData(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-
-    def _parse_json_revgeocode(self, page, exactly_one=True):
+    @staticmethod
+    def _parse_json_revgeocode(page):
         '''Returns location, (latitude, longitude) from json feed.'''
-
- 
         result = page
 
         if result.get('description', None) is None:

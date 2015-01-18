@@ -2,6 +2,8 @@
 -----
 master
 
+* ADDED: NaviData geocoder added. Contributed by NaviData.
+
 * CHANGED: LiveAddress now requires HTTPS connections. If you set `scheme`
     to be `http`, rather than the default `https`, you will now receive a
     `ConfigurationError`.
