@@ -101,9 +101,9 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             exactly_one=True,
             language="en"
         )
-        self.assertEqual(
-            result_reverse_en.raw['address']['state'],
-            self.known_state_en
+        self.assertTrue(
+            # have had a change in the exact authority name
+            "Ionian Islands" in result_reverse_en.raw['address']['state']
         )
 
     def test_geocode_geometry_wkt(self):
