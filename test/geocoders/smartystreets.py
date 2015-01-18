@@ -2,7 +2,7 @@
 import unittest
 
 from geopy.geocoders import LiveAddress
-from geopy.exc import GeocoderAuthenticationFailure
+from geopy.exc import ConfigurationError, GeocoderAuthenticationFailure
 from test.geocoders.util import GeocoderTestBase, env
 
 
@@ -17,7 +17,6 @@ class LiveAddressTestCase(GeocoderTestBase):
         cls.geocoder = LiveAddress(
             auth_id=env['LIVESTREETS_AUTH_ID'],
             auth_token=env['LIVESTREETS_AUTH_TOKEN'],
-            scheme='http'
         )
         cls.delta = 0.04
 
@@ -34,4 +33,15 @@ class LiveAddressTestCase(GeocoderTestBase):
             raise unittest.SkipTest(
                 "Non-geopy/geopy branches fail on this in CI due to an "
                 "encrypted keys issue"  # TODO
+            )
+
+    def test_http_error(self):
+        """
+        LiveAddress() with scheme=http is a ConfigurationError
+        """
+        with self.assertRaises(ConfigurationError):
+            LiveAddress(
+                auth_id=env['LIVESTREETS_AUTH_ID'],
+                auth_token=env['LIVESTREETS_AUTH_TOKEN'],
+                scheme='http',
             )

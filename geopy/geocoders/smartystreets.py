@@ -5,7 +5,7 @@
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.compat import urlencode
 from geopy.location import Location
-from geopy.exc import GeocoderQuotaExceeded
+from geopy.exc import ConfigurationError, GeocoderQuotaExceeded
 from geopy.util import logger
 
 
@@ -46,6 +46,10 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
 
             .. versionadded:: 0.97
 
+            .. versionchanged:: 1.8.0
+            LiveAddress now requires `https`. Specifying `scheme=http` will
+            result in a :class:`geopy.exc.ConfigurationError`.
+
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising an :class:`geopy.exc.GeocoderTimedOut`
             exception.
@@ -60,8 +64,11 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             .. versionadded:: 0.96
         """
         super(LiveAddress, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+            timeout=timeout, proxies=proxies
         )
+        if scheme == "http":
+            raise ConfigurationError("LiveAddress now requires `https`.")
+        self.scheme = scheme
         self.auth_id = auth_id
         self.auth_token = auth_token
         if candidates:

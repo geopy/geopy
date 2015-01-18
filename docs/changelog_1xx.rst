@@ -1,3 +1,12 @@
+1.8.0
+-----
+master
+
+* CHANGED: LiveAddress now requires HTTPS connections. If you set `scheme`
+    to be `http`, rather than the default `https`, you will now receive a
+    `ConfigurationError`.
+
+
 1.7.1
 -----
 2014-01-05
