@@ -1,6 +1,6 @@
 1.8.0
 -----
-master
+2014-01-21
 
 * ADDED: NaviData geocoder added. Contributed by NaviData.
 
