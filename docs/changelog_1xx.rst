@@ -1,3 +1,11 @@
+1.8.1
+-----
+2014-01-28
+
+* FIXED: GoogleV3 geocoder did not send API keys for reverse and timezone
+    methods.
+
+
 1.8.0
 -----
 2014-01-21
