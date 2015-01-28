@@ -241,6 +241,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         }
         if language:
             params['language'] = language
+        if self.api_key:
+            params['key'] = self.api_key
 
         if not self.premier:
             url = "?".join((self.api, urlencode(params)))
