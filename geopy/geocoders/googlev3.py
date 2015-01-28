@@ -297,6 +297,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             "location": location,
             "timestamp": timestamp,
         }
+        if self.api_key:
+            params['key'] = self.api_key
         url = "?".join((self.tz_api, urlencode(params)))
 
         logger.debug("%s.timezone: %s", self.__class__.__name__, url)
