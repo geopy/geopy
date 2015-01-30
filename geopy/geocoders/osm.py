@@ -40,6 +40,7 @@ class Nominatim(Geocoder):
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            api=None,
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -57,6 +58,9 @@ class Nominatim(Geocoder):
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
+
+        :param string api: Use a different server than openstreetmap.org
+           .. versionadded:: 1.8.2
         """
         super(Nominatim, self).__init__(
             format_string, 'http', timeout, proxies
@@ -66,8 +70,8 @@ class Nominatim(Geocoder):
         self.view_box = view_box
         self.country_bias = country_bias
 
-        self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
-        self.reverse_api = (
+        self.api = api or ("%s://nominatim.openstreetmap.org/search" % self.scheme)
+        self.reverse_api = api or (
             "%s://nominatim.openstreetmap.org/reverse" % self.scheme
         )
 
