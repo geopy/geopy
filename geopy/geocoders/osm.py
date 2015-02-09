@@ -6,6 +6,7 @@ from geopy.geocoders.base import (
     Geocoder,
     DEFAULT_FORMAT_STRING,
     DEFAULT_TIMEOUT,
+    DEFAULT_SCHEME
 )
 from geopy.compat import urlencode
 from geopy.location import Location
@@ -40,7 +41,8 @@ class Nominatim(Geocoder):
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            api=None,
+            domain='nominatim.openstreetmap.org',
+            scheme=DEFAULT_SCHEME
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -69,10 +71,12 @@ class Nominatim(Geocoder):
         self.format_string = format_string
         self.view_box = view_box
         self.country_bias = country_bias
+        self.domain = domain.strip('/')
+        self.scheme = scheme
 
-        self.api = api or ("%s://nominatim.openstreetmap.org/search" % self.scheme)
-        self.reverse_api = api or (
-            "%s://nominatim.openstreetmap.org/reverse" % self.scheme
+        self.api = ("%s://%s/search" % (self.scheme, self.domain))
+        self.reverse_api = (
+            "%s://%s/reverse" % (self.scheme, self.domain)
         )
 
     def geocode(
