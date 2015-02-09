@@ -61,8 +61,17 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.96
 
-        :param string api: Use a different server than openstreetmap.org
-           .. versionadded:: 1.8.2
+        :param string domain: Should be the localized Openstreetmap domain to
+            connect to. The default is 'nominatim.openstreetmap.org', but you
+            can change it to a domain of your own.
+
+            .. versionadded:: 1.8.2
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 1.8.2
         """
         super(Nominatim, self).__init__(
             format_string, 'http', timeout, proxies
