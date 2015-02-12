@@ -1,5 +1,6 @@
 1.9.0
 -----
+2014-02-12
 
 * CHANGED: MapQuest geocoder removed as the API it uses is now only available
     to enterprise accounts. OpenMapQuest is a replacement for
