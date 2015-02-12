@@ -186,7 +186,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         else:
             return results
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None, min_quality=0):
         """
         Returns a reverse geocoded location using Yahoo"s PlaceFinder API.
 
@@ -205,5 +205,6 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             query,
             exactly_one=exactly_one,
             timeout=timeout,
-            reverse=True
+            reverse=True,
+            min_quality=min_quality
         )
