@@ -81,7 +81,6 @@ __all__ = (
     "GeoNames",
     "GoogleV3",
     "IGNFrance",
-    "MapQuest",
     "OpenCage",
     "OpenMapQuest",
     "NaviData",
@@ -100,7 +99,6 @@ from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
-from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.navidata import NaviData
@@ -127,7 +125,6 @@ SERVICE_TO_GEOCODER = {
     "placefinder": YahooPlaceFinder,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
-    "mapquest": MapQuest,
     "liveaddress": LiveAddress,
     "navidata": NaviData,
     "nominatim": Nominatim,

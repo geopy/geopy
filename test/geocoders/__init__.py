@@ -7,7 +7,6 @@ from .dotus import GeocoderDotUSTestCase
 from .geocodefarm import GeocodeFarmTestCase
 from .geonames import GeoNamesTestCase
 from .googlev3 import GoogleV3TestCase
-from .mapquest import MapQuestTestCase
 from .nominatim import NominatimTestCase
 from .opencage import OpenCageTestCase
 from .openmapquest import OpenMapQuestTestCase
