@@ -118,6 +118,7 @@ from geopy.exc import GeocoderNotFound
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
     "baidu": Baidu,
+    "bing": Bing,
     "google": GoogleV3,
     "googlev3": GoogleV3,
     "geocoderdotus": GeocoderDotUS,
