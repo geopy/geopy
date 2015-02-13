@@ -202,3 +202,11 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         with self.assertRaises(exc.GeocoderQueryError):
             self.geocoder.timezone(self.new_york_point, "eek")
 
+    def test_geocode(self):
+        """
+        GoogleV3.geocode check bounds restriction
+        """
+        self.geocode_run(
+            {"query": "221b Baker St", "bounds": [50, -2, 55, 2]},
+            {"latitude": 51.52, "longitude": -0.15},
+        )
