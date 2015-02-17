@@ -1,3 +1,11 @@
+1.9.1
+-----
+2014-02-17
+
+* FIXED: Fix support for GoogleV3 bounds parameter. Contributed by
+    Benjamin Trigona-Harany.
+
+
 1.9.0
 -----
 2014-02-12
