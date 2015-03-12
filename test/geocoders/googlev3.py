@@ -202,3 +202,21 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         with self.assertRaises(exc.GeocoderQueryError):
             self.geocoder.timezone(self.new_york_point, "eek")
 
+    def test_geocode_bounds(self):
+        """
+        GoogleV3.geocode check bounds restriction
+        """
+        self.geocode_run(
+            {"query": "221b Baker St", "bounds": [50, -2, 55, 2]},
+            {"latitude": 51.52, "longitude": -0.15},
+        )
+
+    def test_geocode_bounds_invalid(self):
+        """
+        GoogleV3.geocode bounds must be 4-length iterable
+        """
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocode_run(
+                {"query": "221b Baker St", "bounds": [50, -2, 55]},
+                {"latitude": 51.52, "longitude": -0.15},
+            )

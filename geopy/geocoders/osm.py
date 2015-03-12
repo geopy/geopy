@@ -6,6 +6,7 @@ from geopy.geocoders.base import (
     Geocoder,
     DEFAULT_FORMAT_STRING,
     DEFAULT_TIMEOUT,
+    DEFAULT_SCHEME
 )
 from geopy.compat import urlencode
 from geopy.location import Location
@@ -40,6 +41,8 @@ class Nominatim(Geocoder):
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            domain='nominatim.openstreetmap.org',
+            scheme=DEFAULT_SCHEME
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -57,19 +60,31 @@ class Nominatim(Geocoder):
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
+
+        :param string domain: Should be the localized Openstreetmap domain to
+            connect to. The default is 'nominatim.openstreetmap.org', but you
+            can change it to a domain of your own.
+
+            .. versionadded:: 1.8.2
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
+
+            .. versionadded:: 1.8.2
         """
         super(Nominatim, self).__init__(
-            format_string, 'http', timeout, proxies
+            format_string, scheme, timeout, proxies
         )
         self.country_bias = country_bias
         self.format_string = format_string
         self.view_box = view_box
         self.country_bias = country_bias
+        self.domain = domain.strip('/')
 
-        self.api = "%s://nominatim.openstreetmap.org/search" % self.scheme
-        self.reverse_api = (
-            "%s://nominatim.openstreetmap.org/reverse" % self.scheme
-        )
+        self.api = "%s://%s/search" % (self.scheme, self.domain)
+        self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
+
 
     def geocode(
             self,

@@ -1,3 +1,30 @@
+1.9.1
+-----
+2014-02-17
+
+* FIXED: Fix support for GoogleV3 bounds parameter. Contributed by
+    Benjamin Trigona-Harany.
+
+
+1.9.0
+-----
+2014-02-12
+
+* CHANGED: MapQuest geocoder removed as the API it uses is now only available
+    to enterprise accounts. OpenMapQuest is a replacement for
+    Nominatim-sourced data.
+
+* CHANGED: Nominatim now uses HTTPS by default and accepts a `scheme`
+    argument. Contributed by srounet.
+
+* ADDED: Nominatim now accepts a `domain` argument, which
+    allows using a different server than `nominatim.openstreetmap.org`.
+    Contributed by srounet.
+
+* FIXED: Bing was not accessible from `get_geocoder_for_service`. Contributed
+    by Adrián López.
+
+
 1.8.1
 -----
 2014-01-28

@@ -137,6 +137,13 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             )
         )
 
+    @staticmethod
+    def _format_bounds_param(bounds):
+      """
+      Format the bounds to something Google understands.
+      """
+      return '%f,%f|%f,%f' % (bounds[0], bounds[1], bounds[2], bounds[3])
+
     def geocode(
             self,
             query,
@@ -187,7 +194,11 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         if self.api_key:
             params['key'] = self.api_key
         if bounds:
-            params['bounds'] = bounds
+            if len(bounds) != 4:
+                raise GeocoderQueryError(
+                    "bounds must be a four-item iterable of lat,lon,lat,lon"
+                )
+            params['bounds'] = self._format_bounds_param(bounds)
         if region:
             params['region'] = region
         if components:
