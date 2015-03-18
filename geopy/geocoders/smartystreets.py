@@ -25,7 +25,8 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             candidates=1,
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
-            proxies=None
+            proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
@@ -64,7 +65,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             .. versionadded:: 0.96
         """
         super(LiveAddress, self).__init__(
-            timeout=timeout, proxies=proxies
+            timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         if scheme == "http":
             raise ConfigurationError("LiveAddress now requires `https`.")

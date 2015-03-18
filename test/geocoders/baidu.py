@@ -7,6 +7,16 @@ from geopy.geocoders import Baidu
 from test.geocoders.util import GeocoderTestBase, env
 
 
+class BaiduTestCaseUnitTest(GeocoderTestBase):
+
+    def test_user_agent_custom(self):
+        geocoder = Baidu(
+            api_key='DUMMYKEY1234',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
     bool(env.get('BAIDU_KEY')),
     "No BAIDU_KEY env variable set"

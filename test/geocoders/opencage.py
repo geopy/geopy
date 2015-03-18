@@ -6,6 +6,16 @@ from geopy.geocoders import OpenCage
 from test.geocoders.util import GeocoderTestBase, env
 
 
+class OpenCageTestCaseUnitTest(GeocoderTestBase):
+
+    def test_user_agent_custom(self):
+        geocoder = OpenCage(
+            api_key='DUMMYKEY1234',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
     bool(env.get('OPENCAGE_KEY')),
     "No OPENCAGE_KEY env variables set"

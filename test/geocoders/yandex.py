@@ -11,6 +11,12 @@ class YandexTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.delta = 0.04
 
+    def test_user_agent_custom(self):
+        geocoder = Yandex(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
     def test_unicode_name(self):
         """
         Yandex.geocode unicode

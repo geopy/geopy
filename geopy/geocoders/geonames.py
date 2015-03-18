@@ -31,7 +31,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             country_bias=None,
             username=None,
             timeout=DEFAULT_TIMEOUT,
-            proxies=None
+            proxies=None,
+            user_agent=None,
         ):
         """
         :param string country_bias:
@@ -52,7 +53,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             .. versionadded:: 0.96
         """
         super(GeoNames, self).__init__(
-            scheme='http', timeout=timeout, proxies=proxies
+            scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         if username == None:
             raise ConfigurationError(

@@ -1,4 +1,4 @@
-
+from mock import patch
 from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import Nominatim
@@ -32,6 +32,17 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
+
+    def test_user_agent_default(self):
+        with patch('geopy.geocoders.base.DEFAULT_USER_AGENT', 'mocked_user_agent/0.0.0'):
+            geocoder = Nominatim()
+            self.assertEqual(geocoder.headers['User-Agent'], 'mocked_user_agent/0.0.0')
+
+    def test_user_agent_custom(self):
+        geocoder = Nominatim(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_reverse_string(self):
         """

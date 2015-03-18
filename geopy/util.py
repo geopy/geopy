@@ -80,3 +80,10 @@ else:
         else: # requests?
             encoding = page.headers.get("charset") or "utf-8"
             return str(page.content, encoding=encoding)
+
+
+def get_version():
+    from geopy.version import GEOPY_VERSION
+    return str(GEOPY_VERSION)
+
+
