@@ -15,6 +15,7 @@ from geopy.compat import (
     ProxyHandler,
     URLError,
     install_opener,
+    Request,
 )
 from geopy.point import Point
 from geopy.exc import (
@@ -28,7 +29,7 @@ from geopy.exc import (
     GeocoderUnavailable,
     GeocoderParseError,
 )
-from geopy.util import decode_page
+from geopy.util import decode_page, get_version
 
 
 __all__ = (
@@ -44,6 +45,7 @@ DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
 DEFAULT_WKID = 4326
+DEFAULT_USER_AGENT = 'geopy/' + get_version()
 
 ERROR_CODE_MAP = {
     400: GeocoderQueryError,
@@ -70,7 +72,8 @@ class Geocoder(object): # pylint: disable=R0921
             format_string=DEFAULT_FORMAT_STRING,
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
-            proxies=None
+            proxies=None,
+            user_agent=DEFAULT_USER_AGENT
         ):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
@@ -84,6 +87,7 @@ class Geocoder(object): # pylint: disable=R0921
             )
         self.proxies = proxies
         self.timeout = timeout
+        self.headers = {'User-Agent': user_agent }
 
         if self.proxies:
             install_opener(
@@ -129,7 +133,9 @@ class Geocoder(object): # pylint: disable=R0921
         requester = requester or self.urlopen
 
         try:
-            page = requester(url, timeout=(timeout or self.timeout), **kwargs)
+            req = Request(url=url, headers=self.headers)
+            print req.headers
+            page = requester(req, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
                 str(error) if not py3k

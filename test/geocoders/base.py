@@ -1,5 +1,6 @@
 
 import unittest
+from mock import patch
 
 from geopy.point import Point
 from geopy.exc import GeocoderNotFound
@@ -49,6 +50,12 @@ class GeocoderTestCase(unittest.TestCase):
         )
         for attr in ('format_string', 'scheme', 'timeout', 'proxies'):
             self.assertEqual(locals()[attr], getattr(geocoder, attr))
+
+    @patch('geopy.util.get_version')
+    def test_user_agent_default(self, mocked_getversion):
+        from geopy.geocoders.base import DEFAULT_USER_AGENT
+        mocked_getversion.return_value = '1.2.3'
+        self.assertEqual(DEFAULT_USER_AGENT, 'geopy/1.2.3')
 
     def test_point_coercion_point(self):
         """

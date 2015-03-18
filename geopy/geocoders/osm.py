@@ -6,7 +6,8 @@ from geopy.geocoders.base import (
     Geocoder,
     DEFAULT_FORMAT_STRING,
     DEFAULT_TIMEOUT,
-    DEFAULT_SCHEME
+    DEFAULT_SCHEME,
+    DEFAULT_USER_AGENT
 )
 from geopy.compat import urlencode
 from geopy.location import Location
@@ -42,7 +43,8 @@ class Nominatim(Geocoder):
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             domain='nominatim.openstreetmap.org',
-            scheme=DEFAULT_SCHEME
+            scheme=DEFAULT_SCHEME,
+            user_agent=DEFAULT_USER_AGENT
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -74,7 +76,7 @@ class Nominatim(Geocoder):
             .. versionadded:: 1.8.2
         """
         super(Nominatim, self).__init__(
-            format_string, scheme, timeout, proxies
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.country_bias = country_bias
         self.format_string = format_string
