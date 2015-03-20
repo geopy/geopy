@@ -3,6 +3,7 @@ from .arcgis import ArcGISTestCase, ArcGISAuthenticatedTestCase
 from .baidu import BaiduTestCase
 from .base import GeocoderTestCase
 from .bing import BingTestCase
+from .databc import DataBCTestCase
 from .dotus import GeocoderDotUSTestCase
 from .geocodefarm import GeocodeFarmTestCase
 from .geonames import GeoNamesTestCase
