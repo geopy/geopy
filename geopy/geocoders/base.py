@@ -138,7 +138,6 @@ class Geocoder(object): # pylint: disable=R0921
 
         try:
             req = Request(url=url, headers=self.headers)
-            print req.headers
             page = requester(req, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
