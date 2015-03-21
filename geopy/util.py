@@ -83,6 +83,7 @@ else:
 
 
 def get_version():
-    #from geopy import geopy
-    #return str(geopy.__version__)
-    return "0.0"
+    import geopy
+    return str(geopy.__version__)
+
+

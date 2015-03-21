@@ -29,7 +29,7 @@ from geopy.exc import (
     GeocoderUnavailable,
     GeocoderParseError,
 )
-from geopy.util import decode_page, get_version
+import geopy.util as gu
 
 
 __all__ = (
@@ -45,7 +45,11 @@ DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
 DEFAULT_WKID = 4326
-DEFAULT_USER_AGENT = 'geopy/' + get_version()
+
+
+def get_default_user_agent():
+    return "geopy/" + gu.get_version()
+
 
 ERROR_CODE_MAP = {
     400: GeocoderQueryError,
@@ -73,7 +77,7 @@ class Geocoder(object): # pylint: disable=R0921
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            user_agent=DEFAULT_USER_AGENT
+            user_agent=None
         ):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
@@ -87,7 +91,7 @@ class Geocoder(object): # pylint: disable=R0921
             )
         self.proxies = proxies
         self.timeout = timeout
-        self.headers = {'User-Agent': user_agent }
+        self.headers = {'User-Agent': user_agent or get_default_user_agent()}
 
         if self.proxies:
             install_opener(
@@ -172,12 +176,12 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             status_code = None
         if status_code in ERROR_CODE_MAP:
-            raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
+            raise ERROR_CODE_MAP[page.status_code]("\n%s" % gu.decode_page(page))
 
         if raw:
             return page
 
-        page = decode_page(page)
+        page = gu.decode_page(page)
 
         if deserializer is not None:
             try:
