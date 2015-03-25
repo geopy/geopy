@@ -85,7 +85,6 @@ class Nominatim(Geocoder):
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
 
-
     def geocode(
             self,
             query,
