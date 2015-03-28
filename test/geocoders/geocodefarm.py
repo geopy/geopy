@@ -8,23 +8,27 @@ from geopy.geocoders import GeocodeFarm
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
-    bool(env.get('GEOCODEFARM_KEY')),
-    "GEOCODEFARM_KEY env variable not set"
-)
 class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
         cls.delta = 0.04
         cls.geocoder = GeocodeFarm(
-            api_key=env['GEOCODEFARM_KEY'],
-            format_string="%s US"
+            api_key=env.get('GEOCODEFARM_KEY'), # None api_key will use free tier on GeocodeFarm
+            timeout=60,
         )
+
+    def setUp(self):
+        # Store the original _call_geocoder in case we replace it with a mock
+        self._original_call_geocoder = self.geocoder._call_geocoder
+
+    def tearDown(self):
+        # Restore the original _call_geocoder in case we replaced it with a mock
+        self.geocoder._call_geocoder = self._original_call_geocoder
 
     def test_geocode(self):
         """
-        OpenCage.geocode
+        GeocodeFarm.geocode
         """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},

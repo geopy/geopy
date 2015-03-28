@@ -17,12 +17,12 @@ __all__ = ("GeocodeFarm", )
 class GeocodeFarm(Geocoder):
     """
     Geocoder using the GeocodeFarm API. Documentation at:
-        https://www.geocodefarm.com/dashboard/documentation/
+        https://www.geocode.farm/geocoding/free-api-documentation/
     """
 
     def __init__(
             self,
-            api_key,
+            api_key=None,
             format_string=DEFAULT_FORMAT_STRING,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -44,21 +44,17 @@ class GeocodeFarm(Geocoder):
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
-
-        Note that the GeocodeFarm geocoder does not support SSL.
         """
         super(GeocodeFarm, self).__init__(
-            format_string, 'http', timeout, proxies
+            format_string, 'https', timeout, proxies
         )
         self.api_key = api_key
         self.format_string = format_string
         self.api = (
-            "%s://www.geocodefarm.com/api/forward/json/%s/" %
-            (self.scheme, self.api_key)
+            "%s://www.geocode.farm/v3/json/forward/" % self.scheme
         )
         self.reverse_api = (
-            "%s://www.geocodefarm.com/api/reverse/json/%s/" %
-            (self.scheme, self.api_key)
+            "%s://www.geocode.farm/v3/json/reverse/" % self.scheme
         )
 
     def geocode(self, query, exactly_one=True, timeout=None):
@@ -68,8 +64,7 @@ class GeocodeFarm(Geocoder):
         :param string query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
-            available. GeocodeFarm's API will always return at most one
-            result.
+            available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -78,8 +73,11 @@ class GeocodeFarm(Geocoder):
         """
         url = "".join((
             self.api,
+            "?addr=",
             quote((self.format_string % query).encode('utf8'))
         ))
+        if self.api_key:
+            url += "&key=%s" % self.api_key
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
@@ -106,29 +104,35 @@ class GeocodeFarm(Geocoder):
         lat, lon = self._coerce_point_to_string(query).split(',')
         url = "".join((
             self.reverse_api,
-            quote(("%s/%s" % (lat, lon)).encode('utf8'))
+            "?lat=%s" % quote(lat).encode('utf8'),
+            "&lon=%s" % quote(lon).encode('utf8'),
         ))
+        if self.api_key:
+            url += "&key=%s" % self.api_key
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
     @staticmethod
-    def parse_code(place):
+    def parse_code(results):
         """
         Parse each resource.
         """
-        coordinates = place.get('COORDINATES', {})
-        address = place.get('ADDRESS', {})
-        latitude = coordinates.get('latitude', None)
-        longitude = coordinates.get('longitude', None)
-        placename = address.get('address_returned', None)
-        if placename is None:
-            placename = address.get('address', None)
-        if latitude and longitude:
-            latitude = float(latitude)
-            longitude = float(longitude)
-        return Location(placename, (latitude, longitude), place)
+        places = []
+        for result in results.get('RESULTS'):
+            coordinates = result.get('COORDINATES', {})
+            address = result.get('ADDRESS', {})
+            latitude = coordinates.get('latitude', None)
+            longitude = coordinates.get('longitude', None)
+            placename = address.get('address_returned', None)
+            if placename is None:
+                placename = address.get('address', None)
+            if latitude and longitude:
+                latitude = float(latitude)
+                longitude = float(longitude)
+            places.append(Location(placename, (latitude, longitude), result))
+        return places
 
     def _parse_json(self, api_result, exactly_one):
         if api_result is None:
@@ -136,11 +140,11 @@ class GeocodeFarm(Geocoder):
         geocoding_results = api_result["geocoding_results"]
         self._check_for_api_errors(geocoding_results)
 
-        place = self.parse_code(geocoding_results)
+        places = self.parse_code(geocoding_results)
         if exactly_one is True:
-            return place
+            return places[0]
         else:
-            return [place]  # GeocodeFarm always only returns one result
+            return places
 
     @staticmethod
     def _check_for_api_errors(geocoding_results):
