@@ -55,3 +55,12 @@ class YahooPlaceFinderTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
         )
+
+    def test_timezone(self):
+        """
+        YahooPlacefinder.with_timezone
+        """
+        self.geocode_run(
+            {"query": "nyc", 'with_timezone':True},
+            {"latitude": 40.71455, "longitude": -74.00712},
+        )
