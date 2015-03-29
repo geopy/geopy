@@ -156,7 +156,8 @@ class Nominatim(Geocoder):
             params = {'q': self.format_string % query}
 
         params.update({
-            'view_box': self.view_box,
+            # `viewbox` apparently replaces `view_box`
+            'viewbox': self.view_box,
             'format': 'json'
         })
 

@@ -4,6 +4,9 @@ dev
 * ADDED: Placefinder's geocode method now requests a timezone if the
     `with_timezone` parameter is true. Contributed by willr.
 
+* FIXED: Nominatim specifies a `viewbox` parameter rather than the
+    apparently deprecated `view_box`.
+
 
 1.9.1
 -----
