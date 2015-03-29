@@ -37,7 +37,7 @@ class Nominatim(Geocoder):
     def __init__(
             self,
             format_string=DEFAULT_FORMAT_STRING,
-            view_box=(-180, -90, 180, 90),
+            viewbox=(-180, -90, 180, 90),
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -50,7 +50,7 @@ class Nominatim(Geocoder):
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
 
-        :param tuple view_box: Coordinates to restrict search within.
+        :param tuple viewbox: Coordinates to restrict search within.
 
         :param string country_bias: Bias results to this country.
 
@@ -78,13 +78,12 @@ class Nominatim(Geocoder):
         )
         self.country_bias = country_bias
         self.format_string = format_string
-        self.view_box = view_box
+        self.viewbox = viewbox
         self.country_bias = country_bias
         self.domain = domain.strip('/')
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
-
 
     def geocode(
             self,
@@ -156,7 +155,7 @@ class Nominatim(Geocoder):
             params = {'q': self.format_string % query}
 
         params.update({
-            'view_box': self.view_box,
+            'viewbox': self.viewbox,
             'format': 'json'
         })
 
