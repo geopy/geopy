@@ -138,7 +138,7 @@ class Bing(Geocoder):
             exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None, culture=None):
         """
         Reverse geocode a point.
 
@@ -158,6 +158,8 @@ class Bing(Geocoder):
         """
         point = self._coerce_point_to_string(query)
         params = {'key': self.api_key}
+        if culture:
+            params['culture'] = culture
         url = "%s/%s?%s" % (
             self.api, point, urlencode(params))
 
