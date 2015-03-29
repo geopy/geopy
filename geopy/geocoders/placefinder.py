@@ -154,7 +154,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
         :param valid_country_codes:
         :type valid_country_codes: list or tuple
-        :param bool with_timezone:
+
+        :param bool with_timezone: Include the timezone in the response's
+            `raw` dictionary (as `timezone`).
         """
         params = {
             "location": query,

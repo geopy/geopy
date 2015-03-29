@@ -1,3 +1,10 @@
+dev
+---
+
+* ADDED: Placefinder's geocode method now requests a timezone if the
+    `with_timezone` parameter is true. Contributed by willr.
+
+
 1.9.1
 -----
 2014-02-17
