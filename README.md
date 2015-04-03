@@ -38,7 +38,7 @@ The various geocoder classes are located in [geopy.geocoders][geocoders_src].
 
 geopy is tested against CPython 2.7, CPython 3.2, CPython 3.4, PyPy, and PyPy3.
 
-© GeoPy Project and individual contributors under the
+© geopy contributors 2006-2015 (see AUTHORS) under the
 [MIT License](https://github.com/geopy/geopy/blob/master/LICENSE).
 
 ## Installation
