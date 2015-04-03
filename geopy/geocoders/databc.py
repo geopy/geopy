@@ -2,8 +2,7 @@
 :class:`.DataBC` geocoder.
 """
 
-import json
-from geopy.compat import urlencode, Request
+from geopy.compat import urlencode
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderQueryError
@@ -40,17 +39,25 @@ class DataBC(Geocoder):
         )
         self.api = '%s://apps.gov.bc.ca/pub/geocoder/addresses.geojson' % self.scheme
 
-    def geocode(self, query, max_results = 25, set_back = 0, location_descriptor = 'any', exactly_one=True, timeout=None):
+    def geocode(
+            self,
+            query,
+            max_results=25,
+            set_back=0,
+            location_descriptor='any',
+            exactly_one=True,
+            timeout=None,
+        ):
         """
         Geocode a location query.
 
         :param string query: The address or query you wish to geocode.
 
         :param int max_results: The maximum number of resutls to request.
-        
-        :param float set_back: The distance to move the accessPoint away 
+
+        :param float set_back: The distance to move the accessPoint away
             from the curb (in meters) and towards the interior of the parcel.
-            location_descriptor must be set to accessPoint for set_back to 
+            location_descriptor must be set to accessPoint for set_back to
             take effect.
 
         :param string location_descriptor: The type of point requested. It
@@ -74,9 +81,11 @@ class DataBC(Geocoder):
                                        'parcelPoint',
                                        'rooftopPoint',
                                        'routingPoint']:
-            raise GeocoderQueryError("""You did not provided a location_descriptor
-            the webservice can consume. It should be any, accessPoint,
-            frontDoorPoint, parcelPoint, rooftopPoint or routingPoint.""")
+            raise GeocoderQueryError(
+                "You did not provided a location_descriptor "
+                "the webservice can consume. It should be any, accessPoint, "
+                "frontDoorPoint, parcelPoint, rooftopPoint or routingPoint."
+            )
         params['locationDescriptor'] = location_descriptor
         if exactly_one is True:
             max_results = 1
@@ -100,4 +109,7 @@ class DataBC(Geocoder):
     def _parse_feature(feature):
         properties = feature['properties']
         coordinates = feature['geometry']['coordinates']
-        return Location(properties['fullAddress'], (coordinates[1], coordinates[0]), properties)
+        return Location(
+            properties['fullAddress'], (coordinates[1], coordinates[0]),
+            properties
+        )
