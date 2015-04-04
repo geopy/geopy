@@ -8,7 +8,7 @@ from geopy.location import Location
 from geopy.util import logger
 from geopy.exc import GeocoderAuthenticationFailure, GeocoderQuotaExceeded, \
     GeocoderServiceError
-from geopy.compat import quote
+from geopy.compat import urlencode
 
 
 __all__ = ("GeocodeFarm", )
@@ -71,13 +71,12 @@ class GeocodeFarm(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        url = "".join((
-            self.api,
-            "?addr=",
-            quote((self.format_string % query).encode('utf8'))
-        ))
+        params = {
+            'addr': self.format_string % query,
+        }
         if self.api_key:
-            url += "&key=%s" % self.api_key
+            params['key'] = self.api_key
+        url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
@@ -101,14 +100,20 @@ class GeocodeFarm(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        lat, lon = self._coerce_point_to_string(query).split(',')
-        url = "".join((
-            self.reverse_api,
-            "?lat=%s" % quote(lat).encode('utf8'),
-            "&lon=%s" % quote(lon).encode('utf8'),
-        ))
+        try:
+            lat, lon = [
+                x.strip() for x in
+                self._coerce_point_to_string(query).split(',')
+            ]
+        except ValueError:
+            raise ValueError("Must be a coordinate pair or Point")
+        params = {
+            'lat': lat,
+            'lon': lon
+        }
         if self.api_key:
-            url += "&key=%s" % self.api_key
+            params['key'] = self.api_key
+        url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
