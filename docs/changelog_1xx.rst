@@ -1,5 +1,11 @@
-dev
----
+1.10.0
+------
+2015-04-05
+
+* CHANGED: GeocodeFarm now uses version 3 of the service's API, which
+    allows use by unauthenticated users, multiple results, and
+    SSL/TLS. You may need to obtain a new API key from GeocodeFarm, or
+    use `None` for their free tier. Contributed by Eric Palakovich Carr.
 
 * ADDED: DataBC geocoder for use with the British Columbia government's
     DataBC service. Contributed by Benjamin Trigona-Harany.
