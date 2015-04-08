@@ -36,6 +36,7 @@ class What3Words(Geocoder):
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
     ):
         """
         Initialize a What3Words geocoder with 3-word or OneWord-address and
@@ -69,7 +70,8 @@ class What3Words(Geocoder):
             format_string,
             scheme,
             timeout,
-            proxies
+            proxies,
+            user_agent=user_agent,
         )
         self.api_key = api_key
         self.api = (
