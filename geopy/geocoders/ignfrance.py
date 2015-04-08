@@ -50,6 +50,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
     ):  # pylint: disable=R0913
         """
         Initialize a customized IGN France geocoder.
@@ -88,7 +89,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
 
         """
         super(IGNFrance, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
 
         # Catch if no api key with username and password
