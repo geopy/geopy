@@ -45,10 +45,7 @@ DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
 DEFAULT_WKID = 4326
-
-
-def get_default_user_agent():
-    return "geopy/" + gu.get_version()
+DEFAULT_USER_AGENT = "geopy/" + gu.get_version()
 
 
 ERROR_CODE_MAP = {
@@ -91,7 +88,7 @@ class Geocoder(object): # pylint: disable=R0921
             )
         self.proxies = proxies
         self.timeout = timeout
-        self.headers = {'User-Agent': user_agent or get_default_user_agent()}
+        self.headers = {'User-Agent': user_agent or DEFAULT_USER_AGENT}
 
         if self.proxies:
             install_opener(

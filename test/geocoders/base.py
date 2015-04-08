@@ -5,8 +5,8 @@ from mock import patch
 from geopy.point import Point
 from geopy.exc import GeocoderNotFound
 from geopy.geocoders import get_geocoder_for_service, GoogleV3
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, get_default_user_agent
-
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+import geopy.geocoders.base
 
 class GetGeocoderTestCase(unittest.TestCase):
 
@@ -51,13 +51,11 @@ class GeocoderTestCase(unittest.TestCase):
         for attr in ('format_string', 'scheme', 'timeout', 'proxies'):
             self.assertEqual(locals()[attr], getattr(geocoder, attr))
 
-    @patch('geopy.util.get_version')
-    def test_user_agent_default(self, mocked_getversion):
-        mocked_getversion.return_value = '1.2.3'
-        #mmh mocking doesn't work at the moment
-        self.assertEqual(get_default_user_agent(), 'geopy/1.2.3')
-        geocoder = Geocoder()
-        self.assertEqual(geocoder.headers['User-Agent'], 'geopy/1.2.3')
+    def test_user_agent_default(self):
+        with patch('geopy.geocoders.base.DEFAULT_USER_AGENT', 'mocked_user_agent/0.0.0'):
+            self.assertEqual(geopy.geocoders.base.DEFAULT_USER_AGENT, 'mocked_user_agent/0.0.0')
+            geocoder = Geocoder()
+            self.assertEqual(geocoder.headers['User-Agent'], 'mocked_user_agent/0.0.0')
 
     def test_user_agent_custom(self):
         geocoder = Geocoder(

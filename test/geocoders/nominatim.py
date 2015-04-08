@@ -33,11 +33,10 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-    @patch('geopy.util.get_version')
-    def test_user_agent_default(self, mocked_getversion):
-        mocked_getversion.return_value = '1.2.3'
-        geocoder = Nominatim()
-        self.assertEqual(geocoder.headers['User-Agent'], 'geopy/1.2.3')
+    def test_user_agent_default(self):
+        with patch('geopy.geocoders.base.DEFAULT_USER_AGENT', 'mocked_user_agent/0.0.0'):
+            geocoder = Nominatim()
+            self.assertEqual(geocoder.headers['User-Agent'], 'mocked_user_agent/0.0.0')
 
     def test_user_agent_custom(self):
         geocoder = Nominatim(
