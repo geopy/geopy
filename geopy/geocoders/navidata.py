@@ -29,6 +29,7 @@ class NaviData(Geocoder):  # pylint: disable=W0223
             domain='api.navidata.pl',
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
     ):
         """
             .. versionadded:: 1.8.0
@@ -49,7 +50,7 @@ class NaviData(Geocoder):  # pylint: disable=W0223
 
         """
         super(NaviData, self).__init__(
-            scheme="http", timeout=timeout, proxies=proxies
+            scheme="http", timeout=timeout, proxies=proxies, user_agent=user_agent
         )
 
         self.api_key = api_key
