@@ -33,6 +33,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
             format_string=DEFAULT_FORMAT_STRING,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """
         :param string username:
@@ -58,7 +59,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
             .. versionadded:: 0.96
         """
         super(GeocoderDotUS, self).__init__(
-            format_string=format_string, timeout=timeout, proxies=proxies
+            format_string=format_string, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         if username or password:
             if not (username and password):
