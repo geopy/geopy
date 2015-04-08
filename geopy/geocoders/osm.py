@@ -86,7 +86,6 @@ class Nominatim(Geocoder):
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
 
-
     def geocode(
             self,
             query,
@@ -157,8 +156,7 @@ class Nominatim(Geocoder):
             params = {'q': self.format_string % query}
 
         params.update({
-            # `viewbox` apparently replaces `view_box`
-            'viewbox': self.view_box,
+            'view_box': self.view_box,
             'format': 'json'
         })
 
