@@ -19,7 +19,7 @@ class DataBC(Geocoder):
         http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.page
     """
 
-    def __init__(self, scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT, proxies=None):
+    def __init__(self, scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT, proxies=None, user_agent=None):
         """
         Create a DataBC-based geocoder.
 
@@ -35,7 +35,7 @@ class DataBC(Geocoder):
             :class:`urllib2.ProxyHandler`.
         """
         super(DataBC, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         self.api = '%s://apps.gov.bc.ca/pub/geocoder/addresses.geojson' % self.scheme
 

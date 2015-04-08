@@ -14,6 +14,12 @@ class DataBCTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = DataBC()
 
+    def test_user_agent_custom(self):
+        geocoder = DataBC(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
     def test_geocode(self):
         """
         DataBC.geocode
