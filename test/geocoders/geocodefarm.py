@@ -26,6 +26,12 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         # Restore the original _call_geocoder in case we replaced it with a mock
         self.geocoder._call_geocoder = self._original_call_geocoder
 
+    def test_user_agent_custom(self):
+        geocoder = GeocodeFarm(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
     def test_geocode(self):
         """
         GeocodeFarm.geocode
