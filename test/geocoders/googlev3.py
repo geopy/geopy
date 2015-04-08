@@ -17,6 +17,12 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         cls.new_york_point = Point(40.75376406311989, -73.98489005863667)
         cls.america_new_york = timezone("America/New_York")
 
+    def test_user_agent_custom(self):
+        geocoder = GoogleV3(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
     def test_configuration_error(self):
         """
         GoogleV3 raises configuration errors on invalid auth params
