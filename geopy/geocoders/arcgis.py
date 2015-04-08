@@ -29,7 +29,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
     def __init__(self, username=None, password=None, referer=None, # pylint: disable=R0913
                  token_lifetime=60, scheme=DEFAULT_SCHEME,
-                 timeout=DEFAULT_TIMEOUT, proxies=None):
+                 timeout=DEFAULT_TIMEOUT, proxies=None,
+                user_agent=None):
         """
         Create a ArcGIS-based geocoder.
 
@@ -63,7 +64,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             :class:`urllib2.ProxyHandler`.
         """
         super(ArcGIS, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         if username or password or referer:
             if not (username and password and referer):
