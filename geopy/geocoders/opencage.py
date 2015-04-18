@@ -109,9 +109,9 @@ class OpenCage(Geocoder):
         }
         if bounds:
             params['bounds'] = bounds
-        if bounds:
+        if language:
             params['language'] = language
-        if bounds:
+        if country:
             params['country'] = country
 
         url = "?".join((self.api, urlencode(params)))
