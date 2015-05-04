@@ -106,3 +106,18 @@ class BingTestCase(GeocoderTestBase):
 
         self.assertEqual(address['neighborhood'], "Praha 6")
         self.assertEqual(address['countryRegionIso2'], "CZ")
+
+    def test_structured_query(self):
+        """
+        Bing.geocode using structured query
+        """
+        address_dict = {'postalCode': '80020', 'countryRegion': 'United States'}
+        res = self._make_request(
+            self.geocoder.geocode,
+            query=address_dict
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            address = res.raw['address']
+            self.assertEqual(address['locality'], "Broomfield")

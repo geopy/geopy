@@ -25,6 +25,14 @@ class Bing(Geocoder):
         https://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
+    structured_query_params = {
+        'addressLine',
+        'locality',
+        'adminDistrict',
+        'countryRegion',
+        'postalCode',
+    }
+
     def __init__(
             self,
             api_key,
@@ -81,6 +89,10 @@ class Bing(Geocoder):
 
         :param string query: The address or query you wish to geocode.
 
+            For a structured query, provide a dictionary whose keys
+            are one of: `addressLine`, `locality` (city), `adminDistrict` (state), `countryRegion`, or
+            `postalcode`.
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
@@ -114,10 +126,19 @@ class Bing(Geocoder):
 
             .. versionadded:: 1.4.0
         """
-        params = {
-            'query': self.format_string % query,
-            'key': self.api_key
-        }
+        if isinstance(query, dict):
+            params = {
+                key: val
+                for key, val
+                in query.items()
+                if key in self.structured_query_params
+            }
+            params['key'] = self.api_key
+        else:
+            params = {
+                'query': self.format_string % query,
+                'key': self.api_key
+            }
         if user_location:
             params['userLocation'] = ",".join(
                 (str(user_location.latitude), str(user_location.longitude))
