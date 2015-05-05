@@ -67,7 +67,7 @@ class BingTestCase(GeocoderTestBase):
         """
         Bing.geocode using `user_location`
         """
-        pensylvania = "20 Main St, Bally, PA 19503, United States"
+        pensylvania = "20 Main St, Walnutport, PA 18088, United States"
         colorado = "20 Main St, Broomfield, CO 80020, United States"
 
         pennsylvania_bias = (40.922351, -75.096562)
