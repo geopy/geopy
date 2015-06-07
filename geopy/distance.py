@@ -281,6 +281,19 @@ class great_circle(Distance):
 
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
+class great_circle_haversine(great_circle):
+    def __init__(self, *args, **kwargs):
+        super(great_circle_haversine, self).__init__(*args, **kwargs)
+
+    def measure(self, a, b):
+        a, b = Point(a), Point(b)
+        lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
+        lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
+        delta_lat = lat2 - lat1
+        delta_lng = lng2 - lng1
+        first = sin((delta_lat)/2)**2 + cos(lat1) * cos(lat2) * sin((delta_lng/2))**2
+        d = 2 * atan2(sqrt(first), sqrt(1 - first))
+        return self.RADIUS * d
 
 class vincenty(Distance):
     """
@@ -528,3 +541,4 @@ class vincenty(Distance):
 
 distance = VincentyDistance = vincenty
 GreatCircleDistance = great_circle
+GreatCircleHaversineDistance = great_circle_haversine
