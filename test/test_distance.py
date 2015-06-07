@@ -8,6 +8,7 @@ from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E061
 from geopy.point import Point
 from geopy.distance import (Distance,
                             GreatCircleDistance,
+                            GreatCircleHaversineDistance,
                             VincentyDistance,
                             EARTH_RADIUS,
                             ELLIPSOIDS)
@@ -169,6 +170,9 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases):
         destination = distance.destination((0, 0), 0)
         assert_almost_equal(destination.latitude, 0)
         assert_almost_equal(destination.longitude, 180)
+
+class TestWhenComputingGreatCircleHaversineDistance(CommonDistanceCases):
+    cls = GreatCircleHaversineDistance
 
 
 class TestWhenComputingVincentyDistance(CommonDistanceCases):
