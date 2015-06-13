@@ -102,6 +102,13 @@ Using great-circle distance:
     >>> print(great_circle(newport_ri, cleveland_oh).miles)
     537.1485284062816
 
+Using great-circle haversine formula:
+    >>> from geopy.distance import great_circle_haversine
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> print(great_circle_haversine(newport_ri, cleveland_oh).miles)
+    537.882275111
+
 ## Documentation
 
 More documentation and examples can be found at
