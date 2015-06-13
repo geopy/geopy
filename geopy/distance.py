@@ -49,6 +49,14 @@ Using great-circle distance::
     >>> print(great_circle(newport_ri, cleveland_oh).miles)
     537.1485284062816
 
+Using great-circle haversine distance::
+
+    >>> from geopy.distance import great_circle_haversine
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> print(great_circle_haversine(newport_ri, cleveland_oh).miles)
+    537.882275111
+
 You can change the ellipsoid model used by the Vincenty formula like so::
 
     >>> distance.vincenty(ne, cl, ellipsoid='GRS-80').miles
@@ -282,6 +290,19 @@ class great_circle(Distance):
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
 class great_circle_haversine(great_circle):
+    """
+    Calculate shortest distance between two points on the sphere using 
+    Great-circle haversine formula.
+
+    Example::
+
+        >>> from geopy.distance import great_circle_haversine
+        >>> newport_ri = (41.49008, -71.312796)
+        >>> cleveland_oh = (41.499498, -81.695391)
+        >>> print(great_circle_haversine(newport_ri, cleveland_oh).miles)
+        537.882275111
+    """
+
     def __init__(self, *args, **kwargs):
         super(great_circle_haversine, self).__init__(*args, **kwargs)
 
