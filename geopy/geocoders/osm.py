@@ -37,7 +37,7 @@ class Nominatim(Geocoder):
     def __init__(
             self,
             format_string=DEFAULT_FORMAT_STRING,
-            view_box=(-180, -90, 180, 90),
+            view_box=None,
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -160,7 +160,7 @@ class Nominatim(Geocoder):
         })
         
         # `viewbox` apparently replaces `view_box`
-        if self.view_box != (-180, -90, 180, 90):
+        if self.view_box:
             params['viewbox'] = ','.join(self.view_box)
 
         if self.country_bias:
