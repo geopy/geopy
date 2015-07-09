@@ -156,10 +156,12 @@ class Nominatim(Geocoder):
             params = {'q': self.format_string % query}
 
         params.update({
-            # `viewbox` apparently replaces `view_box`
-            'viewbox': self.view_box,
             'format': 'json'
         })
+        
+        # `viewbox` apparently replaces `view_box`
+        if self.view_box != (-180, -90, 180, 90):
+            params['viewbox'] = ','.join(self.view_box)
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
