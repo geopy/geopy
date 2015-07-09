@@ -37,7 +37,7 @@ class Nominatim(Geocoder):
     def __init__(
             self,
             format_string=DEFAULT_FORMAT_STRING,
-            view_box=(-180, -90, 180, 90),
+            view_box=None,
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -156,10 +156,12 @@ class Nominatim(Geocoder):
             params = {'q': self.format_string % query}
 
         params.update({
-            # `viewbox` apparently replaces `view_box`
-            'viewbox': self.view_box,
             'format': 'json'
         })
+        
+        # `viewbox` apparently replaces `view_box`
+        if self.view_box:
+            params['viewbox'] = ','.join(self.view_box)
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
