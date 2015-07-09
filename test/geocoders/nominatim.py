@@ -204,7 +204,6 @@ class NominatimExtraParamsTestCase(unittest.TestCase):
     def test_geocode_extra_params(self):
         with patch(self.geocoder, '_call_geocoder', MockMethod(return_value={})) as _call_geocoder:
             self.geocoder.geocode(query="Reykjavik, Iceland")
-            print _call_geocoder.call_args
             url = _call_geocoder.call_args[0][0][0]
             assert 'my_access_token' in url
             assert 'key' in url

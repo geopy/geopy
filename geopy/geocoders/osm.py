@@ -192,7 +192,6 @@ class Nominatim(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        print self._call_geocoder
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
