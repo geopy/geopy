@@ -42,7 +42,8 @@ class Nominatim(Geocoder):
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             domain='nominatim.openstreetmap.org',
-            scheme=DEFAULT_SCHEME
+            scheme=DEFAULT_SCHEME,
+            extra_params={}
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -82,9 +83,12 @@ class Nominatim(Geocoder):
         self.country_bias = country_bias
         self.domain = domain.strip('/')
 
+        if not isinstance(extra_params, dict):
+            raise ValueError("extra_params: expected dict, got: {}".format(type(extra_params)))
+
+        self.extra_params = extra_params
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
-
 
     def geocode(
             self,
@@ -155,11 +159,11 @@ class Nominatim(Geocoder):
         else:
             params = {'q': self.format_string % query}
 
-        params.update({
+        params.update(dict(self.extra_params,
             # `viewbox` apparently replaces `view_box`
-            'viewbox': self.view_box,
-            'format': 'json'
-        })
+            viewbox=self.view_box,
+            format='json'
+        ))
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
@@ -239,6 +243,7 @@ class Nominatim(Geocoder):
             'lon': lon,
             'format': 'json',
         }
+        params.update(self.extra_params)
         if language:
             params['accept-language'] = language
         url = "?".join((self.reverse_api, urlencode(params)))

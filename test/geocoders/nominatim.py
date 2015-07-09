@@ -1,8 +1,19 @@
+import unittest
+from nose.tools import assert_raises
+from contextlib import contextmanager
 
 from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import Nominatim
 from test.geocoders.util import GeocoderTestBase
+
+
+@contextmanager
+def patch(obj, method, replacement):
+    original_method = getattr(obj, method)
+    setattr(obj, method, replacement)
+    yield replacement
+    setattr(obj, method, original_method)
 
 
 class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
@@ -165,3 +176,41 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             result_geocode.raw['geojson'].get('type'),
             'MultiPolygon'
         )
+
+class MockMethod(object):
+    def __init__(self, return_value=None):
+        self.called = False
+        self.call_args = []
+        self.return_value = return_value
+
+    def __call__(self, *args, **kwargs):
+        self.call_args.append([args, kwargs])
+        self.called = True
+        return self.return_value
+
+
+class NominatimExtraParamsTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.geocoder = Nominatim(extra_params={'key': 'my_access_token'})
+
+    def test_reverse_extra_params(self):
+        with patch(self.geocoder, '_call_geocoder', MockMethod()) as _call_geocoder:
+            self.geocoder.reverse("64.0, 0.0")
+            url = _call_geocoder.call_args[0][0][0]
+            assert 'my_access_token' in url
+            assert 'key' in url
+
+    def test_geocode_extra_params(self):
+        with patch(self.geocoder, '_call_geocoder', MockMethod(return_value={})) as _call_geocoder:
+            self.geocoder.geocode(query="Reykjavik, Iceland")
+            url = _call_geocoder.call_args[0][0][0]
+            assert 'my_access_token' in url
+            assert 'key' in url
+
+    def test_constructor_accepts_and_sets_extra_params(self):
+        geocoder = Nominatim(extra_params={'param': 'value'})
+        assert geocoder.extra_params == {'param': 'value'}
+
+    def test_constructor_rejects_non_dict_extra_params(self):
+        assert_raises(ValueError, lambda: Nominatim(extra_params="string"))
