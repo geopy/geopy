@@ -1,7 +1,7 @@
 
 import os
 import json
-import unittest
+import unittest2 as unittest
 from collections import defaultdict
 
 from geopy import exc
@@ -33,7 +33,7 @@ except IOError:
         'IGNFRANCE_PASSWORD',
         'IGNFRANCE_REFERER',
     )
-    env = {key: os.environ.get(key, None) for key in keys}
+    env = dict((key, os.environ.get(key, None)) for key in keys)
 
 
 class Empty(object):  # pylint: disable=R0903
