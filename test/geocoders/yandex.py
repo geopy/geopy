@@ -17,8 +17,8 @@ class YandexTestCase(GeocoderTestBase):
         """
         self.geocoder = Yandex()
         self.geocode_run(
-            {"query": "площадь Ленина Донецк"},
-            {"latitude": 48.002104, "longitude": 37.805186},
+            dict(query="площадь Ленина Донецк"),
+            dict(latitude=48.002104, longitude=37.805186),
         )
 
     def test_reverse(self):
@@ -27,8 +27,8 @@ class YandexTestCase(GeocoderTestBase):
         """
         self.geocoder = Yandex()
         self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667"},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+            dict(query="40.75376406311989, -73.98489005863667"),
+            dict(latitude=40.75376406311989, longitude=-73.98489005863667),
         )
 
     def test_params(self):
@@ -40,6 +40,6 @@ class YandexTestCase(GeocoderTestBase):
             lang='uk_UA'
         )
         self.geocode_run(
-            {"query": "площа Леніна Донецьк"},
-            {'raw': {"metaDataProperty":{"GeocoderMetaData":{"kind":"street","text":"Україна, Донецьк, площа Леніна","precision":"street","AddressDetails":{"Country":{"AddressLine":"Донецьк, площа Леніна","CountryNameCode":"UA","CountryName":"Україна","AdministrativeArea":{"AdministrativeAreaName":"Донецька область","SubAdministrativeArea":{"SubAdministrativeAreaName":"Донецька міська рада","Locality":{"LocalityName":"Донецьк","Thoroughfare":{"ThoroughfareName":"площа Леніна"}}}}}}}},"description":"Донецьк, Україна","name":"площа Леніна","boundedBy":{"Envelope":{"lowerCorner":"37.804575 48.001669","upperCorner":"37.805805 48.002538"}},"Point":{"pos":"37.805186 48.002104"}}},
+            dict(query="площа Леніна Донецьк"),
+            dict(raw={"metaDataProperty":{"GeocoderMetaData":{"kind":"street","text":"Україна, Донецьк, площа Леніна","precision":"street","AddressDetails":{"Country":{"AddressLine":"Донецьк, площа Леніна","CountryNameCode":"UA","CountryName":"Україна","AdministrativeArea":{"AdministrativeAreaName":"Донецька область","SubAdministrativeArea":{"SubAdministrativeAreaName":"Донецька міська рада","Locality":{"LocalityName":"Донецьк","Thoroughfare":{"ThoroughfareName":"площа Леніна"}}}}}}}},"description":"Донецьк, Україна","name":"площа Леніна","boundedBy":{"Envelope":{"lowerCorner":"37.804575 48.001669","upperCorner":"37.805805 48.002538"}},"Point":{"pos":"37.805186 48.002104"}}),
         )
