@@ -3,7 +3,7 @@
 Test Location.
 """
 
-import unittest
+import unittest2 as unittest
 from geopy.compat import u, py3k
 from geopy.location import Location
 from geopy.point import Point

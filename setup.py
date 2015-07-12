@@ -8,6 +8,7 @@ from geopy import __version__ as version
 
 INSTALL_REQUIRES = []
 TESTS_REQUIRES = [
+    'unittest2',
     'nose-cov',
     'pylint',
     'tox'

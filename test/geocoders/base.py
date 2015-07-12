@@ -1,5 +1,5 @@
 
-import unittest
+import unittest2 as unittest
 
 from geopy.point import Point
 from geopy.exc import GeocoderNotFound

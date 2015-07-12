@@ -1,5 +1,5 @@
 
-import unittest
+import unittest2 as unittest
 
 from geopy.geocoders import LiveAddress
 from geopy.exc import ConfigurationError, GeocoderAuthenticationFailure
