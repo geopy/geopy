@@ -2,7 +2,7 @@
 Test Point.
 """
 
-import unittest
+import unittest2 as unittest
 
 from geopy.compat import u
 from geopy.point import Point

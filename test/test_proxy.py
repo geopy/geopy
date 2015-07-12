@@ -3,7 +3,7 @@ Test ability to proxy requests.
 """
 
 import os
-import unittest
+import unittest2 as unittest
 from test import proxy_server
 from geopy.compat import urlopen, URLError
 from geopy.geocoders.base import Geocoder

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import unittest
+import unittest2 as unittest
 
 from geopy.compat import u
 from geopy.geocoders import NaviData

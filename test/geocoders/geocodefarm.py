@@ -1,5 +1,5 @@
 
-import unittest
+import unittest2 as unittest
 import types
 
 from geopy import exc

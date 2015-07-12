@@ -6,6 +6,6 @@ python:
     - "pypy"
     - "pypy3"
 script:
-    - pip install nose-cov requests-oauthlib pytz
+    - pip install utittest2 nose-cov requests-oauthlib pytz
     - make test
 sudo: false

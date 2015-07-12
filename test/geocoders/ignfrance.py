@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-import unittest
+import unittest2 as unittest
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
