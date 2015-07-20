@@ -183,13 +183,13 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             return page
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, timeout=None, **kwargs):
         """
         Implemented in subclasses.
         """
         raise NotImplementedError()
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None, **kwargs):
         """
         Implemented in subclasses.
         """
