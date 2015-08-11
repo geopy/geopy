@@ -161,6 +161,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             return Location(location, (latitude, longitude), place)
 
         if exactly_one:
-            return parse_code(places[0])
+            try:
+                return parse_code(places[0])
+            except IndexError:
+                return None
         else:
             return [parse_code(place) for place in places]
