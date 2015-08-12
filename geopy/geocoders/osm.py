@@ -79,7 +79,6 @@ class Nominatim(Geocoder):
         self.country_bias = country_bias
         self.format_string = format_string
         self.view_box = view_box
-        self.country_bias = country_bias
         self.domain = domain.strip('/')
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
