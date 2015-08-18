@@ -57,6 +57,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.OpenMapQuest
     :members: __init__, geocode
 
+.. autoclass:: geopy.geocoders.Photon
+    :members: __init__, geocode
+
 .. autoclass:: geopy.geocoders.YahooPlaceFinder
     :members: __init__, geocode
 

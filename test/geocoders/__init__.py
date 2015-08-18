@@ -17,4 +17,5 @@ from .what3words import What3WordsTestCase
 from .yandex import YandexTestCase
 from .ignfrance import IGNFranceTestCase
 from .navidata import NaviDataTestCase
+from .photon import PhotonTestCase
 
