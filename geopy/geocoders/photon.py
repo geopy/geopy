@@ -64,9 +64,14 @@ class Photon(Geocoder):  # pylint: disable=W0223
         self.api = "%s://%s/api" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
 
-    def geocode(self, query, exactly_one=True,
-                timeout=None, location_bias=None,
-                language=False):  # pylint: disable=W0221
+    def geocode(
+        self,
+        query,
+        exactly_one=True,
+        timeout=None,
+        location_bias=None,
+        language=False
+    ):  # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -112,8 +117,13 @@ class Photon(Geocoder):  # pylint: disable=W0223
             exactly_one
         )
 
-    def reverse(self, query, exactly_one=True,
-                timeout=None, language=False):  # pylint: disable=W0221
+    def reverse(
+        self,
+        query,
+        exactly_one=True,
+        timeout=None,
+        language=False
+    ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
 
@@ -171,8 +181,10 @@ class Photon(Geocoder):  # pylint: disable=W0223
         Return location and coordinates tuple from dict.
         """
         name = [resource['properties'].get('name'),
+                resource['properties'].get('housenumber'),
                 resource['properties'].get('street'),
                 resource['properties'].get('postcode'),
+                resource['properties'].get('city'),
                 resource['properties'].get('state'),
                 resource['properties'].get('country')]
         name = [n for n in name if n is not None]
