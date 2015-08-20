@@ -32,8 +32,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
             domain='photon.komoot.de'
     ):   # pylint: disable=R0913
         """
-        Initialize a Photon/Komoot geocoder with location-specific
-        address information. No API Key is needed by the platform.
+        Initialize a Photon/Komoot geocoder which aims to let you "search as
+        you type with OpenStreetMap". No API Key is needed by this platform.
 
         :param string format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
@@ -70,7 +70,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         exactly_one=True,
         timeout=None,
         location_bias=None,
-        language=False
+        language=False,
+        osm_tag=None
     ):  # pylint: disable=W0221
         """
         Geocode a location query.
@@ -91,6 +92,10 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
+        :param osm_tag: The expression to filter (include/exclude) by key and/
+            or value, str as 'key:value' or list/set of str if multiple filters
+            are requiered as ['key:!val', '!key', ':!value']
+        
         """
         params = {
             'q': self.format_string % query
@@ -107,8 +112,17 @@ class Photon(Geocoder):  # pylint: disable=W0223
                 params['lon'] = lon
                 params['lat'] = lat
             except ValueError:
-                raise ValueError("Must be a coordinate pair or Point")
-
+                raise ValueError(("Location bias must be a"
+                                  " coordinate pair or Point"))
+        if osm_tag:
+            if type(osm_tag) == str:
+                params['osm_tag'] = osm_tag
+            else:
+                try:
+                    params['osm_tag'] = '&osm_tag='.join(osm_tag)
+                except ValueError:
+                    raise ValueError(("osm_tag must be a string expression or "
+                                  "a set/list of string expressions"))
         url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -122,7 +136,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         query,
         exactly_one=True,
         timeout=None,
-        language=False
+        language=False,
+        osm_tag=None
     ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
@@ -142,6 +157,9 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
+        :param osm_tag: The expression to filter (include/exclude) by key and/
+            or value, str as 'key:value' or list/set of str if multiple filters
+            are requiered as ['key:!val', '!key', ':!value']
         """
         try:
             lat, lon = [x.strip() for x in
@@ -156,6 +174,15 @@ class Photon(Geocoder):  # pylint: disable=W0223
             params['limit'] = 1
         if language:
             params['lang'] = language
+        if osm_tag:
+            if type(osm_tag) == str:
+                params['osm_tag'] = osm_tag
+            else:
+                try:
+                    params['osm_tag'] = '&osm_tag='.join(osm_tag)
+                except ValueError:
+                    raise ValueError(("osm_tag must be a string expression or "
+                                      "a set/list of string expressions"))
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -180,16 +207,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
         """
         Return location and coordinates tuple from dict.
         """
-        name = [resource['properties'].get('name'),
-                resource['properties'].get('housenumber'),
-                resource['properties'].get('street'),
-                resource['properties'].get('postcode'),
-                resource['properties'].get('city'),
-                resource['properties'].get('state'),
-                resource['properties'].get('country')]
-        name = [n for n in name if n is not None]
+        name_elements = ['name', 'housenumber', 'street',
+                         'postcode', 'street', 'city',
+                         'state', 'country']
+        name = [resource.get(k) for k
+                in name_elements if resource.get(k)]
         location = ', '.join(name)
-        location = location.replace(' ,', '')
 
         latitude = resource['geometry']['coordinates'][1] or None
         longitude = resource['geometry']['coordinates'][0] or None
