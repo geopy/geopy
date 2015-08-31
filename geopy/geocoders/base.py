@@ -29,7 +29,7 @@ from geopy.exc import (
     GeocoderUnavailable,
     GeocoderParseError,
 )
-import geopy.util as gu
+from geopy.util import decode_page, __version__
 
 
 __all__ = (
@@ -45,7 +45,7 @@ DEFAULT_FORMAT_STRING = '%s'
 DEFAULT_SCHEME = 'https'
 DEFAULT_TIMEOUT = 1
 DEFAULT_WKID = 4326
-DEFAULT_USER_AGENT = "geopy/" + gu.get_version()
+DEFAULT_USER_AGENT = "geopy/%s" % __version__
 
 
 ERROR_CODE_MAP = {
@@ -133,8 +133,13 @@ class Geocoder(object): # pylint: disable=R0921
         """
         requester = requester or self.urlopen
 
-        try:
+        if not requester:
             req = Request(url=url, headers=self.headers)
+        else:
+            # work around for placefinder's use of requests
+            req = url
+
+        try:
             page = requester(req, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
@@ -172,12 +177,12 @@ class Geocoder(object): # pylint: disable=R0921
         else:
             status_code = None
         if status_code in ERROR_CODE_MAP:
-            raise ERROR_CODE_MAP[page.status_code]("\n%s" % gu.decode_page(page))
+            raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
 
         if raw:
             return page
 
-        page = gu.decode_page(page)
+        page = decode_page(page)
 
         if deserializer is not None:
             try:

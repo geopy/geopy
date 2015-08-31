@@ -2,8 +2,10 @@
 :class:`.YahooPlaceFinder` geocoder.
 """
 
+from functools import partial
+
 try:
-    from requests import get
+    from requests import get, Request
     from requests_oauthlib import OAuth1
     requests_missing = False
 except ImportError:
