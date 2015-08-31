@@ -1,3 +1,25 @@
+1.11.0
+------
+2015-09-01
+
+
+* ADDED: Photon geocoder. Contributed by mthh.
+
+* ADDED: Bing supports structured query parameters. Contributed by
+    SemiNormal.
+
+* CHANGED: Geocoders send a `User-Agent` header, which by default is
+    `geopy/1.11.0`. Configure it during geocoder initialization. Contributed
+    by sebastianneubauer.
+
+* FIXED: Index out of range error with no results using Yandex. Contributed
+    by facciocose.
+
+* FIXED: Nominatim was incorrectly sending `view_box` when not requested,
+    and formatting it incorrectly. Contributed by m0zes.
+
+
+
 1.10.0
 ------
 2015-04-05
