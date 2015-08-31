@@ -2,7 +2,7 @@
 :class:`.Photon` geocoder.
 """
 
-from geopy.compat import urlencode
+from geopy.compat import urlencode, string_compare
 from geopy.geocoders.base import (
     Geocoder,
     DEFAULT_FORMAT_STRING,
@@ -65,14 +65,14 @@ class Photon(Geocoder):  # pylint: disable=W0223
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
 
     def geocode(
-        self,
-        query,
-        exactly_one=True,
-        timeout=None,
-        location_bias=None,
-        language=False,
-        osm_tag=None
-    ):  # pylint: disable=W0221
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            location_bias=None,
+            language=False,
+            osm_tag=None
+        ):  # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -95,7 +95,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
             are requiered as ['key:!val', '!key', ':!value']
-        
+
         """
         params = {
             'q': self.format_string % query
@@ -115,14 +115,16 @@ class Photon(Geocoder):  # pylint: disable=W0223
                 raise ValueError(("Location bias must be a"
                                   " coordinate pair or Point"))
         if osm_tag:
-            if type(osm_tag) == str:
+            if isinstance(osm_tag, string_compare):
                 params['osm_tag'] = osm_tag
             else:
                 try:
                     params['osm_tag'] = '&osm_tag='.join(osm_tag)
                 except ValueError:
-                    raise ValueError(("osm_tag must be a string expression or "
-                                  "a set/list of string expressions"))
+                    raise ValueError(
+                        "osm_tag must be a string expression or "
+                        "a set/list of string expressions"
+                    )
         url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -132,13 +134,13 @@ class Photon(Geocoder):  # pylint: disable=W0223
         )
 
     def reverse(
-        self,
-        query,
-        exactly_one=True,
-        timeout=None,
-        language=False,
-        osm_tag=None
-    ):  # pylint: disable=W0221
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            language=False,
+            osm_tag=None
+        ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
 
@@ -175,7 +177,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         if language:
             params['lang'] = language
         if osm_tag:
-            if type(osm_tag) == str:
+            if isinstance(osm_tag, string_compare):
                 params['osm_tag'] = osm_tag
             else:
                 try:
