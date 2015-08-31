@@ -5,6 +5,16 @@ from geopy.geocoders import LiveAddress
 from geopy.exc import ConfigurationError, GeocoderAuthenticationFailure
 from test.geocoders.util import GeocoderTestBase, env
 
+class LiveAddressTestCaseUnitTest(GeocoderTestBase):
+
+    def test_user_agent_custom(self):
+        geocoder = LiveAddress(
+            auth_id='DUMMY12345',
+            auth_token='DUMMY67890',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
 
 @unittest.skipUnless( # pylint: disable=R0904,C0111
     'LIVESTREETS_AUTH_ID' in env and 'LIVESTREETS_AUTH_TOKEN' in env,

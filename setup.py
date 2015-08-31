@@ -10,7 +10,8 @@ INSTALL_REQUIRES = []
 TESTS_REQUIRES = [
     'nose-cov',
     'pylint',
-    'tox'
+    'tox',
+    'mock'
 ]
 
 

@@ -5,6 +5,16 @@ from geopy.geocoders import What3Words
 from test.geocoders.util import GeocoderTestBase, env
 
 
+class What3WordsTestCaseUnitTest(GeocoderTestBase):
+
+    def test_user_agent_custom(self):
+        geocoder = What3Words(
+            api_key='DUMMYKEY1234',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+
 @unittest.skipUnless(bool(env.get('WHAT3WORDS_KEY')),
                      "No WHAT3WORDS_KEY env variable set"
 )

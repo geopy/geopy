@@ -42,7 +42,8 @@ class Nominatim(Geocoder):
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             domain='nominatim.openstreetmap.org',
-            scheme=DEFAULT_SCHEME
+            scheme=DEFAULT_SCHEME,
+            user_agent=None
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -74,7 +75,7 @@ class Nominatim(Geocoder):
             .. versionadded:: 1.8.2
         """
         super(Nominatim, self).__init__(
-            format_string, scheme, timeout, proxies
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.country_bias = country_bias
         self.format_string = format_string
@@ -83,7 +84,6 @@ class Nominatim(Geocoder):
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
-
 
     def geocode(
             self,
