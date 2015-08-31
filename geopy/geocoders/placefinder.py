@@ -139,6 +139,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             min_quality=0,
             reverse=False,
             valid_country_codes=None,
+            with_timezone=False,
         ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
@@ -154,6 +155,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
         :param valid_country_codes:
         :type valid_country_codes: list or tuple
+
+        :param bool with_timezone: Include the timezone in the response's
+            `raw` dictionary (as `timezone`).
         """
         params = {
             "location": query,
@@ -164,6 +168,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             params["gflags"] = "R"
         if exactly_one is True:
             params["count"] = "1"
+        if with_timezone is True:
+            params['flags'] += 'T' #Return timezone
 
         response = self._call_geocoder(
             self.api,
