@@ -8,10 +8,12 @@ formulas, with a default of Vincenty available as the function
 `geopy.distance.distance`.
 
 Great-circle distance (:class:`.great_circle`) uses a spherical model of
-the earth, using the average great-circle radius of 6372.795 kilometers,
-resulting in an error of up to about 0.5%. The radius value is stored in
-:const:`distance.EARTH_RADIUS`, so it can be customized
-(it should always be in kilometers, however).
+the earth, using the mean earth radius as defined by the International
+Union of Geodesy and Geophysics, (2*a + b)/3 = 6371.0087714150598
+kilometers approx 6371.009 km (for WGS-84), resulting in an error of up
+to about 0.5%. The radius value is stored in
+:const:`distance.EARTH_RADIUS`, so it can be customized (it should
+always be in kilometers, however).
 
 Vincenty distance (:class:`.vincenty`) uses a more accurate ellipsoidal model
 of the earth. This is the default distance formula, and is thus aliased as
@@ -77,9 +79,10 @@ from geopy import units, util
 from geopy.point import Point
 from geopy.compat import string_compare
 
-# Average great-circle radius in kilometers, from Wikipedia.
-# Using a sphere with this radius results in an error of up to about 0.5%.
-EARTH_RADIUS = 6372.795
+# IUGG mean earth radius in kilometers, from
+# https://en.wikipedia.org/wiki/Earth_radius#Mean_radius.  Using a
+# sphere with this radius results in an error of up to about 0.5%.
+EARTH_RADIUS = 6371.009
 
 # From http://www.movable-type.co.uk/scripts/LatLongVincenty.html:
 #   The most accurate and widely used globally-applicable model for the earth
