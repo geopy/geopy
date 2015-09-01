@@ -84,7 +84,7 @@ def miles(kilometers=0, meters=0, feet=0, nautical=0): # pylint: disable=W0621
         ret += feet / ft(1.)
     if meters:
         kilometers += meters / 1000.
-    ret += kilometers * 0.621371192
+    ret += kilometers / 1.609344
     return ret
 
 def feet(kilometers=0, meters=0, miles=0, nautical=0): # pylint: disable=W0621
