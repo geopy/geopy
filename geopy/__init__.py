@@ -11,6 +11,4 @@ geopy is tested against CPython 2.7, CPython 3.2, CPython 3.4, PyPy, and PyPy3.
 from geopy.point import Point
 from geopy.location import Location
 from geopy.geocoders import * # pylint: disable=W0401
-
-
-__version__ = "1.10.0"
+from geopy.util import __version__

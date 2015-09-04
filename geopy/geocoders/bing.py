@@ -40,6 +40,7 @@ class Bing(Geocoder):
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
@@ -70,7 +71,7 @@ class Bing(Geocoder):
 
             .. versionadded:: 0.96
         """
-        super(Bing, self).__init__(format_string, scheme, timeout, proxies)
+        super(Bing, self).__init__(format_string, scheme, timeout, proxies, user_agent=user_agent)
         self.api_key = api_key
         self.api = "%s://dev.virtualearth.net/REST/v1/Locations" % self.scheme
 

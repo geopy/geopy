@@ -7,6 +7,17 @@ from geopy.geocoders import YahooPlaceFinder
 from test.geocoders.util import GeocoderTestBase, env
 
 
+class YahooPlaceFinderTestCaseUnitTest(GeocoderTestBase): # pylint: disable=R0904,C0111
+
+    def test_user_agent_custom(self):
+        geocoder = YahooPlaceFinder(
+            consumer_key='DUMMYKEY1234',
+            consumer_secret='DUMMYSECRET',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
     bool(env.get('YAHOO_KEY')) and bool(env.get('YAHOO_SECRET')),
     "YAHOO_KEY and YAHOO_SECRET env variables not set"

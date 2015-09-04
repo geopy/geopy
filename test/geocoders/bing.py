@@ -7,6 +7,16 @@ from geopy.geocoders import Bing
 from test.geocoders.util import GeocoderTestBase, env
 
 
+class BingTestCaseUnitTest(GeocoderTestBase):
+
+    def test_user_agent_custom(self):
+        geocoder = Bing(
+            api_key='DUMMYKEY1234',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
     bool(env.get('BING_KEY')),
     "No BING_KEY env variable set"

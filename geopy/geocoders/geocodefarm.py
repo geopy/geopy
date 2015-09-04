@@ -26,6 +26,7 @@ class GeocodeFarm(Geocoder):
             format_string=DEFAULT_FORMAT_STRING,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """
         Create a geocoder for GeocodeFarm.
@@ -46,7 +47,7 @@ class GeocodeFarm(Geocoder):
             :class:`urllib2.ProxyHandler`.
         """
         super(GeocodeFarm, self).__init__(
-            format_string, 'https', timeout, proxies
+            format_string, 'https', timeout, proxies, user_agent=user_agent
         )
         self.api_key = api_key
         self.format_string = format_string

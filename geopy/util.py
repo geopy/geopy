@@ -16,6 +16,9 @@ except ImportError: # pragma: no cover
     pass
 
 
+__version__ = "1.11.0"
+
+
 class NullHandler(logging.Handler):
     """
     No output.
@@ -80,3 +83,10 @@ else:
         else: # requests?
             encoding = page.headers.get("charset") or "utf-8"
             return str(page.content, encoding=encoding)
+
+
+def get_version():
+    from geopy.version import GEOPY_VERSION
+    return str(GEOPY_VERSION)
+
+

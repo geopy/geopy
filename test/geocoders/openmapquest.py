@@ -11,6 +11,12 @@ class OpenMapQuestTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         cls.geocoder = OpenMapQuest(scheme='http', timeout=3)
         cls.delta = 0.04
 
+    def test_user_agent_custom(self):
+        geocoder = OpenMapQuest(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
     def test_geocode(self):
         """
         OpenMapQuest.geocode

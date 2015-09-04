@@ -90,6 +90,7 @@ __all__ = (
     "LiveAddress",
     'Yandex',
     "What3Words",
+    "Photon",
 )
 
 
@@ -110,6 +111,7 @@ from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 from geopy.geocoders.ignfrance import IGNFrance
+from geopy.geocoders.photon import Photon
 
 
 from geopy.exc import GeocoderNotFound
@@ -135,6 +137,7 @@ SERVICE_TO_GEOCODER = {
     "what3words": What3Words,
     "yandex": Yandex,
     "ignfrance": IGNFrance,
+    "photon": Photon
 }
 
 

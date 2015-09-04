@@ -2,8 +2,10 @@
 :class:`.YahooPlaceFinder` geocoder.
 """
 
+from functools import partial
+
 try:
-    from requests import get
+    from requests import get, Request
     from requests_oauthlib import OAuth1
     requests_missing = False
 except ImportError:
@@ -29,7 +31,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             consumer_key,
             consumer_secret,
             timeout=DEFAULT_TIMEOUT,
-            proxies=None
+            proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """
         :param string consumer_key: Key provided by Yahoo.
@@ -54,7 +57,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
                 ' Install with `pip install geopy -e ".[placefinder]"`.'
             )
         super(YahooPlaceFinder, self).__init__(
-            timeout=timeout, proxies=proxies
+            timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         self.consumer_key = (
             unicode(consumer_key)

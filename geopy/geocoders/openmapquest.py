@@ -29,6 +29,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """
         Initialize an Open MapQuest geocoder with location-specific
@@ -60,7 +61,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             .. versionadded:: 0.96
         """
         super(OpenMapQuest, self).__init__(
-            format_string, scheme, timeout, proxies
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.api_key = api_key or ''
         self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \

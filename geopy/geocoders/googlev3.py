@@ -44,7 +44,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             client_id=None,
             secret_key=None,
             timeout=DEFAULT_TIMEOUT,
-            proxies=None
+            proxies=None,
+            user_agent=None,
         ):  # pylint: disable=R0913
         """
         Initialize a customized Google geocoder.
@@ -58,7 +59,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             .. versionadded:: 0.98.2
 
         :param string domain: Should be the localized Google Maps domain to
-            connect to. The default is 'maps.google.com', but if you're
+            connect to. The default is 'maps.googleapis.com', but if you're
             geocoding address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
 
@@ -80,7 +81,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             .. versionadded:: 0.96
         """
         super(GoogleV3, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')

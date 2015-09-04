@@ -37,12 +37,13 @@ class Nominatim(Geocoder):
     def __init__(
             self,
             format_string=DEFAULT_FORMAT_STRING,
-            view_box=(-180, -90, 180, 90),
+            view_box=None,
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             domain='nominatim.openstreetmap.org',
-            scheme=DEFAULT_SCHEME
+            scheme=DEFAULT_SCHEME,
+            user_agent=None
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -74,17 +75,15 @@ class Nominatim(Geocoder):
             .. versionadded:: 1.8.2
         """
         super(Nominatim, self).__init__(
-            format_string, scheme, timeout, proxies
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.country_bias = country_bias
         self.format_string = format_string
         self.view_box = view_box
-        self.country_bias = country_bias
         self.domain = domain.strip('/')
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
-
 
     def geocode(
             self,
@@ -156,10 +155,12 @@ class Nominatim(Geocoder):
             params = {'q': self.format_string % query}
 
         params.update({
-            # `viewbox` apparently replaces `view_box`
-            'viewbox': self.view_box,
             'format': 'json'
         })
+
+        # `viewbox` apparently replaces `view_box`
+        if self.view_box:
+            params['viewbox'] = ','.join(self.view_box)
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias

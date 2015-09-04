@@ -27,7 +27,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
             api_key=None,
             lang=None,
             timeout=DEFAULT_TIMEOUT,
-            proxies=None
+            proxies=None,
+            user_agent=None,
         ):
         """
         Create a Yandex-based geocoder.
@@ -50,7 +51,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             :class:`urllib2.ProxyHandler`.
         """
         super(Yandex, self).__init__(
-            scheme='http', timeout=timeout, proxies=proxies
+            scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         self.api_key = api_key
         self.lang = lang
@@ -161,6 +162,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             return Location(location, (latitude, longitude), place)
 
         if exactly_one:
-            return parse_code(places[0])
+            try:
+                return parse_code(places[0])
+            except IndexError:
+                return None
         else:
             return [parse_code(place) for place in places]

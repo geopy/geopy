@@ -30,6 +30,7 @@ class OpenCage(Geocoder):
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
+            user_agent=None,
     ):  # pylint: disable=R0913
         """
         Initialize a customized Open Cage Data geocoder.
@@ -52,7 +53,7 @@ class OpenCage(Geocoder):
 
         """
         super(OpenCage, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies
+            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
 
         self.api_key = api_key
@@ -109,9 +110,9 @@ class OpenCage(Geocoder):
         }
         if bounds:
             params['bounds'] = bounds
-        if bounds:
+        if language:
             params['language'] = language
-        if bounds:
+        if country:
             params['country'] = country
 
         url = "?".join((self.api, urlencode(params)))
