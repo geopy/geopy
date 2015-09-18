@@ -60,6 +60,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.Photon
     :members: __init__, geocode
 
+.. autoclass:: geopy.geocoders.Teleport
+    :members: __init__, geocode
+
 .. autoclass:: geopy.geocoders.YahooPlaceFinder
     :members: __init__, geocode
 
