@@ -23,7 +23,7 @@ class TeleportTestCase(GeocoderTestBase):
         Teleport.geocode unicode
         """
         # work around ConfigurationError raised in GeoNames init
-        self.geocoder = Teleport()
+        self.geocoder = Teleport(scheme='http')
         self.geocode_run(
             {"query": "New York, NY"},
             {"latitude": 40.71427, "longitude": -74.00597},
@@ -34,7 +34,7 @@ class TeleportTestCase(GeocoderTestBase):
         Teleport.reverse
         """
         # work around ConfigurationError raised in GeoNames init
-        self.geocoder = Teleport()
+        self.geocoder = Teleport(scheme='http')
         self.reverse_run(
             {"query": "40.71427, -74.00597"},
             {"latitude": 40.71427, "longitude": -74.00597,
