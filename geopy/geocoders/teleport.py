@@ -11,7 +11,10 @@ from geopy.geocoders.base import (
 )
 from geopy.location import Location
 from geopy.util import logger
-from urllib import quote
+try:
+    from urllib.parse import quote  # @UnresolvedImport @UnusedImport
+except:
+    from urllib import quote  # @Reimport
 
 
 __all__ = ("Teleport", )
@@ -24,6 +27,12 @@ DEFAULT_REVERSE_EMBEDDINGS = (
     "location:nearest-cities/location:nearest-city" +
     "/{city:country,city:admin1_division}"
 )
+
+
+try:
+    basestring
+except:
+    basestring = str  # @ReservedAssignment
 
 
 class Teleport(Geocoder):
