@@ -33,8 +33,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         ):  # pylint: disable=R0913
         """
         Initialize an Open MapQuest geocoder with location-specific
-        address information. No API Key is needed by the Nominatim based
-        platform.
+        address information.
 
         :param string format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
@@ -84,6 +83,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             .. versionadded:: 0.97
         """
         params = {
+            'key': self.api_key,
             'q': self.format_string % query
         }
         if exactly_one:
