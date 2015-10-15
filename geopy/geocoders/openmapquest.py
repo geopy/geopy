@@ -84,7 +84,8 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             .. versionadded:: 0.97
         """
         params = {
-            'q': self.format_string % query
+            'q': self.format_string % query,
+            'key': self.api_key
         }
         if exactly_one:
             params['maxResults'] = 1
