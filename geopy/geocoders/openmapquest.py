@@ -19,7 +19,7 @@ __all__ = ("OpenMapQuest", )
 class OpenMapQuest(Geocoder): # pylint: disable=W0223
     """
     Geocoder using MapQuest Open Platform Web Services. Documentation at:
-        http://developer.mapquest.com/web/products/open/geocoding-service
+        http://www.mapquestapi.com/geocoding/
     """
 
     def __init__(
@@ -35,6 +35,8 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         Initialize an Open MapQuest geocoder with location-specific
         address information. No API Key is needed by the Nominatim based
         platform.
+
+        :param string api_key: Your api key provided by MapQuest.
 
         :param string format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
