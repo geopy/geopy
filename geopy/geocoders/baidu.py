@@ -127,13 +127,14 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout)
         )
 
-
-    @staticmethod
-    def _parse_reverse_json(page):
+    def _parse_reverse_json(self, page):
         """
         Parses a location from a single-result reverse API call.
         """
-        place = page.get('result')
+        place = page.get('result', None)
+        if not place:
+            self._check_status(page.get('status'))
+            return None
 
         location = place.get('formatted_address').encode('utf-8')
         latitude = place['location']['lat']
@@ -168,10 +169,12 @@ class Baidu(Geocoder):
             return [parse_place(item) for item in place]
 
     @staticmethod
-    def _check_status(status):
+    def _check_status(raw_status):
         """
         Validates error statuses.
         """
+        status = str(raw_status)
+
         if status == '0':
             # When there are no results, just return.
             return
@@ -203,11 +206,11 @@ class Baidu(Geocoder):
             raise GeocoderQueryError(
                 'IP/SN/SCODE/REFERER Illegal:'
             )
-        elif status == '2xx':
+        elif len(status) == 3 and status[0] == '2':
             raise GeocoderQueryError(
                 'Has No Privilleges.'
             )
-        elif status == '3xx':
+        elif len(status) == 3 and status[0] == '3':
             raise GeocoderQuotaExceeded(
                 'Quota Error.'
             )
