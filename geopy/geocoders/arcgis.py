@@ -26,11 +26,12 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     _TOKEN_EXPIRED = 498
     _MAX_RETRIES = 3
     auth_api = 'https://www.arcgis.com/sharing/generateToken'
+    oauth_api = 'https://www.arcgis.com/sharing/oauth2/token'
 
     def __init__(self, username=None, password=None, referer=None, # pylint: disable=R0913
                  token_lifetime=60, scheme=DEFAULT_SCHEME,
                  timeout=DEFAULT_TIMEOUT, proxies=None,
-                user_agent=None):
+                user_agent=None, client_id=None, client_secret=None):
         """
         Create a ArcGIS-based geocoder.
 
@@ -62,26 +63,52 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+            
+        :param string client_id: ArcGIS API client ID. Required to authenticate
+            with OAuth2
+            
+        :param string client_secret: ArcGIS API client secret. Required to 
+            authenticate with OAuth2
         """
         super(ArcGIS, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
-        if username or password or referer:
-            if not (username and password and referer):
-                raise ConfigurationError(
-                    "Authenticated mode requires username,"
-                    " password, and referer"
-                )
+        if username or password or referer or client_id or client_secret:
+            if (username or password or referer) and (client_id or client_secret):
+                raise ConfigurationError("Authentication must be via "
+                                         "username/password/referer, OR via "
+                                         "client ID and client secret, " 
+                                         "not both.")
+
             if self.scheme != 'https':
                 raise ConfigurationError(
                     "Authenticated mode requires scheme of 'https'"
                 )
+
+
+            if client_id or client_secret:
+                if not (client_id and client_secret):
+                    raise ConfigurationError("If authenticating via OAuth2, "
+                                             "both client ID and client secret "
+                                             "are required.")
+                                
+            
+            if username or password or referer:
+                if not (username and password and referer):
+                    raise ConfigurationError(
+                        "Authenticated mode requires username,"
+                        " password, and referer"
+                    )
+            
             self._base_call_geocoder = self._call_geocoder
             self._call_geocoder = self._authenticated_call_geocoder
 
         self.username = username
         self.password = password
         self.referer = referer
+        
+        self.client_id = client_id
+        self.client_secret = client_secret
 
         self.token = None
         self.token_lifetime = token_lifetime * 60 # store in seconds
@@ -218,19 +245,36 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             raise GeocoderAuthenticationFailure(
                 'Too many retries for auth: %s' % self.retry
             )
-        token_request_arguments = {
-            'username': self.username,
-            'password': self.password,
-            'expiration': self.token_lifetime,
-            'f': 'json'
-        }
+
+        if self.username:            
+            auth_url = self.auth_api
+            token_request_arguments = {
+                'username': self.username,
+                'password': self.password,
+                'expiration': self.token_lifetime,
+                'f': 'json'
+            }
+        elif self.client_id:
+            auth_url = self.oauth_api
+            token_request_arguments = {
+                'client_id': self.client_id,
+                'client_secret': self.client_secret,
+                # User/pass method takes token lifetime in seconds, 
+                # OAuth method takes token lifetime in minutes
+                'expiration': self.token_lifetime / 60, 
+                'grant_type': 'client_credentials',
+            }
+        else:
+            raise ConfigurationError("Invalid authentication configuration.")
+            
+            
         token_request_arguments = "&".join([
             "%s=%s" % (key, val)
             for key, val
             in token_request_arguments.items()
         ])
         url = "&".join((
-            "?".join((self.auth_api, token_request_arguments)),
+            "?".join((auth_url, token_request_arguments)),
             urlencode({'referer': self.referer})
         ))
         logger.debug(
@@ -239,11 +283,14 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         )
         self.token_expiry = int(time()) + self.token_lifetime
         response = self._base_call_geocoder(url)
-        if not 'token' in response:
+        if not ('token' in response or 'access_token' in response):
             raise GeocoderAuthenticationFailure(
-                'Missing token in auth request.'
+                'Missing token in auth request. '
                 'Request URL: %s; response JSON: %s' %
                 (url, json.dumps(response))
             )
         self.retry = 0
-        self.token = response['token']
+        if 'token' in response:
+            self.token = response['token']
+        else:
+            self.token = response['access_token']

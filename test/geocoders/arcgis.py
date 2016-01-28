@@ -44,6 +44,13 @@ class ArcGISTestCase(GeocoderTestBase):
                 referer='http://www.example.com',
                 scheme='http'
             )
+            
+    def test_oauth_config_error(self):
+        """
+        ArcGIS.__init__ invalid oauth authentication
+        """
+        with self.assertRaises(exc.ConfigurationError):
+            ArcGIS(username="a", client_id="b")
 
     def test_geocode(self):
         """
@@ -87,6 +94,32 @@ class ArcGISAuthenticatedTestCase(GeocoderTestBase):
             username=env['ARCGIS_USERNAME'],
             password=env['ARCGIS_PASSWORD'],
             referer=env['ARCGIS_REFERER'],
+            timeout=3
+        )
+
+    def test_basic_address(self):
+        """
+        ArcGIS.geocode using authentication
+        """
+        self.geocode_run(
+            {"query": "Potsdamer Platz, Berlin, Deutschland"},
+            {"latitude": 52.5094982, "longitude": 13.3765983},
+        )
+        
+        
+@unittest.skipUnless(  # pylint: disable=R0904,C0111
+    env.get('ARCGIS_USERNAME') is not None \
+    or env.get('ARCGIS_PASSWORD') is not None\
+    or env.get('ARCGIS_REFERER') is not None,
+    "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
+)
+class ArcGISOAuth2AuthenticatedTestCase(GeocoderTestBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = ArcGIS(
+            client_id=env['ARCGIS_CLIENT_ID'],
+            client_secret=env['ARCGIS_CLIENT_SECRET'],
             timeout=3
         )
 
