@@ -88,7 +88,7 @@ class Geoclient(Geocoder):
 
         :param string query: The query string to be geocoded using SFS syntax;
             this must be URL encoded. Documentation at:
-            https://api.cityofnewyork.us/geoclient/v1/doc#section-1.3.1 
+            https://api.cityofnewyork.us/geoclient/v1/doc#section-1.3
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
