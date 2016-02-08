@@ -131,7 +131,7 @@ class Geoclient(Geocoder):
         def parse_place(place):
             '''Get the location, lat, lon from a single json result.'''
             '''Return normalized street address in location, and the entire Geoclient response is also returned'''
-            '''should the user want to parse extended location information'''
+            '''if addressdetails is set to true should the user want to parse extended location information'''
             location = place.get('houseNumber') + ' ' + place.get('boePreferredStreetName') + ', ' + place.get('firstBoroughName') + ', NY ' + place.get('zipCode')
             latitude = place.get('latitude')
             longitude = place.get('longitude')
