@@ -86,8 +86,9 @@ class Geoclient(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The query string to be geocoded; this must
-            be URL encoded.
+        :param string query: The query string to be geocoded using SFS syntax;
+            this must be URL encoded. Documentation at:
+            https://api.cityofnewyork.us/geoclient/v1/doc#section-1.3.1 
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -98,18 +99,16 @@ class Geoclient(Geocoder):
             only, the value set during the geocoder's initialization.
 
         :param bool addressdetails: If you want in *Location.raw* to include
-            addressdetails such as BIN#, community district, etc set it to True
+            address details such as BIN#, community district, etc set it to True.
+            Data Dictionary documenting all available fields at:
+            https://api.cityofnewyork.us/geoclient/v1/doc#section-3.0
 
         """
         params = {
             'input': self.format_string % query,
+            'app_key': self.app_key,
+            'app_id': self.app_id,
         }
-
-        if self.app_key is not None:
-            params["app_key"] = self.app_key
-
-        if self.app_id is not None:
-            params["app_id"] = self.app_id
 
         url = "?".join((self.geocode_api, urlencode(params)))
 
