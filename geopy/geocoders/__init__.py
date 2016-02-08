@@ -91,6 +91,7 @@ __all__ = (
     'Yandex',
     "What3Words",
     "Photon",
+    "Geoclient",
 )
 
 
@@ -112,6 +113,7 @@ from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.photon import Photon
+from geopy.geocoders.geoclient import Geoclient
 
 
 from geopy.exc import GeocoderNotFound
@@ -137,7 +139,8 @@ SERVICE_TO_GEOCODER = {
     "what3words": What3Words,
     "yandex": Yandex,
     "ignfrance": IGNFrance,
-    "photon": Photon
+    "photon": Photon,
+    "geoclient": Geoclient,
 }
 
 
