@@ -131,12 +131,26 @@ class Geoclient(Geocoder):
             '''Get the location, lat, lon from a single json result.'''
             '''Return normalized street address in location, and the entire Geoclient response is also returned'''
             '''if addressdetails is set to true should the user want to parse extended location information'''
-            location = place.get('houseNumber') + ' ' + place.get('boePreferredStreetName') + ', ' + place.get('firstBoroughName') + ', NY ' + place.get('zipCode')
-            latitude = place.get('latitude')
-            longitude = place.get('longitude')
+            
+            request_type = place.get('request').split(' ', 1)[0]
+            
+            response_info = place['response']
+            
+            if request_type == 'address':
+                location = response_info.get('houseNumber') + ' ' + \
+                    response_info.get('boePreferredStreetName') + ', ' + \
+                    response_info.get('firstBoroughName') + ', NY ' + \
+                    response_info.get('zipCode')
+            else:
+                '''for BBL, BIN, BLOCKFACE and INTERSECTION request types, just pass through the request value'''
+                location = place.get('request')
+                
+            latitude = response_info.get('latitudeInternalLabel', 0.0)
+            longitude = response_info.get('longitudeInternalLabel', 0.0)
+            
             return Location(location, (latitude, longitude), place if addressdetails else {})
 
         if exactly_one:
-            return parse_place(places[0]['response'])
+            return parse_place(places[0])
         else:
-            return [parse_place(place['response']) for place in places]
+            return [parse_place(place) for place in places]
