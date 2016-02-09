@@ -16,8 +16,8 @@ class GeoclientTestCaseUnitTest(GeocoderTestBase):
 
 
 @unittest.skipUnless(
-    'GEOCLIENT_APP_ID' in env and 'GEOCLIENT_APP_KEY' in env,
-    "No GEOCLIENT_APP_ID AND GEOCLIENT_APP_KEY env variables set"
+    bool(env.get('GEOCLIENT_APP_ID')) and bool(env.get('GEOCLIENT_APP_KEY')),
+    "No GEOCLIENT_APP_ID and GEOCLIENT_APP_KEY env variables set"
 )
 class GeoclientTestCase(GeocoderTestBase):
 
