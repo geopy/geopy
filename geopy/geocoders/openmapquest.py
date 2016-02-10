@@ -66,6 +66,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         self.api_key = api_key or ''
         self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json" % self.scheme
+        self.reverse_api = "%s://open.mapquestapi.com/nominatim/v1/reverse.php" % self.scheme
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
@@ -96,11 +97,60 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             exactly_one
         )
 
+    def reverse(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            language=False,
+    ):  # pylint: disable=W0221
+        """
+        Returns a reverse geocoded location.
+
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+
+            .. versionadded:: 1.0.0
+
+        """
+        try:
+            lat, lon = [
+                x.strip() for x in
+                self._coerce_point_to_string(query).split(',')
+            ]  # doh
+        except ValueError:
+            raise ValueError("Must be a coordinate pair or Point")
+        params = {
+            'key': self.api_key,
+            'lat': lat,
+            'lon': lon,
+            'format': 'json',
+        }
+        url = "?".join((self.reverse_api, urlencode(params)))
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout), exactly_one
+        )
+
     @classmethod
     def _parse_json(cls, resources, exactly_one=True):
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
+        if resources is None:
+            return None
+        if not isinstance(resources, list):
+            resources = [resources]
         if not len(resources): # pragma: no cover
             return None
         if exactly_one:
@@ -113,7 +163,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         """
         Return location and coordinates tuple from dict.
         """
-        location = resource['display_name']
+        location = resource['display_name'] or None
 
         latitude = resource['lat'] or None
         longitude = resource['lon'] or None
