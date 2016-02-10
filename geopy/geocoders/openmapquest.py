@@ -163,10 +163,10 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         """
         Return location and coordinates tuple from dict.
         """
-        location = resource['display_name'] or None
+        location = resource['display_name'] if 'display_name' in resource else None
 
-        latitude = resource['lat'] or None
-        longitude = resource['lon'] or None
+        latitude = resource['lat'] if 'lat' in resource else None
+        longitude = resource['lon'] if 'lon' in resource else None
         if latitude and longitude:
             latitude = float(latitude)
             longitude = float(longitude)
