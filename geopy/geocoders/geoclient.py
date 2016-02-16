@@ -12,6 +12,7 @@ from geopy.exc import ConfigurationError
 
 __all__ = ("Geoclient", )
 
+DEFAULT_DOMAIN = 'api.cityofnewyork.us/geoclient/v1'
 
 class Geoclient(Geocoder):
     """
@@ -28,7 +29,7 @@ class Geoclient(Geocoder):
             self,
             app_id=None,
             app_key=None,
-            domain='api.cityofnewyork.us/geoclient/v1',
+            domain=DEFAULT_DOMAIN,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
@@ -37,7 +38,7 @@ class Geoclient(Geocoder):
         Initialize Geoclient geocoder. Please note that 'scheme' parameter is
         not supported: at present state, all Geoclient traffic use https.
 
-        :param string appd_id: The application ID.
+        :param string app_id: The application ID.
 
         :param string app_key: The application key. 
 
@@ -56,22 +57,22 @@ class Geoclient(Geocoder):
 
         self.app_id = app_id
         self.app_key = app_key
-        
-        if not app_id:
-            raise ConfigurationError(
-                'No app_id given, required for api access.  If you do not '
-                'have a Geoclient app_id, sign up here: '
-                'https://developer.cityofnewyork.us/api/geoclient-api'
-                )
-        
-        if not app_key:
-            raise ConfigurationError(
-                'No app_key given, required for api access.  If you do not '
-                'have a Geoclient app_key, sign up here: '
-                'https://developer.cityofnewyork.us/api/geoclient-api'
-                )
-        
         self.domain = domain.strip('/')
+        
+        if domain == DEFAULT_DOMAIN:
+            if not app_id:
+                raise ConfigurationError(
+                    'No app_id given, required for api access.  If you do not '
+                    'have a Geoclient app_id, sign up here: '
+                    'https://developer.cityofnewyork.us/api/geoclient-api'
+                    )
+            
+            if not app_key:
+                raise ConfigurationError(
+                    'No app_key given, required for api access.  If you do not '
+                    'have a Geoclient app_key, sign up here: '
+                    'https://developer.cityofnewyork.us/api/geoclient-api'
+                    )
         
         '''use SFS (Single-field search) endpoint'''
         self.geocode_api = 'https://%s/search.json' % (self.domain)
@@ -86,8 +87,8 @@ class Geoclient(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The query string to be geocoded using SFS syntax;
-            this must be URL encoded. Documentation at:
+        :param string query: The query string to be geocoded using SFS syntax.  
+            Documentation at:
             https://api.cityofnewyork.us/geoclient/v1/doc#section-1.3
 
         :param bool exactly_one: Return one result or a list of results, if
@@ -137,16 +138,20 @@ class Geoclient(Geocoder):
             response_info = place['response']
             
             if request_type == 'address':
-                location = response_info.get('houseNumber') + ' ' + \
-                    response_info.get('boePreferredStreetName') + ', ' + \
-                    response_info.get('firstBoroughName') + ', NY ' + \
-                    response_info.get('zipCode')
+                location = response_info.get('houseNumber', '') + ' ' + \
+                    response_info.get('boePreferredStreetName', '') + ', ' + \
+                    response_info.get('firstBoroughName', '') + ', NY ' + \
+                    response_info.get('zipCode', '')
             else:
                 '''for BBL, BIN, BLOCKFACE and INTERSECTION request types, just pass through the request value'''
-                location = place.get('request')
+                location = place.get('request', '')
                 
-            latitude = response_info.get('latitudeInternalLabel', 0.0)
-            longitude = response_info.get('longitudeInternalLabel', 0.0)
+            latitude = response_info.get('latitudeInternalLabel', None)
+            longitude = response_info.get('longitudeInternalLabel', None)
+            
+            if latitude and longitude:
+                latitude = float(latitude)
+                longitude = float(longitude)
             
             return Location(location, (latitude, longitude), place if addressdetails else {})
 
