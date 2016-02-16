@@ -5,7 +5,7 @@
 from geopy.compat import urlencode
 from geopy.location import Location
 from geopy.util import logger
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 
 from geopy.exc import ConfigurationError
 
@@ -29,6 +29,7 @@ class Geoclient(Geocoder):
             self,
             app_id=None,
             app_key=None,
+            scheme=DEFAULT_SCHEME,
             domain=DEFAULT_DOMAIN,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -75,7 +76,7 @@ class Geoclient(Geocoder):
                     )
         
         '''use SFS (Single-field search) endpoint'''
-        self.geocode_api = 'https://%s/search.json' % (self.domain)
+        self.geocode_api = '%s://%s/search.json' % (DEFAULT_SCHEME, self.domain)
 
     def geocode(
             self,
