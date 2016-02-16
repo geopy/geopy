@@ -35,6 +35,6 @@ class GeoclientTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         self.geocode_run(
             {"query": "85 Fifth Ave, Manhattan, NY"},
-            {"latitude": 40.737415391891616, "longitude": -73.9925809709183},  
+            {"latitude": 40.73727812604426, "longitude": -73.99215518677124}
         )
 
