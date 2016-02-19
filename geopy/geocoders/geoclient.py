@@ -147,8 +147,8 @@ class Geoclient(Geocoder):
                 '''for BBL, BIN, BLOCKFACE and INTERSECTION request types, just pass through the request value'''
                 location = place.get('request', '')
                 
-            latitude = response_info.get('latitudeInternalLabel', None)
-            longitude = response_info.get('longitudeInternalLabel', None)
+            latitude = response_info.get('latitude', None)
+            longitude = response_info.get('longitude', None)
             
             if latitude and longitude:
                 latitude = float(latitude)
