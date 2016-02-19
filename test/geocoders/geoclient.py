@@ -24,8 +24,8 @@ class GeoclientTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Geoclient(
-            app_id=env.get['GEOCLIENT_APP_ID'],
-            app_key=env.get['GEOCLIENT_APP_KEY'],
+            app_id=env.get('GEOCLIENT_APP_ID'),
+            app_key=env.get('GEOCLIENT_APP_KEY'),
         )
         cls.delta = 0.04
 
