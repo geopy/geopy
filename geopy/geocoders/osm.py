@@ -43,7 +43,10 @@ class Nominatim(Geocoder):
             proxies=None,
             domain='nominatim.openstreetmap.org',
             scheme=DEFAULT_SCHEME,
-            user_agent=None
+            user_agent=None,
+            api_key = None,
+            api_forward = 'search',
+            api_reverse = 'reverse'
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -73,6 +76,24 @@ class Nominatim(Geocoder):
             verified.
 
             .. versionadded:: 1.8.2
+
+        :param string api_key: API key used by third party services such as
+            PickPoint.
+
+            .. versionadded:: 1.11.0
+
+        :param string api_forward: API string keyword used in the URL to
+            geocode a location query.
+            The default is 'search' which is used by Nominatim.
+            E.g. 'forward' can be used with PickPoint.
+
+            .. versionadded:: 1.11.0
+
+        :param string api_reverse: API string keyword used in the URL to
+            reverse geocode a location query.
+            The default is 'reverse' which is used by Nominatim.
+
+            .. versionadded:: 1.11.0
         """
         super(Nominatim, self).__init__(
             format_string, scheme, timeout, proxies, user_agent=user_agent
@@ -81,9 +102,12 @@ class Nominatim(Geocoder):
         self.format_string = format_string
         self.view_box = view_box
         self.domain = domain.strip('/')
+        self.api_key = api_key
 
-        self.api = "%s://%s/search" % (self.scheme, self.domain)
-        self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
+        self.api = "%s://%s/%s" % (self.scheme, self.domain, api_forward)
+        self.reverse_api = "%s://%s/%s" % (self.scheme,
+                                           self.domain,
+                                           api_reverse)
 
     def geocode(
             self,
@@ -165,6 +189,9 @@ class Nominatim(Geocoder):
         if self.country_bias:
             params['countrycodes'] = self.country_bias
 
+        if self.api_key:
+            params['key'] = self.api_key
+
         if addressdetails:
             params['addressdetails'] = 1
 
@@ -240,8 +267,13 @@ class Nominatim(Geocoder):
             'lon': lon,
             'format': 'json',
         }
+
+        if self.api_key:
+            params['key'] = self.api_key
+
         if language:
             params['accept-language'] = language
+
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -272,3 +304,4 @@ class Nominatim(Geocoder):
             return self.parse_code(places[0])
         else:
             return [self.parse_code(place) for place in places]
+
