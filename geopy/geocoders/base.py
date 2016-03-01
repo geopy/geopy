@@ -140,7 +140,22 @@ class Geocoder(object): # pylint: disable=R0921
             req = url
 
         try:
-            page = requester(req, timeout=(timeout or self.timeout), **kwargs)
+            import urllib
+            import ssl
+
+            '''
+            This restores the same behavior as beforde.
+            ref tps://www.python.org/dev/peps/pep-0476/#opting-out
+            '''
+            context = ssl._create_unverified_context()
+            page = urllib.urlopen(req, context=context)
+            del urllib, ssl
+        except Exception as e:
+            page = None
+
+        try:
+            if page is None:
+                page = requester(req, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
                 str(error) if not py3k
