@@ -32,6 +32,8 @@ except IOError:
         'IGNFRANCE_USERNAME',
         'IGNFRANCE_PASSWORD',
         'IGNFRANCE_REFERER',
+        'GEOCLIENT_APP_ID',
+        'GEOCLIENT_APP_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
 

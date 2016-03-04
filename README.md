@@ -14,13 +14,14 @@ geopy includes geocoder classes for the [OpenStreetMap Nominatim][osm],
 [Yandex][yandex], [IGN France][ignfrance], [GeoNames][geonames],
 [NaviData][navidata], [OpenMapQuest][openmapquest], [What3Words][what3words],
 [OpenCage][opencage], [SmartyStreets][smartystreets], [geocoder.us][dot_us],
-and [GeocodeFarm][geocodefarm] geocoder services.
+[GeocodeFarm][geocodefarm], and NYC's [Geoclient][geoclient] geocoder services.
 The various geocoder classes are located in [geopy.geocoders][geocoders_src].
 
 [arcgis]: http://resources.arcgis.com/en/help/arcgis-rest-api/
 [baidu]: http://developer.baidu.com/map/webservice-geocoding.htm
 [bing]: http://www.microsoft.com/maps/developers/web.aspx
 [dot_us]: http://geocoder.us/
+[geoclient]: https://developer.cityofnewyork.us/api/geoclient-api
 [geocodefarm]: https://www.geocodefarm.com/
 [geonames]: http://www.geonames.org/
 [googlev3]: https://developers.google.com/maps/documentation/geocoding/
