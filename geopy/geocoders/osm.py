@@ -40,6 +40,7 @@ class Nominatim(Geocoder):
             self,
             format_string=None,
             view_box=None,
+            bounded=False,
             country_bias=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -61,6 +62,9 @@ class Nominatim(Geocoder):
             ``["180", "22", "-180", "-22"]``
 
         :param str country_bias: Bias results to this country.
+
+        :param bool bounded: Restrict the results to only items contained
+            within the bounding view_box.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -101,6 +105,7 @@ class Nominatim(Geocoder):
         )
         self.country_bias = country_bias
         self.view_box = view_box
+        self.bounded = bounded
         self.domain = domain.strip('/')
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
@@ -213,6 +218,9 @@ class Nominatim(Geocoder):
                 params['viewbox'] = ','.join(str(p) for p in chain(p1[1::-1], p2[1::-1]))
             else:
                 params['viewbox'] = ','.join(str(coord) for coord in self.view_box)
+
+        if self.bounded:
+            params['bounded'] = 1
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
