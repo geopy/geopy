@@ -1,3 +1,5 @@
+# coding: utf8
+
 from mock import patch
 from geopy.compat import u
 from geopy.point import Point
