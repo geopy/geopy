@@ -91,6 +91,7 @@ __all__ = (
     'Yandex',
     "What3Words",
     "Photon",
+    "Mapzen",
 )
 
 
@@ -112,6 +113,7 @@ from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.photon import Photon
+from geopy.geocoders.mapzen import Mapzen
 
 
 from geopy.exc import GeocoderNotFound
