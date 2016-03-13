@@ -31,7 +31,7 @@ class MapzenTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         Mapzen.geocode unicode
         """
         self.geocode_run(
-            {"query": u(u'san josé')},
+            {"query": u(u'san josé california'.encode('utf8'))},
             {"latitude": 37.33939, "longitude": -121.89496},
         )
 
