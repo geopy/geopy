@@ -131,13 +131,20 @@ class Geocoder(object): # pylint: disable=R0921
         """
         For a generated query URL, get the results.
         """
-        requester = requester or self.urlopen
 
-        if not requester:
-            req = Request(url=url, headers=self.headers)
-        else:
-            # work around for placefinder's use of requests
+        if requester:
+            # Don't construct an urllib's Request for a custom requester
             req = url
+        else:
+            if isinstance(url, Request):
+                # copy Request
+                headers = self.headers.copy()
+                headers.update(url.header_items())
+                req = Request(url=url.get_full_url(), headers=headers)
+            else:
+                req = Request(url=url, headers=self.headers)
+
+        requester = requester or self.urlopen
 
         try:
             page = requester(req, timeout=(timeout or self.timeout), **kwargs)
