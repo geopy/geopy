@@ -196,7 +196,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
-        if not len(resources):  # pragma: no cover
+        # Prevent error when 'features' is empty: {u'type': u'FeatureCollection', u'features': []}
+        if not len(resources) or not resources['features']:  # pragma: no cover
             return None
         if exactly_one:
             return cls.parse_resource(resources['features'][0])
