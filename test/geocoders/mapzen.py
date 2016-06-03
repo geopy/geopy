@@ -1,4 +1,5 @@
 # coding: utf8
+from __future__ import unicode_literals
 
 from mock import patch
 from geopy.compat import u
