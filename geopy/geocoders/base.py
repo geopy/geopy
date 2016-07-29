@@ -144,8 +144,11 @@ class Geocoder(object): # pylint: disable=R0921
             import ssl
 
             '''
+            Certificate verification in Python standard library HTTP clients
+            https://access.redhat.com/articles/2039753
+            
             This restores the same behavior as beforde.
-            ref tps://www.python.org/dev/peps/pep-0476/#opting-out
+            ref https://www.python.org/dev/peps/pep-0476/#opting-out
             '''
             context = ssl._create_unverified_context()
             page = urllib.urlopen(req, context=context)
