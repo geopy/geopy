@@ -11,7 +11,7 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = Photon(timeout=20)
+        cls.geocoder = Photon(timeout=10)
         cls.known_country_it = "Francia"
         cls.known_country_fr = "France"
 
@@ -54,7 +54,7 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
-            {"adress": 'Villeurbanne, 69100, Auvergne-Rhône-Alpes, France'}
+            {"latitude": 45.7733105, "longitude": 4.8869339}
         )
 
     def test_geocode_language_parameter(self):
