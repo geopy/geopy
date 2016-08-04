@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+import unittest
 
 from geopy.compat import u
 from geopy.point import Point
@@ -9,17 +11,23 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = Photon()
+        cls.geocoder = Photon(timeout=10)
         cls.known_country_it = "Francia"
         cls.known_country_fr = "France"
+
+    def test_user_agent_custom(self):
+        geocoder = Photon(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_geocode(self):
         """
         Photon.geocode
         """
         self.geocode_run(
-            {"query": "14 rue pelisson villeurbanne"},
-            {"latitude": 45.7733963, "longitude": 4.88612369},
+            {"query": "14 rue de la Soie, Villeurbanne"},
+            {"latitude": 45.7621004, "longitude": 4.916648},
         )
 
     def test_unicode_name(self):
@@ -28,7 +36,7 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         self.geocode_run(
             {"query": u("\u6545\u5bab")},
-            {"latitude": 39.916, "longitude": 116.390},
+            {"latitude": 39.917252950000005, "longitude": 116.39077025499873}
         )
 
     def test_reverse_string(self):

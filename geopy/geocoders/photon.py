@@ -29,7 +29,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            domain='photon.komoot.de'
+            domain='photon.komoot.de',
+            user_agent=None,
     ):   # pylint: disable=R0913
         """
         Initialize a Photon/Komoot geocoder which aims to let you "search as
@@ -58,7 +59,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             can change it to a domain of your own.
         """
         super(Photon, self).__init__(
-            format_string, scheme, timeout, proxies
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.domain = domain.strip('/')
         self.api = "%s://%s/api" % (self.scheme, self.domain)
@@ -196,7 +197,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
-        if not len(resources):  # pragma: no cover
+        if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
             return cls.parse_resource(resources['features'][0])
@@ -212,8 +213,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',
                          'state', 'country']
-        name = [resource.get(k) for k
-                in name_elements if resource.get(k)]
+        name = [resource['properties'].get(k) for k
+                in name_elements if resource['properties'].get(k)]
         location = ', '.join(name)
 
         latitude = resource['geometry']['coordinates'][1] or None

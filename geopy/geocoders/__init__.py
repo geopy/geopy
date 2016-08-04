@@ -84,7 +84,6 @@ __all__ = (
     "IGNFrance",
     "OpenCage",
     "OpenMapQuest",
-    "NaviData",
     "Nominatim",
     "YahooPlaceFinder",
     "LiveAddress",
@@ -105,7 +104,6 @@ from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
-from geopy.geocoders.navidata import NaviData
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
@@ -133,7 +131,6 @@ SERVICE_TO_GEOCODER = {
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "liveaddress": LiveAddress,
-    "navidata": NaviData,
     "nominatim": Nominatim,
     "geocodefarm": GeocodeFarm,
     "what3words": What3Words,
