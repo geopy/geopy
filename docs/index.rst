@@ -48,9 +48,6 @@ Geocoders
 .. autoclass:: geopy.geocoders.Mapzen
     :members: __init__, geocode, reverse
 
-.. autoclass:: geopy.geocoders.NaviData
-    :members: __init__, geocode, reverse
-
 .. autoclass:: geopy.geocoders.Nominatim
     :members: __init__, geocode, reverse
 
@@ -61,7 +58,7 @@ Geocoders
     :members: __init__, geocode
 
 .. autoclass:: geopy.geocoders.Photon
-    :members: __init__, geocode
+    :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.What3Words
     :members: __init__, geocode, reverse
