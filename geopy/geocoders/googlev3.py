@@ -119,7 +119,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
         """
         params['client'] = self.client_id
-        params['channel'] = self.channel
+
+        if self.channel:
+            params['channel'] = self.channel
+
         path = "?".join(('/maps/api/geocode/json', urlencode(params)))
         signature = hmac.new(
             base64.urlsafe_b64decode(self.secret_key),
