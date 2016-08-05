@@ -1,6 +1,7 @@
 import base64
 from datetime import datetime
 from pytz import timezone
+import urlparse
 
 from geopy import exc
 from geopy.compat import u
@@ -70,6 +71,23 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
                 "signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
             )
         )
+
+    def test_get_signed_url_with_channel(self):
+        """
+        GoogleV3._get_signed_url
+        """
+        geocoder = GoogleV3(
+            client_id='my_client_id',
+            secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8')),
+            channel='my_channel'
+        )
+
+        signed_url = geocoder._get_signed_url({'address': '1 5th Ave New York, NY'})
+        params = urlparse.parse_qs(urlparse.urlparse(signed_url).query)
+
+        self.assertTrue('channel' in params)
+        self.assertTrue('signature' in params)
+        self.assertTrue('client' in params)
 
     def test_format_components_param(self):
         """
