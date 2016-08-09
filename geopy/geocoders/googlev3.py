@@ -46,6 +46,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
+            channel='',
         ):  # pylint: disable=R0913
         """
         Initialize a customized Google geocoder.
@@ -73,6 +74,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param string secret_key: If using premier, the account secret key.
 
+        :param string channel: If using premier, the channel identifier.
+
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
@@ -97,10 +100,12 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             self.premier = True
             self.client_id = client_id
             self.secret_key = secret_key
+            self.channel = channel
         else:
             self.premier = False
             self.client_id = None
             self.secret_key = None
+            self.channel = None
 
         self.api = '%s://%s/maps/api/geocode/json' % (self.scheme, self.domain)
         self.tz_api = '%s://%s/maps/api/timezone/json' % (
@@ -114,6 +119,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             https://developers.google.com/maps/documentation/business/webservices/auth#digital_signatures
         """
         params['client'] = self.client_id
+
+        if self.channel:
+            params['channel'] = self.channel
+
         path = "?".join(('/maps/api/geocode/json', urlencode(params)))
         signature = hmac.new(
             base64.urlsafe_b64decode(self.secret_key),
