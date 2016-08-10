@@ -96,16 +96,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         self.scheme = scheme
         self.doc = {}
 
-        if client_id and secret_key:
-            self.premier = True
-            self.client_id = client_id
-            self.secret_key = secret_key
-            self.channel = channel
-        else:
-            self.premier = False
-            self.client_id = None
-            self.secret_key = None
-            self.channel = None
+        self.premier = bool(client_id and secret_key)
+        self.client_id = client_id
+        self.secret_key = secret_key
+        self.channel = channel
 
         self.api = '%s://%s/maps/api/geocode/json' % (self.scheme, self.domain)
         self.tz_api = '%s://%s/maps/api/timezone/json' % (
