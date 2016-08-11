@@ -26,7 +26,8 @@ else: # pragma: no cover
         return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')
 
 if py3k: # pragma: no cover
-    from urllib.parse import urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
+    from urllib.parse import (urlencode, quote, # pylint: disable=W0611,F0401,W0611,E0611
+                              urlparse, parse_qs)
     from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611
                                 build_opener, ProxyHandler,
                                 URLError, install_opener,
@@ -56,6 +57,7 @@ else: # pragma: no cover
                          build_opener, install_opener,
                          HTTPPasswordMgrWithDefaultRealm,
                          HTTPBasicAuthHandler)
+    from urlparse import urlparse, parse_qs
 
     def force_str(str_or_unicode):
         """
