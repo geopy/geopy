@@ -25,7 +25,7 @@ setup(
     download_url=(
         'https://github.com/geopy/geopy/archive/%s.tar.gz' % version
     ),
-    packages=find_packages(exclude=["test"]),
+    packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRES,
     extras_require={
