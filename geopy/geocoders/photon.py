@@ -71,6 +71,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             timeout=None,
             location_bias=None,
             language=False,
+            limit=None,
             osm_tag=None
         ):  # pylint: disable=W0221
         """
@@ -92,6 +93,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
+        :param int limit: Limit the number of returned results, defaults to no limit.
+
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
             are requiered as ['key:!val', '!key', ':!value']
@@ -102,6 +105,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         }
         if exactly_one:
             params['limit'] = 1
+        if limit:
+            params['limit'] = int(limit)
         if language:
             params['lang'] = language
         if location_bias:
