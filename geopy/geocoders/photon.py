@@ -71,6 +71,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             timeout=None,
             location_bias=None,
             language=False,
+            limit=None,
             osm_tag=None
         ):  # pylint: disable=W0221
         """
@@ -92,6 +93,9 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
+        :param int limit: Limit the number of returned results, defaults to no
+            limit.
+
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
             are requiered as ['key:!val', '!key', ':!value']
@@ -102,6 +106,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         }
         if exactly_one:
             params['limit'] = 1
+        if limit:
+            params['limit'] = int(limit)
         if language:
             params['lang'] = language
         if location_bias:
@@ -116,17 +122,15 @@ class Photon(Geocoder):  # pylint: disable=W0223
                                   " coordinate pair or Point"))
         if osm_tag:
             if isinstance(osm_tag, string_compare):
-                params['osm_tag'] = osm_tag
+                params['osm_tag'] = [osm_tag]
             else:
-                try:
-                    params['osm_tag'] = '&osm_tag='.join(osm_tag)
-                except ValueError:
+                if not (isinstance(osm_tag, list) or isinstance(osm_tag, set)):
                     raise ValueError(
                         "osm_tag must be a string expression or "
                         "a set/list of string expressions"
                     )
-        url = "?".join((self.api, urlencode(params)))
-
+                params['osm_tag'] = osm_tag
+        url = "?".join((self.api, urlencode(params, doseq=True)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),

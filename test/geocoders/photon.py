@@ -22,6 +22,15 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
             {"latitude": 45.7733963, "longitude": 4.88612369},
         )
 
+    def test_osm_tag(self):
+        """
+        Photon.geocode osm_tag
+        """
+        self.geocode_run(
+            {"query": "Boulevard de Montreal"},
+            {"osm_tag": ["place", "highway"]}
+        )
+
     def test_unicode_name(self):
         """
         Photon.geocode unicode
