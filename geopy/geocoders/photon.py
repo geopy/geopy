@@ -93,7 +93,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
-        :param int limit: Limit the number of returned results, defaults to no limit.
+        :param int limit: Limit the number of returned results, defaults to no
+            limit.
 
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
@@ -121,16 +122,18 @@ class Photon(Geocoder):  # pylint: disable=W0223
                                   " coordinate pair or Point"))
         if osm_tag:
             if isinstance(osm_tag, string_compare):
-                params['osm_tag'] = osm_tag
+                encoded_osm_tag = urlencode(('osm_tag', osm_tag))
             else:
                 try:
-                    params['osm_tag'] = '&osm_tag='.join(osm_tag)
+                    encoded_osm_tag = urlencode(
+                        [('osm_tag', tag) for tag in osm_tag])
                 except ValueError:
                     raise ValueError(
                         "osm_tag must be a string expression or "
                         "a set/list of string expressions"
                     )
-        url = "?".join((self.api, urlencode(params)))
+        url = "?".join(
+            (self.api, "&".join((urlencode(params), encoded_osm_tag))))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
