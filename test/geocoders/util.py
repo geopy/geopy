@@ -99,7 +99,8 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             raw=EMPTY,
             latitude=EMPTY,
             longitude=EMPTY,
-            address=EMPTY
+            address=EMPTY,
+            osm_tag=EMPTY,
         ):
         """
         Verifies that a a result matches the kwargs given.
@@ -120,3 +121,9 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             self.assertEqual(
                 item.address, address
             )
+        if osm_tag != EMPTY:
+            raw_osm_key = item.raw['properties']['osm_key']
+            if isinstance(osm_tag, basestring):
+                self.assertEqual(raw_osm_key, osm_tag)
+            else:
+                self.assertIn(raw_osm_key, osm_tag)
