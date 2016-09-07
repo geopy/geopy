@@ -122,19 +122,15 @@ class Photon(Geocoder):  # pylint: disable=W0223
                                   " coordinate pair or Point"))
         if osm_tag:
             if isinstance(osm_tag, string_compare):
-                encoded_osm_tag = urlencode(('osm_tag', osm_tag))
+                params['osm_tag'] = [osm_tag]
             else:
-                try:
-                    encoded_osm_tag = urlencode(
-                        [('osm_tag', tag) for tag in osm_tag])
-                except ValueError:
+                if not (isinstance(osm_tag, list) or isinstance(osm_tag, set)):
                     raise ValueError(
                         "osm_tag must be a string expression or "
                         "a set/list of string expressions"
                     )
-        url = "?".join(
-            (self.api, "&".join((urlencode(params), encoded_osm_tag))))
-
+                params['osm_tag'] = osm_tag
+        url = "?".join((self.api, urlencode(params, doseq=True)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
