@@ -1,30 +1,14 @@
 """
 :class:`.GooglePlaces` is the Google Places API.
 """
-
-import base64
-import hashlib
-import hmac
 from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
-    GeocoderQueryError,
     GeocoderQuotaExceeded,
-    ConfigurationError,
-    GeocoderParseError,
     GeocoderQueryError,
 )
 from geopy.location import Location
 from geopy.util import logger
-
-try:
-    from pytz import timezone, UnknownTimeZoneError
-    from calendar import timegm
-    from datetime import datetime
-    from numbers import Number
-    pytz_available = True
-except ImportError:
-    pytz_available = False
 
 
 __all__ = ("GooglePlaces", )
@@ -43,8 +27,9 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            user_agent=None,
-        ):  # pylint: disable=R0913
+            user_agent=None
+    ):  # pylint: disable=R0913
+
         """
         Initialize a customized Google geocoder.
 
@@ -77,10 +62,8 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         self.scheme = scheme
         self.doc = {}
 
-
         self.autocomplete_api = '%s://%s/maps/api/place/autocomplete/json' % (self.scheme, self.domain)
         self.details_api = '%s://%s/maps/api/place/details/json' % (self.scheme, self.domain)
-
 
     @staticmethod
     def _format_components_param(components):
@@ -90,7 +73,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         return "|".join(
             (":".join(item)
              for item in components.items()
-            )
+             )
         )
 
     def geocode(
@@ -98,13 +81,13 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             query,
             exactly_one=False,
             timeout=None,
-            offset = None,
-            location = None,
-            radius = None,
-            language = None,
-            types = None,
-            components = None,
-        ):  # pylint: disable=W0221,R0913
+            offset=None,
+            location=None,
+            radius=None,
+            language=None,
+            types=None,
+            components=None,
+    ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
 
@@ -169,11 +152,11 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             autocomplete_params['components'] = self._format_components_param(components)
 
         autocomplete_url = "?".join((self.autocomplete_api, urlencode(autocomplete_params)))
+        print "AUTOCOMPLETE URL: {}".format(autocomplete_url)
         logger.debug("%s.google_places_autocomplete: %s", self.__class__.__name__, autocomplete_url)
         autocomplete_predictions = self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
 
-        return [self.parse_predictions(place,detail_params) for place in autocomplete_predictions]
-
+        return [self.parse_predictions(place, detail_params) for place in autocomplete_predictions]
 
     def parse_autocomplete(self, autocomplete_page):
         predictions = autocomplete_page.get('predictions', [])
@@ -182,7 +165,6 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             return None
         return predictions
 
-
     def parse_details(self, details_page):
         status = details_page.get('status')
         if status != "OK":
@@ -190,18 +172,16 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             return None
         return details_page.get('result')
 
-
     # uses the seconds api call to "details" to fetch lat lon info on a place to build the Location object
     def parse_predictions(self, place, detail_params):
         detail_params['placeid'] = place.get('place_id')
         details_url = "?".join((self.details_api, urlencode(detail_params)))
         logger.debug("%s.google_places_details: %s", self.__class__.__name__, details_url)
-        detail_result =self.parse_details(self._call_geocoder(details_url))
+        detail_result = self.parse_details(self._call_geocoder(details_url))
         formatted_address = detail_result['formatted_address']
         latitude = detail_result['geometry']['location']['lat']
         longitude = detail_result['geometry']['location']['lng']
         return Location(formatted_address, (latitude, longitude), detail_result)
-
 
     @staticmethod
     def _check_status(status):
@@ -225,4 +205,3 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             raise GeocoderQueryError('Probably missing address or latlng.')
         else:
             raise GeocoderQueryError('Unknown error.')
-
