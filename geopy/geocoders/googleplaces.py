@@ -152,17 +152,14 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             autocomplete_params['components'] = self._format_components_param(components)
 
         autocomplete_url = "?".join((self.autocomplete_api, urlencode(autocomplete_params)))
-        print "AUTOCOMPLETE URL: {}".format(autocomplete_url)
         logger.debug("%s.google_places_autocomplete: %s", self.__class__.__name__, autocomplete_url)
         autocomplete_predictions = self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
-
         return [self.parse_predictions(place, detail_params) for place in autocomplete_predictions]
 
     def parse_autocomplete(self, autocomplete_page):
         predictions = autocomplete_page.get('predictions', [])
         if not len(predictions):
             self._check_status(autocomplete_page.get('status'))
-            return None
         return predictions
 
     def parse_details(self, details_page):
