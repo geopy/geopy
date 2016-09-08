@@ -33,6 +33,9 @@ Geocoders
 .. autoclass:: geopy.geocoders.GeoNames
     :members: __init__, geocode
 
+.. autoclass:: geopy.geocoders.GooglePlaces
+    :members: __init__, geocode
+
 .. autoclass:: geopy.geocoders.GoogleV3
     :members: __init__, geocode, reverse, timezone
 
