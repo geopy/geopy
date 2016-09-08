@@ -19,4 +19,4 @@ from .ignfrance import IGNFranceTestCase
 from .navidata import NaviDataTestCase
 from .photon import PhotonTestCase
 from .mapzen import MapzenTestCase
-
+from .googleplaces import GooglePlacesTestCase
