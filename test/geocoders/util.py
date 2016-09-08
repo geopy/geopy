@@ -103,7 +103,7 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             osm_tag=EMPTY,
         ):
         """
-        Verifies that a a result matches the kwargs given.
+        Verifies that a result matches the kwargs given.
         """
         item = result[0] if isinstance(result, (tuple, list)) else result
 
