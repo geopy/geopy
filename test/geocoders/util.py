@@ -3,6 +3,7 @@ import os
 import json
 import unittest
 from collections import defaultdict
+from geopy.compat import string_compare, py3k
 
 from geopy import exc
 
@@ -123,7 +124,7 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             )
         if osm_tag != EMPTY:
             raw_osm_key = item.raw['properties']['osm_key']
-            if isinstance(osm_tag, basestring):
+            if isinstance(osm_tag, string_compare):
                 self.assertEqual(raw_osm_key, osm_tag)
             else:
                 self.assertIn(raw_osm_key, osm_tag)
