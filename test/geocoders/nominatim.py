@@ -80,15 +80,26 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         Nominatim.geocode using `language`
         """
+        input = "Mohrenstrasse Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            self.known_state_en,
+            input,
             addressdetails=True,
             language="de",
         )
         self.assertEqual(
-            result_geocode.raw['address']['state'],
-            self.known_state_de
+            result_geocode.raw['address']['country'],
+            "Deutschland"
+        )
+        result_geocode = self._make_request(
+            self.geocoder.geocode,
+            input,
+            addressdetails=True,
+            language="en",
+        )
+        self.assertEqual(
+            result_geocode.raw['address']['country'],
+            "Germany"
         )
 
     def test_reverse_language_parameter(self):
@@ -97,38 +108,39 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         result_reverse_de = self._make_request(
             self.geocoder.reverse,
-            "37.78250, 20.89506",
+             "52.51693903613385, 13.3859332733135",
             exactly_one=True,
             language="de",
         )
         self.assertEqual(
-            result_reverse_de.raw['address']['state'],
-            self.known_state_de
+            result_reverse_de.raw['address']['country'],
+            "Deutschland"
         )
 
         result_reverse_en = self._make_request(
             self.geocoder.reverse,
-            "37.78250, 20.89506",
+            "52.51693903613385, 13.3859332733135",
             exactly_one=True,
             language="en"
         )
         self.assertTrue(
             # have had a change in the exact authority name
-            "Ionian Islands" in result_reverse_en.raw['address']['state']
+            "Germany" in result_reverse_en.raw['address']['country']
         )
 
     def test_geocode_geometry_wkt(self):
         """
         Nominatim.geocode with full geometry (response in WKT format)
         """
+        input = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            self.known_state_en,
+            input,
             geometry='WKT',
 
         )
         self.assertEqual(
-            result_geocode.raw['geotext'].startswith('MULTIPOLYGON((('),
+            result_geocode.raw['geotext'].startswith('POLYGON(('),
             True
         )
 
@@ -136,14 +148,15 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         Nominatim.geocode with full geometry (response in svg format)
         """
+        input = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            self.known_state_en,
+            input,
             geometry='svg',
 
         )
         self.assertEqual(
-            result_geocode.raw['svg'].startswith('M 19.'),
+            result_geocode.raw['svg'].startswith('M 13.'),
             True
         )
 
@@ -151,14 +164,15 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         Nominatim.geocode with full geometry (response in kml format)
         """
+        input = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            self.known_state_en,
+            input,
             geometry='kml',
 
         )
         self.assertEqual(
-            result_geocode.raw['geokml'].startswith('<MultiGeometry>'),
+            result_geocode.raw['geokml'].startswith('<Polygon>'),
             True
         )
 
@@ -166,13 +180,14 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         Nominatim.geocode with full geometry (response in geojson format)
         """
+        input = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            self.known_state_en,
+            input,
             geometry='geojson',
 
         )
         self.assertEqual(
             result_geocode.raw['geojson'].get('type'),
-            'MultiPolygon'
+            'Polygon'
         )
