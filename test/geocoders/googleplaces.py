@@ -9,7 +9,7 @@ class GooglePlacesTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = GooglePlaces(api_key=env['GOOGLEMAPS_KEY'])
+        cls.geocoder = GooglePlaces(api_key=env['GOOGLEMAPS_KEY'], timeout=50)
         cls.known_country_it = "Francia"
         cls.known_country_fr = "France"
 
