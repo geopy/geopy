@@ -33,6 +33,7 @@ except IOError:
         'IGNFRANCE_USERNAME',
         'IGNFRANCE_PASSWORD',
         'IGNFRANCE_REFERER',
+        'GOOGLEMAPS_KEY'
     )
     env = {key: os.environ.get(key, None) for key in keys}
 

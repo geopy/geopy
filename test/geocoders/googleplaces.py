@@ -2,14 +2,14 @@
 from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import GooglePlaces
-from test.geocoders.util import GeocoderTestBase
+from test.geocoders.util import GeocoderTestBase, env
 
 
 class GooglePlacesTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = GooglePlaces()
+        cls.geocoder = GooglePlaces(api_key=env['GOOGLEMAPS_KEY'])
         cls.known_country_it = "Francia"
         cls.known_country_fr = "France"
 
@@ -28,20 +28,24 @@ class GooglePlacesTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         self.geocode_run(
             {"query": u("\u6545\u5bab")},
-            {"latitude": 39.916, "longitude": 116.390},
+            {"latitude": 25.1023554, "longitude": 121.5484925},
         )
 
     def test_geocode_language_parameter(self):
         """
         GooglePlaces.geocode using `language`
         """
-        result_geocode = self._make_request(
+        results_geocode = self._make_request(
             self.geocoder.geocode,
             self.known_country_fr,
             language="it",
         )
-        self.assertEqual(
-            result_geocode.raw['properties']['country'],
-            self.known_country_it
-        )
+
+        address_components = results_geocode[0].raw['address_components']
+
+        for component in address_components:
+                for type in component['types']:
+                   if "country" in type:
+                    country = component['long_name']
+                    self.assertEqual(country,self.known_country_it)
 
