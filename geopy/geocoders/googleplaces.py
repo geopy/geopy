@@ -124,13 +124,51 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             Currently, you can use components to filter by country.
             For example: components=country:fr would restrict your results to places within France.
         """
+
+
+        autocomplete_predictions = self.autocomplete(query,timeout,offset,location,radius,language,types,components)
+        return [self.place_details(place.get('place_id'), language) for place in autocomplete_predictions]
+
+    def parse_details(self, details_page):
+        status = details_page.get('status')
+        if status != "OK":
+            self._check_status(status)
+            return None
+        return details_page.get('result')
+
+    # for getting only details about a specific place
+    def place_details(self, placeid, language):
+        detail_params = {}
+        detail_params['key'] = self.api_key
+        if not placeid:
+            return []
+        detail_params['placeid'] = placeid
+        if language:
+            detail_params['language'] = language
+        details_url = "?".join((self.details_api, urlencode(detail_params)))
+        logger.debug("%s.google_places_details: %s", self.__class__.__name__, details_url)
+        detail_result = self.parse_details(self._call_geocoder(details_url))
+        formatted_address = detail_result['formatted_address']
+        latitude = detail_result['geometry']['location']['lat']
+        longitude = detail_result['geometry']['location']['lng']
+        return Location(formatted_address, (latitude, longitude), detail_result)
+
+    # for getting only autocomplete endpoint results
+    def autocomplete(self, query,
+            timeout=None,
+            offset=None,
+            location=None,
+            radius=None,
+            language=None,
+            types=None,
+            components=None):
+
         autocomplete_params = {
             'input': self.format_string % query,
         }
-        detail_params = {}
+
         if self.api_key:
             autocomplete_params['key'] = self.api_key
-            detail_params['key'] = self.api_key
 
         if offset:
             autocomplete_params['offset'] = offset
@@ -143,18 +181,17 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
 
         if language:
             autocomplete_params['language'] = language
-            detail_params['language'] = language
 
         if types:
             autocomplete_params['types'] = types
 
         if components:
             autocomplete_params['components'] = self._format_components_param(components)
-
         autocomplete_url = "?".join((self.autocomplete_api, urlencode(autocomplete_params)))
+        print "AUTOCOMPLETE REQUEST: {}".format(autocomplete_url)
         logger.debug("%s.google_places_autocomplete: %s", self.__class__.__name__, autocomplete_url)
-        autocomplete_predictions = self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
-        return [self.parse_predictions(place, detail_params) for place in autocomplete_predictions]
+        return self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
+
 
     def parse_autocomplete(self, autocomplete_page):
         predictions = autocomplete_page.get('predictions', [])
@@ -162,23 +199,6 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             self._check_status(autocomplete_page.get('status'))
         return predictions
 
-    def parse_details(self, details_page):
-        status = details_page.get('status')
-        if status != "OK":
-            self._check_status(status)
-            return None
-        return details_page.get('result')
-
-    # uses the seconds api call to "details" to fetch lat lon info on a place to build the Location object
-    def parse_predictions(self, place, detail_params):
-        detail_params['placeid'] = place.get('place_id')
-        details_url = "?".join((self.details_api, urlencode(detail_params)))
-        logger.debug("%s.google_places_details: %s", self.__class__.__name__, details_url)
-        detail_result = self.parse_details(self._call_geocoder(details_url))
-        formatted_address = detail_result['formatted_address']
-        latitude = detail_result['geometry']['location']['lat']
-        longitude = detail_result['geometry']['location']['lng']
-        return Location(formatted_address, (latitude, longitude), detail_result)
 
     @staticmethod
     def _check_status(status):
