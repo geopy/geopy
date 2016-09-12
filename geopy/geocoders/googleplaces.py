@@ -8,7 +8,6 @@ from geopy.exc import (
     GeocoderQueryError,
 )
 from geopy.location import Location
-from geopy.util import logger
 
 
 __all__ = ("GooglePlaces", )
@@ -144,7 +143,6 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         if language:
             detail_params['language'] = language
         details_url = "?".join((self.details_api, urlencode(detail_params)))
-        logger.debug("%s.google_places_details: %s", self.__class__.__name__, details_url)
         detail_result = self.parse_details(self._call_geocoder(details_url))
         formatted_address = detail_result['formatted_address']
         latitude = detail_result['geometry']['location']['lat']
@@ -187,8 +185,6 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             autocomplete_params['components'] = self._format_components_param(components)
 
         autocomplete_url = "?".join((self.autocomplete_api, urlencode(autocomplete_params)))
-        print "AUTOCOMPLETE URL:{}".format(autocomplete_url)
-        logger.debug("%s.google_places_autocomplete: %s", self.__class__.__name__, autocomplete_url)
         return self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
 
     def parse_autocomplete(self, autocomplete_page):
