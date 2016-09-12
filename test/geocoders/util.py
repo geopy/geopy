@@ -86,13 +86,10 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
         Handles remote service errors.
         """
         try:
-            print "my args:{}".format(args)
-            print "my kwargs:{}".format(kwargs)
             result = call(*args, **kwargs)
         except exc.GeocoderQuotaExceeded:
             raise unittest.SkipTest("Quota exceeded")
         except exc.GeocoderTimedOut:
-            print "call timed out"
             raise unittest.SkipTest("Service timed out")
         except exc.GeocoderUnavailable:
             raise unittest.SkipTest("Service unavailable")
