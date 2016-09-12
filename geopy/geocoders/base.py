@@ -140,8 +140,6 @@ class Geocoder(object): # pylint: disable=R0921
             req = url
 
         try:
-            final_timeout = (timeout or self.timeout)
-            print final_timeout
             page = requester(req, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
