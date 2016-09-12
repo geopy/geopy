@@ -124,9 +124,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             Currently, you can use components to filter by country.
             For example: components=country:fr would restrict your results to places within France.
         """
-
-
-        autocomplete_predictions = self.autocomplete(query,timeout,offset,location,radius,language,types,components)
+        autocomplete_predictions = self.autocomplete(query, timeout, offset, location, radius, language, types, components)
         return [self.place_details(place.get('place_id'), language) for place in autocomplete_predictions]
 
     def parse_details(self, details_page):
@@ -155,13 +153,13 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
 
     # for getting only autocomplete endpoint results
     def autocomplete(self, query,
-            timeout=None,
-            offset=None,
-            location=None,
-            radius=None,
-            language=None,
-            types=None,
-            components=None):
+                     timeout=None,
+                     offset=None,
+                     location=None,
+                     radius=None,
+                     language=None,
+                     types=None,
+                     components=None):
 
         autocomplete_params = {
             'input': self.format_string % query,
@@ -192,13 +190,11 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         logger.debug("%s.google_places_autocomplete: %s", self.__class__.__name__, autocomplete_url)
         return self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
 
-
     def parse_autocomplete(self, autocomplete_page):
         predictions = autocomplete_page.get('predictions', [])
         if not len(predictions):
             self._check_status(autocomplete_page.get('status'))
         return predictions
-
 
     @staticmethod
     def _check_status(status):
