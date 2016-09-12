@@ -140,7 +140,9 @@ class Geocoder(object): # pylint: disable=R0921
             req = url
 
         try:
-            page = requester(req, timeout=(timeout or self.timeout), **kwargs)
+            final_timeout=(timeout or self.timeout)
+            print "my timeout value: {}".format(final_timeout)
+            page = requester(req, final_timeout , **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
                 str(error) if not py3k
@@ -160,14 +162,14 @@ class Geocoder(object): # pylint: disable=R0921
                     raise GeocoderServiceError(message)
             elif isinstance(error, URLError):
                 if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
+                    raise GeocoderTimedOut('URLError: Service timed out')
                 elif "unreachable" in message:
                     raise GeocoderUnavailable('Service not available')
             elif isinstance(error, SocketTimeout):
-                raise GeocoderTimedOut('Service timed out')
+                raise GeocoderTimedOut('SocketTimeout: Service timed out')
             elif isinstance(error, SSLError):
                 if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
+                    raise GeocoderTimedOut('SSLError: Service timed out')
             raise GeocoderServiceError(message)
 
         if hasattr(page, 'getcode'):
