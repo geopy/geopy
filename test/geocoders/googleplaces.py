@@ -48,6 +48,3 @@ class GooglePlacesTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
                    if "country" in type:
                     country = component['long_name']
                     self.assertEqual(country,self.known_country_it)
-
-        self.assertEqual(True, False)
-
