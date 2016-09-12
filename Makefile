@@ -17,7 +17,7 @@ pylint:
 	pylint --rcfile .pylintrc geopy
 
 test:
-	nosetests --verbose --with-cover --cover-erase --cover-package=geopy test.geocoders.googlev3 test.geocoders.nominatim test.geocoders.photon test.geocoders.base test.geocoders.util
+	nosetests --verbose --with-cover --cover-erase --cover-package=geopy test.geocoders.googlev3 test.geocoders.nominatim test.geocoders.photon test.geocoders.base test.geocoders.util test.geocoders.googleplaces
 
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf
