@@ -185,7 +185,9 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
 
         if components:
             autocomplete_params['components'] = self._format_components_param(components)
+
         autocomplete_url = "?".join((self.autocomplete_api, urlencode(autocomplete_params)))
+        print "AUTOCOMPLETE URL:{}".format(autocomplete_url)
         logger.debug("%s.google_places_autocomplete: %s", self.__class__.__name__, autocomplete_url)
         return self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
 
