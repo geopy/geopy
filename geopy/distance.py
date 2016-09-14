@@ -365,7 +365,7 @@ class vincenty(Distance):
         iter_limit = self.iterations
 
         i = 0
-        while abs(lambda_lng - lambda_prime) > 10e-12 and i <= iter_limit:
+        while (abs(lambda_lng - lambda_prime) > 10e-12 and i <= iter_limit) or (i == 0):
             i += 1
 
             sin_lambda_lng, cos_lambda_lng = sin(lambda_lng), cos(lambda_lng)
