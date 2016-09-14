@@ -92,7 +92,7 @@ __all__ = (
     'Yandex',
     "What3Words",
     "Photon",
-    "Mapzen"
+    "Mapzen",
 )
 
 
@@ -142,7 +142,7 @@ SERVICE_TO_GEOCODER = {
     "yandex": Yandex,
     "ignfrance": IGNFrance,
     "photon": Photon,
-    "googleplaces": GooglePlaces
+    "googleplaces": GooglePlaces,
 }
 
 

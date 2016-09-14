@@ -22,7 +22,6 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
     def __init__(
             self,
             api_key=None,
-            domain='maps.googleapis.com',
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -38,14 +37,14 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             geocoding requests. API keys are managed through the Google APIs
             console (https://code.google.com/apis/console).
 
-        :param string domain: Should be the localized Google Maps domain to
-            connect to. The default is 'maps.googleapis.com', but if you're
-            geocoding address in the UK (for example), you may want to set it
-            to 'maps.google.co.uk' to properly bias results.
-
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -57,12 +56,10 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         )
 
         self.api_key = api_key
-        self.domain = domain.strip('/')
-        self.scheme = scheme
-        self.doc = {}
+        domain = 'maps.googleapis.com'
 
-        self.autocomplete_api = '%s://%s/maps/api/place/autocomplete/json' % (self.scheme, self.domain)
-        self.details_api = '%s://%s/maps/api/place/details/json' % (self.scheme, self.domain)
+        self.autocomplete_api = '{scheme}://{domain}/maps/api/place/autocomplete/json'.format(scheme=self.scheme, domain=domain)
+        self.details_api = '{scheme}://{domain}/maps/api/place/details/json'.format(scheme=self.scheme, domain=domain)
 
     @staticmethod
     def _format_components_param(components):
@@ -75,18 +72,16 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
              )
         )
 
-    def geocode(
-            self,
-            query,
-            exactly_one=False,
-            timeout=None,
-            offset=None,
-            location=None,
-            radius=None,
-            language=None,
-            types=None,
-            components=None,
-    ):  # pylint: disable=W0221,R0913
+    def geocode(self,
+                query,
+                exactly_one=False,
+                timeout=None,
+                location=None,
+                radius=None,
+                language=None,
+                types=None,
+                components=None,
+                ):  # pylint: disable=W0221,R0913
         """
         Geocode a location query.
 
@@ -102,18 +97,13 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
 
             .. versionadded:: 1.12
 
-        :param offset: The position, in the input term, of the last character that the service uses to match predictions.
-            For example, if the input is 'Google' and the offset is 3, the service will match on 'Goo'.
-            If no offset is supplied, the service will use the whole term.
-        :type offset: int
-
         :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param int radius:  The distance (in meters) within which to return place results.
             Setting a radius biases results to the indicated area, but may not fully restrict results to the specified area.
 
-        :param string language: The language in which to return results.
+        :param string language: The language in which to return results. List of supported languages: https://developers.google.com/maps/faq#languagesupport
 
         :param string types: The types of place results to return.
             Possible values are "geocode", "address", "establishment", "(regions)" or "(cities)"
@@ -123,7 +113,9 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             Currently, you can use components to filter by country.
             For example: components=country:fr would restrict your results to places within France.
         """
-        autocomplete_predictions = self.autocomplete(query, timeout, offset, location, radius, language, types, components)
+        autocomplete_predictions = self.autocomplete(query, timeout, location, radius, language, types, components)
+        if autocomplete_predictions and exactly_one:
+            autocomplete_predictions = [autocomplete_predictions[0]]
         return [self.place_details(place.get('place_id'), language) for place in autocomplete_predictions]
 
     def parse_details(self, details_page):
@@ -142,7 +134,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         detail_params['placeid'] = placeid
         if language:
             detail_params['language'] = language
-        details_url = "?".join((self.details_api, urlencode(detail_params)))
+        details_url = "{}?{}".format(self.details_api, urlencode(detail_params))
         detail_result = self.parse_details(self._call_geocoder(details_url))
         formatted_address = detail_result['formatted_address']
         latitude = detail_result['geometry']['location']['lat']
@@ -150,7 +142,8 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         return Location(formatted_address, (latitude, longitude), detail_result)
 
     # for getting only autocomplete endpoint results
-    def autocomplete(self, query,
+    def autocomplete(self,
+                     query,
                      timeout=None,
                      offset=None,
                      location=None,
@@ -166,25 +159,25 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         if self.api_key:
             autocomplete_params['key'] = self.api_key
 
-        if offset:
+        if offset is not None:
             autocomplete_params['offset'] = offset
 
-        if location:
+        if location is not None:
             autocomplete_params['location'] = location
 
-        if radius:
+        if radius is not None:
             autocomplete_params['radius'] = radius
 
-        if language:
+        if language is not None:
             autocomplete_params['language'] = language
 
-        if types:
+        if types is not None:
             autocomplete_params['types'] = types
 
-        if components:
+        if components is not None:
             autocomplete_params['components'] = self._format_components_param(components)
 
-        autocomplete_url = "?".join((self.autocomplete_api, urlencode(autocomplete_params)))
+        autocomplete_url = "{}?{}".format(self.autocomplete_api, urlencode(autocomplete_params))
         return self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
 
     def parse_autocomplete(self, autocomplete_page):
