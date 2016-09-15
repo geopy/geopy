@@ -114,9 +114,11 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
             For example: components=country:fr would restrict your results to places within France.
         """
         autocomplete_predictions = self.autocomplete(query, timeout, location, radius, language, types, components)
-        if autocomplete_predictions and exactly_one:
-            autocomplete_predictions = [autocomplete_predictions[0]]
-        return [self.place_details(place.get('place_id'), language) for place in autocomplete_predictions]
+
+        if len(autocomplete_predictions) > 1 and exactly_one:
+            return self.place_details(autocomplete_predictions[0].get('place_id'), language)
+        else:
+            return [self.place_details(place.get('place_id'), language) for place in autocomplete_predictions]
 
     def parse_details(self, details_page):
         status = details_page.get('status')
