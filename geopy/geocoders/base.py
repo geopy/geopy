@@ -160,14 +160,14 @@ class Geocoder(object): # pylint: disable=R0921
                     raise GeocoderServiceError(message)
             elif isinstance(error, URLError):
                 if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
+                    raise GeocoderTimedOut('URLError: Service timed out')
                 elif "unreachable" in message:
                     raise GeocoderUnavailable('Service not available')
             elif isinstance(error, SocketTimeout):
-                raise GeocoderTimedOut('Service timed out')
+                raise GeocoderTimedOut('Socket Service timed out')
             elif isinstance(error, SSLError):
                 if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
+                    raise GeocoderTimedOut('SSLError connection error')
             raise GeocoderServiceError(message)
 
         if hasattr(page, 'getcode'):

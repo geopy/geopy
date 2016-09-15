@@ -80,6 +80,7 @@ __all__ = (
     "GeocoderDotUS",
     "GeocodeFarm",
     "GeoNames",
+    "GooglePlaces",
     "GoogleV3",
     "IGNFrance",
     "OpenCage",
@@ -102,6 +103,7 @@ from geopy.geocoders.databc import DataBC
 from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
+from geopy.geocoders.googleplaces import GooglePlaces
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
@@ -139,7 +141,8 @@ SERVICE_TO_GEOCODER = {
     "what3words": What3Words,
     "yandex": Yandex,
     "ignfrance": IGNFrance,
-    "photon": Photon
+    "photon": Photon,
+    "googleplaces": GooglePlaces,
 }
 
 
