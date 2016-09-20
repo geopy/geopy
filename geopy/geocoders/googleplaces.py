@@ -163,7 +163,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         if len(autocomplete_predictions) > 1 and exactly_one:
             return self.place_details(autocomplete_predictions[0].get('place_id'), language)
         else:
-            return [self.place_details(place.get('place_id'), language) for place in autocomplete_predictions]
+            return [self.place_details(place.get('place_id'), language, timeout) for place in autocomplete_predictions]
 
     def parse_details(self, details_page):
         status = details_page.get('status')
@@ -173,7 +173,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         return details_page.get('result')
 
     # for getting only details about a specific place
-    def place_details(self, placeid, language):
+    def place_details(self, placeid, language=None, timeout=None):
         detail_params = {}
         detail_params['key'] = self.api_key
         if not placeid:
@@ -187,7 +187,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         else:
             details_url = self._get_signed_url('/maps/api/details/json', detail_params)
 
-        detail_result = self.parse_details(self._call_geocoder(details_url))
+        detail_result = self.parse_details(self._call_geocoder(details_url, timeout=timeout))
         formatted_address = detail_result['formatted_address']
         latitude = detail_result['geometry']['location']['lat']
         longitude = detail_result['geometry']['location']['lng']
@@ -261,6 +261,6 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
                 'Your request was denied.'
             )
         elif status == 'INVALID_REQUEST':
-            raise GeocoderQueryError('Probably missing address or latlng.')
+            raise GeocoderQueryError('Probably wrong or missing address')
         else:
             raise GeocoderQueryError('Unknown error.')
