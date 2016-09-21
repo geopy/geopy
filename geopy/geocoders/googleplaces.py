@@ -185,7 +185,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         if self.premier is False:
             details_url = "{}?{}".format(self.details_api, urlencode(detail_params))
         else:
-            details_url = self._get_signed_url('/maps/api/details/json', detail_params)
+            details_url = self._get_signed_url('/maps/api/place/details/json', detail_params)
 
         detail_result = self.parse_details(self._call_geocoder(details_url, timeout=timeout))
         formatted_address = detail_result['formatted_address']
@@ -232,7 +232,7 @@ class GooglePlaces(Geocoder):  # pylint: disable=R0902
         if self.premier is False:
             autocomplete_url = "{}?{}".format(self.autocomplete_api, urlencode(autocomplete_params))
         else:
-            autocomplete_url = self._get_signed_url('/maps/api/autocomplete/json', autocomplete_params)
+            autocomplete_url = self._get_signed_url('/maps/api/place/autocomplete/json', autocomplete_params)
 
         return self.parse_autocomplete(self._call_geocoder(autocomplete_url, timeout=timeout))
 
