@@ -70,6 +70,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+            
+        :param dict other_params: You can set any other request parameters described in documentation: 
+            https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
         """
         params = {
             'geocode': query,
