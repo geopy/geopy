@@ -8,6 +8,7 @@ from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E061
 from geopy.point import Point
 from geopy.distance import (Distance,
                             GreatCircleDistance,
+                            GreatCircleHaversineDistance,
                             VincentyDistance,
                             EARTH_RADIUS,
                             ELLIPSOIDS)
@@ -169,6 +170,17 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases):
         destination = distance.destination((0, 0), 0)
         assert_almost_equal(destination.latitude, 0)
         assert_almost_equal(destination.longitude, 180)
+
+class TestWhenComputingGreatCircleHaversineDistance(CommonDistanceCases):
+    cls = GreatCircleHaversineDistance
+
+    def test_should_compute_distance_for_half_trip_around_equator(self):
+        distance_around_earth = self.cls((0, 0), (0, 180)).kilometers
+        assert distance_around_earth == EARTH_CIRCUMFERENCE / 2
+
+    def test_should_compute_distance_with_neg_params(self):
+        distance_around_earth = self.cls((-1, -1), (-1, -1)).kilometers
+        assert distance_around_earth == 0
 
 
 class TestWhenComputingVincentyDistance(CommonDistanceCases):

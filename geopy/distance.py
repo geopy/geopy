@@ -51,6 +51,14 @@ Using great-circle distance::
     >>> print(great_circle(newport_ri, cleveland_oh).miles)
     537.1485284062816
 
+Using great-circle haversine distance::
+
+    >>> from geopy.distance import great_circle_haversine
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> print(great_circle_haversine(newport_ri, cleveland_oh).miles)
+    537.882275111
+
 You can change the ellipsoid model used by the Vincenty formula like so::
 
     >>> distance.vincenty(ne, cl, ellipsoid='GRS-80').miles
@@ -284,6 +292,32 @@ class great_circle(Distance):
 
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
+class great_circle_haversine(great_circle):
+    """
+    Calculate shortest distance between two points on the sphere using 
+    Great-circle haversine formula.
+
+    Example::
+
+        >>> from geopy.distance import great_circle_haversine
+        >>> newport_ri = (41.49008, -71.312796)
+        >>> cleveland_oh = (41.499498, -81.695391)
+        >>> print(great_circle_haversine(newport_ri, cleveland_oh).miles)
+        537.882275111
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(great_circle_haversine, self).__init__(*args, **kwargs)
+
+    def measure(self, a, b):
+        a, b = Point(a), Point(b)
+        lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
+        lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
+        delta_lat = lat2 - lat1
+        delta_lng = lng2 - lng1
+        first = sin((delta_lat)/2)**2 + cos(lat1) * cos(lat2) * sin((delta_lng/2))**2
+        d = 2 * atan2(sqrt(first), sqrt(1 - first))
+        return self.RADIUS * d
 
 class vincenty(Distance):
     """
@@ -531,3 +565,4 @@ class vincenty(Distance):
 
 distance = VincentyDistance = vincenty
 GreatCircleDistance = great_circle
+GreatCircleHaversineDistance = great_circle_haversine
