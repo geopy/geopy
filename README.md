@@ -106,4 +106,4 @@ Using great-circle distance:
 ## Documentation
 
 More documentation and examples can be found at
-[Read the Docs](http://geopy.readthedocs.org/en/latest/).
+[Read the Docs](http://geopy.readthedocs.io/en/latest/).
