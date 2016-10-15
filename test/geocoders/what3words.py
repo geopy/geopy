@@ -23,7 +23,7 @@ class What3WordsTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = What3Words(
             env['WHAT3WORDS_KEY'],
-            scheme='http',
+            scheme='https',
             timeout=3
 
         )
@@ -31,16 +31,11 @@ class What3WordsTestCase(GeocoderTestBase):
 
     def test_geocode(self):
         """
-        What3Words.geocode - '3 Words' and 'OneWord'
+        What3Words.geocode - '3 Words'
         """
         self.geocode_run(
             {"query": u("piped.gains.jangle")},
             {"latitude": 53.037611, "longitude": 11.565012},
-        )
-
-        self.geocode_run(
-            {"query": u("*LibertyTech")},
-            {"latitude": 51.512573, "longitude": -0.144879},
         )
 
 
@@ -75,16 +70,6 @@ class What3WordsTestCase(GeocoderTestBase):
             {"latitude": 53.037611, "longitude": 11.565012},
         )
 
-        self.geocode_run(
-            {
-                "query": u(
-                    "\u002a\u004c\u0069\u0062\u0065\u0072\u0074"
-                    "\u0079\u0054\u0065\u0063\u0068"
-                )
-            },
-            {"latitude": 51.512573, "longitude": -0.144879},
-        )
-
     def test_result_language(self):
         """
         What3Words.geocode result language
@@ -102,9 +87,8 @@ class What3WordsTestCase(GeocoderTestBase):
 
     def test_check_query(self):
         """
-        What3Wors.check_query - 'OneWord' and '3 Words' regex
+        What3Words.check_query - '3 Words' regex
         """
-        result_check_oneword_query = self.geocoder._check_query("*LibertyTech")
         result_check_threeword_query = self.geocoder._check_query(
             u(
                 "\u0066\u0061\u0068\u0072\u0070\u0072"
@@ -114,11 +98,4 @@ class What3WordsTestCase(GeocoderTestBase):
             )
         )
 
-        self.assertTrue(result_check_oneword_query)
         self.assertTrue(result_check_threeword_query)
-
-
-
-
-
-
