@@ -38,7 +38,7 @@ class What3Words(Geocoder):
             user_agent=None,
     ):
         """
-        Initialize a What3Words geocoder with 3-word or OneWord-address and
+        Initialize a What3Words geocoder with 3-word address and
         What3Words API key.
 
             .. versionadded:: 1.5.0
@@ -52,7 +52,9 @@ class What3Words(Geocoder):
 
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
-            verified. As of API v2 only 'https' is supported.
+            verified.  As of API v2 only 'https' is supported - this parameter
+            remains for backwards compatibility (setting to 'http' will stop
+            this geocoder working).
 
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
