@@ -25,7 +25,7 @@ class What3WordsTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = What3Words(
             env['WHAT3WORDS_KEY'],
-            scheme='http',
+            scheme='https',
             timeout=3
 
         )
@@ -89,7 +89,6 @@ class What3WordsTestCase(GeocoderTestBase):
         )
 
     def test_check_query(self):
-        result_check_oneword_query = self.geocoder._check_query("*LibertyTech")
         result_check_threeword_query = self.geocoder._check_query(
             u(
                 "\u0066\u0061\u0068\u0072\u0070\u0072"
@@ -99,5 +98,4 @@ class What3WordsTestCase(GeocoderTestBase):
             )
         )
 
-        self.assertTrue(result_check_oneword_query)
         self.assertTrue(result_check_threeword_query)
