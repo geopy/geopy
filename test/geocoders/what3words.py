@@ -31,7 +31,7 @@ class What3WordsTestCase(GeocoderTestBase):
 
     def test_geocode(self):
         """
-        What3Words.geocode - '3 Words' and 'OneWord'
+        What3Words.geocode - '3 Words'
         """
         self.geocode_run(
             {"query": u("piped.gains.jangle")},
@@ -87,7 +87,7 @@ class What3WordsTestCase(GeocoderTestBase):
 
     def test_check_query(self):
         """
-        What3Wors.check_query - '3 Words' regex
+        What3Words.check_query - '3 Words' regex
         """
         result_check_threeword_query = self.geocoder._check_query(
             u(
