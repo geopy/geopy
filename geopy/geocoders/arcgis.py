@@ -120,8 +120,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
         :param out_fields:
         :type out_fields: A list of output fields to be returned in the
-            attributes field of the raw data. This can be either a python list/tuple
-            or a comma-separated string.
+            attributes field of the raw data. This can be either a python
+            list/tuple of fields or a comma-separated string.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`

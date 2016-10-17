@@ -63,6 +63,34 @@ class ArcGISTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
+    def test_geocode_with_out_fields_string(self):
+        """
+        ArcGIS.geocode with outFields string
+        """
+        self.geocode_run(
+            {"query": "Heathrow Airport", "out_fields":"Country"},
+            {"raw": {
+                u'attributes': {u'Country': u'GBR'},
+                u'score': 100, u'location': {u'y': 51.47114986100047, u'x': -0.45648655399958216},
+                u'extent': {u'xmin': -0.481488, u'ymin': 51.44615, u'ymax': 51.49615, u'xmax': -0.431488},
+                u'address': u'London Heathrow Airport'}}
+        )
+
+    def test_geocode_with_out_fields_list(self):
+        """
+        ArcGIS.geocode with outFields list
+        """
+        self.geocode_run(
+            {"query": "Heathrow Airport", "out_fields":["City","Type"]},
+            {"raw": {
+                u'attributes': {u'City': u'Hillingdon', u'Type': u'Airport'},
+                u'score': 100, u'location': {u'y': 51.47114986100047, u'x': -0.45648655399958216},
+                u'extent': {u'xmin': -0.481488, u'ymin': 51.44615, u'ymax': 51.49615, u'xmax': -0.431488},
+                u'address': u'London Heathrow Airport'
+                }
+            }
+        )
+
     def test_reverse_point(self):
         """
         ArcGIS.reverse using point
