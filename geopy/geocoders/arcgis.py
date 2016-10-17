@@ -118,8 +118,10 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-        :param string out_fields: Comma-separated list of output fields to be returned in the
-            attributes field of the raw data.
+        :param out_fields:
+        :type out_fields: A list of output fields to be returned in the
+            attributes field of the raw data. This can be either a python list/tuple
+            or a comma-separated string.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -130,7 +132,13 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         if exactly_one is True:
             params['maxLocations'] = 1
         if out_fields is not None:
-            params['outFields'] = out_fields
+            # Python 2/3 compatibility
+            if 'basestring' not in globals():
+                basestring = str
+            if isinstance(out_fields, basestring):
+                params['outFields'] = out_fields
+            else:
+                params['outFields'] = ",".join(out_fields)
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
