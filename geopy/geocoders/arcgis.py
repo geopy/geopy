@@ -224,11 +224,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             'expiration': self.token_lifetime,
             'f': 'json'
         }
-        token_request_arguments = urlencode(token_request_arguments) #"&".join([
-        #    "%s=%s" % (key, val)
-        #    for key, val
-        #    in token_request_arguments.items()
-        #])
+        token_request_arguments = urlencode(token_request_arguments)
         url = "&".join((
             "?".join((self.auth_api, token_request_arguments)),
             urlencode({'referer': self.referer})
