@@ -222,13 +222,11 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             'username': self.username,
             'password': self.password,
             'expiration': self.token_lifetime,
-            'f': 'json'
+            'f': 'json',
+            'referer': self.referer
         }
-        token_request_arguments = urlencode(token_request_arguments)
-        url = "&".join((
-            "?".join((self.auth_api, token_request_arguments)),
-            urlencode({'referer': self.referer})
-        ))
+        url = "?".join((self.auth_api, urlencode(token_request_arguments)))
+
         logger.debug(
             "%s._refresh_authentication_token: %s",
             self.__class__.__name__, url
