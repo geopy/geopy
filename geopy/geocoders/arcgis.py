@@ -90,7 +90,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
         self.api = (
             '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/find' % self.scheme
+            'World/GeocodeServer/findAddressCandidates' % self.scheme
         )
         self.reverse_api = (
             '%s://geocode.arcgis.com/arcgis/rest/services/'
@@ -123,7 +123,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        params = {'text': query, 'f': 'json'}
+        params = {'singleLine': query, 'f': 'json'}
         if exactly_one is True:
             params['maxLocations'] = 1
         url = "?".join((self.api, urlencode(params)))
@@ -141,14 +141,14 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             raise GeocoderServiceError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
-        if not len(response['locations']):
+        if not len(response['candidates']):
             return None
         geocoded = []
-        for resource in response['locations']:
-            geometry = resource['feature']['geometry']
+        for resource in response['candidates']:
+            geometry = resource['location']
             geocoded.append(
                 Location(
-                    resource['name'], (geometry['y'], geometry['x']), resource
+                    resource['address'], (geometry['y'], geometry['x']), resource
                 )
             )
         if exactly_one is True:
@@ -224,11 +224,11 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             'expiration': self.token_lifetime,
             'f': 'json'
         }
-        token_request_arguments = "&".join([
-            "%s=%s" % (key, val)
-            for key, val
-            in token_request_arguments.items()
-        ])
+        token_request_arguments = urlencode(token_request_arguments) #"&".join([
+        #    "%s=%s" % (key, val)
+        #    for key, val
+        #    in token_request_arguments.items()
+        #])
         url = "&".join((
             "?".join((self.auth_api, token_request_arguments)),
             urlencode({'referer': self.referer})
