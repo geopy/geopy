@@ -111,7 +111,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
         self.api = (
             '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/find' % self.scheme
+            'World/GeocodeServer/findAddressCandidates' % self.scheme
         )
         self.reverse_api = (
             '%s://geocode.arcgis.com/arcgis/rest/services/'
@@ -144,7 +144,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        params = {'text': self.format_string % query, 'f': 'json'}
+        params = {'singleLine': self.format_string % query, 'f': 'json'}
         if exactly_one:
             params['maxLocations'] = 1
         url = "?".join((self.api, urlencode(params)))
@@ -162,14 +162,14 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             raise GeocoderServiceError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
-        if not len(response['locations']):
+        if not len(response['candidates']):
             return None
         geocoded = []
-        for resource in response['locations']:
-            geometry = resource['feature']['geometry']
+        for resource in response['candidates']:
+            geometry = resource['location']
             geocoded.append(
                 Location(
-                    resource['name'], (geometry['y'], geometry['x']), resource
+                    resource['address'], (geometry['y'], geometry['x']), resource
                 )
             )
         if exactly_one:
