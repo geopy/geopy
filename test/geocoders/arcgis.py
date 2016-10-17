@@ -68,12 +68,12 @@ class ArcGISTestCase(GeocoderTestBase):
         ArcGIS.geocode with outFields string
         """
         self.geocode_run(
-            {"query": "Heathrow Airport", "out_fields":"Country"},
+            {"query": "Trafalgar Square, London", "out_fields":"Country"},
             {"raw": {
                 u'attributes': {u'Country': u'GBR'},
-                u'score': 100, u'location': {u'y': 51.47114986100047, u'x': -0.45648655399958216},
-                u'extent': {u'xmin': -0.481488, u'ymin': 51.44615, u'ymax': 51.49615, u'xmax': -0.431488},
-                u'address': u'London Heathrow Airport'}}
+                u'score': 100, u'location': {u'y': 51.50769561800047, u'x': -0.1273497609995502},
+                u'extent': {u'xmin': -0.137351, u'ymin': 51.497696, u'ymax': 51.517696, u'xmax': -0.117351}, u'address': u'Trafalgar Square'}
+            }
         )
 
     def test_geocode_with_out_fields_list(self):
@@ -81,13 +81,11 @@ class ArcGISTestCase(GeocoderTestBase):
         ArcGIS.geocode with outFields list
         """
         self.geocode_run(
-            {"query": "Heathrow Airport", "out_fields":["City","Type"]},
+            {"query": "Trafalgar Square, London", "out_fields":["City","Type"]},
             {"raw": {
-                u'attributes': {u'City': u'Hillingdon', u'Type': u'Airport'},
-                u'score': 100, u'location': {u'y': 51.47114986100047, u'x': -0.45648655399958216},
-                u'extent': {u'xmin': -0.481488, u'ymin': 51.44615, u'ymax': 51.49615, u'xmax': -0.431488},
-                u'address': u'London Heathrow Airport'
-                }
+                u'attributes': {u'City': u'London', u'Type': u'Tourist Attraction'},
+                u'score': 100, u'location': {u'y': 51.50769561800047, u'x': -0.1273497609995502},
+                u'extent': {u'xmin': -0.137351, u'ymin': 51.497696, u'ymax': 51.517696, u'xmax': -0.117351}, u'address': u'Trafalgar Square'}
             }
         )
 

@@ -4,7 +4,7 @@
 
 import json
 from time import time
-from geopy.compat import urlencode, Request
+from geopy.compat import urlencode, Request, string_compare
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
     DEFAULT_WKID
@@ -121,7 +121,10 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         :param out_fields:
         :type out_fields: A list of output fields to be returned in the
             attributes field of the raw data. This can be either a python
-            list/tuple of fields or a comma-separated string.
+            list/tuple of fields or a comma-separated string. See
+            https://developers.arcgis.com/rest/geocode/api-reference/geocoding-service-output.htm
+            for a list of supported output fields. If you want to return all
+            supported output fields, set out_fields="*".
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -132,10 +135,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         if exactly_one is True:
             params['maxLocations'] = 1
         if out_fields is not None:
-            # Python 2/3 compatibility
-            if 'basestring' not in globals():
-                basestring = str
-            if isinstance(out_fields, basestring):
+            if isinstance(out_fields, string_compare):
                 params['outFields'] = out_fields
             else:
                 params['outFields'] = ",".join(out_fields)
