@@ -4,7 +4,7 @@
 
 import json
 from time import time
-from geopy.compat import urlencode, Request
+from geopy.compat import urlencode, Request, string_compare
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
     DEFAULT_WKID, DEFAULT_FORMAT_STRING
@@ -130,7 +130,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         )
         return self._base_call_geocoder(request, timeout=timeout)
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, timeout=None, out_fields=None):
         """
         Geocode a location query.
 
@@ -143,10 +143,26 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :param out_fields: A list of output fields to be returned in the
+            attributes field of the raw data. This can be either a python
+            list/tuple of fields or a comma-separated string. See
+            https://developers.arcgis.com/rest/geocode/api-reference/geocoding-service-output.htm
+            for a list of supported output fields. If you want to return all
+            supported output fields, set ``out_fields="*"``.
+
+            .. versionadded:: 1.14.0
+        :type out_fields: str or iterable
+
         """
         params = {'singleLine': self.format_string % query, 'f': 'json'}
         if exactly_one:
             params['maxLocations'] = 1
+        if out_fields is not None:
+            if isinstance(out_fields, string_compare):
+                params['outFields'] = out_fields
+            else:
+                params['outFields'] = ",".join(out_fields)
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)

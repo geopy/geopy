@@ -59,6 +59,30 @@ class ArcGISTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
+    def test_geocode_with_out_fields_string(self):
+        """
+        ArcGIS.geocode with outFields string
+        """
+        result = self.geocode_run(
+            {"query": "Trafalgar Square, London",
+             "out_fields": "Country"},
+            {}
+        )
+        self.assertDictEqual(result.raw['attributes'],
+                             {'Country': 'GBR'})
+
+    def test_geocode_with_out_fields_list(self):
+        """
+        ArcGIS.geocode with outFields list
+        """
+        result = self.geocode_run(
+            {"query": "Trafalgar Square, London",
+             "out_fields": ["City", "Type"]},
+            {}
+        )
+        self.assertDictEqual(result.raw['attributes'],
+                             {'City': 'London', 'Type': 'Tourist Attraction'})
+
     def test_reverse_point(self):
         """
         ArcGIS.reverse using point
