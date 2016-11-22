@@ -56,12 +56,12 @@ class Point(object):
 
     Points can be created in a number of ways...
 
-    With longitude, latitude, and altitude::
+    With latitude, longitude, and altitude::
 
         >>> p1 = Point(41.5, -81, 0)
         >>> p2 = Point(latitude=41.5, longitude=-81)
 
-    With a sequence of 0 to 3 values (longitude, latitude, altitude)::
+    With a sequence of 0 to 3 values (latitude, longitude, altitude)::
 
         >>> p1 = Point([41.5, -81, 0])
         >>> p2 = Point((41.5, -81))
