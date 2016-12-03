@@ -20,6 +20,8 @@ class GeocodeFarm(Geocoder):
         https://www.geocode.farm/geocoding/free-api-documentation/
     """
 
+    OPTIONAL_PARAMS = ('lang', 'country', )
+
     def __init__(
             self,
             api_key=None,
@@ -58,7 +60,14 @@ class GeocodeFarm(Geocoder):
             "%s://www.geocode.farm/v3/json/reverse/" % self.scheme
         )
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def _add_optional_params(self, params, **kwargs):
+        for optional_param in self.OPTIONAL_PARAMS:
+            param_value = kwargs.get(optional_param)
+
+            if param_value is not None:
+                params[optional_param] = param_value
+
+    def geocode(self, query, exactly_one=True, timeout=None, **kwargs):
         """
         Geocode a location query.
 
@@ -75,6 +84,9 @@ class GeocodeFarm(Geocoder):
         params = {
             'addr': self.format_string % query,
         }
+
+        self._add_optional_params(params, **kwargs)
+
         if self.api_key:
             params['key'] = self.api_key
         url = "?".join((self.api, urlencode(params)))
@@ -83,7 +95,7 @@ class GeocodeFarm(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=None, **kwargs):
         """
         Returns a reverse geocoded location.
 
@@ -112,6 +124,9 @@ class GeocodeFarm(Geocoder):
             'lat': lat,
             'lon': lon
         }
+
+        self._add_optional_params(params, **kwargs)
+
         if self.api_key:
             params['key'] = self.api_key
         url = "?".join((self.reverse_api, urlencode(params)))
