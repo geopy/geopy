@@ -7,5 +7,5 @@ python:
     - "3.6"
     - "pypy"
     - "pypy3"
-install: coverage nose-cov requests-oauthlib pytz
+install: pip install coverage nose-cov requests-oauthlib pytz
 script: nosetests --verbose --with-cover --cover-erase --cover-package=geopy
