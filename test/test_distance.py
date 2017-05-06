@@ -9,6 +9,8 @@ from geopy.point import Point
 from geopy.distance import (Distance,
                             GreatCircleDistance,
                             VincentyDistance,
+                            GeodesicDistance,
+                            HAVE_GEODESIC,
                             EARTH_RADIUS,
                             ELLIPSOIDS)
 
@@ -56,8 +58,10 @@ class CommonDistanceComputationCases:
         assert_almost_equal(destination.longitude, 0)
 
     def test_should_recognize_equivalence_of_pos_and_neg_180_longitude(self):
-        distance = self.cls((0, 180), (0, -180)).kilometers
-        assert_almost_equal(distance, 0)
+        distance1 = self.cls((0, -180), (0, 180)).kilometers
+        distance2 = self.cls((0, 180), (0, -180)).kilometers
+        assert_almost_equal(distance1, 0)
+        assert_almost_equal(distance2, 0)
 
 
 class CommonMathematicalOperatorCases:
@@ -185,10 +189,11 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases):
         assert_raises(ValueError, self.cls, (0, 0), (0, 180))
 
     def test_should_compute_destination_for_half_trip_around_equator(self):
-        distance = self.cls(EARTH_CIRCUMFERENCE / 2)
-        destination = distance.destination((0, 0), 0)
-        assert_almost_equal(destination.latitude, 0, 0)
-        assert_almost_equal(destination.longitude, -180, 0)
+        distance = self.cls()
+        destination = distance.destination((0, 0), 90,
+                                           math.pi * distance.ELLIPSOID[0])
+        assert_almost_equal(destination.latitude, 0, 8)
+        assert_almost_equal(abs(destination.longitude), 180, 8)
 
     def test_should_compute_same_destination_as_other_libraries(self):
         distance = self.cls(54.972271)
@@ -206,3 +211,93 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases):
                        for y in range(len(results))
                        if x != y)
 
+if HAVE_GEODESIC:
+
+    class TestWhenComputingGeodesicDistance(CommonDistanceCases):
+
+        cls = GeodesicDistance
+
+        def setup(self):
+            self.original_ellipsoid = self.cls.ELLIPSOID
+
+        def teardown(self):
+            self.cls.ELLIPSOID = self.original_ellipsoid
+
+        def test_miscellaneous_high_accuracy_cases(self):
+
+            testcases = [
+              [35.60777, -139.44815, 111.098748429560326,
+               -11.17491, -69.95921, 129.289270889708762,
+               8935244.5604818305],
+              [55.52454, 106.05087, 22.020059880982801,
+               77.03196, 197.18234, 109.112041110671519,
+               4105086.1713924406],
+              [-21.97856, 142.59065, -32.44456876433189,
+               41.84138, 98.56635, -41.84359951440466,
+               8394328.894657671],
+              [-66.99028, 112.2363, 173.73491240878403,
+               -12.70631, 285.90344, 2.512956620913668,
+               11150344.2312080241],
+              [-17.42761, 173.34268, -159.033557661192928,
+               -15.84784, 5.93557, -20.787484651536988,
+               16076603.1631180673],
+              [32.84994, 48.28919, 150.492927788121982,
+               -56.28556, 202.29132, 48.113449399816759,
+               16727068.9438164461],
+              [6.96833, 52.74123, 92.581585386317712,
+               -7.39675, 206.17291, 90.721692165923907,
+               17102477.2496958388],
+              [-50.56724, -16.30485, -105.439679907590164,
+               -33.56571, -94.97412, -47.348547835650331,
+               6455670.5118668696],
+              [-58.93002, -8.90775, 140.965397902500679,
+               -8.91104, 133.13503, 19.255429433416599,
+               11756066.0219864627],
+              [-68.82867, -74.28391, 93.774347763114881,
+               -50.63005, -8.36685, 34.65564085411343,
+               3956936.926063544],
+              [-10.62672, -32.0898, -86.426713286747751,
+               5.883, -134.31681, -80.473780971034875,
+               11470869.3864563009],
+              [-21.76221, 166.90563, 29.319421206936428,
+               48.72884, 213.97627, 43.508671946410168,
+               9098627.3986554915],
+              [-19.79938, -174.47484, 71.167275780171533,
+               -11.99349, -154.35109, 65.589099775199228,
+               2319004.8601169389],
+              [-11.95887, -116.94513, 92.712619830452549,
+               4.57352, 7.16501, 78.64960934409585,
+               13834722.5801401374],
+              [-87.85331, 85.66836, -65.120313040242748,
+               66.48646, 16.09921, -4.888658719272296,
+               17286615.3147144645],
+              [1.74708, 128.32011, -101.584843631173858,
+               -11.16617, 11.87109, -86.325793296437476,
+               12942901.1241347408],
+              [-25.72959, -144.90758, -153.647468693117198,
+               -57.70581, -269.17879, -48.343983158876487,
+               9413446.7452453107],
+              [-41.22777, 122.32875, 14.285113402275739,
+               -7.57291, 130.37946, 10.805303085187369,
+               3812686.035106021],
+              [11.01307, 138.25278, 79.43682622782374,
+               6.62726, 247.05981, 103.708090215522657,
+               11911190.819018408],
+              [-29.47124, 95.14681, -163.779130441688382,
+               -27.46601, -69.15955, -15.909335945554969,
+               13487015.8381145492]]
+            d = self.cls(ellipsoid = 'WGS-84')
+            km = 1000
+            for l in testcases:
+                (lat1, lon1, azi1, lat2, lon2, azi2, s12) = l
+                # lon2 is the UNROLLed longitude, so normalize
+                lon2 = (lon2 + 360 if lon2 < -180 else
+                        lon2 - 360 if lon2 >= 180 else lon2)
+                s12a = d.measure((lat1, lon1), (lat2, lon2)) * km
+                assert_almost_equal(s12a, s12, delta = 1e-8)
+                p = d.destination((lat1, lon1), azi1, s12/km)
+                assert_almost_equal(p.latitude, lat2, delta = 1e-13)
+                assert_almost_equal(p.longitude, lon2, delta = 1e-12)
+                p = d.destination((lat2, lon2), azi2, -s12/km)
+                assert_almost_equal(p.latitude, lat1, delta = 1e-13)
+                assert_almost_equal(p.longitude, lon1, delta = 1e-12)
