@@ -56,7 +56,7 @@ class What3WordsTestCase(GeocoderTestBase):
         )
         self.assertEqual(
             result_reverse.address,
-            'unwesen.voll.schnitt'
+            'fortschrittliche.voll.schnitt'
         )
 
 
@@ -97,7 +97,7 @@ class What3WordsTestCase(GeocoderTestBase):
         )
         self.assertEqual(
             result_geocode.address,
-            'unwesen.voll.schnitt'
+            'fortschrittliche.voll.schnitt'
         )
 
     def test_check_query(self):

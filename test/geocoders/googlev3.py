@@ -3,7 +3,7 @@ from datetime import datetime
 from pytz import timezone
 
 from geopy import exc
-from geopy.compat import u
+from geopy.compat import u, urlparse, parse_qs
 from geopy.point import Point
 from geopy.geocoders import GoogleV3
 from test.geocoders.util import GeocoderTestBase
@@ -70,6 +70,23 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
                 "signature=D3PL0cZJrJYfveGSNoGqrrMsz0M="
             )
         )
+
+    def test_get_signed_url_with_channel(self):
+        """
+        GoogleV3._get_signed_url
+        """
+        geocoder = GoogleV3(
+            client_id='my_client_id',
+            secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8')),
+            channel='my_channel'
+        )
+
+        signed_url = geocoder._get_signed_url({'address': '1 5th Ave New York, NY'})
+        params = parse_qs(urlparse(signed_url).query)
+
+        self.assertTrue('channel' in params)
+        self.assertTrue('signature' in params)
+        self.assertTrue('client' in params)
 
     def test_format_components_param(self):
         """
@@ -166,8 +183,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         GoogleV3.geocode returns None for no result
         """
-        result = self._make_request(self.geocoder.geocode, '')
-        self.assertIsNone(result)
+        self.assertRaises(exc.GeocoderQueryError, self._make_request,self.geocoder.geocode, '')
 
     def test_timezone_datetime(self):
         """

@@ -1,5 +1,5 @@
 """
-OpenStreetMaps geocoder, contributed by Alessandro Pasotti of ItOpen.
+OpenStreetMap geocoder, contributed by Alessandro Pasotti of ItOpen.
 """
 
 from geopy.geocoders.base import (
