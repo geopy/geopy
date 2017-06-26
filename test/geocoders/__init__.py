@@ -13,6 +13,7 @@ from .mapzen import *
 from .nominatim import *
 from .opencage import *
 from .openmapquest import *
+from .pickpoint import *
 from .photon import *
 from .placefinder import *
 from .smartystreets import *
