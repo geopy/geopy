@@ -113,6 +113,7 @@ from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.photon import Photon
+from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
@@ -136,6 +137,7 @@ SERVICE_TO_GEOCODER = {
     "mapzen": Mapzen,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
+    "pickpoint": PickPoint,
     "nominatim": Nominatim,
     "photon": Photon,
     "yahoo": YahooPlaceFinder,
@@ -165,4 +167,3 @@ def get_geocoder_for_service(service):
             "Unknown geocoder '%s'; options are: %s" %
             (service, SERVICE_TO_GEOCODER.keys())
         )
-

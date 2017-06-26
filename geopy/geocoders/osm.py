@@ -95,6 +95,16 @@ class Nominatim(Geocoder):
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
 
+    def _construct_url(self, base_api, params):
+        """
+        Construct geocoding request url.
+        The method can be overriden in Nominatim-based geocoders in order to extend URL parameters.
+        :param base_api: Geocoding function base address, self.api or self.reverse_api.
+        :param params: Geocoding params dictionary.
+        :return: URL string.
+        """
+        return "?".join((base_api, urlencode(params)))
+
     def geocode(
             self,
             query,
@@ -194,8 +204,9 @@ class Nominatim(Geocoder):
                     "wkt, svg, kml, geojson."
                 )
 
-        url = "?".join((self.api, urlencode(params)))
+        url = self._construct_url(self.api, params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
@@ -248,8 +259,10 @@ class Nominatim(Geocoder):
         }
         if language:
             params['accept-language'] = language
-        url = "?".join((self.reverse_api, urlencode(params)))
+
+        url = self._construct_url(self.reverse_api, params)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )

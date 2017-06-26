@@ -28,6 +28,7 @@ except IOError:
         'BAIDU_KEY',
         'OPENCAGE_KEY',
         'OPENMAPQUEST_APIKEY',
+        'PICKPOINT_KEY',
         'WHAT3WORDS_KEY',
         'IGNFRANCE_KEY',
         'IGNFRANCE_USERNAME',
