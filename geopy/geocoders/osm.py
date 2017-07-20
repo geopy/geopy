@@ -130,7 +130,7 @@ class Nominatim(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-        :type addressdetails: string
+        :type language: string
 
             .. versionadded:: 1.0.0
 
@@ -223,7 +223,7 @@ class Nominatim(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-        :type addressdetails: string
+        :type language: string
 
             .. versionadded:: 1.0.0
 
