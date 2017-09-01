@@ -513,7 +513,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         """
         Get the location, lat, lng and place from a single json place.
         """
-        # When freeform already so full adress
+        # When freeform already so full address
         if is_freeform == 'true':
             location = place.get('freeformaddress')
         else:
