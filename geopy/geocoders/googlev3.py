@@ -8,7 +8,6 @@ import hmac
 from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
-    GeocoderQueryError,
     GeocoderQuotaExceeded,
     ConfigurationError,
     GeocoderParseError,
