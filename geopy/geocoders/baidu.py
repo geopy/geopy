@@ -118,6 +118,7 @@ class Baidu(Geocoder):
             'ak': self.api_key,
             'output': 'json',
             'location': self._coerce_point_to_string(query),
+            'coordtype': 'wgs84ll',
         }
 
         url = "?".join((self.api, urlencode(params)))
