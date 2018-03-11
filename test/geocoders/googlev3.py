@@ -183,7 +183,8 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         GoogleV3.geocode returns None for no result
         """
-        self.assertRaises(exc.GeocoderQueryError, self._make_request,self.geocoder.geocode, '')
+        with self.assertRaises(exc.GeocoderQueryError):
+            self._make_request(self.geocoder.geocode, '')
 
     def test_timezone_datetime(self):
         """
