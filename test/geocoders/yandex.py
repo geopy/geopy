@@ -47,5 +47,5 @@ class YandexTestCase(GeocoderTestBase):
         )
         self.geocode_run(
             {"query": "площа Леніна Донецьк"},
-            {'raw': {"metaDataProperty":{"GeocoderMetaData":{"kind":"street","text":"Україна, Донецьк, площа Леніна","precision":"street","AddressDetails":{"Country":{"AddressLine":"Донецьк, площа Леніна","CountryNameCode":"UA","CountryName":"Україна","AdministrativeArea":{"AdministrativeAreaName":"Донецька область","SubAdministrativeArea":{"SubAdministrativeAreaName":"Донецька міська рада","Locality":{"LocalityName":"Донецьк","Thoroughfare":{"ThoroughfareName":"площа Леніна"}}}}}}}},"description":"Донецьк, Україна","name":"площа Леніна","boundedBy":{"Envelope":{"lowerCorner":"37.804575 48.001669","upperCorner":"37.805805 48.002538"}},"Point":{"pos":"37.805186 48.002104"}}},
+            {"address": "Донецьк, Україна", "latitude": 48.002104, "longitude": 37.805186},
         )

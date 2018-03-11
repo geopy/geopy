@@ -12,3 +12,4 @@ docs/_build
 *.config
 .DS_Store
 .idea/
+.python-version
