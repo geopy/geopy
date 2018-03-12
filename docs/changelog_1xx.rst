@@ -1,10 +1,47 @@
 Changelog
 =========
 
+1.12.0
+------
+2018-03-TBD
+
+* ADDED: Mapzen geocoder. Contributed by migurski. (#183)
+
+* CHANGED: GoogleV3 geocoder now supports a `channel` option.
+    Contributed by gotche. (#206)
+
+* CHANGED: Use the IUGG mean earth radius for EARTH_RADIUS.
+    Contributed by cffk. (#151)
+
+* CHANGED: Use the exact conversion factor from kilometers to miles.
+    Contributed by cffk. (#150)
+
+* CHANGED: Photon geocoder now accepts a new `limit` option.
+    Contributed by Mariana Georgieva.
+
+* CHANGED: Photon geocoder: removed `osm_tag` option from
+    reverse geocoding method, as Photon backend doesn't support
+    it for reverse geocoding.
+
+* FIXED: Photon geocoder was always returning an empty address.
+
+* FIXED: Yandex geocoder was returning a truncated address
+    (the `name` part of a place was missing).
+
+* FIXED: The custom `User-Agent` header was not actually sent.
+    This also fixes broken Nominatim, which has recently banned
+    the stock urllib user agent.
+
+* FIXED: `geopy.util.get_version()` function was throwing
+    an `ImportError` exception instead of returning a version string.
+
+* REMOVED: Navidata geocoder has been removed.
+    Contributed by medecau. (#204)
+
+
 1.11.0
 ------
 2015-09-01
-
 
 * ADDED: Photon geocoder. Contributed by mthh.
 
@@ -20,7 +57,6 @@ Changelog
 
 * FIXED: Nominatim was incorrectly sending `view_box` when not requested,
     and formatting it incorrectly. Contributed by m0zes.
-
 
 
 1.10.0
