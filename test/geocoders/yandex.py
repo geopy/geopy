@@ -47,5 +47,5 @@ class YandexTestCase(GeocoderTestBase):
         )
         self.geocode_run(
             {"query": "площа Леніна Донецьк"},
-            {"address": "Донецьк, Україна", "latitude": 48.002104, "longitude": 37.805186},
+            {"address": "площа Леніна, Донецьк, Україна", "latitude": 48.002104, "longitude": 37.805186},
         )

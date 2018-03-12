@@ -157,7 +157,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
                 float(_) for _ in place['Point']['pos'].split(' ')
             ]
 
-            location = place.get('description')
+            name_elements = ['name', 'description']
+            location = ', '.join([place[k] for k in name_elements if place.get(k)])
 
             return Location(location, (latitude, longitude), place)
 
