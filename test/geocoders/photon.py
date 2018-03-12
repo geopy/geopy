@@ -1,3 +1,5 @@
+# coding: utf8
+from __future__ import unicode_literals
 
 from geopy.compat import u
 from geopy.point import Point
@@ -19,7 +21,8 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         self.geocode_run(
             {"query": "14 rue pelisson villeurbanne"},
-            {"latitude": 45.7733963, "longitude": 4.88612369},
+            {"address": "Rue du 14 Juillet 1789, 69003, Villeurbanne, Auvergne-Rhône-Alpes, France",
+             "latitude": 45.7733963, "longitude": 4.88612369},
         )
 
     def test_osm_tag(self):
@@ -41,7 +44,7 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         Photon.geocode unicode
         """
         self.geocode_run(
-            {"query": u("\u6545\u5bab")},
+            {"query": "\u6545\u5bab"},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
@@ -60,7 +63,8 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
-            {"latitude": 45.7733105, "longitude": 4.8869339}
+            {"address": "Rue Raspail, 69100, Villeurbanne, Auvergne-Rhône-Alpes, France",
+             "latitude": 45.7733105, "longitude": 4.8869339}
         )
 
     def test_geocode_language_parameter(self):

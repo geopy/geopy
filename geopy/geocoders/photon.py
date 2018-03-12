@@ -193,7 +193,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
-        if not len(resources):  # pragma: no cover
+        if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
             return cls.parse_resource(resources['features'][0])
@@ -209,8 +209,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',
                          'state', 'country']
-        name = [resource.get(k) for k
-                in name_elements if resource.get(k)]
+        name = [resource['properties'].get(k) for k
+                in name_elements if resource['properties'].get(k)]
         location = ', '.join(name)
 
         latitude = resource['geometry']['coordinates'][1] or None
