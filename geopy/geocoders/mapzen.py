@@ -19,6 +19,10 @@ class Mapzen(Geocoder):
     """
     Mapzen Search geocoder. Documentation at:
         https://mapzen.com/documentation/search/
+
+    .. warning::
+       Please note that Mapzen has shut down their API so this geocoder
+       class might be removed in future releases.
     """
 
     def __init__(

@@ -1,5 +1,6 @@
 # coding: utf8
 from __future__ import unicode_literals
+import unittest
 
 from mock import patch
 from geopy.compat import u
@@ -8,6 +9,7 @@ from geopy.geocoders import Mapzen
 from test.geocoders.util import GeocoderTestBase
 
 
+@unittest.skip("Mapzen has shut down their API")
 class MapzenTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
 
     delta = 0.04
