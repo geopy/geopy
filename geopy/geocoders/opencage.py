@@ -92,6 +92,7 @@ class OpenCage(Geocoder):
             coordinate points forming the south-west and north-east
             corners of a bounding box. For example,
             `bounds=-0.563160,51.280430,0.278970,51.683979`.
+            (min lon, min lat, max lon, max lat)
 
         :param string country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
