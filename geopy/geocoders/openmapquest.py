@@ -3,6 +3,7 @@
 """
 
 from geopy.compat import urlencode
+from geopy.exc import ConfigurationError
 from geopy.geocoders.base import (
     Geocoder,
     DEFAULT_FORMAT_STRING,
@@ -19,7 +20,7 @@ __all__ = ("OpenMapQuest", )
 class OpenMapQuest(Geocoder): # pylint: disable=W0223
     """
     Geocoder using MapQuest Open Platform Web Services. Documentation at:
-        http://developer.mapquest.com/web/products/open/geocoding-service
+        https://developer.mapquest.com/documentation/open/
     """
 
     def __init__(
@@ -33,8 +34,13 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         ):  # pylint: disable=R0913
         """
         Initialize an Open MapQuest geocoder with location-specific
-        address information. No API Key is needed by the Nominatim based
-        platform.
+        address information.
+
+        :param string api_key: API key provided by MapQuest.
+
+            .. versionchanged:: 1.12.0
+               OpenMapQuest now requires an API key. Using an empty key will
+               result in a :class:`geopy.exc.ConfigurationError`.
 
         :param string format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
@@ -63,7 +69,9 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         super(OpenMapQuest, self).__init__(
             format_string, scheme, timeout, proxies, user_agent=user_agent
         )
-        self.api_key = api_key or ''
+        if not api_key:
+            raise ConfigurationError('OpenMapQuest requires an API key')
+        self.api_key = api_key
         self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json" % self.scheme
 
@@ -84,6 +92,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             .. versionadded:: 0.97
         """
         params = {
+            'key': self.api_key,
             'q': self.format_string % query
         }
         if exactly_one:
