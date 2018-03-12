@@ -123,13 +123,14 @@ level of `NOTSET` or a level greater than `DEBUG` for logger name `geopy`.
 geopy does no logging above DEBUG.
 
 
-Changelog
+Reference
 ~~~~~~~~~
 
-.. include:: changelog_1xx.rst
+.. toctree::
+   :maxdepth: 1
 
-For changes in the 0.9 series, see the
-:doc:`0.9x changelog <changelog_09x>`.
+   changelog_1xx
+   changelog_09x
 
 
 Indices and search
