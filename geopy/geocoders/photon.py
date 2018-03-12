@@ -98,16 +98,16 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
-            are requiered as ['key:!val', '!key', ':!value']
+            are required as ['key:!val', '!key', ':!value'].
 
         """
         params = {
             'q': self.format_string % query
         }
-        if exactly_one:
-            params['limit'] = 1
         if limit:
             params['limit'] = int(limit)
+        if exactly_one:
+            params['limit'] = 1
         if language:
             params['lang'] = language
         if location_bias:
@@ -143,7 +143,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             exactly_one=True,
             timeout=None,
             language=False,
-            osm_tag=None
+            limit=None,
         ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
@@ -163,9 +163,9 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
-        :param osm_tag: The expression to filter (include/exclude) by key and/
-            or value, str as 'key:value' or list/set of str if multiple filters
-            are requiered as ['key:!val', '!key', ':!value']
+        :param int limit: Limit the number of returned results, defaults to no
+            limit.
+
         """
         try:
             lat, lon = [x.strip() for x in
@@ -176,19 +176,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
             'lat': lat,
             'lon': lon,
         }
+        if limit:
+            params['limit'] = int(limit)
         if exactly_one:
             params['limit'] = 1
         if language:
             params['lang'] = language
-        if osm_tag:
-            if isinstance(osm_tag, string_compare):
-                params['osm_tag'] = osm_tag
-            else:
-                try:
-                    params['osm_tag'] = '&osm_tag='.join(osm_tag)
-                except ValueError:
-                    raise ValueError(("osm_tag must be a string expression or "
-                                      "a set/list of string expressions"))
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
