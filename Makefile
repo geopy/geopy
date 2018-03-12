@@ -11,7 +11,7 @@ develop:
 	python setup.py develop && python setup.py test
 
 lint:
-	./lint.sh
+	pylint --rcfile=.pylintrc --reports=n geopy
 
 pylint:
 	pylint --rcfile .pylintrc geopy
