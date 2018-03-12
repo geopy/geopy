@@ -470,7 +470,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             for key, value in iteritems(el):
                 if value is not None:
                     place[key] = value.text
-                    if value.text == None:
+                    if value.text is None:
                         place[key] = None
                 else:
                     place[key] = None

@@ -55,7 +55,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         super(GeoNames, self).__init__(
             scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent
         )
-        if username == None:
+        if username is None:
             raise ConfigurationError(
                 'No username given, required for api access.  If you do not '
                 'have a GeoNames username, sign up here: '
