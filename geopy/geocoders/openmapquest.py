@@ -73,7 +73,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             raise ConfigurationError('OpenMapQuest requires an API key')
         self.api_key = api_key
         self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \
-                    "?format=json" % self.scheme
+                   "?key=%s&format=json" % (self.scheme, self.api_key)
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
