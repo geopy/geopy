@@ -74,7 +74,7 @@ class Geocoder(object): # pylint: disable=R0921
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            user_agent=None
+            user_agent=None,
         ):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders

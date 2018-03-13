@@ -49,6 +49,10 @@ class Yandex(Geocoder): # pylint: disable=W0223
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(Yandex, self).__init__(
             scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent

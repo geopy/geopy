@@ -51,6 +51,10 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(GeoNames, self).__init__(
             scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent

@@ -45,6 +45,10 @@ class GeocodeFarm(Geocoder):
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(GeocodeFarm, self).__init__(
             format_string, 'https', timeout, proxies, user_agent=user_agent

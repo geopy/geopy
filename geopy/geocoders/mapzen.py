@@ -54,6 +54,10 @@ class Mapzen(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
         :param string domain: Specify a custom domain for Mapzen API.
 
         :param string scheme: Use 'https' or 'http' as the API URL's scheme.

@@ -73,6 +73,11 @@ class Nominatim(Geocoder):
             verified.
 
             .. versionadded:: 1.8.2
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
         """
         super(Nominatim, self).__init__(
             format_string, scheme, timeout, proxies, user_agent=user_agent

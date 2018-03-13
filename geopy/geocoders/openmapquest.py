@@ -65,6 +65,10 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(OpenMapQuest, self).__init__(
             format_string, scheme, timeout, proxies, user_agent=user_agent

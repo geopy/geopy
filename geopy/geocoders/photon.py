@@ -57,6 +57,10 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :param string domain: Should be the localized Photon domain to
             connect to. The default is 'photon.komoot.de', but you
             can change it to a domain of your own.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(Photon, self).__init__(
             format_string, scheme, timeout, proxies, user_agent=user_agent

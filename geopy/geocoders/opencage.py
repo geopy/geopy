@@ -51,6 +51,10 @@ class OpenCage(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
         """
         super(OpenCage, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
