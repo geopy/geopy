@@ -22,7 +22,12 @@ class Nominatim(Geocoder):
     Nominatim geocoder for OpenStreetMap servers. Documentation at:
         https://wiki.openstreetmap.org/wiki/Nominatim
 
-    Note that Nominatim does not support SSL.
+    .. attention::
+       Nominatim requires each application to provide their own custom
+       user-agent:
+       ``geolocator = Nominatim(user_agent="my-application")``.
+       Nominatim usage policy:
+       https://operations.osmfoundation.org/policies/nominatim/
     """
 
     structured_query_params = {
