@@ -15,6 +15,12 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         cls.known_country_it = "Francia"
         cls.known_country_fr = "France"
 
+    def test_user_agent_custom(self):
+        geocoder = Photon(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
     def test_geocode(self):
         """
         Photon.geocode
