@@ -1,8 +1,8 @@
 include LICENSE
 include MANIFEST.in
 include CHANGELOG
-include README
 recursive-include geopy *
+include README.rst
 recursive-exclude test *
 prune geopy/__pycache__
 prune geopy/geocoders/__pycache__
