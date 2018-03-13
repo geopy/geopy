@@ -96,6 +96,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
+            .. versionadded:: 1.12.0
+
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
             are required as ['key:!val', '!key', ':!value'].
@@ -165,6 +167,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param int limit: Limit the number of returned results, defaults to no
             limit.
+
+            .. versionadded:: 1.12.0
 
         """
         try:

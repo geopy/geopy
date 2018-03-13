@@ -7,7 +7,7 @@ Changelog
 
 * ADDED: Mapzen geocoder. Contributed by migurski. (#183)
 
-* CHANGED: GoogleV3 geocoder now supports a `channel` option.
+* ADDED: GoogleV3 geocoder now supports a `channel` option.
     Contributed by gotche. (#206)
 
 * CHANGED: Use the IUGG mean earth radius for EARTH_RADIUS.
@@ -16,7 +16,10 @@ Changelog
 * CHANGED: Use the exact conversion factor from kilometers to miles.
     Contributed by cffk. (#150)
 
-* CHANGED: Photon geocoder now accepts a new `limit` option.
+* CHANGED: OpenMapQuest geocoder now properly supports `api_key`
+    option and makes it required.
+
+* ADDED: Photon geocoder now accepts a new `limit` option.
     Contributed by Mariana Georgieva.
 
 * CHANGED: Photon geocoder: removed `osm_tag` option from
@@ -34,6 +37,10 @@ Changelog
 
 * FIXED: `geopy.util.get_version()` function was throwing
     an `ImportError` exception instead of returning a version string.
+
+* FIXED: Docs for constructing a `geopy.point.Point` were referencing
+    latitude and longitude in a wrong order. Contributed by micahcochran
+    and sjorek. (#207 #229)
 
 * REMOVED: Navidata geocoder has been removed.
     Contributed by medecau. (#204)

@@ -75,6 +75,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param string channel: If using premier, the channel identifier.
 
+            .. versionadded:: 1.12.0
+
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
