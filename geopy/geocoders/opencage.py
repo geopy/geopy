@@ -17,8 +17,8 @@ __all__ = ("OpenCage", )
 
 class OpenCage(Geocoder):
     """
-    Geocoder using the Open Cage Data API. Documentation at:
-        http://geocoder.opencagedata.com/api.html
+    Geocoder using the OpenCageData API. Documentation at:
+        https://geocoder.opencagedata.com/api
 
     ..versionadded:: 1.1.0
     """
@@ -33,11 +33,11 @@ class OpenCage(Geocoder):
             user_agent=None,
     ):  # pylint: disable=R0913
         """
-        Initialize a customized Open Cage Data geocoder.
+        Initialize a customized OpenCageData geocoder.
 
-        :param string api_key: The API key required by Open Cage Data
+        :param string api_key: The API key required by OpenCageData
             to perform geocoding requests. You can get your key here:
-            https://developer.opencagedata.com/
+            https://geocoder.opencagedata.com/
 
         :param string domain: Currently it is 'api.opencagedata.com', can
             be changed for testing purposes.

@@ -27,7 +27,7 @@ The various geocoder classes are located in [geopy.geocoders][geocoders_src].
 [ignfrance]: http://api.ign.fr/tech-docs-js/fr/developpeur/search.html
 [mapquest]: http://www.mapquestapi.com/geocoding/
 [mapzen]: https://mapzen.com/projects/search/
-[opencage]: http://geocoder.opencagedata.com/api.html
+[opencage]: https://geocoder.opencagedata.com/api
 [openmapquest]: http://developer.mapquest.com/web/products/open/geocoding-service
 [osm]: https://wiki.openstreetmap.org/wiki/Nominatim
 [placefinder]: https://developer.yahoo.com/boss/geo/docs/
