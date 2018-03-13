@@ -59,9 +59,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
         )
         self.api_key = api_key
         self.lang = lang
-        self.api = 'http://geocode-maps.yandex.ru/1.x/'
+        self.api = 'https://geocode-maps.yandex.ru/1.x/'
 
-    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=None, other_params=None): # pylint: disable=W0221
         """
         Geocode a location query.
 
@@ -74,13 +74,18 @@ class Yandex(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+            
+        :param dict other_params: You can set any other request parameters described in documentation: 
+            https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
         """
         params = {
             'geocode': query,
             'format': 'json'
         }
+        if other_params:
+            params.update(other_params)
         if not self.api_key is None:
-            params['key'] = self.api_key
+            params['apikey'] = self.api_key
         if not self.lang is None:
             params['lang'] = self.lang
         if exactly_one is True:
