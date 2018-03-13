@@ -5,7 +5,7 @@ Changelog
 
 1.12.0
 ------
-2018-03-TBD
+2018-03-13
 
 *   ADDED: Mapzen geocoder. Contributed by migurski. (#183)
 
