@@ -90,9 +90,10 @@ class OpenCage(Geocoder):
             but will not restrict the possible results to the supplied
             region. The bounds parameter should be specified as 4
             coordinate points forming the south-west and north-east
-            corners of a bounding box. For example,
-            `bounds=-0.563160,51.280430,0.278970,51.683979`.
-            (min lon, min lat, max lon, max lat)
+            corners of a bounding box. The order of the coordinates is
+            `longitude,latitude,longitude,latitude`. For example,
+            `bounds=-0.563160,51.280430,0.278970,51.683979`
+            
 
         :param string country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
