@@ -40,7 +40,7 @@ The various geocoder classes are located in `geopy.geocoders`_.
 .. _Mapzen Search: https://mapzen.com/projects/search/
 .. _OpenMapQuest: http://developer.mapquest.com/web/products/open/geocoding-service
 .. _What3Words: http://what3words.com/api/reference
-.. _OpenCage: http://geocoder.opencagedata.com/api.html
+.. _OpenCage: https://geocoder.opencagedata.com/
 .. _SmartyStreets: https://smartystreets.com/products/liveaddress-api
 .. _geocoder.us: http://geocoder.us/
 .. _GeocodeFarm: https://www.geocodefarm.com/
