@@ -17,8 +17,8 @@ __all__ = ("OpenCage", )
 
 class OpenCage(Geocoder):
     """
-    Geocoder using the Open Cage Data API. Documentation at:
-        http://geocoder.opencagedata.com/api.html
+    Geocoder using the OpenCageData API. Documentation at:
+        https://geocoder.opencagedata.com/api
 
     ..versionadded:: 1.1.0
     """
@@ -33,11 +33,11 @@ class OpenCage(Geocoder):
             user_agent=None,
     ):  # pylint: disable=R0913
         """
-        Initialize a customized Open Cage Data geocoder.
+        Initialize a customized OpenCageData geocoder.
 
-        :param string api_key: The API key required by Open Cage Data
+        :param string api_key: The API key required by OpenCageData
             to perform geocoding requests. You can get your key here:
-            https://developer.opencagedata.com/
+            https://geocoder.opencagedata.com/
 
         :param string domain: Currently it is 'api.opencagedata.com', can
             be changed for testing purposes.
@@ -90,8 +90,10 @@ class OpenCage(Geocoder):
             but will not restrict the possible results to the supplied
             region. The bounds parameter should be specified as 4
             coordinate points forming the south-west and north-east
-            corners of a bounding box. For example,
-            `bounds=-0.563160,51.280430,0.278970,51.683979`.
+            corners of a bounding box. The order of the coordinates is
+            `longitude,latitude,longitude,latitude`. For example,
+            `bounds=-0.563160,51.280430,0.278970,51.683979`
+            
 
         :param string country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
