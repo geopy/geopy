@@ -73,6 +73,11 @@ need to geocode locations in Cleveland, Ohio, you could do::
 
 __all__ = (
     "get_geocoder_for_service",
+    # The order of classes below should correspond to the order of their
+    # files in the ``geocoders`` directory ordered by name.
+    #
+    # Also don't forget to pull up the list of geocoders
+    # in the docs: docs/changelog_1xx.rst
     "ArcGIS",
     "Baidu",
     "Bing",
@@ -82,15 +87,15 @@ __all__ = (
     "GeoNames",
     "GoogleV3",
     "IGNFrance",
+    "Mapzen",
     "OpenCage",
     "OpenMapQuest",
     "Nominatim",
+    "Photon",
     "YahooPlaceFinder",
     "LiveAddress",
-    'Yandex',
     "What3Words",
-    "Photon",
-    "Mapzen",
+    "Yandex",
 )
 
 
@@ -102,16 +107,16 @@ from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
+from geopy.geocoders.ignfrance import IGNFrance
+from geopy.geocoders.mapzen import Mapzen
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
+from geopy.geocoders.photon import Photon
 from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
-from geopy.geocoders.ignfrance import IGNFrance
-from geopy.geocoders.photon import Photon
-from geopy.geocoders.mapzen import Mapzen
 
 
 from geopy.exc import GeocoderNotFound
@@ -122,21 +127,22 @@ SERVICE_TO_GEOCODER = {
     "baidu": Baidu,
     "bing": Bing,
     "databc": DataBC,
+    "geocoderdotus": GeocoderDotUS,
+    "geocodefarm": GeocodeFarm,
+    "geonames": GeoNames,
     "google": GoogleV3,
     "googlev3": GoogleV3,
-    "geocoderdotus": GeocoderDotUS,
-    "geonames": GeoNames,
-    "yahoo": YahooPlaceFinder,
-    "placefinder": YahooPlaceFinder,
+    "ignfrance": IGNFrance,
+    "mapzen": Mapzen,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
-    "liveaddress": LiveAddress,
     "nominatim": Nominatim,
-    "geocodefarm": GeocodeFarm,
+    "photon": Photon,
+    "yahoo": YahooPlaceFinder,
+    "placefinder": YahooPlaceFinder,
+    "liveaddress": LiveAddress,
     "what3words": What3Words,
     "yandex": Yandex,
-    "ignfrance": IGNFrance,
-    "photon": Photon
 }
 
 

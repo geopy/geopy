@@ -30,7 +30,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     def __init__(self, username=None, password=None, referer=None, # pylint: disable=R0913
                  token_lifetime=60, scheme=DEFAULT_SCHEME,
                  timeout=DEFAULT_TIMEOUT, proxies=None,
-                user_agent=None):
+                 user_agent=None):
         """
         Create a ArcGIS-based geocoder.
 
@@ -62,6 +62,10 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(ArcGIS, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent

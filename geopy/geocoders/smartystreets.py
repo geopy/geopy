@@ -15,9 +15,11 @@ __all__ = ("LiveAddress", )
 class LiveAddress(Geocoder):  # pylint: disable=W0223
     """
     Initialize a customized LiveAddress geocoder provided by SmartyStreets.
+
     More information regarding the LiveAddress API can be found here:
         https://smartystreets.com/products/liveaddress-api
     """
+
     def __init__(
             self,
             auth_id,
@@ -48,8 +50,8 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             .. versionadded:: 0.97
 
             .. versionchanged:: 1.8.0
-            LiveAddress now requires `https`. Specifying `scheme=http` will
-            result in a :class:`geopy.exc.ConfigurationError`.
+               LiveAddress now requires `https`. Specifying `scheme=http` will
+               result in a :class:`geopy.exc.ConfigurationError`.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising an :class:`geopy.exc.GeocoderTimedOut`
@@ -63,6 +65,10 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(LiveAddress, self).__init__(
             timeout=timeout, proxies=proxies, user_agent=user_agent

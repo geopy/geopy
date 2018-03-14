@@ -19,8 +19,9 @@ setup(
     name='geopy',
     version=version,
     description='Python Geocoding Toolbox',
+    long_description=open('README.rst').read(),
     author='GeoPy Contributors',
-    author_email='uijllji@gmail',
+    author_email='uijllji@gmail.com',
     url='https://github.com/geopy/geopy',
     download_url=(
         'https://github.com/geopy/geopy/archive/%s.tar.gz' % version
@@ -46,8 +47,9 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ]

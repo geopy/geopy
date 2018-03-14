@@ -87,6 +87,10 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
         """
         super(IGNFrance, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
@@ -470,7 +474,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             for key, value in iteritems(el):
                 if value is not None:
                     place[key] = value.text
-                    if value.text == None:
+                    if value.text is None:
                         place[key] = None
                 else:
                     place[key] = None
@@ -513,7 +517,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         """
         Get the location, lat, lng and place from a single json place.
         """
-        # When freeform already so full adress
+        # When freeform already so full address
         if is_freeform == 'true':
             location = place.get('freeformaddress')
         else:

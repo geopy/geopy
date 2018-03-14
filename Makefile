@@ -11,13 +11,13 @@ develop:
 	python setup.py develop && python setup.py test
 
 lint:
-	./lint.sh
+	pylint --rcfile=.pylintrc --reports=n geopy
 
 pylint:
 	pylint --rcfile .pylintrc geopy
 
 test:
-	nosetests --verbose --with-cover --cover-erase --cover-package=geopy test.test_distance test.geocoders.googlev3 test.geocoders.nominatim test.geocoders.photon test.geocoders.base test.geocoders.util
+	nosetests --verbose --with-cover --cover-erase --cover-package=geopy
 
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf

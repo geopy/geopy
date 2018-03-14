@@ -1,4 +1,7 @@
+:orphan:
 
+Changelog of the 0.9 series
+===========================
 
 0.99
 ----

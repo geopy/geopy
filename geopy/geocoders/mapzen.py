@@ -5,7 +5,8 @@ Mapzen geocoder, contributed by Michal Migurski of Mapzen.
 from geopy.geocoders.base import (
     Geocoder,
     DEFAULT_FORMAT_STRING,
-    DEFAULT_TIMEOUT
+    DEFAULT_TIMEOUT,
+    DEFAULT_SCHEME,
 )
 from geopy.compat import urlencode
 from geopy.location import Location
@@ -19,17 +20,23 @@ class Mapzen(Geocoder):
     """
     Mapzen Search geocoder. Documentation at:
         https://mapzen.com/documentation/search/
+
+    .. warning::
+       Please note that Mapzen has shut down their API so this geocoder
+       class might be removed in future releases.
     """
 
     def __init__(
             self,
-            api_key,
+            api_key=None,
             format_string=DEFAULT_FORMAT_STRING,
             boundary_rect=None,
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            user_agent=None
+            user_agent=None,
+            domain='search.mapzen.com',
+            scheme=DEFAULT_SCHEME,
     ):  # pylint: disable=R0913
         """
         :param string format_string: String containing '%s' where the
@@ -47,19 +54,28 @@ class Mapzen(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
+        :param string domain: Specify a custom domain for Mapzen API.
+
+        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https. Note that SSL connections' certificates are not
+            verified.
 
         """
         super(Mapzen, self).__init__(
-            format_string, 'https', timeout, proxies, user_agent=user_agent
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.country_bias = country_bias
         self.format_string = format_string
         self.boundary_rect = boundary_rect
         self.api_key = api_key
+        self.domain = domain.strip('/')
 
-        self.geocode_api = 'https://search.mapzen.com/v1/search'
-        self.reverse_api = 'https://search.mapzen.com/v1/reverse'
+        self.geocode_api = '%s://%s/v1/search' % (self.scheme, self.domain)
+        self.reverse_api = '%s://%s/v1/reverse' % (self.scheme, self.domain)
 
     def geocode(
             self,
@@ -88,9 +104,10 @@ class Mapzen(Geocoder):
         """
         params = {'text': self.format_string % query}
 
-        params.update({
-            'api_key': self.api_key
-        })
+        if self.api_key:
+            params.update({
+                'api_key': self.api_key
+            })
 
         if self.boundary_rect:
             params['boundary.rect.min_lon'] = self.boundary_rect[0]
@@ -142,8 +159,12 @@ class Mapzen(Geocoder):
         params = {
             'point.lat': lat,
             'point.lon': lon,
-            'api_key': self.api_key,
         }
+
+        if self.api_key:
+            params.update({
+                'api_key': self.api_key
+            })
 
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)

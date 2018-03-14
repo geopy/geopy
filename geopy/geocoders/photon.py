@@ -29,7 +29,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
             scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            domain='photon.komoot.de'
+            domain='photon.komoot.de',
+            user_agent=None,
     ):   # pylint: disable=R0913
         """
         Initialize a Photon/Komoot geocoder which aims to let you "search as
@@ -56,9 +57,13 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :param string domain: Should be the localized Photon domain to
             connect to. The default is 'photon.komoot.de', but you
             can change it to a domain of your own.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(Photon, self).__init__(
-            format_string, scheme, timeout, proxies
+            format_string, scheme, timeout, proxies, user_agent=user_agent
         )
         self.domain = domain.strip('/')
         self.api = "%s://%s/api" % (self.scheme, self.domain)
@@ -96,18 +101,20 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
+            .. versionadded:: 1.12.0
+
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
-            are requiered as ['key:!val', '!key', ':!value']
+            are required as ['key:!val', '!key', ':!value'].
 
         """
         params = {
             'q': self.format_string % query
         }
-        if exactly_one:
-            params['limit'] = 1
         if limit:
             params['limit'] = int(limit)
+        if exactly_one:
+            params['limit'] = 1
         if language:
             params['lang'] = language
         if location_bias:
@@ -143,7 +150,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             exactly_one=True,
             timeout=None,
             language=False,
-            osm_tag=None
+            limit=None,
         ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
@@ -163,9 +170,11 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
         :param string language: Preferred language in which to return results.
 
-        :param osm_tag: The expression to filter (include/exclude) by key and/
-            or value, str as 'key:value' or list/set of str if multiple filters
-            are requiered as ['key:!val', '!key', ':!value']
+        :param int limit: Limit the number of returned results, defaults to no
+            limit.
+
+            .. versionadded:: 1.12.0
+
         """
         try:
             lat, lon = [x.strip() for x in
@@ -176,19 +185,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
             'lat': lat,
             'lon': lon,
         }
+        if limit:
+            params['limit'] = int(limit)
         if exactly_one:
             params['limit'] = 1
         if language:
             params['lang'] = language
-        if osm_tag:
-            if isinstance(osm_tag, string_compare):
-                params['osm_tag'] = osm_tag
-            else:
-                try:
-                    params['osm_tag'] = '&osm_tag='.join(osm_tag)
-                except ValueError:
-                    raise ValueError(("osm_tag must be a string expression or "
-                                      "a set/list of string expressions"))
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -200,7 +202,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
-        if not len(resources):  # pragma: no cover
+        if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
             return cls.parse_resource(resources['features'][0])
@@ -216,8 +218,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',
                          'state', 'country']
-        name = [resource.get(k) for k
-                in name_elements if resource.get(k)]
+        name = [resource['properties'].get(k) for k
+                in name_elements if resource['properties'].get(k)]
         location = ', '.join(name)
 
         latitude = resource['geometry']['coordinates'][1] or None

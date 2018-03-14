@@ -55,16 +55,18 @@ class What3Words(Geocoder):
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
-
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(What3Words, self).__init__(
             format_string,

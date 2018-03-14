@@ -8,7 +8,6 @@ import hmac
 from geopy.compat import urlencode
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
-    GeocoderQueryError,
     GeocoderQuotaExceeded,
     ConfigurationError,
     GeocoderParseError,
@@ -74,14 +73,20 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param string secret_key: If using premier, the account secret key.
 
-        :param string channel: If using premier, the channel identifier.
-
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
             .. versionadded:: 0.96
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
+        :param string channel: If using premier, the channel identifier.
+
+            .. versionadded:: 1.12.0
         """
         super(GoogleV3, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent

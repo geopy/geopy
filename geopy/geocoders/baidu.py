@@ -28,7 +28,7 @@ class Baidu(Geocoder):
             scheme='http',
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
-            user_agent=None
+            user_agent=None,
         ):
         """
         Initialize a customized Baidu geocoder using the v2 API.
@@ -46,6 +46,10 @@ class Baidu(Geocoder):
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
         """
         super(Baidu, self).__init__(
             scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent

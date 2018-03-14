@@ -22,7 +22,12 @@ class Nominatim(Geocoder):
     Nominatim geocoder for OpenStreetMap servers. Documentation at:
         https://wiki.openstreetmap.org/wiki/Nominatim
 
-    Note that Nominatim does not support SSL.
+    .. attention::
+       Nominatim requires each application to provide their own custom
+       user-agent:
+       ``geolocator = Nominatim(user_agent="my-application")``.
+       Nominatim usage policy:
+       https://operations.osmfoundation.org/policies/nominatim/
     """
 
     structured_query_params = {
@@ -73,6 +78,11 @@ class Nominatim(Geocoder):
             verified.
 
             .. versionadded:: 1.8.2
+
+        :param string user_agent: Use a custom User-Agent header.
+
+            .. versionadded:: 1.12.0
+
         """
         super(Nominatim, self).__init__(
             format_string, scheme, timeout, proxies, user_agent=user_agent
@@ -130,7 +140,7 @@ class Nominatim(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-        :type addressdetails: string
+        :type language: string
 
             .. versionadded:: 1.0.0
 
@@ -223,7 +233,7 @@ class Nominatim(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-        :type addressdetails: string
+        :type language: string
 
             .. versionadded:: 1.0.0
 

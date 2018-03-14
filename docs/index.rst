@@ -24,11 +24,11 @@ Geocoders
 .. autoclass:: geopy.geocoders.DataBC
     :members: __init__, geocode
 
-.. autoclass:: geopy.geocoders.GeocodeFarm
-    :members: __init__, geocode, reverse
-
 .. autoclass:: geopy.geocoders.GeocoderDotUS
     :members: __init__, geocode
+
+.. autoclass:: geopy.geocoders.GeocodeFarm
+    :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.GeoNames
     :members: __init__, geocode
@@ -39,28 +39,25 @@ Geocoders
 .. autoclass:: geopy.geocoders.IGNFrance
     :members: __init__, geocode, reverse
 
-.. autoclass:: geopy.geocoders.LiveAddress
-    :members: __init__, geocode
-
-.. autoclass:: geopy.geocoders.MapQuest
-    :members: __init__, geocode, reverse
-    
 .. autoclass:: geopy.geocoders.Mapzen
-    :members: __init__, geocode, reverse
-
-.. autoclass:: geopy.geocoders.NaviData
-    :members: __init__, geocode, reverse
-
-.. autoclass:: geopy.geocoders.Nominatim
     :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.OpenCage
     :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.OpenMapQuest
-    :members: __init__, geocode
+    :members: __init__, geocode, reverse
+
+.. autoclass:: geopy.geocoders.Nominatim
+    :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.Photon
+    :members: __init__, geocode
+
+.. autoclass:: geopy.geocoders.YahooPlaceFinder
+    :members: __init__, geocode
+
+.. autoclass:: geopy.geocoders.LiveAddress
     :members: __init__, geocode
 
 .. autoclass:: geopy.geocoders.What3Words
@@ -129,7 +126,7 @@ geopy does no logging above DEBUG.
 Changelog
 ~~~~~~~~~
 
-.. include:: changelog_1xx.rst
+:doc:`Changelog <changelog_1xx>`.
 
 For changes in the 0.9 series, see the
 :doc:`0.9x changelog <changelog_09x>`.

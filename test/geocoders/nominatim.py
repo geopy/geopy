@@ -12,8 +12,6 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Nominatim()
-        cls.known_state_de = "Verwaltungsregion Ionische Inseln"
-        cls.known_state_en = "Ionian Islands Periphery"
 
     def test_geocode(self):
         """

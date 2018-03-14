@@ -38,12 +38,6 @@ class What3WordsTestCase(GeocoderTestBase):
             {"latitude": 53.037611, "longitude": 11.565012},
         )
 
-        self.geocode_run(
-            {"query": u("*LibertyTech")},
-            {"latitude": 51.512573, "longitude": -0.144879},
-        )
-
-
     def test_reverse(self):
         """
         What3Words.reverse - '3 Words'
@@ -59,7 +53,6 @@ class What3WordsTestCase(GeocoderTestBase):
             'fortschrittliche.voll.schnitt'
         )
 
-
     def test_unicode_query(self):
         """
         What3Words.geocode - '3 Words' unicode
@@ -73,16 +66,6 @@ class What3WordsTestCase(GeocoderTestBase):
                 )
             },
             {"latitude": 53.037611, "longitude": 11.565012},
-        )
-
-        self.geocode_run(
-            {
-                "query": u(
-                    "\u002a\u004c\u0069\u0062\u0065\u0072\u0074"
-                    "\u0079\u0054\u0065\u0063\u0068"
-                )
-            },
-            {"latitude": 51.512573, "longitude": -0.144879},
         )
 
     def test_result_language(self):
@@ -116,9 +99,3 @@ class What3WordsTestCase(GeocoderTestBase):
 
         self.assertTrue(result_check_oneword_query)
         self.assertTrue(result_check_threeword_query)
-
-
-
-
-
-
