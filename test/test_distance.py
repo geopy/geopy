@@ -190,6 +190,12 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases):
         assert_almost_equal(destination.latitude, 0, 0)
         assert_almost_equal(destination.longitude, -180, 0)
 
+    def test_should_compute_same_destination_as_other_libraries(self):
+        distance = self.cls(54.972271)
+        destination = distance.destination((-37.95103, 144.42487), 306.86816)
+        assert_almost_equal(destination.latitude, -37.6528177174, 10)
+        assert_almost_equal(destination.longitude, 143.9264976682, 10)
+
     def test_should_get_distinct_results_for_different_ellipsoids(self):
         results = []
         for ellipsoid_name in ELLIPSOIDS.keys():

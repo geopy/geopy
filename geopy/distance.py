@@ -482,7 +482,7 @@ class vincenty(Distance):
             delta_sigma = B * sin_sigma * (
                 cos2_sigma_m + B / 4. * (
                     cos_sigma * (
-                        -1 + 2 * cos2_sigma_m
+                        -1 + 2 * cos2_sigma_m ** 2
                     ) - B / 6. * cos2_sigma_m * (
                         -3 + 4 * sin_sigma ** 2
                     ) * (
