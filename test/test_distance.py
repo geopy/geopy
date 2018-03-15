@@ -145,6 +145,19 @@ class CommonConversionCases:
     def test_should_convert_to_nautical_miles_with_abbrevation(self):
         assert_almost_equal(self.cls(1.0).nm, 0.539956803)
 
+    def test_should_convert_from_meters(self):
+        assert(self.cls(meters=1.0).km == 0.001)
+
+    def test_should_convert_from_feet(self):
+        assert_almost_equal(self.cls(feet=1.0).km, 0.0003048, 8)
+
+    def test_should_convert_from_miles(self):
+        assert_almost_equal(self.cls(miles=1.0).km, 1.6093440)
+
+    def test_should_convert_from_nautical_miles(self):
+        assert_almost_equal(self.cls(nautical=1.0).km, 1.8520000)
+
+
 
 class CommonDistanceCases(CommonDistanceComputationCases,
                           CommonMathematicalOperatorCases,
