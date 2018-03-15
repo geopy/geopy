@@ -39,7 +39,7 @@ class IGNFranceTestCase(GeocoderTestBase):
             username=env.get('IGNFRANCE_USERNAME'),
             password=env.get('IGNFRANCE_PASSWORD'),
             referer=env.get('IGNFRANCE_REFERER'),
-            timeout=20
+            timeout=10
         )
         cls.delta_exact = 0.2
 
