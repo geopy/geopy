@@ -1,0 +1,10 @@
+[run]
+source = geopy
+
+[report]
+show_missing = True
+; Remember that tests run from forks and locally don't have access to
+; geocoders' credentials, that means that a significant amount of the code
+; (which requires these creds) cannot be tested. So coverage in CI differs
+; significantly between the builds for forks and for master.
+fail_under = 50
