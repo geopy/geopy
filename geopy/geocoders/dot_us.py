@@ -98,7 +98,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
 
         url = "?".join((self.api, urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        if self.authenticated is True:
+        if self.authenticated:
             auth = " ".join((
                 "Basic",
                 encodestring(":".join((self.username, self.password))\
@@ -115,7 +115,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
         ]
         if not len(places):
             return None
-        if exactly_one is True:
+        if exactly_one:
             return self._parse_result(places[0])
         else:
             result = [self._parse_result(res) for res in places]

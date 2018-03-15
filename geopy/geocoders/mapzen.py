@@ -188,7 +188,7 @@ class Mapzen(Geocoder):
         features = response['features']
         if not len(features):
             return None
-        if exactly_one is True:
+        if exactly_one:
             return self.parse_code(features[0])
         else:
             return [self.parse_code(feature) for feature in features]

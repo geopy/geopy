@@ -92,7 +92,7 @@ class DataBC(Geocoder):
                 "frontDoorPoint, parcelPoint, rooftopPoint or routingPoint."
             )
         params['locationDescriptor'] = location_descriptor
-        if exactly_one is True:
+        if exactly_one:
             max_results = 1
         params['maxResults'] = max_results
 
@@ -106,7 +106,7 @@ class DataBC(Geocoder):
         geocoded = []
         for feature in response['features']:
             geocoded.append(self._parse_feature(feature))
-        if exactly_one is True:
+        if exactly_one:
             return geocoded[0]
         return geocoded
 

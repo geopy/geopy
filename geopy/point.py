@@ -192,7 +192,7 @@ class Point(object):
 
         if altitude is None:
             altitude = bool(self.altitude)
-        if altitude is True:
+        if altitude:
             if not isinstance(altitude, string_compare):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
@@ -201,7 +201,7 @@ class Point(object):
 
     def format_altitude(self, unit='km'):
         """
-        Foamt altitude with unit
+        Format altitude with unit
         """
         return format_distance(self.altitude, unit=unit)
 

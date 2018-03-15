@@ -151,7 +151,7 @@ class GeocodeFarm(Geocoder):
         self._check_for_api_errors(geocoding_results)
 
         places = self.parse_code(geocoding_results)
-        if exactly_one is True:
+        if exactly_one:
             return places[0]
         else:
             return places

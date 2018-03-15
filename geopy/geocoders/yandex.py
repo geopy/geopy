@@ -83,7 +83,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             params['key'] = self.api_key
         if not self.lang is None:
             params['lang'] = self.lang
-        if exactly_one is True:
+        if exactly_one:
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

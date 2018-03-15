@@ -148,7 +148,7 @@ class Bing(Geocoder):
             params['userLocation'] = ",".join(
                 (str(user_location.latitude), str(user_location.longitude))
             )
-        if exactly_one is True:
+        if exactly_one:
             params['maxResults'] = 1
         if culture:
             params['culture'] = culture

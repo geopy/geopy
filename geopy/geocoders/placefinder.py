@@ -170,11 +170,11 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             "flags": "J", # JSON
         }
 
-        if reverse is True:
+        if reverse:
             params["gflags"] = "R"
-        if exactly_one is True:
+        if exactly_one:
             params["count"] = "1"
-        if with_timezone is True:
+        if with_timezone:
             params['flags'] += 'T' #Return timezone
 
         response = self._call_geocoder(

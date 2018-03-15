@@ -278,7 +278,7 @@ class Nominatim(Geocoder):
             places = [places]
         if not len(places):
             return None
-        if exactly_one is True:
+        if exactly_one:
             return self.parse_code(places[0])
         else:
             return [self.parse_code(place) for place in places]

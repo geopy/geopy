@@ -94,7 +94,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         }
         if self.country_bias:
             params['countryBias'] = self.country_bias
-        if exactly_one is True:
+        if exactly_one:
             params['maxRows'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

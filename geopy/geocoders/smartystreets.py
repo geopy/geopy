@@ -123,7 +123,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         """
         if not len(response):
             return None
-        if exactly_one is True:
+        if exactly_one:
             return self._format_structured_address(response[0])
         else:
             return [self._format_structured_address(c) for c in response]

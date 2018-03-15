@@ -215,10 +215,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         if language:
             params['language'] = language
 
-        if self.premier is False:
-            url = "?".join((self.api, urlencode(params)))
-        else:
+        if self.premier:
             url = self._get_signed_url(params)
+        else:
+            url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(

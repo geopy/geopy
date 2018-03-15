@@ -128,7 +128,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             only, the value set during the geocoder's initialization.
         """
         params = {'text': query, 'f': 'json'}
-        if exactly_one is True:
+        if exactly_one:
             params['maxLocations'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -155,7 +155,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
                     resource['name'], (geometry['y'], geometry['x']), resource
                 )
             )
-        if exactly_one is True:
+        if exactly_one:
             return geocoded[0]
         return geocoded
 
