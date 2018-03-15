@@ -43,6 +43,7 @@ class Nominatim(Geocoder):
             self,
             format_string=DEFAULT_FORMAT_STRING,
             view_box=None,
+            bounded=False,
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
@@ -57,6 +58,9 @@ class Nominatim(Geocoder):
             is just '%s'.
 
         :param tuple view_box: Coordinates to restrict search within.
+
+        :param bool bounded: Restrict the results to only items contained
+            with the bounding view_box.
 
         :param string country_bias: Bias results to this country.
 
@@ -90,6 +94,7 @@ class Nominatim(Geocoder):
         self.country_bias = country_bias
         self.format_string = format_string
         self.view_box = view_box
+        self.bounded = bounded
         self.domain = domain.strip('/')
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
@@ -171,6 +176,9 @@ class Nominatim(Geocoder):
         # `viewbox` apparently replaces `view_box`
         if self.view_box:
             params['viewbox'] = ','.join(self.view_box)
+
+        if self.bounded:
+            params['bounded'] = 1
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
