@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 from geopy.compat import (urlencode, HTTPPasswordMgrWithDefaultRealm,
                           HTTPBasicAuthHandler, build_opener, u,
-                          install_opener, iteritems, Request)
+                          iteritems, Request)
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
     GeocoderQueryError,
@@ -366,7 +366,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
 
         # Install the opener.
         # Now all calls to urllib.request.urlopen use our opener.
-        install_opener(opener)
+        self.urlopen = opener.open
 
     def _parse_xml(self,
                    page,

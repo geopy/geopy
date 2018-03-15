@@ -1,60 +1,53 @@
 """
 Test ability to proxy requests.
 """
-
-import os
 import unittest
-from test import proxy_server
-from geopy.compat import urlopen, URLError
+from test.proxy_server import ProxyServerThread
+
+from geopy.compat import urlopen
 from geopy.geocoders.base import Geocoder
 
-### UNIT TEST(S) to test Proxy in Geocoder base class ###
-###
-### Solution requires that proxy_server.py is run to start simple proxy
-### daemon proxy PID is located in /var/run/proxy_server.pid and can be
-### stoped using the command `kill -9 $(cat /var/run/proxy_server.pid)`
+
+class DummyGeocoder(Geocoder):
+    def geocode(self, location):
+        geo_request = self.urlopen(location)
+        geo_html = geo_request.read()
+        return geo_html if geo_html else None
 
 
 class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
+    remote_website_http = "http://example.org/"
+    remote_website_https = "https://example.org/"
+
     def setUp(self):
+        self.proxy_server = ProxyServerThread()
+        self.proxy_server.start()
+        self.proxy_url = self.proxy_server.get_proxy_url()
 
-        # TODO subprocess.Popen proxy locally on os.name=="posix", and skip if not
+    def tearDown(self):
+        self.proxy_server.stop()
+        self.proxy_server.join()
 
-        # Backup environ settings
-        self.orig_http_proxy = os.environ['http_proxy'] if 'http_proxy' in os.environ else None
-
-        # Get HTTP for comparison before proxy test
-        base_http = urlopen('http://www.blankwebsite.com/')
+    def test_geocoder_constructor_uses_http_proxy(self):
+        base_http = urlopen(self.remote_website_http)
         base_html = base_http.read()
-        self.noproxy_data = base_html if base_html else None
 
-        # Create the proxy instance
-        self.proxyd = proxy_server.ProxyServer()
-        # Set the http_proxy environment variable with Proxy_server default value
-        os.environ['http_proxy'] = self.proxyd.get_proxy_url()
+        geocoder_dummy = DummyGeocoder(proxies={"http": self.proxy_url})
+        self.assertEqual(0, len(self.proxy_server.requests))
+        self.assertTrue(
+            base_html,
+            geocoder_dummy.geocode(self.remote_website_http)
+        )
+        self.assertEqual(1, len(self.proxy_server.requests))
 
-    def teardown(self):
-        if self.orig_http_proxy:
-            os.environ['http_proxy'] = self.orig_http_proxy
-        else:
-            del os.environ['http_proxy']
+    def test_geocoder_constructor_uses_https_proxy(self):
+        base_http = urlopen(self.remote_website_https)
+        base_html = base_http.read()
 
-    def test_proxy(self):
-        ''' Test of OTB Geocoder Proxy functionality works'''
-        class DummyGeocoder(Geocoder):
-            def geocode(self, location):
-                geo_request = urlopen(location)
-                geo_html = geo_request.read()
-                return geo_html if geo_html else None
-
-        # Testcase to test that proxy standup code works
-        geocoder_dummy = DummyGeocoder(proxies={"http": "http://localhost:1337"})
-        try:
-            self.assertTrue(
-                self.noproxy_data,
-                geocoder_dummy.geocode('http://www.blankwebsite.com/')
-            )
-        except URLError as err:
-            if "connection refused" in str(err).lower():
-                raise unittest.SkipTest("Proxy not running")
-            raise err
+        geocoder_dummy = DummyGeocoder(proxies={"https": self.proxy_url})
+        self.assertEqual(0, len(self.proxy_server.requests))
+        self.assertTrue(
+            base_html,
+            geocoder_dummy.geocode(self.remote_website_https)
+        )
+        self.assertEqual(1, len(self.proxy_server.requests))

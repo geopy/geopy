@@ -30,7 +30,7 @@ if py3k: # pragma: no cover
                               urlparse, parse_qs)
     from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611
                                 build_opener, ProxyHandler,
-                                URLError, install_opener,
+                                URLError,
                                 HTTPPasswordMgrWithDefaultRealm,
                                 HTTPBasicAuthHandler)
     from urllib.error import HTTPError # pylint: disable=W0611,F0401,W0611,E0611
@@ -54,7 +54,7 @@ else: # pragma: no cover
     from urllib import urlencode as original_urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
     from urllib2 import (Request, HTTPError,   # pylint: disable=W0611,F0401,W0611,E0611
                          ProxyHandler, URLError, urlopen,
-                         build_opener, install_opener,
+                         build_opener,
                          HTTPPasswordMgrWithDefaultRealm,
                          HTTPBasicAuthHandler)
     from urlparse import urlparse, parse_qs

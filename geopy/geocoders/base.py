@@ -14,7 +14,6 @@ from geopy.compat import (
     build_opener,
     ProxyHandler,
     URLError,
-    install_opener,
     Request,
 )
 from geopy.point import Point
@@ -91,12 +90,12 @@ class Geocoder(object): # pylint: disable=R0921
         self.headers = {'User-Agent': user_agent or DEFAULT_USER_AGENT}
 
         if self.proxies:
-            install_opener(
-                build_opener(
-                    ProxyHandler(self.proxies)
-                )
+            opener = build_opener(
+                ProxyHandler(self.proxies)
             )
-        self.urlopen = urllib_urlopen
+            self.urlopen = opener.open
+        else:
+            self.urlopen = urllib_urlopen
 
     @staticmethod
     def _coerce_point_to_string(point):

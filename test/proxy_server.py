@@ -1,51 +1,95 @@
+import threading
+import socket
+import select
+
+from geopy.compat import urlopen
+
 try:
+    # python 2
     import SimpleHTTPServer
     import SocketServer
 except ImportError:
-    import socketserver as SockServer
+    import socketserver as SocketServer
     import http.server as SimpleHTTPServer
 
-import urllib
+
+def pipe_sockets(sock1, sock2, timeout):
+    """Pipe data from one socket to another and vice-versa."""
+    sockets = [sock1, sock2]
+    try:
+        while True:
+            rlist, _, xlist = select.select(sockets, [], sockets, timeout)
+            if xlist:
+                break
+            for sock in rlist:
+                data = sock.recv(8096)
+                if not data:  # disconnected
+                    break
+                other = next(s for s in sockets if s is not sock)
+                other.sendall(data)
+    except IOError:
+        pass
+    finally:
+        for sock in sockets:
+            sock.close()
 
 
-class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        self.copyfile(urllib.urlopen(self.path), self.wfile)
+class ProxyServerThread(threading.Thread):
 
-
-class ProxyServer():
-    '''Class used to invoke a simple test HTTP Proxy server'''
     def __init__(self):
-        self.proxy_port = 1337
         self.proxy_host = 'localhost'
+        self.proxy_port = None  # randomly selected by OS
 
-        self.proxyd = None
+        self.proxy_server = None
+        self.socket_created_event = threading.Event()
+        self.requests = []
 
-    def run_proxy(self):
-        '''Starts Instance of Proxy in a TCPServer'''
-        #Setup Proxy in thread
-        self.proxyd = SocketServer.TCPServer(
-            (self.proxy_host, self.proxy_port),
-            Proxy
-        ).serve_forever()
-        # Start Proxy Process
-        print(
-            "serving at port %s on PID %s " %
-            (self.proxy_port, self.proxyd.pid)
-        )
+        super(ProxyServerThread, self).__init__()
+        self.daemon = True
 
     def get_proxy_url(self):
+        self.socket_created_event.wait()
         return "http://%s:%s" % (self.proxy_host, self.proxy_port)
 
+    def run(self):
+        assert not self.proxy_server, ("This class is not reentrable. "
+                                       "Please create a new instance.")
 
-if __name__ == '__main__':
-    from test import daemon
+        requests = self.requests
 
-    daemon.daemonize()
-    daemon.createPid()
+        class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
+            def do_GET(self):
+                requests.append(self.path)
 
-    proxy = ProxyServer()
-    proxy.run_proxy()
+                req = urlopen(self.path)
+                self.send_response(req.getcode(), req.read())
+                self.end_headers()
 
+            def do_CONNECT(self):
+                requests.append(self.path)
 
+                # Make a raw TCP connection to the target server
+                host, port = self.path.split(':')
+                try:
+                    addr = host, int(port)
+                    other_connection = socket.create_connection(addr)
+                except socket.error:
+                    self.send_error(502, 'Bad gateway')
+                    return
 
+                # Respond that a tunnel has been created
+                self.send_response(200)
+                self.end_headers()
+                pipe_sockets(self.connection, other_connection, self.timeout)
+
+        self.proxy_server = SocketServer.TCPServer(
+            (self.proxy_host, 0),
+            Proxy
+        )
+        self.proxy_port = self.proxy_server.server_address[1]
+        self.socket_created_event.set()
+        self.proxy_server.serve_forever()
+
+    def stop(self):
+        self.proxy_server.shutdown()  # stop serve_forever()
+        self.proxy_server.server_close()
