@@ -63,6 +63,32 @@ class ArcGISTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
+    def test_geocode_with_out_fields_string(self):
+        """
+        ArcGIS.geocode with outFields string
+        """
+        self.geocode_run(
+            {"query": "Trafalgar Square, London", "out_fields":"Country"},
+            {"raw": {
+                u'attributes': {u'Country': u'GBR'},
+                u'score': 100, u'location': {u'y': 51.50769561800047, u'x': -0.1273497609995502},
+                u'extent': {u'xmin': -0.137351, u'ymin': 51.497696, u'ymax': 51.517696, u'xmax': -0.117351}, u'address': u'Trafalgar Square'}
+            }
+        )
+
+    def test_geocode_with_out_fields_list(self):
+        """
+        ArcGIS.geocode with outFields list
+        """
+        self.geocode_run(
+            {"query": "Trafalgar Square, London", "out_fields":["City","Type"]},
+            {"raw": {
+                u'attributes': {u'City': u'London', u'Type': u'Tourist Attraction'},
+                u'score': 100, u'location': {u'y': 51.50769561800047, u'x': -0.1273497609995502},
+                u'extent': {u'xmin': -0.137351, u'ymin': 51.497696, u'ymax': 51.517696, u'xmax': -0.117351}, u'address': u'Trafalgar Square'}
+            }
+        )
+
     def test_reverse_point(self):
         """
         ArcGIS.reverse using point

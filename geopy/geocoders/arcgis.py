@@ -4,7 +4,7 @@
 
 import json
 from time import time
-from geopy.compat import urlencode, Request
+from geopy.compat import urlencode, Request, string_compare
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
     DEFAULT_WKID
@@ -94,7 +94,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
         self.api = (
             '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/find' % self.scheme
+            'World/GeocodeServer/findAddressCandidates' % self.scheme
         )
         self.reverse_api = (
             '%s://geocode.arcgis.com/arcgis/rest/services/'
@@ -113,7 +113,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         )
         return self._base_call_geocoder(request, timeout=timeout)
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, out_fields=None, timeout=None):
         """
         Geocode a location query.
 
@@ -122,14 +122,27 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
+        :param out_fields:
+        :type out_fields: A list of output fields to be returned in the
+            attributes field of the raw data. This can be either a python
+            list/tuple of fields or a comma-separated string. See
+            https://developers.arcgis.com/rest/geocode/api-reference/geocoding-service-output.htm
+            for a list of supported output fields. If you want to return all
+            supported output fields, set out_fields="*".
+
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        params = {'text': query, 'f': 'json'}
+        params = {'singleLine': query, 'f': 'json'}
         if exactly_one is True:
             params['maxLocations'] = 1
+        if out_fields is not None:
+            if isinstance(out_fields, string_compare):
+                params['outFields'] = out_fields
+            else:
+                params['outFields'] = ",".join(out_fields)
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
@@ -145,14 +158,14 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             raise GeocoderServiceError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
-        if not len(response['locations']):
+        if not len(response['candidates']):
             return None
         geocoded = []
-        for resource in response['locations']:
-            geometry = resource['feature']['geometry']
+        for resource in response['candidates']:
+            geometry = resource['location']
             geocoded.append(
                 Location(
-                    resource['name'], (geometry['y'], geometry['x']), resource
+                    resource['address'], (geometry['y'], geometry['x']), resource
                 )
             )
         if exactly_one is True:
@@ -226,17 +239,11 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             'username': self.username,
             'password': self.password,
             'expiration': self.token_lifetime,
-            'f': 'json'
+            'f': 'json',
+            'referer': self.referer
         }
-        token_request_arguments = "&".join([
-            "%s=%s" % (key, val)
-            for key, val
-            in token_request_arguments.items()
-        ])
-        url = "&".join((
-            "?".join((self.auth_api, token_request_arguments)),
-            urlencode({'referer': self.referer})
-        ))
+        url = "?".join((self.auth_api, urlencode(token_request_arguments)))
+
         logger.debug(
             "%s._refresh_authentication_token: %s",
             self.__class__.__name__, url
