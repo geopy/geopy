@@ -36,7 +36,7 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         geocoder_dummy = DummyGeocoder(proxies={"http": self.proxy_url},
                                        timeout=self.timeout)
         self.assertEqual(0, len(self.proxy_server.requests))
-        self.assertTrue(
+        self.assertEqual(
             base_html,
             geocoder_dummy.geocode(self.remote_website_http)
         )
@@ -49,7 +49,7 @@ class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
         geocoder_dummy = DummyGeocoder(proxies={"https": self.proxy_url},
                                        timeout=self.timeout)
         self.assertEqual(0, len(self.proxy_server.requests))
-        self.assertTrue(
+        self.assertEqual(
             base_html,
             geocoder_dummy.geocode(self.remote_website_https)
         )

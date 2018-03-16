@@ -67,8 +67,12 @@ class ProxyServerThread(threading.Thread):
                 requests.append(self.path)
 
                 req = urlopen(self.path, timeout=self.timeout)
-                self.send_response(req.getcode(), req.read())
+                self.send_response(req.getcode())
+                self.send_header('Connection', 'close')
                 self.end_headers()
+                self.copyfile(req, self.wfile)
+                self.connection.close()
+                req.close()
 
             def do_CONNECT(self):
                 requests.append(self.path)
@@ -85,13 +89,23 @@ class ProxyServerThread(threading.Thread):
 
                 # Respond that a tunnel has been created
                 self.send_response(200)
+                self.send_header('Connection', 'close')
                 self.end_headers()
-                pipe_sockets(self.connection, other_connection, self.timeout)
+                pipe_sockets(self.connection,  # it closes sockets
+                             other_connection, self.timeout)
 
-        self.proxy_server = SocketServer.TCPServer(
+        # ThreadingTCPServer offloads connections to separate threads, so
+        # the serve_forever loop doesn't block until connection is closed
+        # (unlike TCPServer). This allows to shutdown the serve_forever loop
+        # even if there's an open connection.
+        self.proxy_server = SocketServer.ThreadingTCPServer(
             (self.proxy_host, 0),
             Proxy
         )
+
+        # don't hang if there're some open connections
+        self.proxy_server.daemon_threads = True
+
         self.proxy_port = self.proxy_server.server_address[1]
         self.socket_created_event.set()
         self.proxy_server.serve_forever()
