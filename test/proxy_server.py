@@ -35,10 +35,12 @@ def pipe_sockets(sock1, sock2, timeout):
 
 
 class ProxyServerThread(threading.Thread):
+    spinup_timeout = 10
 
-    def __init__(self):
+    def __init__(self, timeout=None):
         self.proxy_host = 'localhost'
         self.proxy_port = None  # randomly selected by OS
+        self.timeout = timeout
 
         self.proxy_server = None
         self.socket_created_event = threading.Event()
@@ -48,7 +50,8 @@ class ProxyServerThread(threading.Thread):
         self.daemon = True
 
     def get_proxy_url(self):
-        self.socket_created_event.wait()
+        if not self.socket_created_event.wait(self.spinup_timeout):
+            raise AssertionError("Proxy Server didn't successfully start")
         return "http://%s:%s" % (self.proxy_host, self.proxy_port)
 
     def run(self):
@@ -58,10 +61,12 @@ class ProxyServerThread(threading.Thread):
         requests = self.requests
 
         class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
+            timeout = self.timeout
+
             def do_GET(self):
                 requests.append(self.path)
 
-                req = urlopen(self.path)
+                req = urlopen(self.path, timeout=self.timeout)
                 self.send_response(req.getcode(), req.read())
                 self.end_headers()
 
@@ -72,7 +77,8 @@ class ProxyServerThread(threading.Thread):
                 host, port = self.path.split(':')
                 try:
                     addr = host, int(port)
-                    other_connection = socket.create_connection(addr)
+                    other_connection = \
+                        socket.create_connection(addr, timeout=self.timeout)
                 except socket.error:
                     self.send_error(502, 'Bad gateway')
                     return
