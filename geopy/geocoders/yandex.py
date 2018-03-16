@@ -79,9 +79,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': query,
             'format': 'json'
         }
-        if not self.api_key is None:
-            params['key'] = self.api_key
-        if not self.lang is None:
+        if self.api_key:
+            params['apikey'] = self.api_key
+        if self.lang:
             params['lang'] = self.lang
         if exactly_one:
             params['results'] = 1
@@ -125,9 +125,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': '{0},{1}'.format(lng, lat),
             'format': 'json'
         }
-        if self.api_key is not None:
-            params['key'] = self.api_key
-        if self.lang is not None:
+        if self.api_key:
+            params['apikey'] = self.api_key
+        if self.lang:
             params['lang'] = self.lang
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)

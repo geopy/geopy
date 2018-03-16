@@ -1,8 +1,10 @@
 # coding: utf-8
 from __future__ import unicode_literals
+import unittest
 
+from geopy.exc import GeocoderInsufficientPrivileges
 from geopy.geocoders import Yandex
-from test.geocoders.util import GeocoderTestBase
+from test.geocoders.util import GeocoderTestBase, env
 
 
 class YandexTestCase(GeocoderTestBase):
@@ -27,6 +29,35 @@ class YandexTestCase(GeocoderTestBase):
             {"latitude": 48.002104, "longitude": 37.805186},
         )
 
+    @unittest.skipUnless(  # pylint: disable=R0904,C0111
+        bool(env.get('YANDEX_KEY')),
+        "No YANDEX_KEY env variable set"
+    )
+    def test_with_api_key(self):
+        """
+        Yandex.geocode with api_key
+        """
+        self.geocoder = Yandex(
+            api_key=env['YANDEX_KEY']
+        )
+        self.geocode_run(
+            {"query": "площадь Ленина Донецк"},
+            {"latitude": 48.002104, "longitude": 37.805186},
+        )
+
+    def test_failure_with_invalid_api_key(self):
+        """
+        Yandex.geocode with incorrect api_key
+        """
+        self.geocoder = Yandex(
+            api_key='bad key'
+        )
+        with self.assertRaises(GeocoderInsufficientPrivileges):
+            self.geocode_run(
+                {"query": "площадь Ленина Донецк"},
+                {}
+            )
+
     def test_reverse(self):
         """
         Yandex.reverse
@@ -39,10 +70,9 @@ class YandexTestCase(GeocoderTestBase):
 
     def test_params(self):
         """
-        Yandex.geocode with api_key and lang set
+        Yandex.geocode with lang
         """
         self.geocoder = Yandex(
-            api_key='AGg6X1QBAAAAk0ZiFwIAUfmxqDgGv6n7bhzuCl5D4MC31ZoAAAAAAAAAAADSboKTjoZyt88aQGXUGHUdJ3JHqQ==',
             lang='uk_UA'
         )
         self.geocode_run(
