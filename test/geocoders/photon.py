@@ -69,7 +69,7 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
-            {"address": "Rue Raspail, 69100, Villeurbanne, Auvergne-Rhône-Alpes, France",
+            {"address": "Rue du 8 Mai 1945, 69100, Villeurbanne, Auvergne-Rhône-Alpes, France",
              "latitude": 45.7733105, "longitude": 4.8869339}
         )
 
