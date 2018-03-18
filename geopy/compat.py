@@ -30,6 +30,12 @@ else: # pragma: no cover
         """
         return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')
 
+if py3k:
+    def cmp(a, b):
+        return (a > b) - (a < b)
+else:
+    cmp = cmp  # builtin in py2
+
 if py3k: # pragma: no cover
     from urllib.parse import (urlencode, quote, # pylint: disable=W0611,F0401,W0611,E0611
                               urlparse, parse_qs)

@@ -77,7 +77,7 @@ from math import atan, tan, sin, cos, pi, sqrt, atan2, asin
 from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
-from geopy.compat import string_compare
+from geopy.compat import string_compare, py3k, cmp
 
 # IUGG mean earth radius in kilometers, from
 # https://en.wikipedia.org/wiki/Earth_radius#Mean_radius.  Using a
@@ -165,11 +165,30 @@ class Distance(object):
     def __str__(self): # pragma: no cover
         return '%s km' % self.__kilometers
 
-    def __cmp__(self, other):
+    def __cmp__(self, other):  # py2 only
         if isinstance(other, Distance):
             return cmp(self.kilometers, other.kilometers)
         else:
             return cmp(self.kilometers, other)
+
+    if py3k:
+        def __eq__(self, other):
+            return self.__cmp__(other) == 0
+
+        def __ne__(self, other):
+            return self.__cmp__(other) != 0
+
+        def __gt__(self, other):
+            return self.__cmp__(other) > 0
+
+        def __lt__(self, other):
+            return self.__cmp__(other) < 0
+
+        def __ge__(self, other):
+            return self.__cmp__(other) >= 0
+
+        def __le__(self, other):
+            return self.__cmp__(other) <= 0
 
     @property
     def kilometers(self): # pylint: disable=C0111

@@ -2,6 +2,7 @@
 Test distance formulas
 """
 import math
+import unittest
 
 from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E0611
 
@@ -19,7 +20,7 @@ SOUTH_POLE = Point(-90, 0)
 FIJI = Point(-16.1333333, 180.0) # Vunikondi, Fiji
 
 
-class CommonDistanceComputationCases:
+class CommonDistanceComputationCases(object):
 
     cls = None
 
@@ -60,7 +61,7 @@ class CommonDistanceComputationCases:
         assert_almost_equal(distance, 0)
 
 
-class CommonMathematicalOperatorCases:
+class CommonMathematicalOperatorCases(object):
 
     cls = None
 
@@ -111,7 +112,7 @@ class CommonMathematicalOperatorCases:
         assert distance1.kilometers == distance2.kilometers
 
 
-class CommonConversionCases:
+class CommonConversionCases(object):
 
     cls = None
 
@@ -158,19 +159,55 @@ class CommonConversionCases:
         assert_almost_equal(self.cls(nautical=1.0).km, 1.8520000)
 
 
+class CommonComparisonCases(object):
+
+    cls = None
+
+    def test_should_support_comparison_with_distance(self):
+        self.assertTrue(self.cls(1) <= self.cls(1))
+        self.assertTrue(self.cls(1) >= self.cls(1))
+        self.assertTrue(self.cls(1) < self.cls(2))
+        self.assertTrue(self.cls(2) > self.cls(1))
+        self.assertTrue(self.cls(1) == self.cls(1))
+        self.assertTrue(self.cls(1) != self.cls(2))
+
+        self.assertFalse(self.cls(2) <= self.cls(1))
+        self.assertFalse(self.cls(1) >= self.cls(2))
+        self.assertFalse(self.cls(2) < self.cls(1))
+        self.assertFalse(self.cls(1) > self.cls(2))
+        self.assertFalse(self.cls(1) == self.cls(2))
+        self.assertFalse(self.cls(1) != self.cls(1))
+
+    def test_should_support_comparison_with_number(self):
+        self.assertTrue(1 <= self.cls(1))
+        self.assertTrue(1 >= self.cls(1))
+        self.assertTrue(1 < self.cls(2))
+        self.assertTrue(2 > self.cls(1))
+        self.assertTrue(1 == self.cls(1))
+        self.assertTrue(1 != self.cls(2))
+
+        self.assertFalse(2 <= self.cls(1))
+        self.assertFalse(1 >= self.cls(2))
+        self.assertFalse(2 < self.cls(1))
+        self.assertFalse(1 > self.cls(2))
+        self.assertFalse(1 == self.cls(2))
+        self.assertFalse(1 != self.cls(1))
+
 
 class CommonDistanceCases(CommonDistanceComputationCases,
                           CommonMathematicalOperatorCases,
-                          CommonConversionCases):
+                          CommonConversionCases,
+                          CommonComparisonCases):
     pass
 
 
-class TestWhenInstantiatingBaseDistanceClass:
+class TestWhenInstantiatingBaseDistanceClass(unittest.TestCase):
     def test_should_not_be_able_to_give_multiple_points(self):
         assert_raises(NotImplementedError, lambda: Distance(1, 2, 3, 4))
 
 
-class TestWhenComputingGreatCircleDistance(CommonDistanceCases):
+class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
+                                           unittest.TestCase):
     cls = GreatCircleDistance
 
     def test_should_compute_distance_for_half_trip_around_equator(self):
@@ -184,14 +221,15 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases):
         assert_almost_equal(destination.longitude, 180)
 
 
-class TestWhenComputingVincentyDistance(CommonDistanceCases):
+class TestWhenComputingVincentyDistance(CommonDistanceCases,
+                                        unittest.TestCase):
 
     cls = VincentyDistance
 
-    def setup(self):
+    def setUp(self):
         self.original_ellipsoid = self.cls.ELLIPSOID
 
-    def teardown(self):
+    def tearDown(self):
         self.cls.ELLIPSOID = self.original_ellipsoid
 
     def test_should_not_converge_for_half_trip_around_equator(self):
