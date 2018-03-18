@@ -11,6 +11,11 @@ if py3k: # pragma: no cover
 else: # pragma: no cover
     string_compare = (str, unicode)
 
+if py3k:  # pragma: no cover
+    text_type = str
+else:  # pragma: no cover
+    text_type = unicode
+
 # Unicode compatibility, borrowed from 'six'
 if py3k: # pragma: no cover
     def u(s):

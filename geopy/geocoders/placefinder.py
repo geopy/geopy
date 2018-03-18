@@ -2,8 +2,6 @@
 :class:`.YahooPlaceFinder` geocoder.
 """
 
-from functools import partial
-
 try:
     from requests import get, Request
     from requests_oauthlib import OAuth1
@@ -14,8 +12,7 @@ except ImportError:
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 from geopy.location import Location
-from geopy.compat import string_compare, py3k
-
+from geopy.compat import string_compare, text_type
 
 __all__ = ("YahooPlaceFinder", )
 
@@ -63,16 +60,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         super(YahooPlaceFinder, self).__init__(
             timeout=timeout, proxies=proxies, user_agent=user_agent
         )
-        self.consumer_key = (
-            unicode(consumer_key)
-            if not py3k
-            else str(consumer_key)
-        )
-        self.consumer_secret = (
-            unicode(consumer_secret)
-            if not py3k
-            else str(consumer_secret)
-        )
+        self.consumer_key = text_type(consumer_key)
+        self.consumer_secret = text_type(consumer_secret)
         self.auth = OAuth1(
             client_key=self.consumer_key,
             client_secret=self.consumer_secret,
