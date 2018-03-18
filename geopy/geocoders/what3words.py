@@ -122,14 +122,11 @@ class What3Words(Geocoder):
 
         params = {
             'string': self.format_string % query,
-            'lang': self.format_string % lang.lower()
-
+            'lang': self.format_string % lang.lower(),
+            'key': self.api_key,
         }
 
-        url = "?".join((
-            (self.api + "w3w"),
-            "&".join(("=".join(('key', self.api_key)), urlencode(params)))
-        ))
+        url = "?".join(((self.api + "w3w"), urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -225,14 +222,11 @@ class What3Words(Geocoder):
 
         params = {
             'position': self._coerce_point_to_string(query),
-            'lang': self.format_string % lang
-
+            'lang': self.format_string % lang,
+            'key': self.api_key,
         }
 
-        url = "?".join((
-            (self.api + "position"),
-            "&".join(("=".join(('key', self.api_key)), urlencode(params)))
-        ))
+        url = "?".join(((self.api + "position"), urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(

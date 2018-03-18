@@ -108,7 +108,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         if self.token is None or int(time()) > self.token_expiry:
             self._refresh_authentication_token()
         request = Request(
-            "&token=".join((url, self.token)), # no urlencoding
+            "&".join((url, urlencode({"token": self.token}))),
             headers={"Referer": self.referer}
         )
         return self._base_call_geocoder(request, timeout=timeout)
@@ -225,25 +225,18 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         token_request_arguments = {
             'username': self.username,
             'password': self.password,
+            'referer': self.referer,
             'expiration': self.token_lifetime,
             'f': 'json'
         }
-        token_request_arguments = "&".join([
-            "%s=%s" % (key, val)
-            for key, val
-            in token_request_arguments.items()
-        ])
-        url = "&".join((
-            "?".join((self.auth_api, token_request_arguments)),
-            urlencode({'referer': self.referer})
-        ))
+        url = "?".join((self.auth_api, urlencode(token_request_arguments)))
         logger.debug(
             "%s._refresh_authentication_token: %s",
             self.__class__.__name__, url
         )
         self.token_expiry = int(time()) + self.token_lifetime
         response = self._base_call_geocoder(url)
-        if not 'token' in response:
+        if 'token' not in response:
             raise GeocoderAuthenticationFailure(
                 'Missing token in auth request.'
                 'Request URL: %s; response JSON: %s' %
