@@ -73,6 +73,48 @@ class BingTestCase(GeocoderTestBase):
             self.assertAlmostEqual(res.latitude, 40.753, delta=self.delta)
             self.assertAlmostEqual(res.longitude, -73.984, delta=self.delta)
 
+    def test_reverse_with_culture_de(self):
+        """
+        Bing.reverse using point and culture parameter to get a non english response
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            Point(40.753898, -73.985071),
+            culture="DE"
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            self.assertIn("Vereinigte Staaten von Amerika", res.address)
+
+    def test_reverse_with_culture_en(self):
+        """
+        Bing.reverse using point and culture parameter to get an english response
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            Point(40.753898, -73.985071),
+            culture="EN"
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            self.assertIn("United States", res.address)
+
+    def test_reverse_with_include_country_code(self):
+        """
+        Bing.reverse using point and include country-code in the response
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            Point(40.753898, -73.985071),
+            include_country_code=True
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            self.assertEqual(res.raw["address"].get("countryRegionIso2", 'missing'), 'US')
+
     def test_user_location(self):
         """
         Bing.geocode using `user_location`

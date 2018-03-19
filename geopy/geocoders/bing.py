@@ -164,7 +164,14 @@ class Bing(Geocoder):
             exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(
+            self,
+            query,
+            exactly_one=True,
+            timeout=None,
+            culture=None,
+            include_country_code=False
+        ):  # pylint: disable=W0221
         """
         Reverse geocode a point.
 
@@ -181,9 +188,21 @@ class Bing(Geocoder):
             only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+
+        :param string culture: Affects the language of the response,
+            must be a two-letter country code.
+
+        :param boolean include_country_code: Sets whether to include the
+            two-letter ISO code of the country in the response (field name
+            'countryRegionIso2').
         """
         point = self._coerce_point_to_string(query)
         params = {'key': self.api_key}
+        if culture:
+            params['culture'] = culture
+        if include_country_code:
+            params['include'] = 'ciso2'  # the only acceptable value
+
         url = "%s/%s?%s" % (
             self.api, point, urlencode(params))
 
