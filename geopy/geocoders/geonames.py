@@ -35,9 +35,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             user_agent=None,
         ):
         """
-        :param string country_bias:
+        :param str country_bias:
 
-        :param string username:
+        :param str username:
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -52,7 +52,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -76,7 +76,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -119,7 +119,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param boolean exactly_one: Return one result or a list of results, if
+        :param bool exactly_one: Return one result or a list of results, if
             available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service

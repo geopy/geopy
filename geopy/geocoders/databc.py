@@ -24,7 +24,7 @@ class DataBC(Geocoder):
         """
         Create a DataBC-based geocoder.
 
-        :param string scheme: Desired scheme.
+        :param str scheme: Desired scheme.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -35,7 +35,7 @@ class DataBC(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -56,7 +56,7 @@ class DataBC(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param int max_results: The maximum number of resutls to request.
 
@@ -65,7 +65,7 @@ class DataBC(Geocoder):
             location_descriptor must be set to accessPoint for set_back to
             take effect.
 
-        :param string location_descriptor: The type of point requested. It
+        :param str location_descriptor: The type of point requested. It
             can be any, accessPoint, frontDoorPoint, parcelPoint,
             rooftopPoint and routingPoint.
 

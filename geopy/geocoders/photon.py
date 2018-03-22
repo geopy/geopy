@@ -36,12 +36,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
         Initialize a Photon/Komoot geocoder which aims to let you "search as
         you type with OpenStreetMap". No API Key is needed by this platform.
 
-        :param string format_string: String containing '%s' where
+        :param str format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
             the geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -54,11 +54,11 @@ class Photon(Geocoder):  # pylint: disable=W0223
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string domain: Should be the localized Photon domain to
+        :param str domain: Should be the localized Photon domain to
             connect to. The default is 'photon.komoot.de', but you
             can change it to a domain of your own.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -82,7 +82,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -96,7 +96,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param string language: Preferred language in which to return results.
+        :param str language: Preferred language in which to return results.
 
         :param int limit: Limit the number of returned results, defaults to no
             limit.
@@ -106,6 +106,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as 'key:value' or list/set of str if multiple filters
             are required as ['key:!val', '!key', ':!value'].
+        :type osm_tag: str or list or set
 
         """
         params = {
@@ -168,7 +169,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param string language: Preferred language in which to return results.
+        :param str language: Preferred language in which to return results.
 
         :param int limit: Limit the number of returned results, defaults to no
             limit.

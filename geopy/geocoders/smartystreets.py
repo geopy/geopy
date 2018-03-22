@@ -33,17 +33,17 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
-        :param string auth_id: Valid `Auth ID` from SmartyStreets.
+        :param str auth_id: Valid `Auth ID` from SmartyStreets.
 
             .. versionadded:: 1.5.0
 
-        :param string auth_token: Valid `Auth Token` from SmartyStreets.
+        :param str auth_token: Valid `Auth Token` from SmartyStreets.
 
         :param int candidates: An integer between 1 and 10 indicating the max
             number of candidate addresses to return if a valid address
             could be found.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -66,7 +66,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -88,7 +88,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

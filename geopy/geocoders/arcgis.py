@@ -36,13 +36,13 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
             .. versionadded:: 0.97
 
-        :param string username: ArcGIS username. Required if authenticated
+        :param str username: ArcGIS username. Required if authenticated
             mode is desired.
 
-        :param string password: ArcGIS password. Required if authenticated
+        :param str password: ArcGIS password. Required if authenticated
             mode is desired.
 
-        :param string referer: Required if authenticated mode is desired.
+        :param str referer: Required if authenticated mode is desired.
             'Referer' HTTP header to send with each request,
             e.g., 'http://www.example.com'. This is tied to an issued token,
             so fielding queries for multiple referrers should be handled by
@@ -51,7 +51,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         :param int token_lifetime: Desired lifetime, in minutes, of an
             ArcGIS-issued token.
 
-        :param string scheme: Desired scheme. If authenticated mode is in use,
+        :param str scheme: Desired scheme. If authenticated mode is in use,
             it must be 'https'.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -63,7 +63,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -117,7 +117,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -180,7 +180,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             within which to search. ArcGIS has a default of 100 meters, if not
             specified.
 
-        :param string wkid: WKID to use for both input and output coordinates.
+        :param str wkid: WKID to use for both input and output coordinates.
         """
         # ArcGIS is lon,lat; maintain lat,lon convention of geopy
         point = self._coerce_point_to_string(query).split(",")

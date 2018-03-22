@@ -33,10 +33,10 @@ class GeocodeFarm(Geocoder):
 
             .. versionadded:: 0.99
 
-        :param string api_key: The API key required by GeocodeFarm to perform
+        :param str api_key: The API key required by GeocodeFarm to perform
             geocoding requests.
 
-        :param string format_string: String containing '%s' where the
+        :param str format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
@@ -46,7 +46,7 @@ class GeocodeFarm(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -66,7 +66,7 @@ class GeocodeFarm(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

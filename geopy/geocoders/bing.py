@@ -45,14 +45,14 @@ class Bing(Geocoder):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
-        :param string api_key: Should be a valid Bing Maps API key.
+        :param str api_key: Should be a valid Bing Maps API key.
 
-        :param string format_string: String containing '%s' where the
+        :param str format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -71,7 +71,7 @@ class Bing(Geocoder):
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -92,7 +92,7 @@ class Bing(Geocoder):
         """
         Geocode an address.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
             are one of: `addressLine`, `locality` (city), `adminDistrict` (state), `countryRegion`, or
@@ -115,17 +115,17 @@ class Bing(Geocoder):
 
             .. versionadded:: 0.97
 
-        :param string culture: Affects the language of the response,
+        :param str culture: Affects the language of the response,
             must be a two-letter country code.
 
             .. versionadded:: 1.4.0
 
-        :param boolean include_neighborhood: Sets whether to include the
+        :param bool include_neighborhood: Sets whether to include the
             neighborhood field in the response.
 
             .. versionadded:: 1.4.0
 
-        :param boolean include_country_code: Sets whether to include the
+        :param bool include_country_code: Sets whether to include the
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
 
@@ -189,10 +189,10 @@ class Bing(Geocoder):
 
             .. versionadded:: 0.97
 
-        :param string culture: Affects the language of the response,
+        :param str culture: Affects the language of the response,
             must be a two-letter country code.
 
-        :param boolean include_country_code: Sets whether to include the
+        :param bool include_country_code: Sets whether to include the
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
         """

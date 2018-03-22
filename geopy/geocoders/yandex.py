@@ -35,10 +35,10 @@ class Yandex(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 1.5.0
 
-        :param string api_key: Yandex API key (not obligatory)
+        :param str api_key: Yandex API key (not obligatory)
             http://api.yandex.ru/maps/form.xml
 
-        :param string lang: response locale, the following locales are
+        :param str lang: response locale, the following locales are
             supported: "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -50,7 +50,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -65,7 +65,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -106,7 +106,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param boolean exactly_one: Return one result or a list of results, if
+        :param bool exactly_one: Return one result or a list of results, if
             available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service

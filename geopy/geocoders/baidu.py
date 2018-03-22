@@ -35,11 +35,11 @@ class Baidu(Geocoder):
 
         .. versionadded:: 1.0.0
 
-        :param string api_key: The API key required by Baidu Map to perform
+        :param str api_key: The API key required by Baidu Map to perform
             geocoding requests. API keys are managed through the Baidu APIs
             console (http://lbsyun.baidu.com/apiconsole/key).
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is http and only http support.
 
         :param dict proxies: If specified, routes this geocoder's requests
@@ -47,7 +47,7 @@ class Baidu(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -78,7 +78,7 @@ class Baidu(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

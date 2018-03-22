@@ -44,14 +44,14 @@ class What3Words(Geocoder):
 
             .. versionadded:: 1.5.0
 
-        :param string api_key: Key provided by What3Words.
+        :param str api_key: Key provided by What3Words.
 
-        :param string format_string: String containing '%s' where the
+        :param str format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, piped.gains.jungle'. The default
             is just '%s'.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -64,7 +64,7 @@ class What3Words(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -99,9 +99,9 @@ class What3Words(Geocoder):
         """
         Geocode a "3 words" or "OneWord" query.
 
-        :param string query: The 3-word or OneWord-address you wish to geocode.
+        :param str query: The 3-word or OneWord-address you wish to geocode.
 
-        :param string lang: two character language codes as supported by
+        :param str lang: two character language codes as supported by
             the API (http://what3words.com/api/reference/languages).
 
         :param bool exactly_one: Parameter has no effect for this geocoder.
@@ -204,7 +204,7 @@ class What3Words(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param string lang: two character language codes as supported by the
+        :param str lang: two character language codes as supported by the
             API (http://what3words.com/api/reference/languages).
 
         :param bool exactly_one: Parameter has no effect for this geocoder.

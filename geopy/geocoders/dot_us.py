@@ -36,11 +36,11 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
             user_agent=None,
         ):  # pylint: disable=R0913
         """
-        :param string username:
+        :param str username:
 
-        :param string password:
+        :param str password:
 
-        :param string format_string: String containing '%s' where the
+        :param str format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
@@ -58,7 +58,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -82,7 +82,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

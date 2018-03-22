@@ -39,7 +39,7 @@ class Mapzen(Geocoder):
             scheme=DEFAULT_SCHEME,
     ):  # pylint: disable=R0913
         """
-        :param string format_string: String containing '%s' where the
+        :param str format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
@@ -47,20 +47,20 @@ class Mapzen(Geocoder):
         :param tuple boundary_rect: Coordinates to restrict search within,
             given as (west, south, east, north) coordinate tuple.
 
-        :param string country_bias: Bias results to this country (ISO alpha-3).
+        :param str country_bias: Bias results to this country (ISO alpha-3).
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
 
-        :param string domain: Specify a custom domain for Mapzen API.
+        :param str domain: Specify a custom domain for Mapzen API.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -86,7 +86,7 @@ class Mapzen(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The address, query or structured query to geocode
+        :param str query: The address, query or structured query to geocode
             you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
