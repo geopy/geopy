@@ -86,10 +86,8 @@ class Mapzen(Geocoder):
         """
         Geocode a location query.
 
-        :param query: The address, query or structured query to geocode
+        :param string query: The address, query or structured query to geocode
             you wish to geocode.
-
-        :type query: string
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

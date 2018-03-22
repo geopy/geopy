@@ -290,7 +290,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         :param at_time: The time at which you want the timezone of this
             location. This is optional, and defaults to the time that the
             function is called in UTC.
-        :type at_time integer, long, float, datetime:
+        :type at_time: integer, long, float, datetime
 
         :rtype: pytz timezone
         """

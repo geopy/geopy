@@ -114,7 +114,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 1.2.0
 
-        :param string query: The coordinates for which you wish to obtain the
+        :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"

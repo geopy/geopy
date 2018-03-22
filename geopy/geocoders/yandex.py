@@ -101,7 +101,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
         """
         Given a point, find an address.
 
-        :param string query: The coordinates for which you wish to obtain the
+        :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"

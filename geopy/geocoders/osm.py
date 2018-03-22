@@ -110,16 +110,15 @@ class Nominatim(Geocoder):
         :param query: The address, query or structured query to geocode
             you wish to geocode.
 
-            For a structured query, provide a dictionary whose keys
-            are one of: `street`, `city`, `county`, `state`, `country`, or
-            `postalcode`. For more information, see Nominatim's
-            documentation for "structured requests":
+            .. versionchanged:: 1.0.0
+                For a structured query, provide a dictionary whose keys
+                are one of: `street`, `city`, `county`, `state`, `country`, or
+                `postalcode`. For more information, see Nominatim's
+                documentation for "structured requests":
 
-                https://wiki.openstreetmap.org/wiki/Nominatim
+                    https://wiki.openstreetmap.org/wiki/Nominatim
 
         :type query: dict or string
-
-            .. versionchanged:: 1.0.0
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -131,16 +130,14 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.97
 
-        :param addressdetails: If you want in *Location.raw* to include
+        :param bool addressdetails: If you want in *Location.raw* to include
             addressdetails such as city_district, etc set it to True
-        :type addressdetails: bool
 
         :param string language: Preferred language in which to return results.
             Either uses standard
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-        :type language: string
 
             .. versionadded:: 1.0.0
 
@@ -233,7 +230,6 @@ class Nominatim(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-        :type language: string
 
             .. versionadded:: 1.0.0
 

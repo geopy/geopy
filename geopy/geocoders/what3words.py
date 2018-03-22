@@ -195,14 +195,12 @@ class What3Words(Geocoder):
 
         return parse_resource(resources)
 
-
     def reverse(self, query, lang='en', exactly_one=True, timeout=None):
         """
         Given a point, find the 3 word address.
 
         :param query: The coordinates for which you wish to obtain the 3 word
             address.
-
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
