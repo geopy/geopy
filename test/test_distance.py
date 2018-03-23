@@ -60,11 +60,23 @@ class CommonDistanceComputationCases(object):
         distance = self.cls((0, 180), (0, -180)).kilometers
         assert_almost_equal(distance, 0)
 
+        distance = self.cls((0, -180), (0, 180)).kilometers
+        assert_almost_equal(distance, 0)
+
     def test_should_compute_distance_across_antimeridian(self):
         nines = 1 - 1e-30  # 0.(9)
         distance = self.cls((0, -179 - nines),
                             (0, 179 + nines)).kilometers
         assert_almost_equal(distance, 0)
+
+    def test_should_tolerate_nans(self):
+        nan = float('nan')
+        # This is probably a bad design to silently turn NaNs into NaNs
+        # instead of raising a ValueError, but this is the current behaviour,
+        # hence this test.
+        self.assertTrue(math.isnan(self.cls((nan, nan), (1, 1)).kilometers))
+        self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
+        self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
 
 
 class CommonMathematicalOperatorCases(object):
