@@ -60,6 +60,12 @@ class CommonDistanceComputationCases(object):
         distance = self.cls((0, 180), (0, -180)).kilometers
         assert_almost_equal(distance, 0)
 
+    def test_should_compute_distance_across_antimeridian(self):
+        nines = 1 - 1e-30  # 0.(9)
+        distance = self.cls((0, -179 - nines),
+                            (0, 179 + nines)).kilometers
+        assert_almost_equal(distance, 0)
+
 
 class CommonMathematicalOperatorCases(object):
 
