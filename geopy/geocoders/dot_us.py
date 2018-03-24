@@ -3,7 +3,7 @@
 """
 
 import csv
-from base64 import encodestring
+from base64 import b64encode
 from geopy.compat import urlencode, py3k, Request
 from geopy.geocoders.base import (
     Geocoder,
@@ -98,13 +98,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
 
         url = "?".join((self.api, urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        if self.authenticated:
-            auth = " ".join((
-                "Basic",
-                encodestring(":".join((self.username, self.password))\
-                    .encode('utf-8')).strip().decode('utf-8')
-            ))
-            url = Request(url, headers={"Authorization": auth})
+        url = Request(url, headers=self._get_headers())
         page = self._call_geocoder(url, timeout=timeout, raw=True)
         content = page.read().decode("utf-8") if py3k else page.read() # pylint: disable=E1101,E1103
         places = [
@@ -161,3 +155,14 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
         else:
             return None
         return Location(name, latlon, place)
+
+    def _get_headers(self):
+        headers = {}
+        if self.authenticated:
+            username_password = ":".join((self.username, self.password))
+            auth = " ".join((
+                "Basic",
+                b64encode(username_password.encode('utf-8')).decode('utf-8')
+            ))
+            headers["Authorization"] = auth
+        return headers
