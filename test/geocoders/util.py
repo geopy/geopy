@@ -38,14 +38,7 @@ except IOError:
     env = {key: os.environ.get(key, None) for key in keys}
 
 
-class Empty(object):  # pylint: disable=R0903
-    """
-    Non-None NULL.
-    """
-    pass
-
-
-EMPTY = Empty()
+EMPTY = object()
 
 
 class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
@@ -67,6 +60,7 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             else:
                 return
         self._verify_request(result, **expected)
+        return result
 
     def reverse_run(self, payload, expected, expect_failure=False):
         """
@@ -79,6 +73,7 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             else:
                 return
         self._verify_request(result, **expected)
+        return result
 
     @staticmethod
     def _make_request(call, *args, **kwargs):
@@ -102,30 +97,21 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             latitude=EMPTY,
             longitude=EMPTY,
             address=EMPTY,
-            osm_tag=EMPTY,
         ):
         """
         Verifies that a a result matches the kwargs given.
         """
         item = result[0] if isinstance(result, (tuple, list)) else result
 
-        if raw != EMPTY:
+        if raw is not EMPTY:
             self.assertEqual(item.raw, raw)
-        if latitude != EMPTY:
+        if latitude is not EMPTY:
             self.assertAlmostEqual(
                 item.latitude, latitude, delta=self.delta
             )
-        if longitude != EMPTY:
+        if longitude is not EMPTY:
             self.assertAlmostEqual(
                 item.longitude, longitude, delta=self.delta
             )
-        if address != EMPTY:
-            self.assertEqual(
-                item.address, address
-            )
-        if osm_tag != EMPTY:
-            raw_osm_key = item.raw['properties']['osm_key']
-            if isinstance(osm_tag, string_compare):
-                self.assertEqual(raw_osm_key, osm_tag)
-            else:
-                self.assertIn(raw_osm_key, osm_tag)
+        if address is not EMPTY:
+            self.assertEqual(item.address, address)
