@@ -112,6 +112,15 @@ class Geocoder(object): # pylint: disable=R0921
         else: # pragma: no cover
             raise ValueError("Invalid point")
 
+    def _geocoder_exception_handler(self, error, message):
+        """
+        Geocoder-specific exceptions handler.
+        Override if custom exceptions processing is needed.
+        For example, raising an appropriate GeocoderQuotaExceeded on non-200
+        response with a textual message in the body about the exceeded quota.
+        """
+        pass
+
     def _call_geocoder(
             self,
             url,
@@ -150,8 +159,7 @@ class Geocoder(object): # pylint: disable=R0921
                     else str(error)
                 )
             )
-            if hasattr(self, '_geocoder_exception_handler'):
-                self._geocoder_exception_handler(error, message) # pylint: disable=E1101
+            self._geocoder_exception_handler(error, message)
             if isinstance(error, HTTPError):
                 code = error.getcode()
                 try:

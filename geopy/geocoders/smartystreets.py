@@ -98,7 +98,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         return self._parse_json(self._call_geocoder(url, timeout=timeout),
                                 exactly_one)
 
-    def _geocoder_exception_handler(self, error, message): # pylint: disable=R0201,W0613
+    def _geocoder_exception_handler(self, error, message):
         """
         LiveStreets-specific exceptions.
         """
