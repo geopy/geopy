@@ -132,7 +132,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             if isinstance(osm_tag, string_compare):
                 params['osm_tag'] = [osm_tag]
             else:
-                if not (isinstance(osm_tag, list) or isinstance(osm_tag, set)):
+                if not isinstance(osm_tag, (list, set)):
                     raise ValueError(
                         "osm_tag must be a string expression or "
                         "a set/list of string expressions"
