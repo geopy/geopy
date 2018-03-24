@@ -148,10 +148,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
     @staticmethod
     def _format_bounds_param(bounds):
-      """
-      Format the bounds to something Google understands.
-      """
-      return '%f,%f|%f,%f' % (bounds[0], bounds[1], bounds[2], bounds[3])
+        """
+        Format the bounds to something Google understands.
+        """
+        return '%f,%f|%f,%f' % (bounds[0], bounds[1], bounds[2], bounds[3])
 
     def geocode(
             self,
