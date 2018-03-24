@@ -112,12 +112,6 @@ class Geocoder(object): # pylint: disable=R0921
         else: # pragma: no cover
             raise ValueError("Invalid point")
 
-    def _parse_json(self, page, exactly_one): # pragma: no cover
-        """
-        Template for subclasses
-        """
-        raise NotImplementedError()
-
     def _call_geocoder(
             self,
             url,
