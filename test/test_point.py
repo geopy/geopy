@@ -87,6 +87,9 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(Point(1, 0, 0), Point([1]))
         self.assertEqual(Point(0, 0, 0), Point([]))
 
+        with self.assertRaises(ValueError):
+            Point([1, 2, 3, 4])
+
     def test_point_from_point(self):
         point = Point(self.lat, self.lon, self.alt)
         point_copy = Point(point)
