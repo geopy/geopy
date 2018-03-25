@@ -125,9 +125,30 @@ class PointTestCase(unittest.TestCase):
         point = Point(self.lat + 10, self.lon + 10, self.alt + 10)
         for each in (0, 1, 2):
             point[each] = point[each] - 10
+
         self.assertEqual(point[0], self.lat)
         self.assertEqual(point[1], self.lon)
         self.assertEqual(point[2], self.alt)
+
+        self.assertEqual(self.coords, tuple(point))
+        self.assertEqual(point.latitude, self.lat)
+        self.assertEqual(point.longitude, self.lon)
+        self.assertEqual(point.altitude, self.alt)
+
+    def test_point_assign_coordinates(self):
+        point = Point(self.lat + 10, self.lon + 10, self.alt + 10)
+        point.latitude = self.lat
+        point.longitude = self.lon
+        point.altitude = self.alt
+
+        self.assertEqual(point[0], self.lat)
+        self.assertEqual(point[1], self.lon)
+        self.assertEqual(point[2], self.alt)
+
+        self.assertEqual(self.coords, tuple(point))
+        self.assertEqual(point.latitude, self.lat)
+        self.assertEqual(point.longitude, self.lon)
+        self.assertEqual(point.altitude, self.alt)
 
     def test_point_eq(self):
         """

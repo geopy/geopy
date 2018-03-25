@@ -46,6 +46,9 @@ POINT_PATTERN = re.compile(r"""
 }, re.X)
 
 
+POINT_VALUES_ORDER = ('latitude', 'longitude', 'altitude')
+
+
 class Point(object):
     """
     A geodetic point with latitude, longitude, and altitude.
@@ -100,7 +103,7 @@ class Point(object):
 
     """
 
-    __slots__ = ("latitude", "longitude", "altitude", "_items")
+    __slots__ = ("latitude", "longitude", "altitude")
 
     POINT_PATTERN = POINT_PATTERN
 
@@ -143,20 +146,19 @@ class Point(object):
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
-        self._items = [self.latitude, self.longitude, self.altitude]
         return self
 
     def __getitem__(self, index):
-        return self._items[index]
+        return getattr(self, POINT_VALUES_ORDER[index])
 
     def __setitem__(self, index, value):
-        self._items[index] = value
+        setattr(self, POINT_VALUES_ORDER[index], value)
 
     def __iter__(self):
         return iter((self.latitude, self.longitude, self.altitude))
 
     def __repr__(self):
-        return "Point(%r, %r, %r)" % tuple(self._items)
+        return "Point(%r, %r, %r)" % tuple(self)
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         """
