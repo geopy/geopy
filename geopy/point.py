@@ -3,6 +3,7 @@
 :class:`.Point` data structure.
 """
 
+import collections
 import re
 from itertools import islice
 from geopy import util, units
@@ -214,10 +215,12 @@ class Point(object):
         )
 
     def __eq__(self, other):
+        if not isinstance(other, collections.Iterable):
+            return NotImplemented
         return tuple(self) == tuple(other)
 
     def __ne__(self, other):
-        return tuple(self) != tuple(other)
+        return not (self == other)
 
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):

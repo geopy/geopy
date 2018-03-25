@@ -147,6 +147,15 @@ class PointTestCase(unittest.TestCase):
             Point(self.lat+10, self.lon-10, self.alt)
         )
 
+    def test_point_comparison_does_not_raise_exceptions(self):
+        point = Point(self.lat, self.lon, self.alt)
+        number = 1
+        not_iterable = object()
+        self.assertFalse(point == number)
+        self.assertTrue(point != number)
+        self.assertFalse(point == not_iterable)
+        self.assertTrue(point != not_iterable)
+
     def test_point_comparison_respects_lists(self):
         point = Point(self.lat, self.lon, self.alt)
         l_eq = [self.lat, self.lon, self.alt]
