@@ -2,6 +2,7 @@
 Test Point.
 """
 
+import pickle
 import unittest
 
 from geopy.compat import u
@@ -196,3 +197,12 @@ class PointTestCase(unittest.TestCase):
         self.assertFalse(point == "123")
         self.assertTrue(point != "123")
         self.assertTrue(point == (1, 2, 3))
+
+    def test_point_is_pickleable(self):
+        point = Point(self.lat, self.lon, self.alt)
+        # https://docs.python.org/2/library/pickle.html#data-stream-format
+        for protocol in (0, 1, 2, -1):
+            pickled = pickle.dumps(point, protocol=protocol)
+            point_unp = pickle.loads(pickled)
+            self.assertEqual(point, point_unp)
+            self.assertEqual(self.coords, point_unp)

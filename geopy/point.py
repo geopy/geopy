@@ -157,6 +157,13 @@ class Point(object):
     def __iter__(self):
         return iter((self.latitude, self.longitude, self.altitude))
 
+    def __getstate__(self):
+        return tuple(self)
+
+    def __setstate__(self, state):
+        for idx, value in enumerate(state):
+            self[idx] = value
+
     def __repr__(self):
         return "Point(%r, %r, %r)" % tuple(self)
 
