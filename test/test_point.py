@@ -110,6 +110,11 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(lon, self.lon)
         self.assertEqual(alt, self.alt)
 
+    def test_point_no_len(self):
+        point = Point(self.lat, self.lon)  # is it 2 or 3?
+        with self.assertRaises(TypeError):  # point doesn't support len()
+            len(point)
+
     def test_point_getitem(self):
         """
         Point.__getitem__
