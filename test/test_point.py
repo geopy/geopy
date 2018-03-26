@@ -206,6 +206,24 @@ class PointTestCase(unittest.TestCase):
         self.assertFalse(point == not_iterable)
         self.assertTrue(point != not_iterable)
 
+    def test_point_comparison_with_empty_values(self):
+        empty_values = (None, '', [], (), {})  # Django validators
+        point_nonempty = Point(self.lat, self.lon, self.alt)
+        point_empty = Point()  # actually Point(0, 0, 0), which is not "empty"
+        self.assertFalse(point_nonempty in empty_values)
+        self.assertTrue(point_nonempty)
+
+        # Point() == (0, 0, 0).
+        self.assertEqual(Point(), (0, 0, 0))
+        # Currently Point can't distinguish between zero and unset coordinate
+        # values, so we cannot tell if `point_empty` is really "empty"
+        # (i.e. unset, like `Point()`) or is just a point at the center
+        # (which is obviously not "empty"). That's why on the next line
+        # we assume that `point_empty` is not in the `empty_values` list.
+        self.assertFalse(point_empty in empty_values)
+        # bool(Point(0, 0, 0)) should also be true
+        self.assertTrue(point_empty)
+
     def test_point_comparison_respects_lists(self):
         point = Point(self.lat, self.lon, self.alt)
         l_eq = [self.lat, self.lon, self.alt]
