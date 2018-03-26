@@ -119,6 +119,24 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(point[1], self.lon)
         self.assertEqual(point[2], self.alt)
 
+    def test_point_slices(self):
+        point = Point(self.lat, self.lon, self.alt)
+        self.assertEqual((self.lat, self.lon), point[:2])
+
+        self.assertEqual(self.coords, point[:10])
+        self.assertEqual(self.coords, point[:])
+        self.assertEqual(self.coords[::-1], point[::-1])
+
+        with self.assertRaises(IndexError):
+            point[10]
+
+        with self.assertRaises(TypeError):
+            point[None]
+
+        point[0:2] = (self.lat + 10, self.lon + 10)
+        self.assertEqual((self.lat + 10, self.lon + 10, self.alt),
+                         tuple(point))
+
     def test_point_setitem(self):
         """
         Point.__setitem__
