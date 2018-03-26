@@ -97,6 +97,11 @@ class PointTestCase(unittest.TestCase):
         self.assertTrue(point is not point_copy)
         self.assertEqual(tuple(point), tuple(point_copy))
 
+    def test_point_from_generator(self):
+        point = Point(i + 10 for i in range(3))
+        self.assertEqual((10, 11, 12), tuple(point))
+        self.assertEqual((10, 11, 12), tuple(point))
+
     def test_point_degrees_are_normalized(self):
         point = Point(95, 185, 375)
         self.assertEqual((-85, -175, 375), tuple(point))
