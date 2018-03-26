@@ -226,7 +226,7 @@ class PointTestCase(unittest.TestCase):
         self.assertTrue(point != "123")
         self.assertTrue(point == (1, 2, 3))
 
-    def test_point_is_pickleable(self):
+    def test_point_is_picklable(self):
         point = Point(self.lat, self.lon, self.alt)
         # https://docs.python.org/2/library/pickle.html#data-stream-format
         for protocol in (0, 1, 2, -1):

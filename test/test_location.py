@@ -173,7 +173,7 @@ class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
                 "Location((%s, %s, %s))" % point
             )
 
-    def test_location_is_pickleable(self):
+    def test_location_is_picklable(self):
         loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
         # https://docs.python.org/2/library/pickle.html#data-stream-format
         for protocol in (0, 1, 2, -1):
@@ -181,12 +181,12 @@ class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
             loc_unp = pickle.loads(pickled)
             self.assertEqual(loc, loc_unp)
 
-    def test_location_with_unpickleable_raw(self):
+    def test_location_with_unpicklable_raw(self):
         some_class = type('some_class', (object,), {})
-        raw_unpickleable = dict(missing=some_class())
+        raw_unpicklable = dict(missing=some_class())
         del some_class
-        loc_unpickleable = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT,
-                                    raw_unpickleable)
+        loc_unpicklable = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT,
+                                    raw_unpicklable)
         for protocol in (0, 1, 2, -1):
             with self.assertRaises((AttributeError, pickle.PicklingError)):
-                pickle.dumps(loc_unpickleable, protocol=protocol)
+                pickle.dumps(loc_unpicklable, protocol=protocol)
