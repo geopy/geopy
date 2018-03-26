@@ -182,7 +182,9 @@ class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
             self.assertEqual(loc, loc_unp)
 
     def test_location_with_unpickleable_raw(self):
-        raw_unpickleable = dict(twisted=lambda: 1)
+        some_class = type('some_class', (object,), {})
+        raw_unpickleable = dict(missing=some_class())
+        del some_class
         loc_unpickleable = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT,
                                     raw_unpickleable)
         for protocol in (0, 1, 2, -1):
