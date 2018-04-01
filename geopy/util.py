@@ -18,17 +18,7 @@ except ImportError: # pragma: no cover
 
 __version__ = "1.12.0"
 
-
-class NullHandler(logging.Handler):
-    """
-    No output.
-    """
-
-    def emit(self, record):
-        pass
-
 logger = logging.getLogger('geopy') # pylint: disable=C0103
-logger.setLevel(logging.CRITICAL)
 
 
 def pairwise(seq):
