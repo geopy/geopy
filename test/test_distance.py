@@ -78,6 +78,15 @@ class CommonDistanceComputationCases(object):
         self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
         self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
 
+    def test_should_compute_distance_for_multiple_points_pairwise(self):
+        dist_total = self.cls((10, 20), (40, 60), (0, 80), (0, 10))
+        dist1 = self.cls((10, 20), (40, 60))
+        dist2 = self.cls((40, 60), (0, 80))
+        dist3 = self.cls((0, 80), (0, 10))
+
+        assert_almost_equal(dist_total.kilometers,
+                            dist1.km + dist2.km + dist3.km)
+
 
 class CommonMathematicalOperatorCases(object):
 
