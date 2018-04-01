@@ -73,11 +73,15 @@ calculate the length of a path::
 """
 from __future__ import division
 
+import warnings
+from collections import namedtuple
+from functools import wraps, reduce
 from math import atan, tan, sin, cos, pi, sqrt, atan2, asin
 from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
 from geopy.compat import string_compare, py3k, cmp
+from geopy.util import logger
 
 # IUGG mean earth radius in kilometers, from
 # https://en.wikipedia.org/wiki/Earth_radius#Mean_radius.  Using a
@@ -100,6 +104,183 @@ ELLIPSOIDS = {
     'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
     'GRS-67':        (6378.1600, 6356.774719, 1 / 298.25)
 }
+
+# This variable disables input validation (and warnings) for Distance routines.
+#
+# If you experience performance degradation due to this, try to pass Point
+# instances instead of tuples. It should improve performance. If that
+# doesn't help either, you can switch this flag off.
+#
+# If you want to switch this off just to hide the warnings, then please don't.
+# Fix the warnings instead. If you see them, it's possible that your
+# computations are invalid.
+# In the future these warnings might become exceptions.
+#
+# You've been warned.
+#
+#     from geopy import distance
+#     distance.INPUT_VALIDATION_ENABLED = False
+#
+INPUT_VALIDATION_ENABLED = True
+
+
+def _normalize_measure_input(func):
+    """
+    Decorator for Distance.measure, performing input validation and
+    providing Point instances to the decorated method.
+    """
+    @wraps(func)
+    def measure(self, a, b, **kwargs):
+        a_raw, b_raw = a, b
+        a, b = Point(a), Point(b)
+
+        if INPUT_VALIDATION_ENABLED:
+            # TODO consider raising exceptions instead of the warnings.
+            _warn_validated_coordinates_errors(
+                (_ValidatedCoordinates.from_coords(a_raw) |
+                 _ValidatedCoordinates.from_coords(b_raw)),
+                called_args=lambda: repr((a_raw, b_raw)),
+                interpreted_args=lambda: repr((a[:2], b[:2])),
+            )
+            # TODO maybe warn if altitude is not zero?
+        return func(self, a, b, **kwargs)
+    return measure
+
+
+def _normalize_destination_input(func):
+    """
+    Decorator for Distance.destination, performing input validation and
+    providing Point instance to the decorated method.
+    """
+    @wraps(func)
+    def destination(self, point, bearing, distance=None, **kwargs):
+        point_raw = point
+        point = Point(point)
+
+        if INPUT_VALIDATION_ENABLED:
+            # TODO consider raising exceptions instead of the warnings.
+            _warn_validated_coordinates_errors(
+                _ValidatedCoordinates.from_coords(point_raw),
+                called_args=lambda: repr((point_raw,)),
+                interpreted_args=lambda: repr((point[:2],)),
+            )
+            # TODO maybe check bearing and distance too?
+            # TODO maybe warn if altitude is not zero?
+        return func(self, point, bearing, distance=distance, **kwargs)
+    return destination
+
+
+def _warn_validated_coordinates_errors(validated_coordinates, called_args,
+                                       interpreted_args):
+    """
+    Issue warnings for the validated coordinates.
+
+    Please note that `called_args` and `interpreted_args` are functions rather
+    than strings, to avoid doing unneeded operations when the input is valid.
+    """
+
+    v = validated_coordinates
+    log_correction = False
+
+    if v.is_any_single_number:
+        log_correction = True
+        warnings.warn('A single number has been passed as a point. '
+                      'If this is exactly what was meant, then pass the zero '
+                      'longitudes explicitly to get rid of this warning. So '
+                      'instead of (a, b) the ((a, 0), (b, 0)) points should '
+                      'be passed.',
+                      UserWarning)
+
+    if v.is_any_coords_tuple and not v.validated_numbers:
+        if v.validated_numbers.is_invalid_type:
+            log_correction = True
+            warnings.warn('Coordinates are expected to be numbers. Cast '
+                          'them to floats or construct Point instances '
+                          'explicitly.',
+                          UserWarning)
+
+        if v.validated_numbers.is_infinite:
+            log_correction = True
+            warnings.warn('Coordinates should be finite. NaN or inf has '
+                          'been passed as a coordinate. Distance behavior is '
+                          'undefined in this case.',
+                          UserWarning)
+
+        if v.validated_numbers.is_outside_boundaries:
+            log_correction = True
+            warnings.warn('Coordinates are not within valid boundaries '
+                          'of latitude [-90; 90] or longitude '
+                          '[-180; 180]. This might be due to a mixed up '
+                          'latitude/longitude order. The expected order '
+                          'is (latitude, longitude) or (y, x) in Cartesian '
+                          'terms.',
+                          UserWarning)
+
+    if log_correction:
+        logger.info('Distance input correction: {} has been interpreted as {}'
+                    .format(called_args(), interpreted_args()))
+
+
+class _ValidatedCoordinates(namedtuple('_ValidatedCoordinates',
+                                       ('are_all_points',
+                                        'is_any_single_number',
+                                        'is_any_string',
+                                        'is_any_coords_tuple',
+                                        'validated_numbers'))):
+    """
+    Perform validation of a coordinate type (which might be a Point, string,
+    single number or a tuple) and describe it. This object is used to issue
+    appropriate warnings.
+    """
+    __slots__ = ()  # namedtuple doesn't have __dict__, don't use it there too
+
+    @classmethod
+    def from_coords(cls, coords):
+        """
+        Construct a _ValidatedCoordinates from an input.
+        """
+        is_point = isinstance(coords, Point)
+        is_single_number = isinstance(coords, util.NUMBER_TYPES)
+        is_string = isinstance(coords, string_compare)
+        is_coords_tuple = False
+        if not is_point and not is_single_number and not is_string:
+            # Then it should be a tuple of (lat, lon, [alt]).
+            try:
+                is_coords_tuple = 2 <= len(coords) <= 3
+            except:
+                pass
+        if is_coords_tuple:
+            # lat, lon, alt
+            boundaries = [(-90, 90), (-180, 180), None]
+            validated_numbers = reduce(
+                lambda a, b: a | b,
+                (util.ValidatedNumber.from_number(coord, bnd)
+                 for coord, bnd in zip(coords, boundaries)))
+        else:
+            validated_numbers = util.ValidatedNumber.all_valid()
+        return cls(
+            is_point, is_single_number, is_string, is_coords_tuple,
+            validated_numbers
+        )
+
+    def __or__(self, other):
+        """
+        Return a new _ValidatedCoordinates which combines errors from the two
+        _ValidatedCoordinates instances.
+        """
+        cls = _ValidatedCoordinates
+        if not isinstance(other, cls):
+            return NotImplemented
+        if self == other:  # perf optimization
+            return self
+        return cls(
+            self.are_all_points and other.are_all_points,
+            self.is_any_single_number or other.is_any_single_number,
+            self.is_any_string or other.is_any_string,
+            self.is_any_coords_tuple or other.is_any_coords_tuple,
+            self.validated_numbers | other.validated_numbers,
+        )
+
 
 class Distance(object):
     """
@@ -256,9 +437,8 @@ class great_circle(Distance):
         self.RADIUS = kwargs.pop('radius', EARTH_RADIUS)
         super(great_circle, self).__init__(*args, **kwargs)
 
+    @_normalize_measure_input
     def measure(self, a, b):
-        a, b = Point(a), Point(b)
-
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
 
@@ -275,11 +455,11 @@ class great_circle(Distance):
 
         return self.RADIUS * d
 
+    @_normalize_destination_input
     def destination(self, point, bearing, distance=None): # pylint: disable=W0621
         """
         TODO docs.
         """
-        point = Point(point)
         lat1 = units.radians(degrees=point.latitude)
         lng1 = units.radians(degrees=point.longitude)
         bearing = units.radians(degrees=bearing)
@@ -360,8 +540,8 @@ class vincenty(Distance):
             self.ellipsoid_key = None
         return
 
+    @_normalize_measure_input
     def measure(self, a, b):
-        a, b = Point(a), Point(b)
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
 
@@ -460,11 +640,11 @@ class vincenty(Distance):
         s = minor * A * (sigma - delta_sigma)
         return s
 
+    @_normalize_destination_input
     def destination(self, point, bearing, distance=None): # pylint: disable=W0621
         """
         TODO docs.
         """
-        point = Point(point)
         lat1 = units.radians(degrees=point.latitude)
         lng1 = units.radians(degrees=point.longitude)
         bearing = units.radians(degrees=bearing)

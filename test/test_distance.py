@@ -3,9 +3,11 @@ Test distance formulas
 """
 import math
 import unittest
+import warnings
 
 from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E0611
 
+from geopy import distance as geopy_distance
 from geopy.point import Point
 from geopy.distance import (Distance,
                             GreatCircleDistance,
@@ -74,9 +76,14 @@ class CommonDistanceComputationCases(object):
         # This is probably a bad design to silently turn NaNs into NaNs
         # instead of raising a ValueError, but this is the current behaviour,
         # hence this test.
-        self.assertTrue(math.isnan(self.cls((nan, nan), (1, 1)).kilometers))
-        self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
-        self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.assertTrue(math.isnan(self.cls((nan, nan), (1, 1)).kilometers))
+            self.assertEqual(1, len(w))
+            self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
+            self.assertEqual(2, len(w))
+            self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
+            self.assertEqual(3, len(w))
 
     def test_should_compute_distance_for_multiple_points_pairwise(self):
         dist_total = self.cls((10, 20), (40, 60), (0, 80), (0, 10))
@@ -86,6 +93,49 @@ class CommonDistanceComputationCases(object):
 
         assert_almost_equal(dist_total.kilometers,
                             dist1.km + dist2.km + dist3.km)
+
+    def test_should_not_warn_when_validation_is_disabled(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            geopy_distance.INPUT_VALIDATION_ENABLED = False
+            try:
+                self.cls(10, 20)
+                self.assertEqual(0, len(w))
+            finally:
+                geopy_distance.INPUT_VALIDATION_ENABLED = True
+            self.cls(10, 20)
+            self.assertEqual(1, len(w))
+
+    def test_should_warn_when_using_single_numbers_as_points(self):
+        # Each argument is expected to be a Point. If it's not a point,
+        # it will be wrapped in Point.
+        # Point(10) equals to Point(10, 0).
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            dist1 = self.cls(10, 20)
+            self.assertEqual(1, len(w))
+            dist2 = self.cls((10, 0), (20, 0))
+            # still one - explicit tuples are not that suspicious
+            self.assertEqual(1, len(w))
+        assert_almost_equal(dist1.kilometers, dist2.kilometers)
+
+    def test_should_warn_for_tuples_with_non_numbers(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            dist1 = self.cls(("1", "30"), ("20", "60"))
+            self.assertEqual(1, len(w))
+            dist2 = self.cls((1, 30), (20, 60))
+            self.assertEqual(1, len(w))
+        assert_almost_equal(dist1.kilometers, dist2.kilometers)
+
+    def test_should_warn_for_mixed_up_lat_lon(self):
+        lat = 40
+        lon = 120  # should exceed max lat (abs 90) to cause a warning
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # The correct order is (lat, lon).
+            self.cls((lon, lat), (lon - 10, lat))
+            self.assertEqual(1, len(w))
 
 
 class CommonMathematicalOperatorCases(object):
