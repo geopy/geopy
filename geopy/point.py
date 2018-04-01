@@ -5,6 +5,7 @@
 
 import collections
 import re
+import warnings
 from math import fmod
 from itertools import islice
 from geopy import util, units
@@ -15,7 +16,7 @@ from geopy.format import (
     format_degrees,
     format_distance,
 )
-from geopy.compat import string_compare
+from geopy.compat import string_compare, isfinite
 
 
 POINT_PATTERN = re.compile(r"""
@@ -58,6 +59,35 @@ def _normalize_angle(x, limit):
     if modulo >= limit:
         return modulo - double_limit
     return modulo
+
+
+def _normalize_coordinates(latitude, longitude, altitude):
+    latitude = float(latitude or 0.0)
+    longitude = float(longitude or 0.0)
+    altitude = float(altitude or 0.0)
+
+    is_all_finite = all(isfinite(x) for x in (latitude, longitude, altitude))
+    if not is_all_finite:
+        warnings.warn('Point coordinates should be finite. NaN or inf has '
+                      'been passed as a coordinate.  This will cause a '
+                      'ValueError exception in the future versions of geopy.',
+                      UserWarning)
+
+    if abs(latitude) > 90:
+        warnings.warn('Latitude has been normalized, because its '
+                      'absolute value was more than 90. This is probably '
+                      'not what was meant, because the normalized value '
+                      'is on a different pole.  This will cause a '
+                      'ValueError exception in the future versions of geopy.',
+                      UserWarning)
+        latitude = _normalize_angle(latitude, 90.0)
+
+    if abs(longitude) > 180:
+        # Longitude normalization is pretty straightforward and doesn't seem
+        # to be error-prone, so there's nothing to complain about.
+        longitude = _normalize_angle(longitude, 180.0)
+
+    return latitude, longitude, altitude
 
 
 class Point(object):
@@ -124,12 +154,10 @@ class Point(object):
         :param float longitude: Longitude of point.
         :param float altitude: Altitude of point.
         """
-        single_arg = longitude is None and altitude is None
+        single_arg = latitude is not None and longitude is None and altitude is None
         if single_arg and not isinstance(latitude, util.NUMBER_TYPES):
             arg = latitude
-            if arg is None: # pragma: no cover
-                pass
-            elif isinstance(arg, Point):
+            if isinstance(arg, Point):
                 return cls.from_point(arg)
             elif isinstance(arg, string_compare):
                 return cls.from_string(arg)
@@ -143,15 +171,17 @@ class Point(object):
                 else:
                     return cls.from_sequence(seq)
 
-        latitude = float(latitude or 0.0)
-        if abs(latitude) > 90:
-            latitude = _normalize_angle(latitude, 90.0)
+        if single_arg:
+            warnings.warn('A single number has been passed to the Point '
+                          'constructor. This is probably a mistake, because '
+                          'constructing a Point with just a latitude '
+                          'seems senseless. If this is exactly what was '
+                          'meant, then pass the zero longitude explicitly '
+                          'to get rid of this warning.',
+                          UserWarning)
 
-        longitude = float(longitude or 0.0)
-        if abs(longitude) > 180:
-            longitude = _normalize_angle(longitude, 180.0)
-
-        altitude = float(altitude or 0.0)
+        latitude, longitude, altitude = \
+            _normalize_coordinates(latitude, longitude, altitude)
 
         self = super(Point, cls).__new__(cls)
         self.latitude = latitude
@@ -165,7 +195,8 @@ class Point(object):
     def __setitem__(self, index, value):
         point = list(self)
         point[index] = value  # list handles slices
-        self.latitude, self.longitude, self.altitude = point
+        self.latitude, self.longitude, self.altitude = \
+            _normalize_coordinates(*point)
 
     def __iter__(self):
         return iter((self.latitude, self.longitude, self.altitude))

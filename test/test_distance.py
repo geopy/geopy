@@ -7,6 +7,7 @@ import warnings
 
 from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E0611
 
+from geopy import distance as geopy_distance
 from geopy.point import Point
 from geopy.distance import (Distance,
                             GreatCircleDistance,
@@ -86,9 +87,14 @@ class CommonDistanceComputationCases(object):
         # This is probably a bad design to silently turn NaNs into NaNs
         # instead of raising a ValueError, but this is the current behaviour,
         # hence this test.
-        self.assertTrue(math.isnan(self.cls((nan, nan), (1, 1)).kilometers))
-        self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
-        self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.assertTrue(math.isnan(self.cls((nan, nan), (1, 1)).kilometers))
+            self.assertEqual(1, len(w))
+            self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
+            self.assertEqual(3, len(w))  # 1 per each point tuple
+            self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
+            self.assertEqual(5, len(w))
 
     def test_should_compute_distance_for_multiple_points_pairwise(self):
         dist_total = self.cls((10, 20), (40, 60), (0, 80), (0, 10))
@@ -98,6 +104,33 @@ class CommonDistanceComputationCases(object):
 
         assert_almost_equal(dist_total.kilometers,
                             dist1.km + dist2.km + dist3.km)
+
+    def test_should_warn_when_using_single_numbers_as_points(self):
+        # Each argument is expected to be a Point. If it's not a point,
+        # it will be wrapped in Point.
+        # Point(10) equals to Point(10, 0).
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            dist1 = self.cls(10, 20)
+            self.assertEqual(2, len(w))  # 1 per each point
+            dist2 = self.cls((10, 0), (20, 0))
+            # no warnings: explicit tuples are not that suspicious
+            self.assertEqual(2, len(w))
+        assert_almost_equal(dist1.kilometers, dist2.kilometers)
+
+    def test_should_tolerate_tuples_with_textual_numbers(self):
+        dist1 = self.cls(("1", "30"), ("20", "60"))
+        dist2 = self.cls((1, 30), (20, 60))
+        assert_almost_equal(dist1.kilometers, dist2.kilometers)
+
+    def test_should_warn_for_mixed_up_lat_lon(self):
+        lat = 40
+        lon = 120  # should exceed max lat (abs 90) to cause a warning
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # The correct order is (lat, lon).
+            self.cls((lon, lat), (lon - 10, lat))
+            self.assertEqual(2, len(w))  # 1 per each point tuple
 
 
 class CommonMathematicalOperatorCases(object):

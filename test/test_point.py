@@ -6,6 +6,7 @@ import pickle
 import unittest
 import math
 import sys
+import warnings
 
 from geopy.compat import u
 from geopy.point import Point
@@ -85,13 +86,29 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(point.format_decimal('m'), "41.5, 81.0, 0.0m")
 
     def test_point_from_iterable(self):
-        self.assertEqual(Point(1, 2, 3), Point([1, 2, 3]))
-        self.assertEqual(Point(1, 2, 0), Point([1, 2]))
-        self.assertEqual(Point(1, 0, 0), Point([1]))
-        self.assertEqual(Point(0, 0, 0), Point([]))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.assertEqual(Point(1, 2, 3), Point([1, 2, 3]))
+            self.assertEqual(Point(1, 2, 0), Point([1, 2]))
+            self.assertEqual(0, len(w))
+            self.assertEqual(Point(1, 0, 0), Point([1]))
+            self.assertEqual(1, len(w))  # a single latitude is discouraged
+            self.assertEqual(Point(0, 0, 0), Point([]))
+            self.assertEqual(1, len(w))
 
         with self.assertRaises(ValueError):
             Point([1, 2, 3, 4])
+
+    def test_point_from_single_number(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # Point from a single number is probably a misuse,
+            # thus it's discouraged.
+            self.assertEqual((5, 0, 0), tuple(Point(5)))
+            self.assertEqual(1, len(w))
+            # But an explicit zero longitude is fine
+            self.assertEqual((5, 0, 0), tuple(Point(5, 0)))
+            self.assertEqual(1, len(w))
 
     def test_point_from_point(self):
         point = Point(self.lat, self.lon, self.alt)
@@ -105,22 +122,33 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual((10, 11, 12), tuple(point))
 
     def test_point_degrees_are_normalized(self):
-        point = Point(95, 185, 375)
-        self.assertEqual((-85, -175, 375), tuple(point))
-        point = Point(-95, -185, 375)
-        self.assertEqual((85, 175, 375), tuple(point))
-        point = Point(-0.0, -0.0, 375)
-        self.assertEqual((0.0, 0.0, 375.0), tuple(point))  # note that the zeros might be negative
-        # ensure that negative zeros are normalized to the positive ones
-        self.assertEqual((1.0, 1.0, 1.0), tuple(math.copysign(1.0, x) for x in point))
-        point = Point(90, 180, 375)
-        self.assertEqual((90, 180, 375), tuple(point))
-        point = Point(-90, -180, 375)
-        self.assertEqual((-90, -180, 375), tuple(point))
-        point = Point(-270, -540, 375)
-        self.assertEqual((-90, -180, 375), tuple(point))
-        point = Point(270, 540, 375)
-        self.assertEqual((-90, -180, 375), tuple(point))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            point = Point(95, 185, 375)
+            self.assertEqual((-85, -175, 375), tuple(point))
+            self.assertEqual(1, len(w))
+
+            point = Point(-95, -185, 375)
+            self.assertEqual((85, 175, 375), tuple(point))
+            self.assertEqual(2, len(w))
+
+            point = Point(-0.0, -0.0, 375)
+            self.assertEqual((0.0, 0.0, 375.0), tuple(point))  # note that the zeros might be negative
+            # ensure that negative zeros are normalized to the positive ones
+            self.assertEqual((1.0, 1.0, 1.0), tuple(math.copysign(1.0, x) for x in point))
+            point = Point(90, 180, 375)
+            self.assertEqual((90, 180, 375), tuple(point))
+            point = Point(-90, -180, 375)
+            self.assertEqual((-90, -180, 375), tuple(point))
+            self.assertEqual(2, len(w))
+
+            point = Point(-270, -540, 375)
+            self.assertEqual((-90, -180, 375), tuple(point))
+            self.assertEqual(3, len(w))
+
+            point = Point(270, 540, 375)
+            self.assertEqual((-90, -180, 375), tuple(point))
+            self.assertEqual(4, len(w))
 
     def test_point_degrees_normalization_does_not_lose_precision(self):
         if sys.float_info.mant_dig != 53:
@@ -145,10 +173,13 @@ class PointTestCase(unittest.TestCase):
         # (180.00000000000003 + 180) fraction doesn't fit in 52 bits.
         #
         # This test ensures that such unwanted precision loss is not happening.
-        self.assertEqual(tuple(Point(90.00000000000002, 180.00000000000003)),
-                         (-89.99999999999998, -179.99999999999997, 0))
-        self.assertEqual(tuple(Point(9.000000000000002, 1.8000000000000003)),
-                         (9.000000000000002, 1.8000000000000003, 0))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.assertEqual(tuple(Point(90.00000000000002, 180.00000000000003)),
+                             (-89.99999999999998, -179.99999999999997, 0))
+            self.assertEqual(tuple(Point(9.000000000000002, 1.8000000000000003)),
+                             (9.000000000000002, 1.8000000000000003, 0))
+            self.assertEqual(1, len(w))
 
     def test_unpacking(self):
         point = Point(self.lat, self.lon, self.alt)
@@ -205,6 +236,19 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(point.latitude, self.lat)
         self.assertEqual(point.longitude, self.lon)
         self.assertEqual(point.altitude, self.alt)
+
+    def test_point_setitem_normalization(self):
+        point = Point()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            point[0] = 100
+            point[1] = 200
+            # Please note that attribute assignments are not normalized.
+            # Only __setitem__ assignments are.
+            self.assertEqual((-80, -160, 0), tuple(point))
+            self.assertEqual(1, len(w))  # for latitude
+            point[1] = float("nan")
+            self.assertEqual(2, len(w))
 
     def test_point_assign_coordinates(self):
         point = Point(self.lat + 10, self.lon + 10, self.alt + 10)
