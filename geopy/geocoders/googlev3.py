@@ -52,26 +52,26 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         API authentication is only required for Google Maps Premier customers.
 
-        :param string api_key: The API key required by Google to perform
+        :param str api_key: The API key required by Google to perform
             geocoding requests. API keys are managed through the Google APIs
             console (https://code.google.com/apis/console).
 
             .. versionadded:: 0.98.2
 
-        :param string domain: Should be the localized Google Maps domain to
+        :param str domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.googleapis.com', but if you're
             geocoding address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
             .. versionadded:: 0.97
 
-        :param string client_id: If using premier, the account client id.
+        :param str client_id: If using premier, the account client id.
 
-        :param string secret_key: If using premier, the account secret key.
+        :param str secret_key: If using premier, the account secret key.
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -80,11 +80,11 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
 
-        :param string channel: If using premier, the channel identifier.
+        :param str channel: If using premier, the channel identifier.
 
             .. versionadded:: 1.12.0
         """
@@ -148,10 +148,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
     @staticmethod
     def _format_bounds_param(bounds):
-      """
-      Format the bounds to something Google understands.
-      """
-      return '%f,%f|%f,%f' % (bounds[0], bounds[1], bounds[2], bounds[3])
+        """
+        Format the bounds to something Google understands.
+        """
+        return '%f,%f|%f,%f' % (bounds[0], bounds[1], bounds[2], bounds[3])
 
     def geocode(
             self,
@@ -167,7 +167,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -183,7 +183,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             to bias geocode results more prominently.
         :type bounds: list or tuple
 
-        :param string region: The region code, specified as a ccTLD
+        :param str region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.
 
         :param dict components: Restricts to an area. Can use any combination
@@ -191,7 +191,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
             .. versionadded:: 0.97.1
 
-        :param string language: The language in which to return results.
+        :param str language: The language in which to return results.
 
         :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor.
@@ -215,10 +215,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         if language:
             params['language'] = language
 
-        if self.premier is False:
-            url = "?".join((self.api, urlencode(params)))
-        else:
+        if self.premier:
             url = self._get_signed_url(params)
+        else:
+            url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -241,7 +241,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param boolean exactly_one: Return one result or a list of results, if
+        :param bool exactly_one: Return one result or a list of results, if
             available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -250,9 +250,9 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
             .. versionadded:: 0.97
 
-        :param string language: The language in which to return results.
+        :param str language: The language in which to return results.
 
-        :param boolean sensor: Whether the geocoding request comes from a
+        :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor.
         """
         params = {
@@ -290,7 +290,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         :param at_time: The time at which you want the timezone of this
             location. This is optional, and defaults to the time that the
             function is called in UTC.
-        :type at_time integer, long, float, datetime:
+        :type at_time: int or float or datetime
 
         :rtype: pytz timezone
         """

@@ -26,7 +26,7 @@ class OpenCageTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = OpenCage(
             api_key=env['OPENCAGE_KEY'],
-            timeout=20,
+            timeout=10,
         )
         cls.delta_exact = 0.2
 

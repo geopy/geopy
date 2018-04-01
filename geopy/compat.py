@@ -11,6 +11,11 @@ if py3k: # pragma: no cover
 else: # pragma: no cover
     string_compare = (str, unicode)
 
+if py3k:  # pragma: no cover
+    text_type = str
+else:  # pragma: no cover
+    text_type = unicode
+
 # Unicode compatibility, borrowed from 'six'
 if py3k: # pragma: no cover
     def u(s):
@@ -25,12 +30,18 @@ else: # pragma: no cover
         """
         return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')
 
+if py3k:
+    def cmp(a, b):
+        return (a > b) - (a < b)
+else:
+    cmp = cmp  # builtin in py2
+
 if py3k: # pragma: no cover
     from urllib.parse import (urlencode, quote, # pylint: disable=W0611,F0401,W0611,E0611
                               urlparse, parse_qs)
     from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611
                                 build_opener, ProxyHandler,
-                                URLError, install_opener,
+                                URLError,
                                 HTTPPasswordMgrWithDefaultRealm,
                                 HTTPBasicAuthHandler)
     from urllib.error import HTTPError # pylint: disable=W0611,F0401,W0611,E0611
@@ -54,7 +65,7 @@ else: # pragma: no cover
     from urllib import urlencode as original_urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
     from urllib2 import (Request, HTTPError,   # pylint: disable=W0611,F0401,W0611,E0611
                          ProxyHandler, URLError, urlopen,
-                         build_opener, install_opener,
+                         build_opener,
                          HTTPPasswordMgrWithDefaultRealm,
                          HTTPBasicAuthHandler)
     from urlparse import urlparse, parse_qs

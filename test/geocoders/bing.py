@@ -73,28 +73,72 @@ class BingTestCase(GeocoderTestBase):
             self.assertAlmostEqual(res.latitude, 40.753, delta=self.delta)
             self.assertAlmostEqual(res.longitude, -73.984, delta=self.delta)
 
+    def test_reverse_with_culture_de(self):
+        """
+        Bing.reverse using point and culture parameter to get a non english response
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            Point(40.753898, -73.985071),
+            culture="DE"
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            self.assertIn("Vereinigte Staaten von Amerika", res.address)
+
+    def test_reverse_with_culture_en(self):
+        """
+        Bing.reverse using point and culture parameter to get an english response
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            Point(40.753898, -73.985071),
+            culture="EN"
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            self.assertIn("United States", res.address)
+
+    def test_reverse_with_include_country_code(self):
+        """
+        Bing.reverse using point and include country-code in the response
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            Point(40.753898, -73.985071),
+            include_country_code=True
+        )
+        if res is None:
+            unittest.SkipTest("Bing sometimes returns no result")
+        else:
+            self.assertEqual(res.raw["address"].get("countryRegionIso2", 'missing'), 'US')
+
     def test_user_location(self):
         """
         Bing.geocode using `user_location`
         """
-        pensylvania = "20 Main St, Blairstown, NJ 07825, United States"
-        colorado = "20 Main St, Longmont, CO 80501, United States"
+        pennsylvania = (40.98327, -74.96064)
+        colorado = (40.1602849999851, -105.102491162672)
 
         pennsylvania_bias = (40.922351, -75.096562)
         colorado_bias = (39.914231, -105.070104)
-        for each in (
-                (pensylvania, pennsylvania_bias),
+        for expected, bias in (
+                (pennsylvania, pennsylvania_bias),
                 (colorado, colorado_bias)
             ):
             res = self._make_request(
                 self.geocoder.geocode,
                 "20 Main Street",
-                user_location=Point(each[1]),
+                user_location=Point(bias),
             )
             if res is None:
                 unittest.SkipTest("Bing sometimes returns no result")
             else:
-                self.assertEqual(res[0], each[0])
+                self._verify_request(res,
+                                     latitude=expected[0],
+                                     longitude=expected[1])
 
     def test_optional_params(self):
         """

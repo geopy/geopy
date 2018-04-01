@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 from geopy.compat import (urlencode, HTTPPasswordMgrWithDefaultRealm,
                           HTTPBasicAuthHandler, build_opener, u,
-                          install_opener, iteritems, Request)
+                          iteritems, Request)
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
     GeocoderQueryError,
@@ -55,25 +55,25 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         """
         Initialize a customized IGN France geocoder.
 
-        :param string api_key: The API key required by IGN France API
+        :param str api_key: The API key required by IGN France API
             to perform geocoding requests. You can get your key here:
             http://api.ign.fr. Mandatory. For authentication with referer
             and with username/password, the api key always differ.
 
-        :param string username: When making a call need HTTP simple
+        :param str username: When making a call need HTTP simple
             authentication username. Mandatory if no referer set
 
-        :param string password: When making a call need HTTP simple
+        :param str password: When making a call need HTTP simple
             authentication password. Mandatory if no referer set
 
-        :param string referer: When making a call need HTTP referer.
+        :param str referer: When making a call need HTTP referer.
             Mandatory if no password and username
 
-        :param string domain: Currently it is 'wxs.ign.fr', can
+        :param str domain: Currently it is 'wxs.ign.fr', can
             be changed for testing purposes for developer API
             e.g gpp3-wxs.ign.fr at the moment.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -87,7 +87,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
 
@@ -139,20 +139,20 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The query string to be geocoded.
+        :param str query: The query string to be geocoded.
 
-        :param string query_type: The type to provide for geocoding. It can be
+        :param str query_type: The type to provide for geocoding. It can be
             PositionOfInterest, StreetAddress or CadastralParcel.
             StreetAddress is the default choice if none provided.
 
         :param int maximum_responses: The maximum number of responses
             to ask to the API in the query body.
 
-        :param string is_freeform: Set if return is structured with
+        :param str is_freeform: Set if return is structured with
             freeform structure or a more structured returned.
             By default, value is False.
 
-        :param string filtering: Provide string that help setting geocoder
+        :param str filtering: Provide string that help setting geocoder
             filter. It contains an XML string. See examples in documentation
             and ignfrance.py file in directory tests.
 
@@ -252,11 +252,11 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         :param int maximum_responses: The maximum number of responses
             to ask to the API in the query body.
 
-        :param string filtering: Provide string that help setting geocoder
+        :param str filtering: Provide string that help setting geocoder
             filter. It contains an XML string. See examples in documentation
             and ignfrance.py file in directory tests.
 
-        :param boolean exactly_one: Return one result or a list of results, if
+        :param bool exactly_one: Return one result or a list of results, if
             available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -366,7 +366,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
 
         # Install the opener.
         # Now all calls to urllib.request.urlopen use our opener.
-        install_opener(opener)
+        self.urlopen = opener.open
 
     def _parse_xml(self,
                    page,

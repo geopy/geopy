@@ -3,7 +3,7 @@
 """
 
 import csv
-from base64 import encodestring
+from base64 import b64encode
 from geopy.compat import urlencode, py3k, Request
 from geopy.geocoders.base import (
     Geocoder,
@@ -36,11 +36,11 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
             user_agent=None,
         ):  # pylint: disable=R0913
         """
-        :param string username:
+        :param str username:
 
-        :param string password:
+        :param str password:
 
-        :param string format_string: String containing '%s' where the
+        :param str format_string: String containing '%s' where the
             string to geocode should be interpolated before querying the
             geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
@@ -58,7 +58,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -82,7 +82,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -98,13 +98,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
 
         url = "?".join((self.api, urlencode({'address':query_str})))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        if self.authenticated is True:
-            auth = " ".join((
-                "Basic",
-                encodestring(":".join((self.username, self.password))\
-                    .encode('utf-8')).strip().decode('utf-8')
-            ))
-            url = Request(url, headers={"Authorization": auth})
+        url = Request(url, headers=self._get_headers())
         page = self._call_geocoder(url, timeout=timeout, raw=True)
         content = page.read().decode("utf-8") if py3k else page.read() # pylint: disable=E1101,E1103
         places = [
@@ -115,7 +109,7 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
         ]
         if not len(places):
             return None
-        if exactly_one is True:
+        if exactly_one:
             return self._parse_result(places[0])
         else:
             result = [self._parse_result(res) for res in places]
@@ -161,3 +155,14 @@ class GeocoderDotUS(Geocoder):  # pylint: disable=W0223
         else:
             return None
         return Location(name, latlon, place)
+
+    def _get_headers(self):
+        headers = {}
+        if self.authenticated:
+            username_password = ":".join((self.username, self.password))
+            auth = " ".join((
+                "Basic",
+                b64encode(username_password.encode('utf-8')).decode('utf-8')
+            ))
+            headers["Authorization"] = auth
+        return headers

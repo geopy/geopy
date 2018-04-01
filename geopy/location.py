@@ -6,6 +6,10 @@ from geopy.point import Point
 from geopy.compat import string_compare, py3k
 
 
+def _location_tuple(location):
+    return location._address, (location._point[0], location._point[1])
+
+
 class Location(object): # pylint: disable=R0903,R0921
     """
     Contains a parsed geocoder response. Can be iterated over as
@@ -33,7 +37,7 @@ class Location(object): # pylint: disable=R0903,R0921
                 "point an unsupported type: %r; use %r or Point",
                 type(point), type(string_compare)
             )
-        self._tuple = (self._address, (self._point[0], self._point[1]))
+        self._tuple = _location_tuple(self)
         self._raw = raw
 
     @property
@@ -116,9 +120,15 @@ class Location(object): # pylint: disable=R0903,R0921
                 self.latitude, self.longitude, self.altitude
             )
 
-
     def __iter__(self):
         return iter(self._tuple)
+
+    def __getstate__(self):
+        return self._address, self._point, self._raw
+
+    def __setstate__(self, state):
+        self._address, self._point, self._raw = state
+        self._tuple = _location_tuple(self)
 
     def __eq__(self, other):
         return (
@@ -129,8 +139,8 @@ class Location(object): # pylint: disable=R0903,R0921
         )
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        return not (self == other)
 
-    def __len__(self): # pragma: no cover
+    def __len__(self):  # pragma: no cover
         return len(self._tuple)
 

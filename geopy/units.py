@@ -61,7 +61,7 @@ def kilometers(meters=0, miles=0, feet=0, nautical=0): # pylint: disable=W0621
     if meters:
         ret += meters / 1000.
     if feet:
-        miles += feet / ft(1.)
+        ret += feet / ft(1.)
     if nautical:
         ret += nautical / nm(1.)
     ret += miles * 1.609344
@@ -81,7 +81,7 @@ def miles(kilometers=0, meters=0, feet=0, nautical=0): # pylint: disable=W0621
     if nautical:
         kilometers += nautical / nm(1.)
     if feet:
-        ret += feet / ft(1.)
+        kilometers += feet / ft(1.)
     if meters:
         kilometers += meters / 1000.
     ret += kilometers / 1.609344
@@ -107,7 +107,7 @@ def nautical(kilometers=0, meters=0, miles=0, feet=0): # pylint: disable=W0621
     """
     ret = 0.
     if feet:
-        miles += feet / ft(1.)
+        kilometers += feet / ft(1.)
     if miles:
         kilometers += km(miles=miles)
     if meters:

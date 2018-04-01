@@ -67,11 +67,11 @@ class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
         """
         Photon.reverse Point
         """
-        self.reverse_run(
+        result = self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
-            {"address": "Rue Raspail, 69100, Villeurbanne, Auvergne-Rhône-Alpes, France",
-             "latitude": 45.7733105, "longitude": 4.8869339}
+            {"latitude": 45.7733105, "longitude": 4.8869339}
         )
+        self.assertIn("France", result.address)
 
     def test_geocode_language_parameter(self):
         """

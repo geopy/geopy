@@ -15,7 +15,7 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         cls.delta = 0.04
         cls.geocoder = GeocodeFarm(
             api_key=env.get('GEOCODEFARM_KEY'), # None api_key will use free tier on GeocodeFarm
-            timeout=60,
+            timeout=10,
         )
 
     def setUp(self):

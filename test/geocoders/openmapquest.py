@@ -23,8 +23,12 @@ class OpenMapQuestTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = OpenMapQuest(scheme='http', timeout=3,
-                                    api_key=env.get('OPENMAPQUEST_APIKEY'))
+        # setUpClass is still called even if test is skipped.
+        # OpenMapQuest raises ConfigurationError when api_key is empty,
+        # so don't try to create the instance when api_key is empty.
+        if env.get('OPENMAPQUEST_APIKEY'):
+            cls.geocoder = OpenMapQuest(scheme='http', timeout=3,
+                                        api_key=env['OPENMAPQUEST_APIKEY'])
         cls.delta = 0.04
 
     def test_geocode(self):

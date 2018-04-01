@@ -3,6 +3,7 @@
 Test Location.
 """
 
+import pickle
 import unittest
 from geopy.compat import u, py3k
 from geopy.location import Location
@@ -172,3 +173,20 @@ class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
                 "Location((%s, %s, %s))" % point
             )
 
+    def test_location_is_picklable(self):
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
+        # https://docs.python.org/2/library/pickle.html#data-stream-format
+        for protocol in (0, 1, 2, -1):
+            pickled = pickle.dumps(loc, protocol=protocol)
+            loc_unp = pickle.loads(pickled)
+            self.assertEqual(loc, loc_unp)
+
+    def test_location_with_unpicklable_raw(self):
+        some_class = type('some_class', (object,), {})
+        raw_unpicklable = dict(missing=some_class())
+        del some_class
+        loc_unpicklable = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT,
+                                    raw_unpicklable)
+        for protocol in (0, 1, 2, -1):
+            with self.assertRaises((AttributeError, pickle.PicklingError)):
+                pickle.dumps(loc_unpicklable, protocol=protocol)

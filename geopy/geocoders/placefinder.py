@@ -2,8 +2,6 @@
 :class:`.YahooPlaceFinder` geocoder.
 """
 
-from functools import partial
-
 try:
     from requests import get, Request
     from requests_oauthlib import OAuth1
@@ -14,8 +12,7 @@ except ImportError:
 from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
 from geopy.exc import GeocoderParseError
 from geopy.location import Location
-from geopy.compat import string_compare, py3k
-
+from geopy.compat import string_compare, text_type
 
 __all__ = ("YahooPlaceFinder", )
 
@@ -35,9 +32,9 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             user_agent=None,
         ):  # pylint: disable=R0913
         """
-        :param string consumer_key: Key provided by Yahoo.
+        :param str consumer_key: Key provided by Yahoo.
 
-        :param string consumer_secret: Secret corresponding to the key
+        :param str consumer_secret: Secret corresponding to the key
             provided by Yahoo.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -51,7 +48,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -63,16 +60,8 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         super(YahooPlaceFinder, self).__init__(
             timeout=timeout, proxies=proxies, user_agent=user_agent
         )
-        self.consumer_key = (
-            unicode(consumer_key)
-            if not py3k
-            else str(consumer_key)
-        )
-        self.consumer_secret = (
-            unicode(consumer_secret)
-            if not py3k
-            else str(consumer_secret)
-        )
+        self.consumer_key = text_type(consumer_key)
+        self.consumer_secret = text_type(consumer_secret)
         self.auth = OAuth1(
             client_key=self.consumer_key,
             client_secret=self.consumer_secret,
@@ -150,7 +139,7 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -170,11 +159,11 @@ class YahooPlaceFinder(Geocoder): # pylint: disable=W0223
             "flags": "J", # JSON
         }
 
-        if reverse is True:
+        if reverse:
             params["gflags"] = "R"
-        if exactly_one is True:
+        if exactly_one:
             params["count"] = "1"
-        if with_timezone is True:
+        if with_timezone:
             params['flags'] += 'T' #Return timezone
 
         response = self._call_geocoder(

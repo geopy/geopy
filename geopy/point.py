@@ -3,6 +3,7 @@
 :class:`.Point` data structure.
 """
 
+import collections
 import re
 from itertools import islice
 from geopy import util, units
@@ -99,7 +100,7 @@ class Point(object):
 
     """
 
-    __slots__ = ("latitude", "longitude", "altitude", "_items")
+    __slots__ = ("latitude", "longitude", "altitude")
 
     POINT_PATTERN = POINT_PATTERN
 
@@ -142,20 +143,27 @@ class Point(object):
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
-        self._items = [self.latitude, self.longitude, self.altitude]
         return self
 
     def __getitem__(self, index):
-        return self._items[index]
+        return tuple(self)[index]  # tuple handles slices
 
     def __setitem__(self, index, value):
-        self._items[index] = value
+        point = list(self)
+        point[index] = value  # list handles slices
+        self.latitude, self.longitude, self.altitude = point
 
     def __iter__(self):
         return iter((self.latitude, self.longitude, self.altitude))
 
+    def __getstate__(self):
+        return tuple(self)
+
+    def __setstate__(self, state):
+        self.latitude, self.longitude, self.altitude = state
+
     def __repr__(self):
-        return "Point(%r, %r, %r)" % tuple(self._items)
+        return "Point(%r, %r, %r)" % tuple(self)
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         """
@@ -192,7 +200,7 @@ class Point(object):
 
         if altitude is None:
             altitude = bool(self.altitude)
-        if altitude is True:
+        if altitude:
             if not isinstance(altitude, string_compare):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
@@ -201,7 +209,7 @@ class Point(object):
 
     def format_altitude(self, unit='km'):
         """
-        Foamt altitude with unit
+        Format altitude with unit
         """
         return format_distance(self.altitude, unit=unit)
 
@@ -214,10 +222,12 @@ class Point(object):
         )
 
     def __eq__(self, other):
+        if not isinstance(other, collections.Iterable):
+            return NotImplemented
         return tuple(self) == tuple(other)
 
     def __ne__(self, other):
-        return tuple(self) != tuple(other)
+        return not (self == other)
 
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):
@@ -350,6 +360,9 @@ class Point(object):
         and altitude, respectively.
         """
         args = tuple(islice(seq, 4))
+        if len(args) > 3:
+            raise ValueError('When creating a Point from sequence, it '
+                             'must not have more than 3 items.')
         return cls(*args)
 
     @classmethod

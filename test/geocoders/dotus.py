@@ -1,5 +1,6 @@
 
 import unittest
+from mock import patch
 
 from geopy.compat import u
 from geopy.compat import py3k
@@ -14,6 +15,34 @@ class GeocoderDotUSTestCaseUnitTest(GeocoderTestBase):
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_dot_us_auth(self):
+        """
+        GeocoderDotUS Authorization header
+        """
+        geocoder = GeocoderDotUS(username='username', password='password')
+        with patch.object(geocoder, '_call_geocoder',
+                          side_effect=NotImplementedError()) as mock_call_geocoder:
+            with self.assertRaises(NotImplementedError):
+                geocoder.geocode("1 5th Ave NYC")
+            args, kwargs = mock_call_geocoder.call_args
+            request = args[0]
+            self.assertEqual(
+                request.get_header('Authorization'),
+                'Basic dXNlcm5hbWU6cGFzc3dvcmQ='
+            )
+
+    def test_get_headers(self):
+        geocoder = GeocoderDotUS()
+        self.assertDictEqual({}, geocoder._get_headers())
+
+        username = 'testuser'
+        password = 'testpassword'
+        # echo -n testuser:testpassword | base64
+        b64 = 'dGVzdHVzZXI6dGVzdHBhc3N3b3Jk'
+        geocoder = GeocoderDotUS(username=username, password=password)
+        self.assertDictEqual({'Authorization': 'Basic %s' % b64},
+                             geocoder._get_headers())
 
 
 @unittest.skipUnless(  # pylint: disable=R0904,C0111
@@ -30,31 +59,6 @@ class GeocoderDotUSTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             password=env['GEOCODERDOTUS_PASSWORD'],
             timeout=3
         )
-
-    def test_dot_us_auth(self):
-        """
-        GeocoderDotUS Authorization header
-        """
-        geocoder = GeocoderDotUS(username='username', password='password')
-
-        def _print_call_geocoder(query, timeout, raw):
-            """
-            We want to abort at call time and just get the request object.
-            """
-            raise Exception(query)
-
-        geocoder._call_geocoder = _print_call_geocoder
-        exc_raised = False
-        try:
-            geocoder.geocode("1 5th Ave NYC")
-        except Exception as err:
-            exc_raised = True
-            request = err.message if not py3k else err.args[0]
-            self.assertEqual(
-                request.get_header('Authorization'),
-                'Basic dXNlcm5hbWU6cGFzc3dvcmQ='
-            )
-        self.assertTrue(exc_raised)
 
     def test_geocode(self):
         """

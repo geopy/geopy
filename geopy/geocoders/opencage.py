@@ -17,8 +17,8 @@ __all__ = ("OpenCage", )
 
 class OpenCage(Geocoder):
     """
-    Geocoder using the Open Cage Data API. Documentation at:
-        http://geocoder.opencagedata.com/api.html
+    Geocoder using the OpenCageData API. Documentation at:
+        https://geocoder.opencagedata.com/api
 
     ..versionadded:: 1.1.0
     """
@@ -33,16 +33,16 @@ class OpenCage(Geocoder):
             user_agent=None,
     ):  # pylint: disable=R0913
         """
-        Initialize a customized Open Cage Data geocoder.
+        Initialize a customized OpenCageData geocoder.
 
-        :param string api_key: The API key required by Open Cage Data
+        :param str api_key: The API key required by OpenCageData
             to perform geocoding requests. You can get your key here:
-            https://developer.opencagedata.com/
+            https://geocoder.opencagedata.com/
 
-        :param string domain: Currently it is 'api.opencagedata.com', can
+        :param str domain: Currently it is 'api.opencagedata.com', can
             be changed for testing purposes.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -51,7 +51,7 @@ class OpenCage(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
 
@@ -77,23 +77,25 @@ class OpenCage(Geocoder):
         """
         Geocode a location query.
 
-        :param string query: The query string to be geocoded; this must
+        :param str query: The query string to be geocoded; this must
             be URL encoded.
 
-        :param string language: an IETF format language code (such as `es`
+        :param str language: an IETF format language code (such as `es`
             for Spanish or pt-BR for Brazilian Portuguese); if this is
             omitted a code of `en` (English) will be assumed by the remote
             service.
 
-        :param string bounds: Provides the geocoder with a hint to the region
+        :param str bounds: Provides the geocoder with a hint to the region
             that the query resides in. This value will help the geocoder
             but will not restrict the possible results to the supplied
             region. The bounds parameter should be specified as 4
             coordinate points forming the south-west and north-east
-            corners of a bounding box. For example,
-            `bounds=-0.563160,51.280430,0.278970,51.683979`.
+            corners of a bounding box. The order of the coordinates is
+            `longitude,latitude,longitude,latitude`. For example,
+            `bounds=-0.563160,51.280430,0.278970,51.683979`
+            
 
-        :param string country: Provides the geocoder with a hint to the
+        :param str country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
             geocoder but will not restrict the possible results to the
             supplied country. The country code is a 3 character code as
@@ -141,9 +143,9 @@ class OpenCage(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param string language: The language in which to return results.
+        :param str language: The language in which to return results.
 
-        :param boolean exactly_one: Return one result or a list of results, if
+        :param bool exactly_one: Return one result or a list of results, if
             available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service

@@ -1,5 +1,5 @@
-
-""".. versionadded:: 0.93
+"""
+.. versionadded:: 0.93
 
 Geopy can calculate geodesic distance between two points using the
 [geodesic distance](https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid) or
@@ -100,7 +100,7 @@ from math import atan, tan, sin, cos, pi, sqrt, atan2, asin
 from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
-from geopy.compat import string_compare
+from geopy.compat import string_compare, py3k, cmp
 
 HAVE_PROJ = HAVE_GEODESIC = False
 try:
@@ -200,11 +200,30 @@ class Distance(object):
     def __str__(self): # pragma: no cover
         return '%s km' % self.__kilometers
 
-    def __cmp__(self, other):
+    def __cmp__(self, other):  # py2 only
         if isinstance(other, Distance):
             return cmp(self.kilometers, other.kilometers)
         else:
             return cmp(self.kilometers, other)
+
+    if py3k:
+        def __eq__(self, other):
+            return self.__cmp__(other) == 0
+
+        def __ne__(self, other):
+            return self.__cmp__(other) != 0
+
+        def __gt__(self, other):
+            return self.__cmp__(other) > 0
+
+        def __lt__(self, other):
+            return self.__cmp__(other) < 0
+
+        def __ge__(self, other):
+            return self.__cmp__(other) >= 0
+
+        def __le__(self, other):
+            return self.__cmp__(other) <= 0
 
     @property
     def kilometers(self): # pylint: disable=C0111
@@ -399,6 +418,7 @@ class vincenty(Distance):
         iter_limit = self.iterations
 
         i = 0
+
         while (i == 0 or
                (abs(lambda_lng - lambda_prime) > 10e-12 and i <= iter_limit)):
             i += 1

@@ -14,7 +14,6 @@ from geopy.compat import (
     build_opener,
     ProxyHandler,
     URLError,
-    install_opener,
     Request,
 )
 from geopy.point import Point
@@ -91,12 +90,12 @@ class Geocoder(object): # pylint: disable=R0921
         self.headers = {'User-Agent': user_agent or DEFAULT_USER_AGENT}
 
         if self.proxies:
-            install_opener(
-                build_opener(
-                    ProxyHandler(self.proxies)
-                )
+            opener = build_opener(
+                ProxyHandler(self.proxies)
             )
-        self.urlopen = urllib_urlopen
+            self.urlopen = opener.open
+        else:
+            self.urlopen = urllib_urlopen
 
     @staticmethod
     def _coerce_point_to_string(point):
@@ -113,11 +112,14 @@ class Geocoder(object): # pylint: disable=R0921
         else: # pragma: no cover
             raise ValueError("Invalid point")
 
-    def _parse_json(self, page, exactly_one): # pragma: no cover
+    def _geocoder_exception_handler(self, error, message):
         """
-        Template for subclasses
+        Geocoder-specific exceptions handler.
+        Override if custom exceptions processing is needed.
+        For example, raising an appropriate GeocoderQuotaExceeded on non-200
+        response with a textual message in the body about the exceeded quota.
         """
-        raise NotImplementedError()
+        pass
 
     def _call_geocoder(
             self,
@@ -157,8 +159,7 @@ class Geocoder(object): # pylint: disable=R0921
                     else str(error)
                 )
             )
-            if hasattr(self, '_geocoder_exception_handler'):
-                self._geocoder_exception_handler(error, message) # pylint: disable=E1101
+            self._geocoder_exception_handler(error, message)
             if isinstance(error, HTTPError):
                 code = error.getcode()
                 try:

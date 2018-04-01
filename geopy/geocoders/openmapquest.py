@@ -36,18 +36,18 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         Initialize an Open MapQuest geocoder with location-specific
         address information.
 
-        :param string api_key: API key provided by MapQuest.
+        :param str api_key: API key provided by MapQuest.
 
             .. versionchanged:: 1.12.0
                OpenMapQuest now requires an API key. Using an empty key will
                result in a :class:`geopy.exc.ConfigurationError`.
 
-        :param string format_string: String containing '%s' where
+        :param str format_string: String containing '%s' where
             the string to geocode should be interpolated before querying
             the geocoder. For example: '%s, Mountain View, CA'. The default
             is just '%s'.
 
-        :param string scheme: Use 'https' or 'http' as the API URL's scheme.
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
             Default is https. Note that SSL connections' certificates are not
             verified.
 
@@ -66,7 +66,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 0.96
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -83,7 +83,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

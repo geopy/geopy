@@ -35,10 +35,10 @@ class Yandex(Geocoder): # pylint: disable=W0223
 
             .. versionadded:: 1.5.0
 
-        :param string api_key: Yandex API key (not obligatory)
+        :param str api_key: Yandex API key (not obligatory)
             http://api.yandex.ru/maps/form.xml
 
-        :param string lang: response locale, the following locales are
+        :param str lang: response locale, the following locales are
             supported: "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -50,7 +50,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-        :param string user_agent: Use a custom User-Agent header.
+        :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
         """
@@ -65,7 +65,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
         """
         Geocode a location query.
 
-        :param string query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -79,11 +79,11 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': query,
             'format': 'json'
         }
-        if not self.api_key is None:
-            params['key'] = self.api_key
-        if not self.lang is None:
+        if self.api_key:
+            params['apikey'] = self.api_key
+        if self.lang:
             params['lang'] = self.lang
-        if exactly_one is True:
+        if exactly_one:
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -101,12 +101,12 @@ class Yandex(Geocoder): # pylint: disable=W0223
         """
         Given a point, find an address.
 
-        :param string query: The coordinates for which you wish to obtain the
+        :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
-        :param boolean exactly_one: Return one result or a list of results, if
+        :param bool exactly_one: Return one result or a list of results, if
             available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -125,9 +125,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             'geocode': '{0},{1}'.format(lng, lat),
             'format': 'json'
         }
-        if self.api_key is not None:
-            params['key'] = self.api_key
-        if self.lang is not None:
+        if self.api_key:
+            params['apikey'] = self.api_key
+        if self.lang:
             params['lang'] = self.lang
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
