@@ -117,10 +117,12 @@ class CommonMathematicalOperatorCases(object):
 
     def test_should_be_able_to_divide_distances_by_distances(self):
         ratio = self.cls(4.0) / self.cls(2.0)
+        self.assertIsInstance(ratio, float)
         assert_almost_equal(ratio, 2.0)
 
     def test_should_be_able_to_divide_distances_by_floats(self):
         divided_distance = self.cls(4.0) / 2.0
+        self.assertIsInstance(divided_distance, self.cls)
         assert_almost_equal(divided_distance.kilometers, 2.0)
 
     def test_should_be_able_to_take_absolute_value_of_distances(self):
