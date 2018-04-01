@@ -3,6 +3,65 @@
 Changelog
 =========
 
+1.13.0
+------
+2018-04-TBD
+
+*   ADDED: Pickpoint geocoder. Contributed by Vladimir Kalinkin. (#246)
+
+*   ADDED: Bing geocoder: additional parameters for geocoding (`culture`
+    and `include_country_code`). Contributed by Bernd Schlapsi. (#166)
+
+*   ADDED: `Point` and `Location` instances are now picklable.
+
+*   ADDED: More accurate algorithm for distance computation
+    `geopy.distance.geodesic`, which is now a default
+    `geopy.distance.distance`. Vincenty usage is now discouraged in favor of
+    the geodesic. This also has added a dependency of geopy on
+    `geographiclib` package. Contributed by Charles Karney. (#144)
+
+*   ADDED: Nominatim geocoder now supports a `limit` option and uses `limit=1`
+    for `exactly_one=True` requests. Contributed by Serphentas. (#281)
+
+*   CHANGED: `Point` now issues warnings for incorrect or ambiguous inputs.
+    Some of them (namely not finite values and out of band latitudes)
+    will be replaced with ValueError exceptions in the future versions
+    of geopy. (#272)
+
+*   CHANGED: `Point` now uses `fmod` instead of `%` which results in more
+    accurate coordinates normalization. Contributed by svalee. (#275, #279)
+
+*   CHANGED: When using http proxy, urllib's `install_opener` was used, which
+    was altering `urlopen` call globally. It's not used anymore.
+
+*   CHANGED: `Point` now raises `ValueError` instead of `TypeError` when more
+    than 3 arguments have been passed.
+
+*   FIXED: `Point` was raising an exception when compared to non-iterables.
+
+*   FIXED: Coordinates of a `Point` instance changed via `__setitem__` were
+    not updating the corresponding lat/long/alt attributes.
+
+*   FIXED: Coordinates of a `Point` instance changed via `__setitem__` were
+    not being normalized after assignment. Note, however, that attribute
+    assignments are still not normalized. (#272)
+
+*   FIXED: `Distance` instances comparison was not working in Python3.
+
+*   FIXED: Yandex geocoder was sending API key with an incorrect parameter.
+
+*   FIXED: Unit conversions from feet were incorrect.
+    Contributed by scottessner. (#162)
+
+*   FIXED: Vincenty destination function had an error in the formula
+    implementation. Contributed by Hanno Schlichting. (#194)
+
+*   FIXED: Vincenty was throwing UnboundLocalError when difference between
+    the two longitudes was close to 2*pi or either of them was NaN. (#187)
+
+*   REMOVED: `geopy.util.NullHandler` logging handler has been removed.
+
+
 1.12.0
 ------
 2018-03-13
