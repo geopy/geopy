@@ -107,6 +107,10 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual((-85, -175, 375), tuple(point))
         point = Point(-95, -185, 375)
         self.assertEqual((85, 175, 375), tuple(point))
+        point = Point(-0.0, -0.0, 375)
+        self.assertEqual((0.0, 0.0, 375.0), tuple(point))
+        point = Point(0.0, 0.0, 375)
+        self.assertEqual((0.0, 0.0, 375), point)
 
     def test_unpacking(self):
         point = Point(self.lat, self.lon, self.alt)

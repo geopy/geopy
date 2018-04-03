@@ -133,18 +133,12 @@ class Point(object):
         latitude = float(latitude or 0.0)
         if abs(latitude) > 90:
             modulo = fmod(latitude + 90, 180)
-            if modulo < 0:
-                latitude = modulo + 90
-            else:
-                latitude = modulo - 90
+            latitude = (modulo - 90) if modulo >= 0 else (modulo + 90)
 
         longitude = float(longitude or 0.0)
         if abs(longitude) > 180:
             modulo = fmod(longitude + 180, 360)
-            if modulo < 0:
-                longitude = modulo + 180
-            else:
-                longitude = modulo - 180
+            longitude = (modulo - 180) if modulo >= 0 else (modulo + 180)
 
         altitude = float(altitude or 0.0)
 
