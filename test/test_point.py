@@ -4,6 +4,7 @@ Test Point.
 
 import pickle
 import unittest
+import math
 
 from geopy.compat import u
 from geopy.point import Point
@@ -108,9 +109,9 @@ class PointTestCase(unittest.TestCase):
         point = Point(-95, -185, 375)
         self.assertEqual((85, 175, 375), tuple(point))
         point = Point(-0.0, -0.0, 375)
-        self.assertEqual((0.0, 0.0, 375.0), tuple(point))
-        point = Point(0.0, 0.0, 375)
-        self.assertEqual((0.0, 0.0, 375), point)
+        self.assertEqual((0.0, 0.0, 375.0), tuple(point))  # note that the zeros might be negative
+        # ensure that negative zeros are normalized to the positive ones
+        self.assertEqual((1.0, 1.0, 1.0), tuple(math.copysign(1.0, x) for x in point))
 
     def test_unpacking(self):
         point = Point(self.lat, self.lon, self.alt)
