@@ -6,7 +6,9 @@ geopy
 from setuptools import setup, find_packages
 from geopy import __version__ as version
 
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    'geographiclib'
+]
 TESTS_REQUIRES = [
     'nose-cov',
     'pylint',

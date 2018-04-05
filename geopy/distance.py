@@ -17,21 +17,16 @@ always be in kilometers, however).
 
 The geodesic distance is the shortest distance on the surface of an
 ellipsoidal model of the earth.  There are two algorithms used to
-compute this distance
-[Vincenty's method](https://en.wikipedia.org/wiki/Vincenty's_formulae)
-(:class:`.vincenty`) which is accurate to 0.2 mm and the distance
-calculation fails to converge for nearly antipodal points.
+compute this distance.  The default algorithm uses the method is given
+by [Karney (2013)](https://doi.org/10.1007%2Fs00190-012-0578-z)
+(:class:`.geodesic`); this is accurate to round-off and always
+converges.  An older method due to
+[Vincenty](https://en.wikipedia.org/wiki/Vincenty's_formulae)
+(:class:`.vincenty`) is also available; this is faster, but is only
+accurate to 0.2 mm and the distance calculation fails to converge for
+nearly antipodal points.
 
-If either of the python packages pyproj or geographiclib is available,
-then the method given by
-[Karney (2013)](https://doi.org/10.1007%2Fs00190-012-0578-z)
-(:class:`.geodesic`) is also provided.  This is accurate to round-off
-and always converges.  You can install pyproj and geographiclib with
-
-    pip install pyproj geographiclib
-
-`geopy.distance.distance` uses :class:`.geodesic` if it is available
-otherwise it uses :class:`.vincenty`.
+`geopy.distance.distance` uses :class:`.geodesic`.
 
 There are multiple popular ellipsoidal models,
 and which one will be the most accurate depends on where your points are
@@ -57,24 +52,24 @@ Here are examples of distance.distance::
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
     >>> print(distance.distance(newport_ri, cleveland_oh).miles)
-    538.390445368
+    538.3904453677203
 
     >>> wellington = (-41.32, 174.81)
     >>> salamanca = (40.96, -5.50)
     >>> print(distance.distance(wellington, salamanca).km)
-    19959.6792674
+    19959.67926735382
 
-The second example above fails unless geographiclib has been installed.
+The second example above fails with `distance.vincenty`.
 
 Using great-circle distance::
 
     >>> print(distance.great_circle(newport_ri, cleveland_oh).miles)
-    536.997990696
+    536.9979906964344
 
 You can change the ellipsoid model used by the geodesic formulas like so::
 
     >>> ne, cl = newport_ri, cleveland_oh
-    >>> distance.distance(ne, cl, ellipsoid='GRS-80').miles
+    >>> print(distance.distance(ne, cl, ellipsoid='GRS-80').miles)
 
 The above model name will automatically be retrieved from the
 ELLIPSOIDS dictionary. Alternatively, you can specify the model values
@@ -91,7 +86,7 @@ calculate the length of a path::
     >>> _, wa = g.geocode('Washington, DC')
     >>> _, pa = g.geocode('Palo Alto, CA')
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
-    3277.30439191
+    3277.304391911067
 
 """
 from __future__ import division
@@ -101,17 +96,7 @@ from geopy.units import radians
 from geopy import units, util
 from geopy.point import Point
 from geopy.compat import string_compare, py3k, cmp
-
-HAVE_PROJ = HAVE_GEODESIC = False
-try:
-    from pyproj import Geod
-    HAVE_PROJ = HAVE_GEODESIC = True
-except ImportError:
-    try:
-        from geographiclib.geodesic import Geodesic
-        HAVE_GEODESIC = True
-    except ImportError:
-        pass
+from geographiclib.geodesic import Geodesic
 
 # IUGG mean earth radius in kilometers, from
 # https://en.wikipedia.org/wiki/Earth_radius#Mean_radius.  Using a
@@ -268,7 +253,7 @@ class Distance(object):
 class great_circle(Distance):
     """
     Use spherical geometry to calculate the surface distance between two
-    geodesic points.
+    points.
 
     Set which radius of the earth to use by specifying a 'radius' keyword
     argument. It must be in kilometers. The default is to use the module
@@ -279,7 +264,7 @@ class great_circle(Distance):
         >>> from geopy.distance import great_circle
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
-        >>> great_circle(newport_ri, cleveland_oh).miles
+        >>> print(great_circle(newport_ri, cleveland_oh).miles)
         536.9979906964344
 
     """
@@ -358,14 +343,12 @@ class vincenty(Distance):
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
         >>> print(vincenty(newport_ri, cleveland_oh).miles)
-        538.3904451566326
+        538.3904453622719
 
-    Note: This implementation of Vincenty distance fails to converge for
-    some valid points. In some cases, a result can be obtained by increasing
-    the number of iterations (`iterations` keyword argument, given in the
-    class `__init__`, with a default of 20). It may be preferable to use
-    :class:`.great_circle`, which is marginally less accurate, but always
-    produces a result.
+    Note: The Vincenty algorithm for distance fails to converge for some
+    valid points. In such cases, use :class:`.geodesic` which always
+    produces an accurate result.
+
     """
 
     ellipsoid_key = None
@@ -607,11 +590,7 @@ class geodesic(Distance):
     geod = None
 
     def __init__(self, *args, **kwargs):
-        if not HAVE_GEODESIC:
-            raise NotImplementedError(
-                "neither pyproj nor geographiclib is available")
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
-        self.method = "pyproj" if HAVE_PROJ else "geographiclib"
         major, minor, f = self.ELLIPSOID # pylint: disable=W0612
         super(geodesic, self).__init__(*args, **kwargs)
 
@@ -638,21 +617,13 @@ class geodesic(Distance):
         lat1, lon1 = a.latitude, a.longitude
         lat2, lon2 = b.latitude, b.longitude
 
-        if not (isinstance(self.geod, Geod if HAVE_PROJ else Geodesic) and
+        if not (isinstance(self.geod, Geodesic) and
                 self.geod.a == self.ELLIPSOID[0] and
                 self.geod.f == self.ELLIPSOID[2]):
-            self.geod = (Geod(a = self.ELLIPSOID[0], f = self.ELLIPSOID[2])
-                         if HAVE_PROJ
-                         else Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2]))
+            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
 
-        if HAVE_PROJ:
-            try:
-                s12 = self.geod.inv(lon1, lat1, lon2, lat2)[2]
-            except ValueError:  # pyproj trips on nans
-                s12 = float('nan')
-        else:
-            s12 =  self.geod.Inverse(lat1, lon1, lat2, lon2,
-                                     Geodesic.DISTANCE)['s12']
+        s12 =  self.geod.Inverse(lat1, lon1, lat2, lon2,
+                                 Geodesic.DISTANCE)['s12']
 
         return s12
 
@@ -670,22 +641,14 @@ class geodesic(Distance):
         if isinstance(distance, Distance):
             distance = distance.kilometers
 
-        if not (isinstance(self.geod, Geod if HAVE_PROJ else Geodesic) and
+        if not (isinstance(self.geod, Geodesic) and
                 self.geod.a == self.ELLIPSOID[0] and
                 self.geod.f == self.ELLIPSOID[2]):
-            self.geod = (Geod(a = self.ELLIPSOID[0], f = self.ELLIPSOID[2])
-                         if HAVE_PROJ
-                         else Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2]))
+            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
 
-        if HAVE_PROJ:
-            try:
-                lon2, lat2 = self.geod.fwd(lon1, lat1, azi1, distance)[0:2]
-            except ValueError:  # pyproj trips on nans
-                lon2 = lat2 = float('nan')
-        else:
-            r = self.geod.Direct(lat1, lon1, azi1, distance,
-                                 Geodesic.LATITUDE | Geodesic.LONGITUDE)
-            lat2, lon2  = r['lat2'], r['lon2']
+        r = self.geod.Direct(lat1, lon1, azi1, distance,
+                             Geodesic.LATITUDE | Geodesic.LONGITUDE)
+        lat2, lon2  = r['lat2'], r['lon2']
 
         return Point(lat2, lon2)
 
@@ -695,4 +658,4 @@ GeodesicDistance = geodesic
 
 # Set the default distance formula
 
-distance = GeodesicDistance if HAVE_GEODESIC else VincentyDistance
+distance = GeodesicDistance
