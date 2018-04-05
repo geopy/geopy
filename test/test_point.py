@@ -120,14 +120,14 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual((-90, -180, 375), tuple(point))
         initial = (90, 180)
         for counter in range(2, 10):
-            point = Point(*(ini * counter for ini in initial), 375)
+            point = Point(*(ini * counter for ini in initial), altitude=375)
             if counter % 2 == 0:
                 self.assertEqual((0.0, 0.0, 375.0), tuple(point))
             else:
                 self.assertEqual((-90.0, -180.0, 375.0), tuple(point))
         initial = (-90, -180)
         for counter in range(2, 10):
-            point = Point(*(ini * counter for ini in initial), 375)
+            point = Point(*(ini * counter for ini in initial), altitude=375)
             if counter % 2 == 0:
                 self.assertEqual((0.0, 0.0, 375.0), tuple(point))
             else:
