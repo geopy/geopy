@@ -10,6 +10,7 @@ INSTALL_REQUIRES = [
     'geographiclib'
 ]
 TESTS_REQUIRES = [
+    'geographiclib',
     'nose-cov',
     'pylint',
     'tox',

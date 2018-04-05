@@ -322,6 +322,95 @@ class great_circle(Distance):
 
 GreatCircleDistance = great_circle
 
+class geodesic(Distance):
+    """
+    Calculate the geodesic distance between two points
+
+    Set which ellipsoidal model of the earth to use by specifying an
+    ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
+    most globally accurate model.  If ``ellipsoid`` is a string, it is
+    looked up in the `ELLIPSOIDS` dictionary to obtain the major and minor
+    semiaxes and the flattening. Otherwise, it should be a tuple with those
+    values.  See the comments above the `ELLIPSOIDS` dictionary for
+    more information.
+
+    Example::
+
+        >>> from geopy.distance import geodesic
+        >>> newport_ri = (41.49008, -71.312796)
+        >>> cleveland_oh = (41.499498, -81.695391)
+        >>> print(geodesic(newport_ri, cleveland_oh).miles)
+        538.390445368
+    """
+
+    ellipsoid_key = None
+    ELLIPSOID = None
+    geod = None
+
+    def __init__(self, *args, **kwargs):
+        self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
+        major, minor, f = self.ELLIPSOID # pylint: disable=W0612
+        super(geodesic, self).__init__(*args, **kwargs)
+
+    def set_ellipsoid(self, ellipsoid):
+        """
+        Change the ellipsoid used in the calculation.
+        """
+        if not isinstance(ellipsoid, (list, tuple)):
+            try:
+                self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
+                self.ellipsoid_key = ellipsoid
+            except KeyError:
+                raise Exception(
+                    "Invalid ellipsoid. See geopy.distance.ELLIPSOIDS"
+                )
+        else:
+            self.ELLIPSOID = ellipsoid
+            self.ellipsoid_key = None
+        return
+
+    # Karney's algorithms for measure and destination
+    def measure(self, a, b):
+        a, b = Point(a), Point(b)
+        lat1, lon1 = a.latitude, a.longitude
+        lat2, lon2 = b.latitude, b.longitude
+
+        if not (isinstance(self.geod, Geodesic) and
+                self.geod.a == self.ELLIPSOID[0] and
+                self.geod.f == self.ELLIPSOID[2]):
+            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
+
+        s12 =  self.geod.Inverse(lat1, lon1, lat2, lon2,
+                                 Geodesic.DISTANCE)['s12']
+
+        return s12
+
+    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
+        """
+        TODO docs.
+        """
+        point = Point(point)
+        lat1 = point.latitude
+        lon1 = point.longitude
+        azi1 = bearing
+
+        if distance is None:
+            distance = self
+        if isinstance(distance, Distance):
+            distance = distance.kilometers
+
+        if not (isinstance(self.geod, Geodesic) and
+                self.geod.a == self.ELLIPSOID[0] and
+                self.geod.f == self.ELLIPSOID[2]):
+            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
+
+        r = self.geod.Direct(lat1, lon1, azi1, distance,
+                             Geodesic.LATITUDE | Geodesic.LONGITUDE)
+        lat2, lon2  = r['lat2'], r['lon2']
+
+        return Point(lat2, lon2)
+
+GeodesicDistance = geodesic
 
 class vincenty(Distance):
     """
@@ -564,98 +653,7 @@ class vincenty(Distance):
 
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
-class geodesic(Distance):
-    """
-    Calculate the geodesic distance between two points
-
-    Set which ellipsoidal model of the earth to use by specifying an
-    ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
-    most globally accurate model.  If ``ellipsoid`` is a string, it is
-    looked up in the `ELLIPSOIDS` dictionary to obtain the major and minor
-    semiaxes and the flattening. Otherwise, it should be a tuple with those
-    values.  See the comments above the `ELLIPSOIDS` dictionary for
-    more information.
-
-    Example::
-
-        >>> from geopy.distance import geodesic
-        >>> newport_ri = (41.49008, -71.312796)
-        >>> cleveland_oh = (41.499498, -81.695391)
-        >>> print(geodesic(newport_ri, cleveland_oh).miles)
-        538.390445368
-    """
-
-    ellipsoid_key = None
-    ELLIPSOID = None
-    geod = None
-
-    def __init__(self, *args, **kwargs):
-        self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
-        major, minor, f = self.ELLIPSOID # pylint: disable=W0612
-        super(geodesic, self).__init__(*args, **kwargs)
-
-    def set_ellipsoid(self, ellipsoid):
-        """
-        Change the ellipsoid used in the calculation.
-        """
-        if not isinstance(ellipsoid, (list, tuple)):
-            try:
-                self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
-                self.ellipsoid_key = ellipsoid
-            except KeyError:
-                raise Exception(
-                    "Invalid ellipsoid. See geopy.distance.ELLIPSOIDS"
-                )
-        else:
-            self.ELLIPSOID = ellipsoid
-            self.ellipsoid_key = None
-        return
-
-    # Karney's algorithms for measure and destination
-    def measure(self, a, b):
-        a, b = Point(a), Point(b)
-        lat1, lon1 = a.latitude, a.longitude
-        lat2, lon2 = b.latitude, b.longitude
-
-        if not (isinstance(self.geod, Geodesic) and
-                self.geod.a == self.ELLIPSOID[0] and
-                self.geod.f == self.ELLIPSOID[2]):
-            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
-
-        s12 =  self.geod.Inverse(lat1, lon1, lat2, lon2,
-                                 Geodesic.DISTANCE)['s12']
-
-        return s12
-
-    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
-        """
-        TODO docs.
-        """
-        point = Point(point)
-        lat1 = point.latitude
-        lon1 = point.longitude
-        azi1 = bearing
-
-        if distance is None:
-            distance = self
-        if isinstance(distance, Distance):
-            distance = distance.kilometers
-
-        if not (isinstance(self.geod, Geodesic) and
-                self.geod.a == self.ELLIPSOID[0] and
-                self.geod.f == self.ELLIPSOID[2]):
-            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
-
-        r = self.geod.Direct(lat1, lon1, azi1, distance,
-                             Geodesic.LATITUDE | Geodesic.LONGITUDE)
-        lat2, lon2  = r['lat2'], r['lon2']
-
-        return Point(lat2, lon2)
-
 VincentyDistance = vincenty
-GreatCircleDistance = great_circle
-GeodesicDistance = geodesic
 
 # Set the default distance formula
-
 distance = GeodesicDistance
