@@ -2,14 +2,16 @@
 .. versionadded:: 0.93
 
 Geopy can calculate geodesic distance between two points using the
-[geodesic distance](https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid) or
-[great-circle distance](https://en.wikipedia.org/wiki/Great-circle_distance)
+`geodesic distance
+<https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid>`_ or
+`great-circle distance
+<https://en.wikipedia.org/wiki/Great-circle_distance>`_
 formulas, with a default of the geodesic distance available as the function
 `geopy.distance.distance`.
 
 Great-circle distance (:class:`.great_circle`) uses a spherical model of
 the earth, using the mean earth radius as defined by the International
-Union of Geodesy and Geophysics, (2*a + b)/3 = 6371.0087714150598
+Union of Geodesy and Geophysics, (2\ *a* + *b*)/3 = 6371.0087714150598
 kilometers approx 6371.009 km (for WGS-84), resulting in an error of up
 to about 0.5%. The radius value is stored in
 :const:`distance.EARTH_RADIUS`, so it can be customized (it should
@@ -18,10 +20,10 @@ always be in kilometers, however).
 The geodesic distance is the shortest distance on the surface of an
 ellipsoidal model of the earth.  There are two algorithms used to
 compute this distance.  The default algorithm uses the method is given
-by [Karney (2013)](https://doi.org/10.1007%2Fs00190-012-0578-z)
+by `Karney (2013) <https://doi.org/10.1007%2Fs00190-012-0578-z>`_
 (:class:`.geodesic`); this is accurate to round-off and always
 converges.  An older method due to
-[Vincenty](https://en.wikipedia.org/wiki/Vincenty's_formulae)
+`Vincenty (1975) <https://en.wikipedia.org/wiki/Vincenty's_formulae>`_
 (:class:`.vincenty`) is also available; this is faster, but is only
 accurate to 0.2 mm and the distance calculation fails to converge for
 nearly antipodal points.
@@ -435,8 +437,8 @@ class vincenty(Distance):
         538.3904453622719
 
     Note: The Vincenty algorithm for distance fails to converge for some
-    valid points. In such cases, use :class:`.geodesic` which always
-    produces an accurate result.
+    valid (nearly antipodal) points. In such cases, use
+    :class:`.geodesic` which always produces an accurate result.
 
     """
 

@@ -11,7 +11,6 @@ from geopy.distance import (Distance,
                             GreatCircleDistance,
                             VincentyDistance,
                             GeodesicDistance,
-                            HAVE_GEODESIC,
                             EARTH_RADIUS,
                             ELLIPSOIDS)
 
@@ -297,14 +296,15 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases,
                        for y in range(len(results))
                        if x != y)
 
-class TestWhenComputingGeodesicDistance(CommonDistanceCases):
+class TestWhenComputingGeodesicDistance(CommonDistanceCases,
+                                        unittest.TestCase):
 
     cls = GeodesicDistance
 
-    def setup(self):
+    def setUp(self):
         self.original_ellipsoid = self.cls.ELLIPSOID
 
-    def teardown(self):
+    def tearDown(self):
         self.cls.ELLIPSOID = self.original_ellipsoid
 
     def test_miscellaneous_high_accuracy_cases(self):
@@ -374,9 +374,6 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases):
         km = 1000
         for l in testcases:
             (lat1, lon1, azi1, lat2, lon2, azi2, s12) = l
-            # lon2 is the UNROLLed longitude, so normalize
-            lon2 = (lon2 + 360 if lon2 < -180 else
-                    lon2 - 360 if lon2 >= 180 else lon2)
             s12a = d.measure((lat1, lon1), (lat2, lon2)) * km
             assert_almost_equal(s12a, s12, delta = 1e-8)
             p = d.destination((lat1, lon1), azi1, s12/km)
