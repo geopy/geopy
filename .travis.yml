@@ -8,6 +8,7 @@ python:
     - "pypy"
     - "pypy3"
 install:
-    - travis_retry pip install coverage nose-cov requests-oauthlib pytz mock
+    - travis_retry pip install coverage nose-cov mock
+    - travis_retry pip install -e . ".[timezone,placefinder]"
 script:
     - nosetests --verbose --with-cover --cover-erase --cover-package=geopy

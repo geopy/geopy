@@ -7,12 +7,6 @@ from setuptools import setup, find_packages
 from geopy import __version__ as version
 
 INSTALL_REQUIRES = []
-TESTS_REQUIRES = [
-    'nose-cov',
-    'pylint',
-    'tox',
-    'mock'
-]
 
 
 setup(
@@ -28,9 +22,8 @@ setup(
     ),
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
-    tests_require=TESTS_REQUIRES,
     extras_require={
-        "placefinder": ["requests_oauthlib>=0.4.0"],
+        "placefinder": ["requests_oauthlib<1,>=0.4.0"],
         "timezone": ["pytz"],
     },
     license='MIT',
