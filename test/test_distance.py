@@ -374,6 +374,9 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
         km = 1000
         for l in testcases:
             (lat1, lon1, azi1, lat2, lon2, azi2, s12) = l
+            # lon2 is the UNROLLed longitude, so normalize
+            lon2 = (lon2 + 360 if lon2 < -180 else
+                    lon2 - 360 if lon2 >= 180 else lon2)
             s12a = d.measure((lat1, lon1), (lat2, lon2)) * km
             assert_almost_equal(s12a, s12, delta = 1e-8)
             p = d.destination((lat1, lon1), azi1, s12/km)
