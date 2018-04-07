@@ -3,10 +3,10 @@
 
 Geopy can calculate geodesic distance between two points using the
 `geodesic distance
-<https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid>`_ or
+<https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid>`_ or the
 `great-circle distance
-<https://en.wikipedia.org/wiki/Great-circle_distance>`_
-formulas, with a default of the geodesic distance available as the function
+<https://en.wikipedia.org/wiki/Great-circle_distance>`_,
+with a default of the geodesic distance available as the function
 `geopy.distance.distance`.
 
 Great-circle distance (:class:`.great_circle`) uses a spherical model of
@@ -51,19 +51,19 @@ Here are examples of distance.distance::
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
     >>> print(distance.distance(newport_ri, cleveland_oh).miles)
-    538.3904453677203
+    538.39044536
 
     >>> wellington = (-41.32, 174.81)
     >>> salamanca = (40.96, -5.50)
     >>> print(distance.distance(wellington, salamanca).km)
-    19959.67926735382
+    19959.6792674
 
 The second example above fails with `distance.vincenty`.
 
 Using great-circle distance::
 
     >>> print(distance.great_circle(newport_ri, cleveland_oh).miles)
-    536.9979906964344
+    536.997990696
 
 You can change the ellipsoid model used by the geodesic formulas like so::
 
@@ -85,7 +85,7 @@ calculate the length of a path::
     >>> _, wa = g.geocode('Washington, DC')
     >>> _, pa = g.geocode('Palo Alto, CA')
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
-    3277.304391911067
+    3277.30439191
 
 """
 from __future__ import division
@@ -264,7 +264,7 @@ class great_circle(Distance):
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
         >>> print(great_circle(newport_ri, cleveland_oh).miles)
-        536.9979906964344
+        536.997990696
 
     """
 
@@ -430,7 +430,7 @@ class vincenty(Distance):
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
         >>> print(vincenty(newport_ri, cleveland_oh).miles)
-        538.3904453622719
+        538.390445362
 
     Note: Vincenty's method for distance fails to converge for some
     valid (nearly antipodal) points. In such cases, use

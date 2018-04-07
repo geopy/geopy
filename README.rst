@@ -100,21 +100,22 @@ Measuring Distance
 ------------------
 
 Geopy can calculate geodesic distance between two points using the
-`Vincenty distance <https://en.wikipedia.org/wiki/Vincenty's_formulae>`__ or
-`great-circle distance <https://en.wikipedia.org/wiki/Great-circle_distance>`__
-formulas, with a default of Vincenty available as the class
-``geopy.distance.distance``, and the computed distance available as
-attributes (e.g., ``miles``, ``meters``, etc.).
+`geodesic distance
+<https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid>`_ or the
+`great-circle distance
+<https://en.wikipedia.org/wiki/Great-circle_distance>`_,
+with a default of the geodesic distance available as the function
+`geopy.distance.distance`.
 
-Here's an example usage of Vincenty distance:
+Here's an example usage of the geodesic distance:
 
 ::
 
-    >>> from geopy.distance import vincenty
+    >>> from geopy.distance import geodesic
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
-    >>> print(vincenty(newport_ri, cleveland_oh).miles)
-    538.3904451566326
+    >>> print(geodesic(newport_ri, cleveland_oh).miles)
+    538.390445368
 
 Using great-circle distance:
 
@@ -124,7 +125,7 @@ Using great-circle distance:
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
     >>> print(great_circle(newport_ri, cleveland_oh).miles)
-    537.1485284062816
+    536.997990696
 
 Documentation
 -------------
