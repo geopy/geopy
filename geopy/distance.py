@@ -326,7 +326,7 @@ GreatCircleDistance = great_circle
 
 class geodesic(Distance):
     """
-    Calculate the geodesic distance between two points
+    Calculate the geodesic distance between two points.
 
     Set which ellipsoidal model of the earth to use by specifying an
     ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
@@ -371,7 +371,7 @@ class geodesic(Distance):
             self.ellipsoid_key = None
         return
 
-    # Karney's algorithms for measure and destination
+    # Call geographiclib routines for measure and destination
     def measure(self, a, b):
         a, b = Point(a), Point(b)
         lat1, lon1 = a.latitude, a.longitude
@@ -408,9 +408,8 @@ class geodesic(Distance):
 
         r = self.geod.Direct(lat1, lon1, azi1, distance,
                              Geodesic.LATITUDE | Geodesic.LONGITUDE)
-        lat2, lon2  = r['lat2'], r['lon2']
 
-        return Point(lat2, lon2)
+        return Point(r['lat2'], r['lon2'])
 
 GeodesicDistance = geodesic
 
