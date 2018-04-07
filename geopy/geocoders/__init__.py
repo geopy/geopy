@@ -77,7 +77,7 @@ __all__ = (
     # files in the ``geocoders`` directory ordered by name.
     #
     # Also don't forget to pull up the list of geocoders
-    # in the docs: docs/changelog_1xx.rst
+    # in the docs: docs/index.rst
     "ArcGIS",
     "Baidu",
     "Bing",
