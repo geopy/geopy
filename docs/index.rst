@@ -72,6 +72,9 @@ Calculating Distance
 .. automodule:: geopy.distance
     :members: __doc__
 
+.. autoclass:: geopy.distance.geodesic
+    :members: __init__
+
 .. autoclass:: geopy.distance.vincenty
     :members: __init__
 
