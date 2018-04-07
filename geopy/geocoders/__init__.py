@@ -90,6 +90,7 @@ __all__ = (
     "Mapzen",
     "OpenCage",
     "OpenMapQuest",
+    "PickPoint",
     "Nominatim",
     "Photon",
     "YahooPlaceFinder",

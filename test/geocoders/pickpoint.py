@@ -5,6 +5,7 @@ from geopy.point import Point
 from geopy.geocoders import PickPoint
 from test.geocoders.util import GeocoderTestBase, env
 
+
 @unittest.skipUnless(bool(env['PICKPOINT_KEY']),
                      "No PICKPOINT_KEY env variable set"
 )
@@ -14,8 +15,8 @@ class PickPointTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
-        print('HERE')
-        cls.geocoder = PickPoint(api_key=env['PICKPOINT_KEY'])
+        cls.API_KEY = env['PICKPOINT_KEY']
+        cls.geocoder = PickPoint(api_key=cls.API_KEY, timeout=3)
 
     def test_geocode(self):
         """
@@ -39,19 +40,21 @@ class PickPointTestCase(GeocoderTestBase):
         """
         PickPoint.reverse string
         """
-        self.reverse_run(
+        location = self.reverse_run(
             {"query": "40.75376406311989, -73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
         )
+        self.assertIn("New York", location.address)
 
     def test_reverse_point(self):
         """
         PickPoint.reverse Point
         """
-        self.reverse_run(
+        location = self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
         )
+        self.assertIn("New York", location.address)
 
     def test_city_district_with_dict_query(self):
         """
@@ -63,7 +66,6 @@ class PickPointTestCase(GeocoderTestBase):
             geocoder.geocode,
             query,
             addressdetails=True,
-
         )
         self.assertEqual(result.raw['address']['city_district'], 'Mitte')
 
@@ -71,10 +73,10 @@ class PickPointTestCase(GeocoderTestBase):
         """
         PickPoint.geocode using `language`
         """
-        input = "Mohrenstrasse Berlin"
+        query = "Mohrenstrasse Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            input,
+            query,
             addressdetails=True,
             language="de",
         )
@@ -84,7 +86,7 @@ class PickPointTestCase(GeocoderTestBase):
         )
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            input,
+            query,
             addressdetails=True,
             language="en",
         )
@@ -114,69 +116,62 @@ class PickPointTestCase(GeocoderTestBase):
             exactly_one=True,
             language="en"
         )
-        self.assertTrue(
+        self.assertIn(
             # have had a change in the exact authority name
-            "Germany" in result_reverse_en.raw['address']['country']
+            "Germany", result_reverse_en.raw['address']['country']
         )
 
     def test_geocode_geometry_wkt(self):
         """
         PickPoint.geocode with full geometry (response in WKT format)
         """
-        input = "Halensee,Berlin"
+        query = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            input,
+            query,
             geometry='WKT',
-
         )
-        self.assertEqual(
+        self.assertTrue(
             result_geocode.raw['geotext'].startswith('POLYGON(('),
-            True
         )
 
     def test_geocode_geometry_svg(self):
         """
         PickPoint.geocode with full geometry (response in svg format)
         """
-        input = "Halensee,Berlin"
+        query = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            input,
+            query,
             geometry='svg',
-
         )
-        self.assertEqual(
+        self.assertTrue(
             result_geocode.raw['svg'].startswith('M 13.'),
-            True
         )
 
     def test_geocode_geometry_kml(self):
         """
         PickPoint.geocode with full geometry (response in kml format)
         """
-        input = "Halensee,Berlin"
+        query = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            input,
+            query,
             geometry='kml',
-
         )
-        self.assertEqual(
+        self.assertTrue(
             result_geocode.raw['geokml'].startswith('<Polygon>'),
-            True
         )
 
     def test_geocode_geometry_geojson(self):
         """
         PickPoint.geocode with full geometry (response in geojson format)
         """
-        input = "Halensee,Berlin"
+        query = "Halensee,Berlin"
         result_geocode = self._make_request(
             self.geocoder.geocode,
-            input,
+            query,
             geometry='geojson',
-
         )
         self.assertEqual(
             result_geocode.raw['geojson'].get('type'),

@@ -98,10 +98,15 @@ class Nominatim(Geocoder):
     def _construct_url(self, base_api, params):
         """
         Construct geocoding request url.
-        The method can be overriden in Nominatim-based geocoders in order to extend URL parameters.
-        :param base_api: Geocoding function base address, self.api or self.reverse_api.
-        :param params: Geocoding params dictionary.
-        :return: URL string.
+        The method can be overriden in Nominatim-based geocoders in order
+        to extend URL parameters.
+
+        :param string base_api: Geocoding function base address - self.api
+            or self.reverse_api.
+
+        :param dict params: Geocoding params.
+
+        :return: string URL.
         """
         return "?".join((base_api, urlencode(params)))
 
