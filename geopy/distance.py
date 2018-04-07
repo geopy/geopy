@@ -18,15 +18,15 @@ to about 0.5%. The radius value is stored in
 always be in kilometers, however).
 
 The geodesic distance is the shortest distance on the surface of an
-ellipsoidal model of the earth.  There are two algorithms used to
-compute this distance.  The default algorithm uses the method is given
-by `Karney (2013) <https://doi.org/10.1007%2Fs00190-012-0578-z>`_
-(:class:`.geodesic`); this is accurate to round-off and always
-converges.  An older method due to
-`Vincenty (1975) <https://en.wikipedia.org/wiki/Vincenty's_formulae>`_
-(:class:`.vincenty`) is also available; this is faster, but is only
-accurate to 0.2 mm and the distance calculation fails to converge for
-nearly antipodal points.
+ellipsoidal model of the earth.  The default algorithm uses the method
+is given by `Karney (2013)
+<https://doi.org/10.1007%2Fs00190-012-0578-z>`_ (:class:`.geodesic`);
+this is accurate to round-off and always converges.  An older
+*deprecated* method due to `Vincenty (1975)
+<https://en.wikipedia.org/wiki/Vincenty's_formulae>`_
+(:class:`.vincenty`) is also available; this is only accurate to 0.2 mm
+and the distance calculation fails to converge for nearly antipodal
+points.
 
 `geopy.distance.distance` uses :class:`.geodesic`.
 
@@ -37,12 +37,9 @@ most globally accurate.  geopy includes a few other models in the
 distance.ELLIPSOIDS dictionary::
 
                   model             major (km)   minor (km)     flattening
-    ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / \
-                                                                298.257223563),
-                  'GRS-80':        (6378.137,    6356.7523141,  1 / \
-                                                                298.257222101),
-                  'Airy (1830)':   (6377.563396, 6356.256909,   1 / \
-                                                                299.3249646),
+    ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / 298.257223563),
+                  'GRS-80':        (6378.137,    6356.7523141,  1 / 298.257222101),
+                  'Airy (1830)':   (6377.563396, 6356.256909,   1 / 299.3249646),
                   'Intl 1924':     (6378.388,    6356.911946,   1 / 297.0),
                   'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
@@ -415,9 +412,9 @@ GeodesicDistance = geodesic
 
 class vincenty(Distance):
     """
-    Calculate the geodesic distance between two points using the formula
-    devised by Thaddeus Vincenty, with an accurate ellipsoidal model of the
-    earth.
+    .. deprecated:: 1.13
+    Calculate the geodesic distance between two points using the Vincenty's
+    method.
 
     Set which ellipsoidal model of the earth to use by specifying an
     ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
@@ -435,7 +432,7 @@ class vincenty(Distance):
         >>> print(vincenty(newport_ri, cleveland_oh).miles)
         538.3904453622719
 
-    Note: The Vincenty algorithm for distance fails to converge for some
+    Note: Vincenty's method for distance fails to converge for some
     valid (nearly antipodal) points. In such cases, use
     :class:`.geodesic` which always produces an accurate result.
 
