@@ -47,6 +47,19 @@ POINT_PATTERN = re.compile(r"""
 }, re.X)
 
 
+def _normalize_angle(x, limit):
+    """
+    Normalize angle `x` to be within `[-limit; limit)` range.
+    """
+    double_limit = limit * 2.0
+    modulo = fmod(x, double_limit) or 0.0  # `or 0` is to turn -0 to +0.
+    if modulo < -limit:
+        return modulo + double_limit
+    if modulo >= limit:
+        return modulo - double_limit
+    return modulo
+
+
 class Point(object):
     """
     A geodetic point with latitude, longitude, and altitude.
@@ -132,13 +145,11 @@ class Point(object):
 
         latitude = float(latitude or 0.0)
         if abs(latitude) > 90:
-            modulo = fmod(latitude + 90, 180)
-            latitude = (modulo - 90) if modulo >= 0 else (modulo + 90)
+            latitude = _normalize_angle(latitude, 90.0)
 
         longitude = float(longitude or 0.0)
         if abs(longitude) > 180:
-            modulo = fmod(longitude + 180, 360)
-            longitude = (modulo - 180) if modulo >= 0 else (modulo + 180)
+            longitude = _normalize_angle(longitude, 180.0)
 
         altitude = float(altitude or 0.0)
 

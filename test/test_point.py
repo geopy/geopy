@@ -5,6 +5,7 @@ Test Point.
 import pickle
 import unittest
 import math
+import sys
 
 from geopy.compat import u
 from geopy.point import Point
@@ -120,6 +121,34 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual((-90, -180, 375), tuple(point))
         point = Point(270, 540, 375)
         self.assertEqual((-90, -180, 375), tuple(point))
+
+    def test_point_degrees_normalization_does_not_lose_precision(self):
+        if sys.float_info.mant_dig != 53:
+            raise unittest.SkipTest('This platform does not store floats as '
+                                    'IEEE 754 double')
+        # IEEE 754 double is stored like this:
+        # sign (1 bit) | exponent (11 bit) | fraction (52 bit)
+        # \/         \/
+        # 0100000111010010011001001001001011000010100000000000000000000000
+        #
+        # The issue is that there might be a loss in precision during
+        # normalization.
+        # For example, 180.00000000000003 is stored like this:
+        # \/         \/
+        # 0100000001100110100000000000000000000000000000000000000000000001
+        #
+        # And if we do (180.00000000000003 + 180 - 180), then we would get
+        # exactly 180.0:
+        # 0100000001100110100000000000000000000000000000000000000000000000
+        #
+        # Notice that the last fraction bit has been lost, because
+        # (180.00000000000003 + 180) fraction doesn't fit in 52 bits.
+        #
+        # This test ensures that such unwanted precision loss is not happening.
+        self.assertEqual(tuple(Point(90.00000000000002, 180.00000000000003)),
+                         (-89.99999999999998, -179.99999999999997, 0))
+        self.assertEqual(tuple(Point(9.000000000000002, 1.8000000000000003)),
+                         (9.000000000000002, 1.8000000000000003, 0))
 
     def test_unpacking(self):
         point = Point(self.lat, self.lon, self.alt)
