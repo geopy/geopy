@@ -5,8 +5,12 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
+    - "3.7-dev"
     - "pypy"
     - "pypy3"
+matrix:
+    allow_failures:
+        - python: "3.7-dev"
 install:
     - travis_retry pip install coverage nose-cov mock
     - travis_retry pip install -e . ".[timezone,placefinder]"
