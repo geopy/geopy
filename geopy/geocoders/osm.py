@@ -114,8 +114,8 @@ class Nominatim(Geocoder):
             self,
             query,
             exactly_one=True,
-            limit=None,
             timeout=None,
+            limit=None,
             addressdetails=False,
             language=False,
             geometry=None
@@ -145,6 +145,10 @@ class Nominatim(Geocoder):
             only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+
+        :param int limit: Maximum amount of results to return from Nominatim
+
+            .. versionadded:: 1.13.0
 
         :param bool addressdetails: If you want in *Location.raw* to include
             addressdetails such as city_district, etc set it to True
