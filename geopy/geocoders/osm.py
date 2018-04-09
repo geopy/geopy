@@ -115,6 +115,7 @@ class Nominatim(Geocoder):
             query,
             exactly_one=True,
             timeout=None,
+            limit=None,
             addressdetails=False,
             language=False,
             geometry=None
@@ -144,6 +145,11 @@ class Nominatim(Geocoder):
             only, the value set during the geocoder's initialization.
 
             .. versionadded:: 0.97
+
+        :param int limit: Maximum amount of results to return from Nominatim.
+            Unless exactly_one is set to False, limit will always be 1.
+
+            .. versionadded:: 1.13.0
 
         :param bool addressdetails: If you want in *Location.raw* to include
             addressdetails such as city_district, etc set it to True
@@ -179,6 +185,14 @@ class Nominatim(Geocoder):
         params.update({
             'format': 'json'
         })
+
+        if exactly_one:
+            params['limit'] = 1
+        elif limit:
+            limit = int(limit)
+            if limit < 1:
+                raise ValueError("Limit cannot be less than 1")
+            params['limit'] = limit
 
         # `viewbox` apparently replaces `view_box`
         if self.view_box:
