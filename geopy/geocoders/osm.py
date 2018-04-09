@@ -146,7 +146,8 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 0.97
 
-        :param int limit: Maximum amount of results to return from Nominatim
+        :param int limit: Maximum amount of results to return from Nominatim.
+            Unless exactly_one is set to False, limit will always be 1.
 
             .. versionadded:: 1.13.0
 
@@ -185,14 +186,13 @@ class Nominatim(Geocoder):
             'format': 'json'
         })
 
-        if limit:
+        if exactly_one:
+            params['limit'] = 1
+        elif limit:
             limit = int(limit)
             if limit < 1:
                 raise ValueError("Limit cannot be less than 1")
-            exactly_one = limit == 1
-            params['limit'] = int(limit)
-        elif exactly_one:
-            params['limit'] = 1
+            params['limit'] = limit
 
         # `viewbox` apparently replaces `view_box`
         if self.view_box:
