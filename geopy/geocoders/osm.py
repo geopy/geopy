@@ -114,6 +114,7 @@ class Nominatim(Geocoder):
             self,
             query,
             exactly_one=True,
+            limit=None,
             timeout=None,
             addressdetails=False,
             language=False,
@@ -179,6 +180,15 @@ class Nominatim(Geocoder):
         params.update({
             'format': 'json'
         })
+
+        if limit:
+            limit = int(limit)
+            if limit < 1:
+                raise ValueError("Limit cannot be less than 1")
+            exactly_one = limit == 1
+            params['limit'] = int(limit)
+        elif exactly_one:
+            params['limit'] = 1
 
         # `viewbox` apparently replaces `view_box`
         if self.view_box:
