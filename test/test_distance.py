@@ -72,6 +72,13 @@ class CommonDistanceComputationCases(object):
                             (0, 179 + nines)).kilometers
         assert_almost_equal(distance, 0)
 
+    def test_should_compute_destination_across_antimeridian(self):
+        nines = 1 - 1e-30  # 0.(9)
+        distance = self.cls(10)
+        point = distance.destination((0, -179 - nines), -90)
+        assert_almost_equal(point.latitude, 0.0)
+        assert_almost_equal(point.longitude, 179.91, 3)
+
     def test_should_tolerate_nans(self):
         nan = float('nan')
         # This is probably a bad design to silently turn NaNs into NaNs
