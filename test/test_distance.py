@@ -3,6 +3,7 @@ Test distance formulas
 """
 import math
 import unittest
+import warnings
 
 from nose.tools import assert_raises, assert_almost_equal # pylint: disable=E0611
 
@@ -11,6 +12,7 @@ from geopy.distance import (Distance,
                             GreatCircleDistance,
                             VincentyDistance,
                             GeodesicDistance,
+                            distance,
                             EARTH_RADIUS,
                             ELLIPSOIDS)
 
@@ -243,6 +245,20 @@ class CommonDistanceCases(CommonDistanceComputationCases,
 class TestWhenInstantiatingBaseDistanceClass(unittest.TestCase):
     def test_should_not_be_able_to_give_multiple_points(self):
         assert_raises(NotImplementedError, lambda: Distance(1, 2, 3, 4))
+
+
+class TestDefaultDistanceClass(unittest.TestCase):
+    def test_should_accept_iterations_constructor_kwarg(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            # `iterations` kwarg is a legacy from Vincenty.
+            self.assertEqual(distance(132, iterations=20).km, 132)
+            # `iterations` is not a valid arg of the base Distance class,
+            # so it should raise a warning.
+            self.assertEqual(1, len(w))
+
+            self.assertEqual(distance(132).km, 132)
+            self.assertEqual(1, len(w))
 
 
 class TestWhenComputingGreatCircleDistance(CommonDistanceCases,

@@ -90,6 +90,7 @@ calculate the length of a path::
 """
 from __future__ import division
 
+import warnings
 from math import atan, tan, sin, cos, pi, sqrt, atan2, asin
 from geopy.units import radians
 from geopy import units, util
@@ -348,6 +349,10 @@ class geodesic(Distance):
 
     def __init__(self, *args, **kwargs):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
+        if 'iterations' in kwargs:
+            warnings.warn('Ignoring unused `iterations` kwarg for geodesic '
+                          'distance.', UserWarning)
+        kwargs.pop('iterations', 0)
         major, minor, f = self.ELLIPSOID # pylint: disable=W0612
         super(geodesic, self).__init__(*args, **kwargs)
 
