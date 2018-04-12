@@ -341,6 +341,9 @@ class geodesic(Distance):
         >>> cleveland_oh = (41.499498, -81.695391)
         >>> print(geodesic(newport_ri, cleveland_oh).miles)
         538.390445368
+
+
+    .. versionadded:: 1.13.0
     """
 
     ellipsoid_key = None
@@ -418,6 +421,8 @@ GeodesicDistance = geodesic
 class vincenty(Distance):
     """
     .. deprecated:: 1.13
+       Use :class:`.geodesic` instead.
+
     Calculate the geodesic distance between two points using the Vincenty's
     method.
 
