@@ -5,7 +5,7 @@ Changelog
 
 1.13.0
 ------
-2018-04-TBD
+2018-04-12
 
 *   ADDED: Pickpoint geocoder. Contributed by Vladimir Kalinkin. (#246)
 
