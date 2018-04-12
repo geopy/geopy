@@ -77,8 +77,11 @@ def _normalize_coordinates(latitude, longitude, altitude):
         warnings.warn('Latitude has been normalized, because its '
                       'absolute value was more than 90. This is probably '
                       'not what was meant, because the normalized value '
-                      'is on a different pole.  This will cause a '
-                      'ValueError exception in the future versions of geopy.',
+                      'is on a different pole. If you pass coordinates as '
+                      'positional args, please make sure that the order is '
+                      '(latitude, longitude) or (y, x) in Cartesian terms.  '
+                      'This will cause a ValueError exception in the future '
+                      'versions of geopy.',
                       UserWarning)
         latitude = _normalize_angle(latitude, 90.0)
 
