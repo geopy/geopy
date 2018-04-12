@@ -36,6 +36,16 @@ if py3k:
 else:
     cmp = cmp  # builtin in py2
 
+
+if py3k:
+    from math import isfinite
+else:
+    from math import isinf, isnan
+
+    def isfinite(x):
+        return not isinf(x) and not isnan(x)
+
+
 if py3k: # pragma: no cover
     from urllib.parse import (urlencode, quote, # pylint: disable=W0611,F0401,W0611,E0611
                               urlparse, parse_qs)
