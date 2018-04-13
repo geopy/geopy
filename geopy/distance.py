@@ -87,6 +87,18 @@ calculate the length of a path::
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
     3277.30439191
 
+Using a latlon and lonlat helper function. latlon takes tuple of (latitude, longitude, altitude=0),
+lonlat takes tuple of (longitude, latitude, altitude=0) and returns Point(latitude, longitude, altitude)
+This helper functions would be especially useful when some foreign API gives one a tuple: lonlat(*coords)
+looks explicit yet concise
+    >>> from geopy.distance import lonlat, latlon, distance
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> print(distance(latlon(*newport_ri), latlon(*cleveland_oh)).miles)
+    538.3904453677203
+    >>> print(distance(lonlat(-71.312796, 41.49008), lonlat(-81.695391, 41.499498)).miles)
+    538.3904453677203
+
 """
 from __future__ import division
 
@@ -119,6 +131,15 @@ ELLIPSOIDS = {
     'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
     'GRS-67':        (6378.1600, 6356.774719, 1 / 298.25)
 }
+
+
+def lonlat(x, y, z=0):
+    return Point(y, x, z)
+
+
+def latlon(y, x, z=0):
+    return Point(y, x, z)
+
 
 class Distance(object):
     """
