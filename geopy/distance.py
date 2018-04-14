@@ -124,9 +124,9 @@ def lonlat(x, y, z=0):
     """
     Helper function that can be used for more explicit and obvious calling of the distance methods
     >>> from geopy.distance import lonlat, distance
-    >>> newport_ri = (41.49008, -71.312796)
-    >>> cleveland_oh = (41.499498, -81.695391)
-    >>> print(distance(latlon(*newport_ri), latlon(*cleveland_oh)).miles)
+    >>> newport_ri = (-71.312796, 41.49008)
+    >>> cleveland_oh = (-81.695391, 41.499498)
+    >>> print(distance(lonlat(*newport_ri), lonlat(*cleveland_oh)).miles)
     538.3904453677203
     :param x: longitude 
     :param y: latitude
