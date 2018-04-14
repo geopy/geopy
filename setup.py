@@ -25,6 +25,12 @@ setup(
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     extras_require={
+        "dev": [
+            "coverage",
+            "pytest>=3",
+            "mock",
+            "sphinx",
+        ],
         "placefinder": ["requests_oauthlib<1,>=0.4.0"],
         "timezone": ["pytz"],
     },
