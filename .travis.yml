@@ -12,7 +12,7 @@ matrix:
     allow_failures:
         - python: "3.7-dev"
 install:
-    - travis_retry pip install -e ".[dev,placefinder,timezone]"
+    - travis_retry pip install -e ".[dev,timezone]"
 script:
     - coverage run -m py.test
     - coverage report

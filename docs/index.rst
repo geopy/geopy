@@ -57,9 +57,6 @@ Geocoders
 .. autoclass:: geopy.geocoders.Photon
     :members: __init__, geocode
 
-.. autoclass:: geopy.geocoders.YahooPlaceFinder
-    :members: __init__, geocode
-
 .. autoclass:: geopy.geocoders.LiveAddress
     :members: __init__, geocode
 
