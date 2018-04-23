@@ -97,10 +97,6 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
     def test_no_results(self):
-        """
-        GeocodeFarm unhandled error
-        """
-
         def mock_call_geocoder(*args, **kwargs):
             """
             Mock API call to return bad response.
