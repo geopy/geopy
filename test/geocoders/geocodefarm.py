@@ -96,6 +96,31 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         with self.assertRaises(exc.GeocoderQuotaExceeded):
             self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
+    def test_no_results(self):
+        def mock_call_geocoder(*args, **kwargs):
+            """
+            Mock API call to return bad response.
+            """
+            return {
+                "geocoding_results": {
+                    "STATUS": {
+                        "access": "KEY_VALID, ACCESS_GRANTED",
+                        "status": "FAILED, NO_RESULTS"
+                    }
+                }
+            }
+
+        self.geocoder._call_geocoder = types.MethodType(
+            mock_call_geocoder,
+            self.geocoder
+        )
+
+        self.geocode_run(
+            {"query": "435 north michigan ave, tampa fl 60611 usa"},
+            None,
+            expect_failure=True
+        )
+
     def test_unhandled_api_error(self):
         """
         GeocodeFarm unhandled error
