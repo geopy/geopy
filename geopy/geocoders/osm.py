@@ -265,7 +265,9 @@ class Nominatim(Geocoder):
             .. versionadded:: 1.0.0
 
         :param bool addressdetails: Whether or not to include address details,
-        such as city, county, state, etc. in *Location.raw*
+            such as city, county, state, etc. in *Location.raw*
+
+            .. versionadded:: 1.14.0
 
         """
         try:
