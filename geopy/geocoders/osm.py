@@ -236,7 +236,7 @@ class Nominatim(Geocoder):
             exactly_one=True,
             timeout=None,
             language=False,
-            addressdetails=False
+            addressdetails=True
     ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
