@@ -189,3 +189,17 @@ class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             result_geocode.raw['geojson'].get('type'),
             'Polygon'
         )
+
+    def test_missing_reverse_details(self):
+        """
+        Nominatim.reverse without address details
+        """
+        res = self._make_request(
+            self.geocoder.reverse,
+            query=(46.46131, 6.84311),
+            addressdetails=False
+        )
+        self.assertNotIn(
+            'address',
+            res
+        )
