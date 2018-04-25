@@ -236,6 +236,7 @@ class Nominatim(Geocoder):
             exactly_one=True,
             timeout=None,
             language=False,
+            addressdetails=False
     ):  # pylint: disable=W0221
         """
         Returns a reverse geocoded location.
@@ -263,6 +264,9 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.0.0
 
+        :param bool addressdetails: Whether or not to include address details,
+        such as city, county, state, etc. in *Location.raw*
+
         """
         try:
             lat, lon = [
@@ -278,6 +282,8 @@ class Nominatim(Geocoder):
         }
         if language:
             params['accept-language'] = language
+
+        params['addressdetails'] = 1 if addressdetails else 0
 
         url = self._construct_url(self.reverse_api, params)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
