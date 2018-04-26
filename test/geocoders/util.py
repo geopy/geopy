@@ -16,8 +16,6 @@ except IOError:
         'ARCGIS_USERNAME',
         'ARCGIS_PASSWORD',
         'ARCGIS_REFERER',
-        'YAHOO_KEY',
-        'YAHOO_SECRET',
         'BING_KEY',
         'GEONAMES_USERNAME',
         'LIVESTREETS_AUTH_ID',

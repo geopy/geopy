@@ -31,7 +31,6 @@ setup(
             "mock",
             "sphinx",
         ],
-        "placefinder": ["requests_oauthlib<1,>=0.4.0"],
         "timezone": ["pytz"],
     },
     license='MIT',

@@ -93,7 +93,6 @@ __all__ = (
     "PickPoint",
     "Nominatim",
     "Photon",
-    "YahooPlaceFinder",
     "LiveAddress",
     "What3Words",
     "Yandex",
@@ -115,7 +114,6 @@ from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
-from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
@@ -141,8 +139,6 @@ SERVICE_TO_GEOCODER = {
     "pickpoint": PickPoint,
     "nominatim": Nominatim,
     "photon": Photon,
-    "yahoo": YahooPlaceFinder,
-    "placefinder": YahooPlaceFinder,
     "liveaddress": LiveAddress,
     "what3words": What3Words,
     "yandex": Yandex,
