@@ -76,6 +76,12 @@ __all__ = (
     # The order of classes below should correspond to the order of their
     # files in the ``geocoders`` directory ordered by name.
     #
+    # If you're adding a new geocoder class, then you should mention it in
+    # this module 3 times:
+    # 1. In this ``__all__`` tuple.
+    # 2. In the imports block below.
+    # 3. In the ``SERVICE_TO_GEOCODER`` dict below.
+    #
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
     "ArcGIS",

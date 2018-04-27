@@ -48,14 +48,14 @@ Geocoders
 .. autoclass:: geopy.geocoders.OpenMapQuest
     :members: __init__, geocode, reverse
 
-.. autoclass:: geopy.geocoders.PickPoint
-    :members: __init__, geocode, reverse
-
 .. autoclass:: geopy.geocoders.Nominatim
     :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.Photon
     :members: __init__, geocode
+
+.. autoclass:: geopy.geocoders.PickPoint
+    :members: __init__, geocode, reverse
 
 .. autoclass:: geopy.geocoders.LiveAddress
     :members: __init__, geocode
