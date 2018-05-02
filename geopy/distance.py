@@ -86,6 +86,7 @@ calculate the length of a path::
     >>> _, pa = g.geocode('Palo Alto, CA')
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
     3277.30439191
+    
 """
 from __future__ import division
 
@@ -122,12 +123,17 @@ ELLIPSOIDS = {
 
 def lonlat(x, y, z=0):
     """
-    Helper function that can be used for more explicit and obvious calling of the distance methods
+    distance accepts coordinates in (y, x)/(lat, lon) order, while some other libraries/systems might use 
+    (x, y)/(lon, lat).
+    This helper function introduced here for solving this problem. It accepts coordinates in a form of (x, y)/(lon, lat)
+    and returns Point that is safe to use with distance
+    
     >>> from geopy.distance import lonlat, distance
     >>> newport_ri = (-71.312796, 41.49008)
     >>> cleveland_oh = (-81.695391, 41.499498)
     >>> print(distance(lonlat(*newport_ri), lonlat(*cleveland_oh)).miles)
     538.3904453677203
+    
     :param x: longitude 
     :param y: latitude
     :param z: altitude
@@ -138,12 +144,16 @@ def lonlat(x, y, z=0):
 
 def latlon(y, x, z=0):
     """
-    Helper function that can be used for more explicit and obvious calling of the distance methods
+    This helper function just repeating Point constructor and was added just for convenience.
+    
     >>> from geopy.distance import latlon, distance
-    >>> newport_ri = (41.49008, -71.312796)
-    >>> cleveland_oh = (41.499498, -81.695391)
-    >>> print(distance(latlon(*newport_ri), latlon(*cleveland_oh)).miles)
+    >>> newport_ri_yx = (41.49008, -71.312796)
+    >>> cleveland_oh_yx = (41.499498, -81.695391)
+    >>> print(distance(Point(newport_ri_yx), Point(cleveland_oh_yx)).miles)
     538.3904453677203
+    >>> print(distance(latlon(*newport_ri_yx), latlon(*cleveland_oh_yx)).miles)
+    538.3904453677203
+    
     :param y: latitude
     :param x: longitude
     :param z: altitude
