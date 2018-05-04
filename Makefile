@@ -17,7 +17,8 @@ pylint:
 	pylint --rcfile .pylintrc geopy
 
 test:
-	nosetests --verbose --with-cover --cover-erase --cover-package=geopy
+	coverage run -m py.test
+	coverage report
 
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -rf

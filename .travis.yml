@@ -12,7 +12,7 @@ matrix:
     allow_failures:
         - python: "3.7-dev"
 install:
-    - travis_retry pip install coverage nose-cov mock
-    - travis_retry pip install -e . ".[timezone,placefinder]"
+    - travis_retry pip install -e ".[dev,timezone]"
 script:
-    - nosetests --verbose --with-cover --cover-erase --cover-package=geopy
+    - coverage run -m py.test
+    - coverage report

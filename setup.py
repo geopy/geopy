@@ -25,7 +25,12 @@ setup(
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        "placefinder": ["requests_oauthlib<1,>=0.4.0"],
+        "dev": [
+            "coverage",
+            "pytest>=3",
+            "mock",
+            "sphinx",
+        ],
         "timezone": ["pytz"],
     },
     license='MIT',

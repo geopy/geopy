@@ -150,6 +150,8 @@ class GeocodeFarm(Geocoder):
         geocoding_results = api_result["geocoding_results"]
         self._check_for_api_errors(geocoding_results)
 
+        if "NO_RESULTS" in geocoding_results.get("STATUS", {}).get("status", ""): return None
+
         places = self.parse_code(geocoding_results)
         if exactly_one:
             return places[0]
@@ -163,6 +165,7 @@ class GeocodeFarm(Geocoder):
         in the api response.
         """
         status_result = geocoding_results.get("STATUS", {})
+        if "NO_RESULTS" in status_result.get("status", ""): return
         api_call_success = status_result.get("status", "") == "SUCCESS"
         if not api_call_success:
             access_error = status_result.get("access")

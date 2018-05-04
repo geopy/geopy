@@ -76,6 +76,12 @@ __all__ = (
     # The order of classes below should correspond to the order of their
     # files in the ``geocoders`` directory ordered by name.
     #
+    # If you're adding a new geocoder class, then you should mention it in
+    # this module 3 times:
+    # 1. In this ``__all__`` tuple.
+    # 2. In the imports block below.
+    # 3. In the ``SERVICE_TO_GEOCODER`` dict below.
+    #
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
     "ArcGIS",
@@ -93,7 +99,6 @@ __all__ = (
     "PickPoint",
     "Nominatim",
     "Photon",
-    "YahooPlaceFinder",
     "LiveAddress",
     "What3Words",
     "Yandex",
@@ -115,7 +120,6 @@ from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
-from geopy.geocoders.placefinder import YahooPlaceFinder
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
@@ -141,8 +145,6 @@ SERVICE_TO_GEOCODER = {
     "pickpoint": PickPoint,
     "nominatim": Nominatim,
     "photon": Photon,
-    "yahoo": YahooPlaceFinder,
-    "placefinder": YahooPlaceFinder,
     "liveaddress": LiveAddress,
     "what3words": What3Words,
     "yandex": Yandex,
