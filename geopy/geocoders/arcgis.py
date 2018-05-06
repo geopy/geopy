@@ -34,8 +34,6 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         """
         Create a ArcGIS-based geocoder.
 
-            .. versionadded:: 0.97
-
         :param str username: ArcGIS username. Required if authenticated
             mode is desired.
 

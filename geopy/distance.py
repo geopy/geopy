@@ -1,6 +1,4 @@
 """
-.. versionadded:: 0.93
-
 Geopy can calculate geodesic distance between two points using the
 `geodesic distance
 <https://en.wikipedia.org/wiki/Geodesics_on_an_ellipsoid>`_ or the

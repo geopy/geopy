@@ -65,8 +65,6 @@ class Nominatim(Geocoder):
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
 
-            .. versionadded:: 0.96
-
         :param str domain: Should be the localized Openstreetmap domain to
             connect to. The default is 'nominatim.openstreetmap.org', but you
             can change it to a domain of your own.
@@ -143,8 +141,6 @@ class Nominatim(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-            .. versionadded:: 0.97
 
         :param int limit: Maximum amount of results to return from Nominatim.
             Unless exactly_one is set to False, limit will always be 1.
@@ -253,8 +249,6 @@ class Nominatim(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-            .. versionadded:: 0.97
 
         :param str language: Preferred language in which to return results.
             Either uses standard

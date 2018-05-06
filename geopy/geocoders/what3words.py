@@ -111,7 +111,6 @@ class What3Words(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-            .. versionadded:: 0.97
         """
 
         if not self._check_query(query):

@@ -16,8 +16,6 @@ class Location(object): # pylint: disable=R0903,R0921
     (location<String>, (latitude<float>, longitude<Float)). Or one can access
     the properties `address`, `latitude`, `longitude`, or `raw`. The last
     is a dictionary of the geocoder's response for this item.
-
-    .. versionadded:: 0.98
     """
 
     __slots__ = ("_address", "_point", "_tuple", "_raw")

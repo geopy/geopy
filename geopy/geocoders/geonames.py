@@ -43,14 +43,10 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
 
-            .. versionadded:: 0.97
-
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
-
-            .. versionadded:: 0.96
 
         :param str user_agent: Use a custom User-Agent header.
 
@@ -85,8 +81,6 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-            .. versionadded:: 0.97
         """
         params = {
             'q': query,

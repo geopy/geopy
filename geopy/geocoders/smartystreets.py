@@ -47,8 +47,6 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.97
-
             .. versionchanged:: 1.8.0
                LiveAddress now requires `https`. Specifying `scheme=http` will
                result in a :class:`geopy.exc.ConfigurationError`.
@@ -57,14 +55,10 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             to respond before raising an :class:`geopy.exc.GeocoderTimedOut`
             exception.
 
-            .. versionadded:: 0.97
-
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
-
-            .. versionadded:: 0.96
 
         :param str user_agent: Use a custom User-Agent header.
 

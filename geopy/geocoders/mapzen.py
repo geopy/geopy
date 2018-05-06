@@ -96,9 +96,6 @@ class Mapzen(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-            .. versionadded:: 0.97
-
         """
         params = {'text': self.format_string % query}
 
@@ -143,9 +140,6 @@ class Mapzen(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-            .. versionadded:: 0.97
-
         """
         try:
             lat, lon = [

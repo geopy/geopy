@@ -31,8 +31,6 @@ class GeocodeFarm(Geocoder):
         """
         Create a geocoder for GeocodeFarm.
 
-            .. versionadded:: 0.99
-
         :param str api_key: The API key required by GeocodeFarm to perform
             geocoding requests.
 

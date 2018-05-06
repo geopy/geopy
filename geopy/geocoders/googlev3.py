@@ -56,8 +56,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             geocoding requests. API keys are managed through the Google APIs
             console (https://code.google.com/apis/console).
 
-            .. versionadded:: 0.98.2
-
         :param str domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.googleapis.com', but if you're
             geocoding address in the UK (for example), you may want to set it
@@ -67,8 +65,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             Default is https. Note that SSL connections' certificates are not
             verified.
 
-            .. versionadded:: 0.97
-
         :param str client_id: If using premier, the account client id.
 
         :param str secret_key: If using premier, the account secret key.
@@ -77,8 +73,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
             more information, see documentation on
             :class:`urllib2.ProxyHandler`.
-
-            .. versionadded:: 0.96
 
         :param str user_agent: Use a custom User-Agent header.
 
@@ -177,8 +171,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-            .. versionadded:: 0.97
-
         :param bounds: The bounding box of the viewport within which
             to bias geocode results more prominently.
         :type bounds: list or tuple
@@ -188,8 +180,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param dict components: Restricts to an area. Can use any combination
             of: route, locality, administrative_area, postal_code, country.
-
-            .. versionadded:: 0.97.1
 
         :param str language: The language in which to return results.
 
@@ -247,8 +237,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception.
-
-            .. versionadded:: 0.97
 
         :param str language: The language in which to return results.
 
