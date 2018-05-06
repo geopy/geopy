@@ -3,7 +3,8 @@
 """
 
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
+    DEFAULT_FORMAT_STRING
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
@@ -29,7 +30,8 @@ class Baidu(Geocoder):
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
-        ):
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         Initialize a customized Baidu geocoder using the v2 API.
 
@@ -53,9 +55,20 @@ class Baidu(Geocoder):
         :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
+
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
         """
         super(Baidu, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         self.api_key = api_key
         self.scheme = scheme

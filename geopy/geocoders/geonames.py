@@ -4,7 +4,7 @@
 
 from geopy.compat import urlencode
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_FORMAT_STRING
 from geopy.location import Location
 from geopy.exc import (
     GeocoderInsufficientPrivileges,
@@ -33,7 +33,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
-        ):
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         :param str country_bias:
 
@@ -51,9 +52,20 @@ class GeoNames(Geocoder): # pylint: disable=W0223
         :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
+
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
         """
         super(GeoNames, self).__init__(
-            scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme='http',
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         if username is None:
             raise ConfigurationError(
@@ -83,7 +95,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             only, the value set during the geocoder's initialization.
         """
         params = {
-            'q': query,
+            'q': self.format_string % query,
             'username': self.username
         }
         if self.country_bias:

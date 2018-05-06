@@ -2,7 +2,8 @@
 :class:`.LiveAddress` geocoder.
 """
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
+    DEFAULT_FORMAT_STRING
 from geopy.compat import urlencode
 from geopy.location import Location
 from geopy.exc import ConfigurationError, GeocoderQuotaExceeded
@@ -29,7 +30,8 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
-        ):  # pylint: disable=R0913
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
 
@@ -63,13 +65,23 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
+
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
         """
         super(LiveAddress, self).__init__(
-            timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
-        if scheme == "http":
+        if self.scheme == "http":
             raise ConfigurationError("LiveAddress now requires `https`.")
-        self.scheme = scheme
         self.auth_id = auth_id
         self.auth_token = auth_token
         if candidates:
@@ -87,7 +99,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
         """
-        url = self._compose_url(query)
+        url = self._compose_url(self.format_string % query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url, timeout=timeout),
                                 exactly_one)

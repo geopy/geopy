@@ -4,7 +4,8 @@
 
 from geopy.compat import urlencode
 
-from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT
+from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
+    DEFAULT_FORMAT_STRING
 from geopy.exc import GeocoderQueryError
 from geopy.location import Location
 from geopy.util import logger
@@ -19,8 +20,14 @@ class DataBC(Geocoder):
         http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.page
     """
 
-    def __init__(self, scheme=DEFAULT_SCHEME, timeout=DEFAULT_TIMEOUT,
-                 proxies=None, user_agent=None):
+    def __init__(
+            self,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+            user_agent=None,
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         Create a DataBC-based geocoder.
 
@@ -38,9 +45,20 @@ class DataBC(Geocoder):
         :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
+
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
         """
         super(DataBC, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         self.api = '%s://apps.gov.bc.ca/pub/geocoder/addresses.geojson' % self.scheme
 
@@ -77,7 +95,7 @@ class DataBC(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        params = {'addressString': query}
+        params = {'addressString': self.format_string % query}
         if set_back != 0:
             params['setBack'] = set_back
         if location_descriptor not in ['any',

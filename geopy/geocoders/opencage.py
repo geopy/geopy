@@ -3,7 +3,8 @@
 """
 
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
+    DEFAULT_FORMAT_STRING
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
@@ -31,7 +32,8 @@ class OpenCage(Geocoder):
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
-    ):  # pylint: disable=R0913
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         Initialize a customized OpenCageData geocoder.
 
@@ -55,9 +57,20 @@ class OpenCage(Geocoder):
 
             .. versionadded:: 1.12.0
 
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
+
         """
         super(OpenCage, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
 
         self.api_key = api_key
@@ -93,7 +106,6 @@ class OpenCage(Geocoder):
             corners of a bounding box. The order of the coordinates is
             `longitude,latitude,longitude,latitude`. For example,
             `bounds=-0.563160,51.280430,0.278970,51.683979`
-            
 
         :param str country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the

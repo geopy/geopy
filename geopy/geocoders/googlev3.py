@@ -6,7 +6,8 @@ import base64
 import hashlib
 import hmac
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
+    DEFAULT_FORMAT_STRING
 from geopy.exc import (
     GeocoderQuotaExceeded,
     ConfigurationError,
@@ -45,8 +46,9 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
+            format_string=DEFAULT_FORMAT_STRING,
             channel='',
-        ):  # pylint: disable=R0913
+    ):
         """
         Initialize a customized Google geocoder.
 
@@ -78,12 +80,23 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
             .. versionadded:: 1.12.0
 
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
+
         :param str channel: If using premier, the channel identifier.
 
             .. versionadded:: 1.12.0
         """
         super(GoogleV3, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')

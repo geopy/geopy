@@ -7,7 +7,7 @@ from time import time
 from geopy.compat import urlencode, Request
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
-    DEFAULT_WKID
+    DEFAULT_WKID, DEFAULT_FORMAT_STRING
 from geopy.exc import GeocoderServiceError, GeocoderAuthenticationFailure
 from geopy.exc import ConfigurationError
 from geopy.location import Location
@@ -27,10 +27,18 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     _MAX_RETRIES = 3
     auth_api = 'https://www.arcgis.com/sharing/generateToken'
 
-    def __init__(self, username=None, password=None, referer=None, # pylint: disable=R0913
-                 token_lifetime=60, scheme=DEFAULT_SCHEME,
-                 timeout=DEFAULT_TIMEOUT, proxies=None,
-                 user_agent=None):
+    def __init__(
+            self,
+            username=None,
+            password=None,
+            referer=None,
+            token_lifetime=60,
+            scheme=DEFAULT_SCHEME,
+            timeout=DEFAULT_TIMEOUT,
+            proxies=None,
+            user_agent=None,
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         Create a ArcGIS-based geocoder.
 
@@ -64,9 +72,20 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
+
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
         """
         super(ArcGIS, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         if username or password or referer:
             if not (username and password and referer):
@@ -125,7 +144,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
         """
-        params = {'text': query, 'f': 'json'}
+        params = {'text': self.format_string % query, 'f': 'json'}
         if exactly_one:
             params['maxLocations'] = 1
         url = "?".join((self.api, urlencode(params)))

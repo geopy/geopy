@@ -4,7 +4,8 @@
 
 from geopy.compat import urlencode
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
+    DEFAULT_FORMAT_STRING
 from geopy.location import Location
 from geopy.exc import (
     GeocoderServiceError,
@@ -30,7 +31,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
             proxies=None,
             user_agent=None,
             scheme=DEFAULT_SCHEME,
-        ):
+            format_string=DEFAULT_FORMAT_STRING,
+    ):
         """
         Create a Yandex-based geocoder.
 
@@ -62,9 +64,20 @@ class Yandex(Geocoder): # pylint: disable=W0223
             Default is https.
 
             .. versionadded:: 1.14.0
+
+        :param str format_string: String containing '%s' where the
+            string to geocode should be interpolated before querying the
+            geocoder. For example: '%s, Mountain View, CA'. The default
+            is just '%s'.
+
+            .. versionadded:: 1.14.0
         """
         super(Yandex, self).__init__(
-            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         self.api_key = api_key
         self.lang = lang
@@ -85,7 +98,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             only, the value set during the geocoder's initialization.
         """
         params = {
-            'geocode': query,
+            'geocode': self.format_string % query,
             'format': 'json'
         }
         if self.api_key:
