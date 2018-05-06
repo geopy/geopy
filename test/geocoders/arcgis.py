@@ -59,6 +59,13 @@ class ArcGISTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
+    def test_empty_response(self):
+        self.geocode_run(
+            {"query": "dksahdksahdjksahdoufydshf"},
+            {},
+            expect_failure=True
+        )
+
     def test_geocode_with_out_fields_string(self):
         """
         ArcGIS.geocode with outFields string
