@@ -121,7 +121,7 @@ class What3Words(Geocoder):
 
         params = {
             'string': self.format_string % query,
-            'lang': self.format_string % lang.lower(),
+            'lang': lang.lower(),
             'key': self.api_key,
         }
 
@@ -219,7 +219,7 @@ class What3Words(Geocoder):
 
         params = {
             'position': self._coerce_point_to_string(query),
-            'lang': self.format_string % lang,
+            'lang': lang.lower(),
             'key': self.api_key,
         }
 
