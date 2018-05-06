@@ -33,19 +33,62 @@ from geopy.util import decode_page, __version__
 
 __all__ = (
     "Geocoder",
-    "DEFAULT_FORMAT_STRING",
-    "DEFAULT_SCHEME",
-    "DEFAULT_TIMEOUT",
-    "DEFAULT_WKID",
+    "options",
 )
 
 
-DEFAULT_FORMAT_STRING = '%s'
-DEFAULT_SCHEME = 'https'
-DEFAULT_TIMEOUT = 1
-DEFAULT_WKID = 4326
-DEFAULT_USER_AGENT = "geopy/%s" % __version__
+class options(object):
+    """The ``options`` object contains default configuration values for
+    geocoders, e.g. timeout and User-Agent.
+    Instead of passing a custom value to each geocoder individually, you can
+    override a default value in this object.
 
+    Please note that not all geocoders use all attributes of this object.
+    For example, some geocoders don't respect the ``default_scheme``
+    attribute. Refer to the specific geocoder's initializer doc for a list
+    of parameters which that geocoder accepts.
+
+    Example for overriding default ``timeout`` and ``user_agent``::
+
+        >>> import geopy.geocoders
+        >>> geopy.geocoders.options.default_user_agent = 'my_app/1'
+        >>> geopy.geocoders.options.default_timeout = 7
+        >>>
+        >>> from geopy.geocoders import Nominatim
+        >>> geolocator = Nominatim()
+        >>> print(geolocator.headers)
+        {'User-Agent': 'my_app/1'}
+        >>> print(geolocator.timeout)
+        7
+
+    """
+
+    default_format_string = '%s'
+    """String containing ``'%s'`` where the string to geocode should be
+    interpolated before querying the geocoder. Used by ``geocode`` calls only.
+    For example: ``'%s, Mountain View, CA'``."""
+
+    default_scheme = 'https'
+    """Use ``'https'`` or ``'http'`` as the API URL's scheme."""
+
+    default_timeout = 1
+    """Time, in seconds, to wait for the geocoding service to respond before
+    raising a :class:`geopy.exc.GeocoderTimedOut` exception. Pass ``None``
+    to disable timeout."""
+
+    default_proxies = None
+    """If specified, tunnel requests through the specified proxy.
+    E.g., ``{"https": "192.0.2.0"}``. For more information, see documentation
+    on :class:`urllib2.ProxyHandler`."""
+
+    default_user_agent = "geopy/%s" % __version__
+    """User-Agent header to send with the requests to geocoder API."""
+
+
+# Create an object which `repr` returns 'DEFAULT_SENTINEL'. Sphinx (docs) uses
+# this value when generating method's signature.
+DEFAULT_SENTINEL = type('object', (object,),
+                        {'__repr__': lambda self: 'DEFAULT_SENTINEL'})()
 
 ERROR_CODE_MAP = {
     400: GeocoderQueryError,
@@ -62,32 +105,34 @@ ERROR_CODE_MAP = {
 }
 
 
-class Geocoder(object): # pylint: disable=R0921
+class Geocoder(object):
     """
     Template object for geocoders.
     """
 
     def __init__(
             self,
-            format_string=DEFAULT_FORMAT_STRING,
-            scheme=DEFAULT_SCHEME,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            format_string=None,
+            scheme=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-        ):
+    ):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
         specify format_string and such.
         """
-        self.format_string = format_string
-        self.scheme = scheme
-        if self.scheme not in ('http', 'https'): # pragma: no cover
+        self.format_string = format_string or options.default_format_string
+        self.scheme = scheme or options.default_scheme
+        if self.scheme not in ('http', 'https'):
             raise ConfigurationError(
                 'Supported schemes are `http` and `https`.'
             )
-        self.proxies = proxies
-        self.timeout = timeout
-        self.headers = {'User-Agent': user_agent or DEFAULT_USER_AGENT}
+        self.timeout = (timeout if timeout is not DEFAULT_SENTINEL
+                        else options.default_timeout)
+        self.proxies = (proxies if proxies is not DEFAULT_SENTINEL
+                        else options.default_proxies)
+        self.headers = {'User-Agent': user_agent or options.default_user_agent}
 
         if self.proxies:
             opener = build_opener(
@@ -149,6 +194,8 @@ class Geocoder(object): # pylint: disable=R0921
         requester = requester or self.urlopen
 
         try:
+            # TODO: default value for `timeout` should be DEFAULT_SENTINEL
+            # instead of None.
             page = requester(req, timeout=(timeout or self.timeout), **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (

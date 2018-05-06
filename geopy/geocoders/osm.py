@@ -2,17 +2,11 @@
 OpenStreetMap geocoder, contributed by Alessandro Pasotti of ItOpen.
 """
 
-from geopy.geocoders.base import (
-    Geocoder,
-    DEFAULT_FORMAT_STRING,
-    DEFAULT_TIMEOUT,
-    DEFAULT_SCHEME
-)
 from geopy.compat import urlencode
+from geopy.exc import GeocoderQueryError
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
-from geopy.exc import GeocoderQueryError
-
 
 __all__ = ("Nominatim", )
 
@@ -41,29 +35,30 @@ class Nominatim(Geocoder):
 
     def __init__(
             self,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
             view_box=None,
             country_bias=None,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             domain='nominatim.openstreetmap.org',
-            scheme=DEFAULT_SCHEME,
-            user_agent=None
-    ):  # pylint: disable=R0913
+            scheme=None,
+            user_agent=None,
+            # Make sure to synchronize the changes of this signature in the
+            # inheriting classes (e.g. PickPoint).
+    ):
         """
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param tuple view_box: Coordinates to restrict search within.
 
         :param str country_bias: Bias results to this country.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
+
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
 
         :param str domain: Should be the localized Openstreetmap domain to
             connect to. The default is 'nominatim.openstreetmap.org', but you
@@ -71,22 +66,25 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.8.2
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
             .. versionadded:: 1.8.2
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
         """
         super(Nominatim, self).__init__(
-            format_string, scheme, timeout, proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         self.country_bias = country_bias
-        self.format_string = format_string
         self.view_box = view_box
         self.domain = domain.strip('/')
 

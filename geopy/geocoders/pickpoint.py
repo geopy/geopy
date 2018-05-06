@@ -4,12 +4,7 @@ PickPoint geocoder
 
 from geopy.compat import urlencode
 from geopy.geocoders import Nominatim
-
-from geopy.geocoders.base import (
-    DEFAULT_FORMAT_STRING,
-    DEFAULT_TIMEOUT,
-    DEFAULT_SCHEME
-)
+from geopy.geocoders.base import DEFAULT_SENTINEL
 
 __all__ = ("PickPoint",)
 
@@ -26,38 +21,42 @@ class PickPoint(Nominatim):
     def __init__(
             self,
             api_key,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
             view_box=None,
             country_bias=None,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             domain='api.pickpoint.io',
-            scheme=DEFAULT_SCHEME,
-            user_agent=None
+            scheme=None,
+            user_agent=None,
     ):
         """
 
-        :param string api_key: PickPoint API key obtained at https://pickpoint.io.
+        :param string api_key: PickPoint API key obtained at
+            https://pickpoint.io.
 
-        :param string format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param tuple view_box: Coordinates to restrict search within.
 
         :param string country_bias: Bias results to this country.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param str domain: Should be the localized Openstreetmap domain to
+            connect to. The default is 'api.pickpoint.io', but you
+            can change it to a domain of your own.
+
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
+
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
         """
 
         super(PickPoint, self).__init__(

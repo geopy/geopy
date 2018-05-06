@@ -2,16 +2,10 @@
 Mapzen geocoder, contributed by Michal Migurski of Mapzen.
 """
 
-from geopy.geocoders.base import (
-    Geocoder,
-    DEFAULT_FORMAT_STRING,
-    DEFAULT_TIMEOUT,
-    DEFAULT_SCHEME,
-)
 from geopy.compat import urlencode
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
-
 
 __all__ = ("Mapzen", )
 
@@ -29,47 +23,51 @@ class Mapzen(Geocoder):
     def __init__(
             self,
             api_key=None,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
             boundary_rect=None,
             country_bias=None,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
             domain='search.mapzen.com',
-            scheme=DEFAULT_SCHEME,
-    ):  # pylint: disable=R0913
+            scheme=None,
+    ):
         """
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str api_key: Mapzen API key, optional.
+
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param tuple boundary_rect: Coordinates to restrict search within,
             given as (west, south, east, north) coordinate tuple.
 
         :param str country_bias: Bias results to this country (ISO alpha-3).
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
+
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
         :param str domain: Specify a custom domain for Mapzen API.
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
         """
         super(Mapzen, self).__init__(
-            format_string, scheme, timeout, proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         self.country_bias = country_bias
-        self.format_string = format_string
         self.boundary_rect = boundary_rect
         self.api_key = api_key
         self.domain = domain.strip('/')

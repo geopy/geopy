@@ -5,15 +5,15 @@
 import base64
 import hashlib
 import hmac
+
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
-    DEFAULT_FORMAT_STRING
 from geopy.exc import (
-    GeocoderQuotaExceeded,
     ConfigurationError,
     GeocoderParseError,
     GeocoderQueryError,
+    GeocoderQuotaExceeded,
 )
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
@@ -40,13 +40,13 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             self,
             api_key=None,
             domain='maps.googleapis.com',
-            scheme=DEFAULT_SCHEME,
+            scheme=None,
             client_id=None,
             secret_key=None,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
             channel='',
     ):
         """
@@ -63,27 +63,26 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             geocoding address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
         :param str client_id: If using premier, the account client id.
 
         :param str secret_key: If using premier, the account secret key.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
+
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
 
@@ -105,8 +104,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.scheme = scheme
-        self.doc = {}
 
         self.premier = bool(client_id and secret_key)
         self.client_id = client_id
@@ -381,4 +378,3 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             raise GeocoderQueryError('Probably missing address or latlng.')
         else:
             raise GeocoderQueryError('Unknown error.')
-

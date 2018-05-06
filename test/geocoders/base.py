@@ -2,11 +2,12 @@
 import unittest
 from mock import patch
 
-from geopy.point import Point
+import geopy.geocoders
 from geopy.exc import GeocoderNotFound
-from geopy.geocoders import get_geocoder_for_service, GoogleV3
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
-import geopy.geocoders.base
+from geopy.geocoders import GoogleV3, get_geocoder_for_service
+from geopy.geocoders.base import Geocoder
+from geopy.point import Point
+
 
 class GetGeocoderTestCase(unittest.TestCase):
 
@@ -34,28 +35,51 @@ class GeocoderTestCase(unittest.TestCase):
         cls.coordinates_str = "40.74113,-73.989656"
         cls.coordinates_address = "175 5th Avenue, NYC, USA"
 
-    def test_init(self):
-        """
-        Geocoder()
-        """
+    def test_init_with_args(self):
         format_string = '%s Los Angeles, CA USA'
         scheme = 'http'
-        timeout = DEFAULT_TIMEOUT + 1
+        timeout = 942
         proxies = {'https': '192.0.2.0'}
+        user_agent = 'test app'
+
         geocoder = Geocoder(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
-            proxies=proxies
+            proxies=proxies,
+            user_agent=user_agent,
         )
         for attr in ('format_string', 'scheme', 'timeout', 'proxies'):
             self.assertEqual(locals()[attr], getattr(geocoder, attr))
+        self.assertEqual(user_agent, geocoder.headers['User-Agent'])
 
+    def test_init_with_defaults(self):
+        attr_to_option = {
+            'format_string': 'default_format_string',
+            'scheme': 'default_scheme',
+            'timeout': 'default_timeout',
+            'proxies': 'default_proxies',
+        }
+
+        geocoder = Geocoder()
+        for geocoder_attr, options_attr in attr_to_option.items():
+            self.assertEqual(getattr(geopy.geocoders.options, options_attr),
+                             getattr(geocoder, geocoder_attr))
+        self.assertEqual(geopy.geocoders.options.default_user_agent,
+                         geocoder.headers['User-Agent'])
+
+    @patch.object(geopy.geocoders.options, 'default_proxies', {'https': '192.0.2.0'})
+    @patch.object(geopy.geocoders.options, 'default_timeout', 10)
+    def test_init_with_none_overrides_default(self):
+        geocoder = Geocoder(proxies=None, timeout=None)
+        self.assertIsNone(geocoder.proxies)
+        self.assertIsNone(geocoder.timeout)
+
+    @patch.object(geopy.geocoders.options, 'default_user_agent', 'mocked_user_agent/0.0.0')
     def test_user_agent_default(self):
-        with patch('geopy.geocoders.base.DEFAULT_USER_AGENT', 'mocked_user_agent/0.0.0'):
-            self.assertEqual(geopy.geocoders.base.DEFAULT_USER_AGENT, 'mocked_user_agent/0.0.0')
-            geocoder = Geocoder()
-            self.assertEqual(geocoder.headers['User-Agent'], 'mocked_user_agent/0.0.0')
+        geocoder = Geocoder()
+        self.assertEqual(geocoder.headers['User-Agent'],
+                         'mocked_user_agent/0.0.0')
 
     def test_user_agent_custom(self):
         geocoder = Geocoder(

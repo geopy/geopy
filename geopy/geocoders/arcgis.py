@@ -4,17 +4,20 @@
 
 import json
 from time import time
-from geopy.compat import urlencode, Request, string_compare
 
-from geopy.geocoders.base import Geocoder, DEFAULT_SCHEME, DEFAULT_TIMEOUT, \
-    DEFAULT_WKID, DEFAULT_FORMAT_STRING
-from geopy.exc import GeocoderServiceError, GeocoderAuthenticationFailure
-from geopy.exc import ConfigurationError
+from geopy.compat import Request, string_compare, urlencode
+from geopy.exc import (
+    ConfigurationError,
+    GeocoderAuthenticationFailure,
+    GeocoderServiceError,
+)
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
-
 __all__ = ("ArcGIS", )
+
+DEFAULT_WKID = 4326
 
 
 class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
@@ -33,11 +36,11 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             password=None,
             referer=None,
             token_lifetime=60,
-            scheme=DEFAULT_SCHEME,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            scheme=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
     ):
         """
         Create a ArcGIS-based geocoder.
@@ -57,26 +60,23 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         :param int token_lifetime: Desired lifetime, in minutes, of an
             ArcGIS-issued token.
 
-        :param str scheme: Desired scheme. If authenticated mode is in use,
-            it must be 'https'.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
+            If authenticated mode is in use, it must be ``'https'``.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
         """

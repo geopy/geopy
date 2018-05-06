@@ -3,18 +3,16 @@
 """
 
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
-    DEFAULT_TIMEOUT, DEFAULT_SCHEME
-from geopy.location import Location
 from geopy.exc import (
     GeocoderAuthenticationFailure,
-    GeocoderQuotaExceeded,
     GeocoderInsufficientPrivileges,
-    GeocoderUnavailable,
+    GeocoderQuotaExceeded,
     GeocoderServiceError,
+    GeocoderUnavailable,
 )
-from geopy.util import logger, join_filter
-
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.location import Location
+from geopy.util import join_filter, logger
 
 __all__ = ("Bing", )
 
@@ -36,40 +34,41 @@ class Bing(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=DEFAULT_FORMAT_STRING,
-            scheme=DEFAULT_SCHEME,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            format_string=None,
+            scheme=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-        ):  # pylint: disable=R0913
+    ):
         """Initialize a customized Bing geocoder with location-specific
         address information and your Bing Maps API key.
 
         :param str api_key: Should be a valid Bing Maps API key.
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
         """
-        super(Bing, self).__init__(format_string, scheme, timeout, proxies, user_agent=user_agent)
+        super(Bing, self).__init__(
+            format_string=format_string,
+            scheme=scheme,
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
+        )
         self.api_key = api_key
         self.api = "%s://dev.virtualearth.net/REST/v1/Locations" % self.scheme
 

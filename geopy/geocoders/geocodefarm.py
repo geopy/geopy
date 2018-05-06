@@ -2,14 +2,15 @@
 :class:`.GeocodeFarm` geocoder.
 """
 
-from geopy.geocoders.base import Geocoder, DEFAULT_FORMAT_STRING, \
-    DEFAULT_TIMEOUT
+from geopy.compat import urlencode
+from geopy.exc import (
+    GeocoderAuthenticationFailure,
+    GeocoderQuotaExceeded,
+    GeocoderServiceError,
+)
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
-from geopy.exc import GeocoderAuthenticationFailure, GeocoderQuotaExceeded, \
-    GeocoderServiceError
-from geopy.compat import urlencode
-
 
 __all__ = ("GeocodeFarm", )
 
@@ -23,36 +24,39 @@ class GeocodeFarm(Geocoder):
     def __init__(
             self,
             api_key=None,
-            format_string=DEFAULT_FORMAT_STRING,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            format_string=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-        ):  # pylint: disable=R0913
+    ):
         """
         Create a geocoder for GeocodeFarm.
 
         :param str api_key: The API key required by GeocodeFarm to perform
             geocoding requests.
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
+
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
         """
         super(GeocodeFarm, self).__init__(
-            format_string, 'https', timeout, proxies, user_agent=user_agent
+            format_string=format_string,
+            scheme='https',
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
         )
         self.api_key = api_key
-        self.format_string = format_string
         self.api = (
             "%s://www.geocode.farm/v3/json/forward/" % self.scheme
         )

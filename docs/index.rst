@@ -10,6 +10,10 @@ Geocoders
 .. automodule:: geopy.geocoders
    :members: __doc__
 
+.. autoclass:: geopy.geocoders.options
+   :members:
+   :undoc-members:
+
 .. autofunction:: geopy.geocoders.get_geocoder_for_service
 
 .. autoclass:: geopy.geocoders.ArcGIS

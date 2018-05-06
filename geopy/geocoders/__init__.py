@@ -74,6 +74,7 @@ need to geocode locations in Cleveland, Ohio, you could do::
 
 __all__ = (
     "get_geocoder_for_service",
+    "options",
     # The order of classes below should correspond to the order of their
     # files in the ``geocoders`` directory ordered by name.
     #
@@ -123,7 +124,7 @@ from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 
-
+from geopy.geocoders.base import options
 from geopy.exc import GeocoderNotFound
 
 

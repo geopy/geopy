@@ -2,13 +2,11 @@
 :class:`.LiveAddress` geocoder.
 """
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
-    DEFAULT_FORMAT_STRING
 from geopy.compat import urlencode
-from geopy.location import Location
 from geopy.exc import ConfigurationError, GeocoderQuotaExceeded
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.location import Location
 from geopy.util import logger
-
 
 __all__ = ("LiveAddress", )
 
@@ -26,11 +24,11 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             auth_id,
             auth_token,
             candidates=1,
-            scheme=DEFAULT_SCHEME,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            scheme=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
     ):
         """
         Initialize a customized SmartyStreets LiveAddress geocoder.
@@ -45,37 +43,38 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             number of candidate addresses to return if a valid address
             could be found.
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https. Note that SSL connections' certificates are not
-            verified.
+        :param str scheme: Must be ``https``.
+
+            .. deprecated:: 1.14.0
+               Don't use this parameter, it's going to be removed in the
+               future versions of geopy.
 
             .. versionchanged:: 1.8.0
                LiveAddress now requires `https`. Specifying `scheme=http` will
                result in a :class:`geopy.exc.ConfigurationError`.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising an :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
         """
         super(LiveAddress, self).__init__(
             format_string=format_string,
-            scheme=scheme,
+            # The `scheme` argument is present for the legacy reasons only.
+            # If a custom value has been passed, it should be validated.
+            # Otherwise use `https` instead of the `options.default_scheme`.
+            scheme=(scheme or 'https'),
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
@@ -85,7 +84,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         self.auth_id = auth_id
         self.auth_token = auth_token
         if candidates:
-            if not 1 <= candidates <= 10:
+            if not (1 <= candidates <= 10):
                 raise ValueError('candidates must be between 1 and 10')
         self.candidates = candidates
         self.api = '%s://api.smartystreets.com/street-address' % self.scheme

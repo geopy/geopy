@@ -3,16 +3,10 @@
 """
 
 from geopy.compat import urlencode
-
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
-    DEFAULT_FORMAT_STRING
+from geopy.exc import GeocoderParseError, GeocoderServiceError
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.exc import (
-    GeocoderServiceError,
-    GeocoderParseError
-)
 from geopy.util import logger
-
 
 __all__ = ("Yandex", )
 
@@ -27,11 +21,11 @@ class Yandex(Geocoder): # pylint: disable=W0223
             self,
             api_key=None,
             lang=None,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            scheme=DEFAULT_SCHEME,
-            format_string=DEFAULT_FORMAT_STRING,
+            scheme=None,
+            format_string=None,
     ):
         """
         Create a Yandex-based geocoder.
@@ -47,28 +41,24 @@ class Yandex(Geocoder): # pylint: disable=W0223
         :param str lang: response locale, the following locales are
             supported: "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
             .. versionadded:: 1.14.0
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
         """

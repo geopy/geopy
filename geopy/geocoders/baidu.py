@@ -3,16 +3,14 @@
 """
 
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME, \
-    DEFAULT_FORMAT_STRING
 from geopy.exc import (
+    GeocoderAuthenticationFailure,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
-    GeocoderAuthenticationFailure,
 )
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
-
 
 __all__ = ("Baidu", )
 
@@ -26,11 +24,11 @@ class Baidu(Geocoder):
     def __init__(
             self,
             api_key,
-            scheme=DEFAULT_SCHEME,
-            timeout=DEFAULT_TIMEOUT,
-            proxies=None,
+            scheme=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=DEFAULT_FORMAT_STRING,
+            format_string=None,
     ):
         """
         Initialize a customized Baidu geocoder using the v2 API.
@@ -41,25 +39,25 @@ class Baidu(Geocoder):
             geocoding requests. API keys are managed through the Baidu APIs
             console (http://lbsyun.baidu.com/apiconsole/key).
 
-        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is https.
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
             .. versionchanged:: 1.14.0
                Default scheme has been changed from ``http`` to ``https``.
 
-        :param dict proxies: If specified, routes this geocoder's requests
-            through the specified proxy. E.g., {"https": "192.0.2.0"}. For
-            more information, see documentation on
-            :class:`urllib2.ProxyHandler`.
+        :param int timeout:
+            See :attr:`geopy.geocoders.options.default_timeout`.
 
-        :param str user_agent: Use a custom User-Agent header.
+        :param dict proxies:
+            See :attr:`geopy.geocoders.options.default_proxies`.
+
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
 
-        :param str format_string: String containing '%s' where the
-            string to geocode should be interpolated before querying the
-            geocoder. For example: '%s, Mountain View, CA'. The default
-            is just '%s'.
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
         """
@@ -71,8 +69,6 @@ class Baidu(Geocoder):
             user_agent=user_agent,
         )
         self.api_key = api_key
-        self.scheme = scheme
-        self.doc = {}
         self.api = '%s://api.map.baidu.com/geocoder/v2/' % self.scheme
 
 
