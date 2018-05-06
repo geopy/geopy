@@ -16,10 +16,6 @@ class ArcGISTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
-    bool(env.get('ARCGIS_USERNAME')),
-    "No ARCGIS_USERNAME env variable set"
-)
 class ArcGISTestCase(GeocoderTestBase):
 
     @classmethod
