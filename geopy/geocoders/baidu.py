@@ -3,7 +3,7 @@
 """
 
 from geopy.compat import urlencode
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.exc import (
     GeocoderQueryError,
     GeocoderQuotaExceeded,
@@ -25,7 +25,7 @@ class Baidu(Geocoder):
     def __init__(
             self,
             api_key,
-            scheme='http',
+            scheme=DEFAULT_SCHEME,
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
@@ -40,7 +40,10 @@ class Baidu(Geocoder):
             console (http://lbsyun.baidu.com/apiconsole/key).
 
         :param str scheme: Use 'https' or 'http' as the API URL's scheme.
-            Default is http and only http support.
+            Default is https.
+
+            .. versionchanged:: 1.14.0
+               Default scheme has been changed from ``http`` to ``https``.
 
         :param dict proxies: If specified, routes this geocoder's requests
             through the specified proxy. E.g., {"https": "192.0.2.0"}. For
@@ -57,7 +60,7 @@ class Baidu(Geocoder):
         self.api_key = api_key
         self.scheme = scheme
         self.doc = {}
-        self.api = 'http://api.map.baidu.com/geocoder/v2/'
+        self.api = '%s://api.map.baidu.com/geocoder/v2/' % self.scheme
 
 
     @staticmethod

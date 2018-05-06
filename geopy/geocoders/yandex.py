@@ -4,7 +4,7 @@
 
 from geopy.compat import urlencode
 
-from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT
+from geopy.geocoders.base import Geocoder, DEFAULT_TIMEOUT, DEFAULT_SCHEME
 from geopy.location import Location
 from geopy.exc import (
     GeocoderServiceError,
@@ -29,11 +29,15 @@ class Yandex(Geocoder): # pylint: disable=W0223
             timeout=DEFAULT_TIMEOUT,
             proxies=None,
             user_agent=None,
+            scheme=DEFAULT_SCHEME,
         ):
         """
         Create a Yandex-based geocoder.
 
             .. versionadded:: 1.5.0
+
+            .. versionchanged:: 1.14.0
+               Default scheme has been changed from ``http`` to ``https``.
 
         :param str api_key: Yandex API key (not obligatory)
             http://api.yandex.ru/maps/form.xml
@@ -53,13 +57,18 @@ class Yandex(Geocoder): # pylint: disable=W0223
         :param str user_agent: Use a custom User-Agent header.
 
             .. versionadded:: 1.12.0
+
+        :param str scheme: Use 'https' or 'http' as the API URL's scheme.
+            Default is https.
+
+            .. versionadded:: 1.14.0
         """
         super(Yandex, self).__init__(
-            scheme='http', timeout=timeout, proxies=proxies, user_agent=user_agent
+            scheme=scheme, timeout=timeout, proxies=proxies, user_agent=user_agent
         )
         self.api_key = api_key
         self.lang = lang
-        self.api = 'http://geocode-maps.yandex.ru/1.x/'
+        self.api = '%s://geocode-maps.yandex.ru/1.x/' % self.scheme
 
     def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
         """
