@@ -20,8 +20,6 @@ except IOError:
         'GEONAMES_USERNAME',
         'LIVESTREETS_AUTH_ID',
         'LIVESTREETS_AUTH_TOKEN',
-        'GEOCODERDOTUS_USERNAME',
-        'GEOCODERDOTUS_PASSWORD',
         'GEOCODEFARM_KEY',
         'BAIDU_KEY',
         'OPENCAGE_KEY',

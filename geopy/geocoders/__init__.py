@@ -88,7 +88,6 @@ __all__ = (
     "Baidu",
     "Bing",
     "DataBC",
-    "GeocoderDotUS",
     "GeocodeFarm",
     "GeoNames",
     "GoogleV3",
@@ -109,7 +108,6 @@ from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.baidu import Baidu
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
-from geopy.geocoders.dot_us import GeocoderDotUS
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
@@ -133,7 +131,6 @@ SERVICE_TO_GEOCODER = {
     "baidu": Baidu,
     "bing": Bing,
     "databc": DataBC,
-    "geocoderdotus": GeocoderDotUS,
     "geocodefarm": GeocodeFarm,
     "geonames": GeoNames,
     "google": GoogleV3,
