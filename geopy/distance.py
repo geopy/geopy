@@ -123,10 +123,13 @@ ELLIPSOIDS = {
 
 def lonlat(x, y, z=0):
     """
-    distance accepts coordinates in (y, x)/(lat, lon) order, while some other libraries/systems might use 
-    (x, y)/(lon, lat).
-    This helper function introduced here for solving this problem. It accepts coordinates in a form of (x, y)/(lon, lat)
-    and returns Point that is safe to use with distance
+    `geopy.distance.distance` accepts coordinates in ``(y, x)/(lat, lon)`` order, while some other libraries/systems
+    might use ``(x, y)/(lon, lat)``.
+
+    This function provides a convenient way to convert coordinates of the ``(x, y)/(lon, lat)`` format to
+    a :class:`geopy.point.Point` instance.
+
+    Example::
     
     >>> from geopy.distance import lonlat, distance
     >>> newport_ri = (-71.312796, 41.49008)
@@ -136,26 +139,6 @@ def lonlat(x, y, z=0):
     
     :param x: longitude 
     :param y: latitude
-    :param z: altitude
-    :return: Point(latitude, longitude, altitude)
-    """
-    return Point(y, x, z)
-
-
-def latlon(y, x, z=0):
-    """
-    This helper function just repeating Point constructor and was added just for convenience.
-    
-    >>> from geopy.distance import latlon, distance
-    >>> newport_ri_yx = (41.49008, -71.312796)
-    >>> cleveland_oh_yx = (41.499498, -81.695391)
-    >>> print(distance(Point(newport_ri_yx), Point(cleveland_oh_yx)).miles)
-    538.3904453677203
-    >>> print(distance(latlon(*newport_ri_yx), latlon(*cleveland_oh_yx)).miles)
-    538.3904453677203
-    
-    :param y: latitude
-    :param x: longitude
     :param z: altitude
     :return: Point(latitude, longitude, altitude)
     """

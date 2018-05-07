@@ -74,8 +74,6 @@ Calculating Distance
 
 .. autofunction:: geopy.lonlat
 
-.. autofunction:: geopy.latlon
-
 .. autoclass:: geopy.distance.geodesic
     :members: __init__
 
