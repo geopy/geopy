@@ -28,6 +28,7 @@ class GeocodeFarm(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         Create a geocoder for GeocodeFarm.
@@ -48,6 +49,12 @@ class GeocodeFarm(Geocoder):
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
         """
         super(GeocodeFarm, self).__init__(
             format_string=format_string,
@@ -55,6 +62,7 @@ class GeocodeFarm(Geocoder):
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         self.api_key = api_key
         self.api = (

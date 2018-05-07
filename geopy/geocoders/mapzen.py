@@ -31,6 +31,7 @@ class Mapzen(Geocoder):
             user_agent=None,
             domain='search.mapzen.com',
             scheme=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         :param str api_key: Mapzen API key, optional.
@@ -59,6 +60,12 @@ class Mapzen(Geocoder):
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
 
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
+
         """
         super(Mapzen, self).__init__(
             format_string=format_string,
@@ -66,6 +73,7 @@ class Mapzen(Geocoder):
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         self.country_bias = country_bias
         self.boundary_rect = boundary_rect

@@ -2,7 +2,9 @@
 Compatibility...
 """
 
+import inspect
 import sys
+import warnings
 
 py3k = sys.version_info >= (3, 0)
 
@@ -50,7 +52,7 @@ if py3k: # pragma: no cover
     from urllib.parse import (urlencode, quote, # pylint: disable=W0611,F0401,W0611,E0611
                               urlparse, parse_qs)
     from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611
-                                build_opener, ProxyHandler,
+                                build_opener, ProxyHandler, HTTPSHandler,
                                 URLError,
                                 HTTPPasswordMgrWithDefaultRealm,
                                 HTTPBasicAuthHandler)
@@ -74,7 +76,7 @@ if py3k: # pragma: no cover
 else: # pragma: no cover
     from urllib import urlencode as original_urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
     from urllib2 import (Request, HTTPError,   # pylint: disable=W0611,F0401,W0611,E0611
-                         ProxyHandler, URLError, urlopen,
+                         ProxyHandler, HTTPSHandler, URLError, urlopen,
                          build_opener,
                          HTTPPasswordMgrWithDefaultRealm,
                          HTTPBasicAuthHandler)
@@ -120,3 +122,31 @@ else: # pragma: no cover
         For Python3
         """
         return d.iteritems()
+
+
+def _is_urllib_context_supported(HTTPSHandler_=HTTPSHandler):
+    context_arg = 'context'
+    if py3k:
+        argspec = inspect.getfullargspec(HTTPSHandler_.__init__)
+        return context_arg in argspec.args or context_arg in argspec.kwonlyargs
+    else:
+        return context_arg in inspect.getargspec(HTTPSHandler_.__init__).args
+
+
+_URLLIB_SUPPORTS_SSL_CONTEXT = _is_urllib_context_supported()
+
+
+def build_opener_with_context(context=None, *handlers):
+    # `context` has been added in Python 2.7.9 and 3.4.3.
+    if _URLLIB_SUPPORTS_SSL_CONTEXT:
+        https_handler = HTTPSHandler(context=context)
+    else:
+        warnings.warn(
+            ("SSL context is not supported in your environment for urllib "
+             "calls. Perhaps your Python version is obsolete? "
+             "This probably means that TLS verification doesn't happen, "
+             "which is insecure. Please consider upgrading your Python "
+             "interpreter version."),
+            UserWarning)
+        https_handler = HTTPSHandler()
+    return build_opener(https_handler, *handlers)

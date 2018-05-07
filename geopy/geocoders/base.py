@@ -4,6 +4,7 @@
 
 from ssl import SSLError
 from socket import timeout as SocketTimeout
+import functools
 import json
 import warnings
 
@@ -11,8 +12,7 @@ from geopy.compat import (
     string_compare,
     HTTPError,
     py3k,
-    urlopen as urllib_urlopen,
-    build_opener,
+    build_opener_with_context,
     ProxyHandler,
     URLError,
     Request,
@@ -85,6 +85,28 @@ class options(object):
     default_user_agent = "geopy/%s" % __version__
     """User-Agent header to send with the requests to geocoder API."""
 
+    default_ssl_context = None
+    """An :class:`ssl.SSLContext` instance with custom TLS verification
+    settings. Pass ``None`` to use the interpreter's defaults (starting from
+    Python 2.7.9 and 3.4.3 that is to use the system's trusted CA certificates;
+    the older versions don't support TLS verification completely).
+
+    For older versions of Python (before 2.7.9 and 3.4.3) this argument is
+    ignored, as ``urlopen`` doesn't accept an ssl context there, and a warning
+    is issued.
+
+    To disable TLS certificate verification completely::
+
+        >>> import ssl
+        >>> import geopy.geocoders
+        >>> ctx = ssl.create_default_context()
+        >>> ctx.check_hostname = False
+        >>> ctx.verify_mode = ssl.CERT_NONE
+        >>> geopy.geocoders.options.default_ssl_context = ctx
+
+    See docs for the :class:`ssl.SSLContext` class for more examples.
+    """
+
 
 # Create an object which `repr` returns 'DEFAULT_SENTINEL'. Sphinx (docs) uses
 # this value when generating method's signature.
@@ -118,6 +140,7 @@ class Geocoder(object):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         Mostly-common geocoder validation, proxies, &c. Not all geocoders
@@ -134,14 +157,19 @@ class Geocoder(object):
         self.proxies = (proxies if proxies is not DEFAULT_SENTINEL
                         else options.default_proxies)
         self.headers = {'User-Agent': user_agent or options.default_user_agent}
+        self.ssl_context = (ssl_context if ssl_context is not DEFAULT_SENTINEL
+                            else options.default_ssl_context)
 
         if self.proxies:
-            opener = build_opener(
-                ProxyHandler(self.proxies)
+            opener = build_opener_with_context(
+                self.ssl_context,
+                ProxyHandler(self.proxies),
             )
-            self.urlopen = opener.open
         else:
-            self.urlopen = urllib_urlopen
+            opener = build_opener_with_context(
+                self.ssl_context,
+            )
+        self.urlopen = opener.open
 
     @staticmethod
     def _coerce_point_to_string(point):
@@ -181,8 +209,9 @@ class Geocoder(object):
         """
 
         if requester:
-            # Don't construct an urllib's Request for a custom requester
-            req = url
+            req = url  # Don't construct an urllib's Request for a custom requester
+            requester = functools.partial(requester, context=self.ssl_context,
+                                          headers=self.headers)
         else:
             if isinstance(url, Request):
                 # copy Request

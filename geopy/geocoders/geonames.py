@@ -32,6 +32,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             format_string=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         :param str country_bias:
@@ -54,6 +55,12 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
         """
         super(GeoNames, self).__init__(
             format_string=format_string,
@@ -61,6 +68,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         if username is None:
             raise ConfigurationError(

@@ -29,6 +29,7 @@ class PickPoint(Nominatim):
             domain='api.pickpoint.io',
             scheme=None,
             user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
 
@@ -57,6 +58,12 @@ class PickPoint(Nominatim):
 
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
         """
 
         super(PickPoint, self).__init__(
@@ -68,6 +75,7 @@ class PickPoint(Nominatim):
             domain=domain,
             scheme=scheme,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         self.api_key = api_key
         self.api = "%s://%s/v1/forward" % (self.scheme, self.domain)
