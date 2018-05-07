@@ -1,6 +1,6 @@
 """
 Each geolocation service you might use, such as Google Maps, Bing Maps, or
-Yahoo BOSS, has its own class in ``geopy.geocoders`` abstracting the service's
+Nominatim, has its own class in ``geopy.geocoders`` abstracting the service's
 API. Geocoders each define at least a ``geocode`` method, for resolving a
 location from a string, and may define a ``reverse`` method, which resolves a
 pair of coordinates to an address. Each Geocoder accepts any credentials
@@ -33,7 +33,8 @@ To find the address corresponding to a set of coordinates:
     {'place_id': '654513', 'osm_type': 'node', ...}
 
 Locators' ``geolocate`` and ``reverse`` methods require the argument ``query``,
-and also accept at least the argument ``exactly_one``, which is ``True``.
+and also accept at least the argument ``exactly_one``, which is ``True`` by
+default.
 Geocoders may have additional attributes, e.g., Bing accepts ``user_location``,
 the effect of which is to bias results near that location. ``geolocate``
 and ``reverse`` methods  may return three types of values:
@@ -44,30 +45,30 @@ and ``reverse`` methods  may return three types of values:
   result is found, returns a :class:`geopy.location.Location` object, which
   can be iterated over as:
 
-    (address<String>, (latitude<Float>, longitude<Float>))
+    ``(address<String>, (latitude<Float>, longitude<Float>))``
 
-  Or can be accessed as `Location.address`, `Location.latitude`,
-  `Location.longitude`, `Location.altitude`, and `Location.raw`. The
-  last contains the geocoder's unparsed response for this result.
+  Or can be accessed as ``Location.address``, ``Location.latitude``,
+  ``Location.longitude``, ``Location.altitude``, and ``Location.raw``. The
+  last contains the full geocoder's response for this result.
 
 - When ``exactly_one`` is False, and there is at least one result, returns a
   list of :class:`geopy.location.Location` objects, as above:
 
-    [Location, [...]]
+    ``[Location, [...]]``
 
 If a service is unavailable or otherwise returns a non-OK response, or doesn't
 receive a response in the allotted timeout, you will receive one of the
 `Exceptions`_ detailed below.
 
-Every geocoder accepts an argument ``format_string`` that defaults to '%s'
+Every geocoder accepts an argument ``format_string`` that defaults to ``'%s'``
 where the input string to geocode is interpolated. For example, if you only
 need to geocode locations in Cleveland, Ohio, you could do::
 
-    >>> from geopy.geocoders import GeocoderDotUS
-    >>> geolocator = GeocoderDotUS(format_string="%s, Cleveland OH")
+    >>> from geopy.geocoders import GoogleV3
+    >>> geolocator = GoogleV3(format_string="%s, Cleveland OH")
     >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
     >>> print(address, latitude, longitude)
-    11111 Euclid Ave, Cleveland, OH 44106 41.506784 -81.608148
+    Thwing Center, 11111 Euclid Ave, Cleveland, OH 44106, USA 41.5074066 -81.60832649999999
 
 """
 
