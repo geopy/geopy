@@ -110,12 +110,12 @@ class Nominatim(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             limit=None,
             addressdetails=False,
             language=False,
             geometry=None
-    ):  # pylint: disable=R0913,W0221
+    ):
         """
         Geocode a location query.
 
@@ -228,10 +228,10 @@ class Nominatim(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             language=False,
             addressdetails=True
-    ):  # pylint: disable=W0221
+    ):
         """
         Returns a reverse geocoded location.
 

@@ -75,7 +75,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             "%s://api.geonames.org/findNearbyPlaceNameJSON" % self.scheme
         )
 
-    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Geocode a location query.
 
@@ -108,8 +108,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             self,
             query,
             exactly_one=False,
-            timeout=None,
-        ):
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Given a point, find an address.
 
@@ -125,7 +125,8 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         """
         try:

@@ -79,8 +79,8 @@ class Mapzen(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=None,
-    ):  # pylint: disable=R0913,W0221
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Geocode a location query.
 
@@ -121,8 +121,8 @@ class Mapzen(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=None,
-    ):  # pylint: disable=W0221
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Returns a reverse geocoded location.
 

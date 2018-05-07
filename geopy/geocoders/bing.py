@@ -77,19 +77,19 @@ class Bing(Geocoder):
             query,
             exactly_one=True,
             user_location=None,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             culture=None,
             include_neighborhood=None,
             include_country_code=False
-        ):  # pylint: disable=W0221
+    ):
         """
         Geocode an address.
 
         :param str query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
-            are one of: `addressLine`, `locality` (city), `adminDistrict` (state), `countryRegion`, or
-            `postalcode`.
+            are one of: `addressLine`, `locality` (city),
+            `adminDistrict` (state), `countryRegion`, or `postalcode`.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -156,10 +156,10 @@ class Bing(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             culture=None,
             include_country_code=False
-        ):  # pylint: disable=W0221
+    ):
         """
         Reverse geocode a point.
 
@@ -218,7 +218,7 @@ class Bing(Geocoder):
                 raise GeocoderServiceError(err)
 
         resources = doc['resourceSets'][0]['resources']
-        if resources is None or not len(resources): # pragma: no cover
+        if resources is None or not len(resources):
             return None
 
         def parse_resource(resource):

@@ -71,7 +71,6 @@ class Baidu(Geocoder):
         self.api_key = api_key
         self.api = '%s://api.map.baidu.com/geocoder/v2/' % self.scheme
 
-
     @staticmethod
     def _format_components_param(components):
         """
@@ -85,8 +84,8 @@ class Baidu(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=None
-        ):
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Geocode a location query.
 
@@ -113,7 +112,7 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    def reverse(self, query, timeout=None):  # pylint: disable=W0221
+    def reverse(self, query, timeout=DEFAULT_SENTINEL):
         """
         Given a point, find an address.
 
@@ -141,7 +140,6 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout)
         )
 
-
     @staticmethod
     def _parse_reverse_json(page):
         """
@@ -154,7 +152,6 @@ class Baidu(Geocoder):
         longitude = place['location']['lng']
 
         return Location(location, (latitude, longitude), place)
-
 
     def _parse_json(self, page, exactly_one=True):
         """

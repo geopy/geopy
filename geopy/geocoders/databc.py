@@ -63,8 +63,8 @@ class DataBC(Geocoder):
             set_back=0,
             location_descriptor='any',
             exactly_one=True,
-            timeout=None,
-        ):
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Geocode a location query.
 

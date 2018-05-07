@@ -66,7 +66,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         self.api = "%s://open.mapquestapi.com/nominatim/v1/search" \
                     "?format=json" % self.scheme
 
-    def geocode(self, query, exactly_one=True, timeout=None): # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Geocode a location query.
 
@@ -99,7 +99,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
         """
         Parse display name, latitude, and longitude from an JSON response.
         """
-        if not len(resources): # pragma: no cover
+        if not len(resources):
             return None
         if exactly_one:
             return cls.parse_resource(resources[0])

@@ -64,7 +64,7 @@ class GeocodeFarm(Geocoder):
             "%s://www.geocode.farm/v3/json/reverse/" % self.scheme
         )
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Geocode a location query.
 
@@ -89,7 +89,7 @@ class GeocodeFarm(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Returns a reverse geocoded location.
 

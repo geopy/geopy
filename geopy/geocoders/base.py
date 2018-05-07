@@ -5,6 +5,7 @@
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 import json
+import warnings
 
 from geopy.compat import (
     string_compare,
@@ -169,12 +170,12 @@ class Geocoder(object):
     def _call_geocoder(
             self,
             url,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             raw=False,
             requester=None,
             deserializer=json.loads,
             **kwargs
-        ):
+    ):
         """
         For a generated query URL, get the results.
         """
@@ -193,10 +194,19 @@ class Geocoder(object):
 
         requester = requester or self.urlopen
 
+        if timeout is None:
+            warnings.warn(
+                ('`timeout=None` has been passed to a geocoder call. Using '
+                 'default geocoder timeout. In future versions of geopy the '
+                 'behavior will be different: None will mean "no timeout" '
+                 'instead of "default geocoder timeout".'), DeprecationWarning)
+            timeout = DEFAULT_SENTINEL
+
+        timeout = (timeout if timeout is not DEFAULT_SENTINEL
+                   else self.timeout)
+
         try:
-            # TODO: default value for `timeout` should be DEFAULT_SENTINEL
-            # instead of None.
-            page = requester(req, timeout=(timeout or self.timeout), **kwargs)
+            page = requester(req, timeout=timeout, **kwargs)
         except Exception as error: # pylint: disable=W0703
             message = (
                 str(error) if not py3k
@@ -249,13 +259,13 @@ class Geocoder(object):
         else:
             return page
 
-    def geocode(self, query, exactly_one=True, timeout=None):
+    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Implemented in subclasses.
         """
         raise NotImplementedError()
 
-    def reverse(self, query, exactly_one=True, timeout=None):
+    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Implemented in subclasses.
         """

@@ -1,6 +1,7 @@
 
 import unittest
 from mock import patch
+import warnings
 
 import geopy.geocoders
 from geopy.exc import GeocoderNotFound
@@ -86,6 +87,29 @@ class GeocoderTestCase(unittest.TestCase):
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    @patch.object(geopy.geocoders.options, 'default_timeout', 12)
+    def test_call_geocoder_timeout(self):
+        url = 'spam://ham/eggs'
+
+        g = Geocoder()
+        self.assertEqual(g.timeout, 12)
+
+        with patch.object(g, 'urlopen') as mock_urlopen:
+            g._call_geocoder(url, raw=True)
+            args, kwargs = mock_urlopen.call_args
+            self.assertEqual(kwargs['timeout'], 12)
+
+            g._call_geocoder(url, timeout=7, raw=True)
+            args, kwargs = mock_urlopen.call_args
+            self.assertEqual(kwargs['timeout'], 7)
+
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter('always')
+                g._call_geocoder(url, timeout=None, raw=True)
+                args, kwargs = mock_urlopen.call_args
+                self.assertEqual(kwargs['timeout'], 12)
+                self.assertEqual(1, len(w))
 
     def test_point_coercion_point(self):
         """

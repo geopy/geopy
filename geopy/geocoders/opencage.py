@@ -78,8 +78,8 @@ class OpenCage(Geocoder):
             country=None,
             language=None,
             exactly_one=True,
-            timeout=None,
-    ):  # pylint: disable=W0221,R0913
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Geocode a location query.
 
@@ -138,8 +138,8 @@ class OpenCage(Geocoder):
             query,
             language=None,
             exactly_one=False,
-            timeout=None,
-    ):  # pylint: disable=W0221,R0913
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Given a point, find an address.
 

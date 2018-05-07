@@ -84,7 +84,7 @@ class What3Words(Geocoder):
                 query,
                 lang='en',
                 exactly_one=True,
-                timeout=None):
+                timeout=DEFAULT_SENTINEL):
 
         """
         Geocode a "3 words" or "OneWord" query.
@@ -181,10 +181,10 @@ class What3Words(Geocoder):
             else:
                 raise exc.GeocoderParseError('Error parsing result.')
 
-
         return parse_resource(resources)
 
-    def reverse(self, query, lang='en', exactly_one=True, timeout=None):
+    def reverse(self, query, lang='en', exactly_one=True,
+                timeout=DEFAULT_SENTINEL):
         """
         Given a point, find the 3 word address.
 
@@ -219,7 +219,6 @@ class What3Words(Geocoder):
         return self._parse_reverse_json(
             self._call_geocoder(url, timeout=timeout),
         )
-
 
     @staticmethod
     def _parse_reverse_json(resources):

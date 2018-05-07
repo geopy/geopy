@@ -89,7 +89,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
         self.candidates = candidates
         self.api = '%s://api.smartystreets.com/street-address' % self.scheme
 
-    def geocode(self, query, exactly_one=True, timeout=None):  # pylint: disable=W0221
+    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Geocode a location query.
 
@@ -97,6 +97,11 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
         """
         url = self._compose_url(self.format_string % query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

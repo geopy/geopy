@@ -136,8 +136,8 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             is_freeform=False,
             filtering=None,
             exactly_one=True,
-            timeout=None
-    ):  # pylint: disable=W0221,R0913
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Geocode a location query.
 
@@ -239,8 +239,8 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             maximum_responses=25,
             filtering='',
             exactly_one=False,
-            timeout=None
-    ):  # pylint: disable=W0221,R0913
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Given a point, find an address.
 
@@ -514,7 +514,6 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         )
 
         return raw_xml
-
 
     @staticmethod
     def _parse_place(place, is_freeform=None):

@@ -118,7 +118,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             'World/GeocodeServer/reverseGeocode' % self.scheme
         )
 
-    def _authenticated_call_geocoder(self, url, timeout=None):
+    def _authenticated_call_geocoder(self, url, timeout=DEFAULT_SENTINEL):
         """
         Wrap self._call_geocoder, handling tokens.
         """
@@ -130,7 +130,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         )
         return self._base_call_geocoder(request, timeout=timeout)
 
-    def geocode(self, query, exactly_one=True, timeout=None, out_fields=None):
+    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
+                out_fields=None):
         """
         Geocode a location query.
 
@@ -192,7 +193,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             return geocoded[0]
         return geocoded
 
-    def reverse(self, query, exactly_one=True, timeout=None, # pylint: disable=R0913,W0221
+    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 distance=None, wkid=DEFAULT_WKID):
         """
         Given a point, find an address.

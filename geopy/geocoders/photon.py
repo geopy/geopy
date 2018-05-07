@@ -66,12 +66,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
             self,
             query,
             exactly_one=True,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             location_bias=None,
             language=False,
             limit=None,
             osm_tag=None
-        ):  # pylint: disable=W0221
+    ):
         """
         Geocode a location query.
 
@@ -142,10 +142,10 @@ class Photon(Geocoder):  # pylint: disable=W0223
             self,
             query,
             exactly_one=True,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             language=False,
             limit=None,
-        ):  # pylint: disable=W0221
+    ):
         """
         Returns a reverse geocoded location.
 

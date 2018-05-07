@@ -161,13 +161,13 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             self,
             query,
             exactly_one=True,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             bounds=None,
             region=None,
             components=None,
             language=None,
             sensor=False,
-        ):  # pylint: disable=W0221,R0913
+    ):
         """
         Geocode a location query.
 
@@ -229,10 +229,10 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             self,
             query,
             exactly_one=False,
-            timeout=None,
+            timeout=DEFAULT_SENTINEL,
             language=None,
             sensor=False,
-        ):  # pylint: disable=W0221,R0913
+    ):
         """
         Given a point, find an address.
 
@@ -246,7 +246,8 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception.
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         :param str language: The language in which to return results.
 
@@ -272,7 +273,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def timezone(self, location, at_time=None, timeout=None):
+    def timezone(self, location, at_time=None, timeout=DEFAULT_SENTINEL):
         """
         **This is an unstable API.**
 
@@ -289,6 +290,11 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             location. This is optional, and defaults to the time that the
             function is called in UTC.
         :type at_time: int or float or datetime
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         :rtype: pytz timezone
         """
