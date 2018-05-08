@@ -118,6 +118,31 @@ ELLIPSOIDS = {
     'GRS-67':        (6378.1600, 6356.774719, 1 / 298.25)
 }
 
+
+def lonlat(x, y, z=0):
+    """
+    `geopy.distance.distance` accepts coordinates in ``(y, x)/(lat, lon)`` order, while some other libraries/systems
+    might use ``(x, y)/(lon, lat)``.
+
+    This function provides a convenient way to convert coordinates of the ``(x, y)/(lon, lat)`` format to
+    a :class:`geopy.point.Point` instance.
+
+    Example::
+    
+        >>> from geopy.distance import lonlat, distance
+        >>> newport_ri_xy = (-71.312796, 41.49008)
+        >>> cleveland_oh_xy = (-81.695391, 41.499498)
+        >>> print(distance(lonlat(*newport_ri_xy), lonlat(*cleveland_oh_xy)).miles)
+        538.3904453677203
+    
+    :param x: longitude 
+    :param y: latitude
+    :param z: (optional) altitude
+    :return: Point(latitude, longitude, altitude)
+    """
+    return Point(y, x, z)
+
+
 class Distance(object):
     """
     Base for :class:`.great_circle`, :class:`.vincenty`, and
