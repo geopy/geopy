@@ -86,7 +86,7 @@ calculate the length of a path::
     >>> _, pa = g.geocode('Palo Alto, CA')
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
     3277.30439191
-    
+
 """
 from __future__ import division
 
@@ -131,15 +131,15 @@ def lonlat(x, y, z=0):
 
     Example::
     
-    >>> from geopy.distance import lonlat, distance
-    >>> newport_ri = (-71.312796, 41.49008)
-    >>> cleveland_oh = (-81.695391, 41.499498)
-    >>> print(distance(lonlat(*newport_ri), lonlat(*cleveland_oh)).miles)
-    538.3904453677203
+        >>> from geopy.distance import lonlat, distance
+        >>> newport_ri_xy = (-71.312796, 41.49008)
+        >>> cleveland_oh_xy = (-81.695391, 41.499498)
+        >>> print(distance(lonlat(*newport_ri_xy), lonlat(*cleveland_oh_xy)).miles)
+        538.3904453677203
     
     :param x: longitude 
     :param y: latitude
-    :param z: altitude
+    :param z: (optional) altitude
     :return: Point(latitude, longitude, altitude)
     """
     return Point(y, x, z)
