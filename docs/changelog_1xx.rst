@@ -2,6 +2,76 @@
 
 Changelog
 =========
+1.14.0
+------
+2018-05-TBD
+
+*   ADDED: Nominatim geocoder now supports an `addressdetails` option in
+    the `reverse` method.
+    Contributed by Serphentas. (#285)
+
+*   ADDED: ArcGIS geocoder now supports an `out_fields` option in
+    the `geocode` method.
+    Contributed by Jonathan Batchelor. (#227)
+
+*   ADDED: Yandex geocoder now supports a `kind` option in the
+    `reverse` method.
+
+*   ADDED: Some geocoders were missing `format_string` option. Now all
+    geocoders support it.
+
+*   ADDED: `lonlat` function for conveniently converting ``(x, y, [z])``
+    coordinate tuples to the `Point` instances, which use ``(y, x, [z])``.
+    Contributed by svalee. (#282)
+
+*   ADDED: `geopy.geocoders.options` object, which allows to configure
+    geocoder defaults (such as User-Agent, timeout, format_string)
+    application-wide. (#288)
+
+*   ADDED: Support for supplying a custom SSL context. See docs for
+    `geopy.geocoders.options.default_ssl_context`. (#291)
+
+*   CHANGED: Baidu and Yandex geocoders now use https scheme by default
+    instead of http.
+
+*   CHANGED: ArcGIS geocoder was updated to use the latest API.
+    Please note that ``Location.raw`` results for `geocode` have changed
+    a little due to that.
+    Contributed by Jonathan Batchelor. (#227)
+
+*   CHANGED: Explicitly passed `timeout=None` in geocoder calls now
+    issues a warning. Currently it means "use geocoder's default timeout",
+    while in geopy 2.0 it would mean "use no timeout". (#288)
+
+*   CHANGED: GoogleV3 `geocode` call now supports `components` without
+    `query` being specified. (#296)
+
+*   CHANGED: GeoNames, GoogleV3, IGNFrance, OpenCage and Yandex erroneously
+    had `exactly_one=False` by default for `reverse` methods, which must have
+    been True. This behavior has been kept, however a warning will be issued
+    now unless `exactly_one` option is explicitly specified in `reverse` calls
+    for these geocoders. The default value will be changed in geopy 2.0. (#295)
+
+*   CHANGED: Point now throws a `ValueError` exception instead of normalizing
+    latitude and tolerating NaN/inf values for coordinates. (#294)
+
+*   CHANGED: `Vincenty` usage now issues a warning. `Geodesic` should be used
+    instead. Vincenty is planned to be removed in geopy 2.0. (#293)
+
+*   CHANGED: ArcGIS `wkid` option for `reverse` call has been deprecated
+    because it was never working properly, and it won't, due to
+    the coordinates normalization in Point.
+
+*   FIXED: `GeocodeFarm` was raising an exception on empty responce instead
+    of returning `None`. Contributed by Arthur Pemberton. (#240)
+
+*   REMOVED: `geopy.geocoders.DEFAULT_*` constants (in favor of
+    `geopy.geocoders.options.default_*` attributes). (#288)
+
+*   REMOVED: YahooPlaceFinder geocoder. (#283)
+
+*   REMOVED: GeocoderDotUS geocoder. (#286)
+
 
 1.13.0
 ------
