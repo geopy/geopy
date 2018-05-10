@@ -44,6 +44,6 @@ class GeoNamesTestCase(GeocoderTestBase):
         # work around ConfigurationError raised in GeoNames init
         self.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
         self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667"},
+            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )

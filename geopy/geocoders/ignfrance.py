@@ -1,7 +1,7 @@
 """
 :class:`.IGNFrance` is the IGN France Geocoder.
 """
-
+import warnings
 import xml.etree.ElementTree as ET
 
 from geopy.compat import (HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, Request,
@@ -238,7 +238,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             reverse_geocode_preference=('StreetAddress', ),
             maximum_responses=25,
             filtering='',
-            exactly_one=False,
+            exactly_one=DEFAULT_SENTINEL,
             timeout=DEFAULT_SENTINEL,
     ):
         """
@@ -263,12 +263,25 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
+            .. versionchanged:: 1.14.0
+               Default value for ``exactly_one`` was ``False``, which differs
+               from the conventional default across geopy. Please always pass
+               this argument explicitly, otherwise you would get a warning.
+               In geopy 2.0 the default value will become ``True``.
+
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
         """
+        if exactly_one is DEFAULT_SENTINEL:
+            warnings.warn('%s.reverse: default value for `exactly_one` '
+                          'argument will become True in geopy 2.0. '
+                          'Specify `exactly_one=False` as the argument '
+                          'explicitly to get rid of this warning.' % type(self).__name__,
+                          DeprecationWarning)
+            exactly_one = False
 
         sub_request = """
             <ReverseGeocodeRequest>
