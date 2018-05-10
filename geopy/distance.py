@@ -473,8 +473,15 @@ class vincenty(Distance):
 
     ellipsoid_key = None
     ELLIPSOID = None
+    _show_deprecation_warning = True
 
     def __init__(self, *args, **kwargs):
+        if self._show_deprecation_warning:
+            warnings.warn('Vincenty is deprecated and is going to be removed '
+                          'in geopy 2.0. Use `geopy.distance.geodesic` '
+                          '(or the default `geopy.distance.distance`) '
+                          'instead, which is more accurate and always converges.',
+                          DeprecationWarning)
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         self.iterations = kwargs.pop('iterations', 20)
         major, minor, f = self.ELLIPSOID # pylint: disable=W0612
