@@ -109,6 +109,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             query,
             exactly_one=False,
             timeout=DEFAULT_SENTINEL,
+            kind=None,
     ):
         """
         Given a point, find an address.
@@ -126,6 +127,10 @@ class Yandex(Geocoder): # pylint: disable=W0223
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param str kind: Type of toponym. Allowed values: `house`, `street`, `metro`,
+            `district`, `locality`.
+
+            .. versionadded:: 1.14.0
         """
         try:
             lat, lng = [
@@ -142,6 +147,8 @@ class Yandex(Geocoder): # pylint: disable=W0223
             params['apikey'] = self.api_key
         if self.lang:
             params['lang'] = self.lang
+        if kind:
+            params['kind'] = kind
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(

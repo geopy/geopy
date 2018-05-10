@@ -79,3 +79,10 @@ class YandexTestCase(GeocoderTestBase):
             {"query": "площа Леніна Донецьк"},
             {"address": "площа Леніна, Донецьк, Україна", "latitude": 48.002104, "longitude": 37.805186},
         )
+
+    def test_reverse_kind_param(self):
+        self.geocoder = Yandex()
+        self.reverse_run(
+            {"query": (55.743659, 37.408055), "kind": "locality", "exactly_one": True},
+            {"address": "Москва, Россия"}
+        )
