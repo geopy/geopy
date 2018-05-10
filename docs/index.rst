@@ -69,7 +69,7 @@ Calculating Distance
 .. automodule:: geopy.distance
     :members: __doc__
 
-.. autofunction:: geopy.lonlat
+.. autofunction:: geopy.distance.lonlat
 
 .. autoclass:: geopy.distance.geodesic
     :members: __init__

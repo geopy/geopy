@@ -12,6 +12,7 @@ from geopy.distance import (Distance,
                             VincentyDistance,
                             GeodesicDistance,
                             distance,
+                            lonlat,
                             EARTH_RADIUS,
                             ELLIPSOIDS)
 
@@ -288,6 +289,11 @@ class TestDefaultDistanceClass(unittest.TestCase):
 
             self.assertEqual(distance(132).km, 132)
             self.assertEqual(1, len(w))
+
+    def test_lonlat_function(self):
+        newport_ri_xy = (-71.312796, 41.49008)
+        point = lonlat(*newport_ri_xy)
+        self.assertEqual(point, (41.49008, -71.312796, 0))
 
 
 class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
