@@ -56,7 +56,8 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
                 self.fail('No result found')
             else:
                 return
-        self._verify_request(result, **expected)
+        self._verify_request(result, exactly_one=payload.get('exactly_one', True),
+                             **expected)
         return result
 
     def reverse_run(self, payload, expected, expect_failure=False):
@@ -69,7 +70,8 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
                 self.fail('No result found')
             else:
                 return
-        self._verify_request(result, **expected)
+        self._verify_request(result, exactly_one=payload.get('exactly_one', True),
+                             **expected)
         return result
 
     @staticmethod
@@ -94,11 +96,12 @@ class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
             latitude=EMPTY,
             longitude=EMPTY,
             address=EMPTY,
-        ):
+            exactly_one=True,
+    ):
         """
         Verifies that a a result matches the kwargs given.
         """
-        item = result[0] if isinstance(result, (tuple, list)) else result
+        item = result if exactly_one else result[0]
 
         if raw is not EMPTY:
             self.assertEqual(item.raw, raw)

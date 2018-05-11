@@ -253,6 +253,7 @@ class IGNFranceTestCase(GeocoderTestBase):
         res = self._make_request(
             self.geocoder.reverse,
             query='47.229554,-1.541519',
+            exactly_one=False,
             reverse_geocode_preference=['StreetAddress', 'PositionOfInterest']
         )
         self.assertEqual(
@@ -278,12 +279,14 @@ class IGNFranceTestCase(GeocoderTestBase):
         res_call_radius = self._make_request(
             self.geocoder.reverse,
             query='48.8033333,2.3241667',
+            exactly_one=False,
             maximum_responses=10,
             filtering=spatial_filtering_radius)
 
         res_call = self._make_request(
             self.geocoder.reverse,
             query='48.8033333,2.3241667',
+            exactly_one=False,
             maximum_responses=10
         )
 

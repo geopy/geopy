@@ -5,6 +5,7 @@
 import base64
 import hashlib
 import hmac
+import warnings
 
 from geopy.compat import urlencode
 from geopy.exc import (
@@ -238,7 +239,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
     def reverse(
             self,
             query,
-            exactly_one=False,
+            exactly_one=DEFAULT_SENTINEL,
             timeout=DEFAULT_SENTINEL,
             language=None,
             sensor=False,
@@ -254,6 +255,12 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
+            .. versionchanged:: 1.14.0
+               Default value for ``exactly_one`` was ``False``, which differs
+               from the conventional default across geopy. Please always pass
+               this argument explicitly, otherwise you would get a warning.
+               In geopy 2.0 the default value will become ``True``.
+
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -264,6 +271,14 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor.
         """
+        if exactly_one is DEFAULT_SENTINEL:
+            warnings.warn('%s.reverse: default value for `exactly_one` '
+                          'argument will become True in geopy 2.0. '
+                          'Specify `exactly_one=False` as the argument '
+                          'explicitly to get rid of this warning.' % type(self).__name__,
+                          DeprecationWarning)
+            exactly_one = False
+
         params = {
             'latlng': self._coerce_point_to_string(query),
             'sensor': str(sensor).lower()

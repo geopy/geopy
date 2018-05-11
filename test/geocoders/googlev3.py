@@ -174,7 +174,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GoogleV3.reverse string
         """
         self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667"},
+            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
@@ -183,7 +183,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         GoogleV3.reverse Point
         """
         self.reverse_run(
-            {"query": self.new_york_point},
+            {"query": self.new_york_point, "exactly_one": True},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
