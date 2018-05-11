@@ -159,7 +159,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
     def geocode(
             self,
-            query,
+            query=None,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             bounds=None,
@@ -171,7 +171,14 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
         """
         Geocode a location query.
 
-        :param str query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode. Optional,
+            if ``components`` param is set::
+
+                >>> g = GoogleV3()
+                >>> g.geocode(components={"city": "Paris", "country": "FR"})
+
+            .. versionchanged:: 1.14.0
+               Now ``query`` is optional if ``components`` param is set.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -197,9 +204,12 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             device with a location sensor.
         """
         params = {
-            'address': self.format_string % query,
             'sensor': str(sensor).lower()
         }
+        if query is None and not components:
+            raise ValueError('Either `query` or `components` must be set.`')
+        if query is not None:
+            params['address'] = self.format_string % query
         if self.api_key:
             params['key'] = self.api_key
         if bounds:

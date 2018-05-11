@@ -131,7 +131,7 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-    def test_geocode_components(self):
+    def test_geocode_with_conflicting_components(self):
         """
         GoogleV3.geocode returns None on conflicting components
         """
@@ -159,6 +159,14 @@ class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
                 }
             },
             {"latitude": 28.4636296, "longitude": -16.2518467},
+        )
+
+    def test_components_without_query(self):
+        self.geocode_run(
+            {
+                "components": {"city": "Paris", "country": "FR"},
+            },
+            {"latitude": 46.227638, "longitude": 2.213749},
         )
 
     def test_reverse_string(self):
