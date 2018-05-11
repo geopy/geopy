@@ -68,22 +68,18 @@ def _normalize_coordinates(latitude, longitude, altitude):
 
     is_all_finite = all(isfinite(x) for x in (latitude, longitude, altitude))
     if not is_all_finite:
-        warnings.warn('Point coordinates should be finite. NaN or inf has '
-                      'been passed as a coordinate.  This will cause a '
-                      'ValueError exception in the future versions of geopy.',
-                      UserWarning)
+        raise ValueError('Point coordinates must be finite. %r has been passed '
+                         'as coordinates.' % ((latitude, longitude, altitude),))
 
     if abs(latitude) > 90:
-        warnings.warn('Latitude has been normalized, because its '
-                      'absolute value was more than 90. This is probably '
-                      'not what was meant, because the normalized value '
-                      'is on a different pole. If you pass coordinates as '
-                      'positional args, please make sure that the order is '
-                      '(latitude, longitude) or (y, x) in Cartesian terms.  '
-                      'This will cause a ValueError exception in the future '
-                      'versions of geopy.',
+        warnings.warn('Latitude normalization has been prohibited in the newer '
+                      'versions of geopy, because the normalized value happened '
+                      'to be on a different pole, which is probably not what was '
+                      'meant. If you pass coordinates as positional args, '
+                      'please make sure that the order is '
+                      '(latitude, longitude) or (y, x) in Cartesian terms.',
                       UserWarning)
-        latitude = _normalize_angle(latitude, 90.0)
+        raise ValueError('Latitude must be in the [-90; 90] range.')
 
     if abs(longitude) > 180:
         # Longitude normalization is pretty straightforward and doesn't seem

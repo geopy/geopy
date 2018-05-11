@@ -78,19 +78,14 @@ class CommonDistanceComputationCases(object):
         self.assertAlmostEqual(point.latitude, 0.0)
         self.assertAlmostEqual(point.longitude, 179.91, 3)
 
-    def test_should_tolerate_nans(self):
+    def test_should_not_tolerate_nans(self):
         nan = float('nan')
-        # This is probably a bad design to silently turn NaNs into NaNs
-        # instead of raising a ValueError, but this is the current behaviour,
-        # hence this test.
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            self.assertTrue(math.isnan(self.cls((nan, nan), (1, 1)).kilometers))
-            self.assertEqual(1, len(w))
-            self.assertTrue(math.isnan(self.cls((nan, 1), (1, nan)).kilometers))
-            self.assertEqual(3, len(w))  # 1 per each point tuple
-            self.assertTrue(math.isnan(self.cls((nan, 1), (nan, 1)).kilometers))
-            self.assertEqual(5, len(w))
+        with self.assertRaises(ValueError):
+            self.cls((nan, nan), (1, 1)).kilometers
+        with self.assertRaises(ValueError):
+            self.cls((nan, 1), (1, nan)).kilometers
+        with self.assertRaises(ValueError):
+            self.cls((nan, 1), (nan, 1)).kilometers
 
     def test_should_compute_distance_for_multiple_points_pairwise(self):
         dist_total = self.cls((10, 20), (40, 60), (0, 80), (0, 10))
@@ -125,8 +120,9 @@ class CommonDistanceComputationCases(object):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             # The correct order is (lat, lon).
-            self.cls((lon, lat), (lon - 10, lat))
-            self.assertEqual(2, len(w))  # 1 per each point tuple
+            with self.assertRaises(ValueError):
+                self.cls((lon, lat), (lon - 10, lat))
+            self.assertEqual(1, len(w))
 
 
 class CommonMathematicalOperatorCases(object):
