@@ -4,6 +4,7 @@ Test distance formulas
 import math
 import unittest
 import warnings
+from mock import patch
 
 from geopy import distance as geopy_distance
 from geopy.point import Point
@@ -291,6 +292,11 @@ class TestDefaultDistanceClass(unittest.TestCase):
         point = lonlat(*newport_ri_xy)
         self.assertEqual(point, (41.49008, -71.312796, 0))
 
+    def test_vincenty_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            VincentyDistance((0, 0), (10, 10))
+            self.assertEqual(1, len(w))
 
 class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
                                            unittest.TestCase):
@@ -307,6 +313,7 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
         self.assertAlmostEqual(destination.longitude, 180)
 
 
+@patch.object(VincentyDistance, '_show_deprecation_warning', False)
 class TestWhenComputingVincentyDistance(CommonDistanceCases,
                                         unittest.TestCase):
 
