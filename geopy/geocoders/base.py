@@ -62,58 +62,76 @@ class options(object):
         >>> print(geolocator.timeout)
         7
 
+    Attributes:
+        ``default_format_string``
+            String containing ``'%s'`` where the string to geocode should
+            be interpolated before querying the geocoder. Used by ``geocode``
+            calls only. For example: ``'%s, Mountain View, CA'``.
+
+        ``default_proxies``
+            If specified, tunnel requests through the specified proxy.
+            E.g., ``{"https": "192.0.2.0"}``. For more information, see
+            documentation on :class:`urllib2.ProxyHandler`.
+
+        ``default_scheme``
+            Use ``'https'`` or ``'http'`` as the API URL's scheme.
+
+        ``default_ssl_context``
+            An :class:`ssl.SSLContext` instance with custom TLS
+            verification settings. Pass ``None`` to use the interpreter's
+            defaults (starting from Python 2.7.9 and 3.4.3 that is to use
+            the system's trusted CA certificates; the older versions don't
+            support TLS verification completely).
+
+            For older versions of Python (before 2.7.9 and 3.4.3) this
+            argument is ignored, as ``urlopen`` doesn't accept an ssl
+            context there, and a warning is issued.
+
+            To disable TLS certificate verification completely::
+
+                >>> import ssl
+                >>> import geopy.geocoders
+                >>> ctx = ssl.create_default_context()
+                >>> ctx.check_hostname = False
+                >>> ctx.verify_mode = ssl.CERT_NONE
+                >>> geopy.geocoders.options.default_ssl_context = ctx
+
+            To use the CA bundle used by `requests` library::
+
+                >>> import ssl
+                >>> import certifi
+                >>> import geopy.geocoders
+                >>> ctx = ssl.create_default_context(cafile=certifi.where())
+                >>> geopy.geocoders.options.default_ssl_context = ctx
+
+            See docs for the :class:`ssl.SSLContext` class for more examples.
+
+        ``default_timeout``
+            Time, in seconds, to wait for the geocoding service to respond
+            before raising a :class:`geopy.exc.GeocoderTimedOut` exception.
+            Pass ``None`` to disable timeout.
+
+        ``default_user_agent``
+            User-Agent header to send with the requests to geocoder API.
     """
 
+    # Please keep the attributes sorted (Sphinx sorts them in the rendered
+    # docs) and make sure that each attr has a corresponding section in
+    # the docstring above.
+    #
+    # It's bad to have the attrs docs separated from the attrs
+    # themselves. Although Sphinx supports docstrings for each attr [1],
+    # this is not standardized and won't work with `help()` function and
+    # in the ReadTheDocs (at least out of the box) [2].
+    #
+    # [1]: http://www.sphinx-doc.org/en/master/ext/autodoc.html#directive-autoattribute
+    # [2]: https://github.com/rtfd/readthedocs.org/issues/855#issuecomment-261337038
     default_format_string = '%s'
-    """String containing ``'%s'`` where the string to geocode should be
-    interpolated before querying the geocoder. Used by ``geocode`` calls only.
-    For example: ``'%s, Mountain View, CA'``."""
-
-    default_scheme = 'https'
-    """Use ``'https'`` or ``'http'`` as the API URL's scheme."""
-
-    default_timeout = 1
-    """Time, in seconds, to wait for the geocoding service to respond before
-    raising a :class:`geopy.exc.GeocoderTimedOut` exception. Pass ``None``
-    to disable timeout."""
-
     default_proxies = None
-    """If specified, tunnel requests through the specified proxy.
-    E.g., ``{"https": "192.0.2.0"}``. For more information, see documentation
-    on :class:`urllib2.ProxyHandler`."""
-
-    default_user_agent = "geopy/%s" % __version__
-    """User-Agent header to send with the requests to geocoder API."""
-
+    default_scheme = 'https'
     default_ssl_context = None
-    """An :class:`ssl.SSLContext` instance with custom TLS verification
-    settings. Pass ``None`` to use the interpreter's defaults (starting from
-    Python 2.7.9 and 3.4.3 that is to use the system's trusted CA certificates;
-    the older versions don't support TLS verification completely).
-
-    For older versions of Python (before 2.7.9 and 3.4.3) this argument is
-    ignored, as ``urlopen`` doesn't accept an ssl context there, and a warning
-    is issued.
-
-    To disable TLS certificate verification completely::
-
-        >>> import ssl
-        >>> import geopy.geocoders
-        >>> ctx = ssl.create_default_context()
-        >>> ctx.check_hostname = False
-        >>> ctx.verify_mode = ssl.CERT_NONE
-        >>> geopy.geocoders.options.default_ssl_context = ctx
-
-    To use the CA bundle used by `requests` library::
-
-        >>> import ssl
-        >>> import certifi
-        >>> import geopy.geocoders
-        >>> ctx = ssl.create_default_context(cafile=certifi.where())
-        >>> geopy.geocoders.options.default_ssl_context = ctx
-
-    See docs for the :class:`ssl.SSLContext` class for more examples.
-    """
+    default_timeout = 1
+    default_user_agent = "geopy/%s" % __version__
 
 
 # Create an object which `repr` returns 'DEFAULT_SENTINEL'. Sphinx (docs) uses
