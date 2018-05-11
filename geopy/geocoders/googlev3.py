@@ -48,6 +48,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             format_string=None,
+            ssl_context=DEFAULT_SENTINEL,
             channel='',
     ):
         """
@@ -87,6 +88,12 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
             .. versionadded:: 1.14.0
 
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
+
         :param str channel: If using premier, the channel identifier.
 
             .. versionadded:: 1.12.0
@@ -97,6 +104,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')

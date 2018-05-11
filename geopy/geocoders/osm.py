@@ -43,6 +43,7 @@ class Nominatim(Geocoder):
             domain='nominatim.openstreetmap.org',
             scheme=None,
             user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. PickPoint).
     ):
@@ -76,6 +77,12 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.12.0
 
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
+
         """
         super(Nominatim, self).__init__(
             format_string=format_string,
@@ -83,6 +90,7 @@ class Nominatim(Geocoder):
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         self.country_bias = country_bias
         self.view_box = view_box

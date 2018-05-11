@@ -29,6 +29,7 @@ class OpenCage(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             format_string=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         Initialize a customized OpenCageData geocoder.
@@ -59,6 +60,12 @@ class OpenCage(Geocoder):
 
             .. versionadded:: 1.14.0
 
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
+
         """
         super(OpenCage, self).__init__(
             format_string=format_string,
@@ -66,6 +73,7 @@ class OpenCage(Geocoder):
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
 
         self.api_key = api_key

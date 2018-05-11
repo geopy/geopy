@@ -25,6 +25,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             proxies=DEFAULT_SENTINEL,
             domain='photon.komoot.de',
             user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         Initialize a Photon/Komoot geocoder which aims to let you "search as
@@ -50,6 +51,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
         """
         super(Photon, self).__init__(
             format_string=format_string,
@@ -57,6 +64,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         self.domain = domain.strip('/')
         self.api = "%s://%s/api" % (self.scheme, self.domain)

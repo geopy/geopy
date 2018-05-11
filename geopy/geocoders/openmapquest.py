@@ -25,6 +25,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         Initialize an Open MapQuest geocoder with location-specific
@@ -52,6 +53,12 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
             .. versionadded:: 1.12.0
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
         """
         super(OpenMapQuest, self).__init__(
             format_string=format_string,
@@ -59,6 +66,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         if not api_key:
             raise ConfigurationError('OpenMapQuest requires an API key')

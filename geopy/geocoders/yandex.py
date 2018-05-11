@@ -27,6 +27,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             user_agent=None,
             scheme=None,
             format_string=None,
+            ssl_context=DEFAULT_SENTINEL,
     ):
         """
         Create a Yandex-based geocoder.
@@ -62,6 +63,12 @@ class Yandex(Geocoder): # pylint: disable=W0223
             See :attr:`geopy.geocoders.options.default_format_string`.
 
             .. versionadded:: 1.14.0
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+            .. versionadded:: 1.14.0
         """
         super(Yandex, self).__init__(
             format_string=format_string,
@@ -69,6 +76,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
+            ssl_context=ssl_context,
         )
         self.api_key = api_key
         self.lang = lang
