@@ -104,6 +104,14 @@ class options(object):
         >>> ctx.verify_mode = ssl.CERT_NONE
         >>> geopy.geocoders.options.default_ssl_context = ctx
 
+    To use the CA bundle used by `requests` library::
+
+        >>> import ssl
+        >>> import certifi
+        >>> import geopy.geocoders
+        >>> ctx = ssl.create_default_context(cafile=certifi.where())
+        >>> geopy.geocoders.options.default_ssl_context = ctx
+
     See docs for the :class:`ssl.SSLContext` class for more examples.
     """
 
