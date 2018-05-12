@@ -72,6 +72,20 @@ class PointTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             Point("gibberish")
 
+    def test_point_from_string(self):
+        # Examples are from the docstring of `Point.from_string`.
+        self.assertEqual(Point("41.5;-81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("41.5,-81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("41.5 -81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("41.5 N -81.0 W"), (41.5, 81.0, 0.0))
+        self.assertEqual(Point("-41.5 S;81.0 E"), (41.5, 81.0, 0.0))
+        self.assertEqual(Point("23 26m 22s N 23 27m 30s E"),
+                         (23.439444444444444, 23.458333333333332, 0.0))
+        self.assertEqual(Point("23 26' 22\" N 23 27' 30\" E"),
+                         (23.439444444444444, 23.458333333333332, 0.0))
+        self.assertEqual(Point(u("UT: N 39\xb020' 0'' / W 74\xb035' 0''")),
+                         (39.333333333333336, -74.58333333333333, 0.0))
+
     def test_point_format_altitude(self):
         """
         Point.format() includes altitude
