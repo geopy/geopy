@@ -45,7 +45,7 @@ POINT_PATTERN = re.compile(r"""
     "PRIME": PRIME,
     "DOUBLE_PRIME": DOUBLE_PRIME,
     "SEP": r'\s*[,;/\s]\s*',
-}, re.VERBOSE + re.UNICODE)
+}, re.VERBOSE | re.UNICODE)
 
 
 def _normalize_angle(x, limit):
