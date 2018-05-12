@@ -9,7 +9,11 @@ geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6), PyPy, and
 PyPy3. geopy does not and will not support CPython 2.6.
 """
 
-from geopy.point import Point
 from geopy.location import Location
-from geopy.geocoders import * # pylint: disable=W0401
+from geopy.point import Point
 from geopy.util import __version__
+
+from geopy.geocoders import *  # noqa
+# geopy.geocoders.options must not be importable as `geopy.options`,
+# because that is ambiguous (which options are that).
+del options  # noqa
