@@ -1,23 +1,43 @@
-
 import unittest
+from mock import patch
 
+import geopy.geocoders
 from geopy.geocoders import LiveAddress
 from geopy.exc import ConfigurationError, GeocoderAuthenticationFailure
 from test.geocoders.util import GeocoderTestBase, env
 
+
 class LiveAddressTestCaseUnitTest(GeocoderTestBase):
+    dummy_id = 'DUMMY12345'
+    dummy_token = 'DUMMY67890'
 
     def test_user_agent_custom(self):
         geocoder = LiveAddress(
-            auth_id='DUMMY12345',
-            auth_token='DUMMY67890',
+            auth_id=self.dummy_id,
+            auth_token=self.dummy_token,
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
+    def test_http_scheme_is_disallowed(self):
+        with self.assertRaises(ConfigurationError):
+            LiveAddress(
+                auth_id=self.dummy_id,
+                auth_token=self.dummy_token,
+                scheme='http',
+            )
 
-@unittest.skipUnless( # pylint: disable=R0904,C0111
-    'LIVESTREETS_AUTH_ID' in env and 'LIVESTREETS_AUTH_TOKEN' in env,
+    @patch.object(geopy.geocoders.options, 'default_scheme', 'http')
+    def test_default_scheme_is_ignored(self):
+        geocoder = LiveAddress(auth_id=self.dummy_id, auth_token=self.dummy_token)
+        self.assertEqual(geocoder.scheme, 'https')
+        geocoder = LiveAddress(auth_id=self.dummy_id, auth_token=self.dummy_token,
+                               scheme=None)
+        self.assertEqual(geocoder.scheme, 'https')
+
+
+@unittest.skipUnless(
+    env.get('LIVESTREETS_AUTH_ID') and env.get('LIVESTREETS_AUTH_TOKEN'),
     "No LIVESTREETS_AUTH_ID AND LIVESTREETS_AUTH_TOKEN env variables set"
 )
 class LiveAddressTestCase(GeocoderTestBase):
@@ -34,24 +54,7 @@ class LiveAddressTestCase(GeocoderTestBase):
         """
         LiveAddress.geocode
         """
-        try:
-            self.geocode_run(
-                {"query": "435 north michigan ave, chicago il 60611 usa"},
-                {"latitude": 41.890, "longitude": -87.624},
-            )
-        except GeocoderAuthenticationFailure:
-            raise unittest.SkipTest(
-                "Non-geopy/geopy branches fail on this in CI due to an "
-                "encrypted keys issue"  # TODO
-            )
-
-    def test_http_error(self):
-        """
-        LiveAddress() with scheme=http is a ConfigurationError
-        """
-        with self.assertRaises(ConfigurationError):
-            LiveAddress(
-                auth_id=env['LIVESTREETS_AUTH_ID'],
-                auth_token=env['LIVESTREETS_AUTH_TOKEN'],
-                scheme='http',
-            )
+        self.geocode_run(
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
+        )

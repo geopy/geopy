@@ -24,7 +24,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             auth_id,
             auth_token,
             candidates=1,
-            scheme=None,
+            scheme='https',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -87,7 +87,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        if self.scheme == "http":
+        if self.scheme != "https":
             raise ConfigurationError("LiveAddress now requires `https`.")
         self.auth_id = auth_id
         self.auth_token = auth_token
