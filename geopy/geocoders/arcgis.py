@@ -208,8 +208,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
-        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s".
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param bool exactly_one: Return one result, or a list?
 

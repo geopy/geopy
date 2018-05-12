@@ -199,8 +199,8 @@ class What3Words(Geocoder):
 
         :param query: The coordinates for which you wish to obtain the 3 word
             address.
-        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param str lang: two character language codes as supported by the
             API (http://what3words.com/api/reference/languages).

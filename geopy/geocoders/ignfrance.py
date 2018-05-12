@@ -254,8 +254,8 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
-        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param list reverse_geocode_preference: Enable to set expected results
             type. It can be StreetAddress or PositionOfInterest.

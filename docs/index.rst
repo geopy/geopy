@@ -97,36 +97,48 @@ Exceptions
 ~~~~~~~~~~
 
 .. autoclass:: geopy.exc.GeopyError
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.ConfigurationError
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderServiceError
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderQueryError
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderQuotaExceeded
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderAuthenticationFailure
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderInsufficientPrivileges
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderTimedOut
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderUnavailable
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderParseError
+    :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderNotFound
+    :show-inheritance:
 
 
 Logging
 ~~~~~~~
 
-geopy will log geocoding URLs with a logger name `geopy` at level `DEBUG`,
+geopy will log geocoding URLs with a logger name ``geopy`` at level `DEBUG`,
 and for some geocoders, these URLs will include authentication information.
-If this is a concern, one can disable this logging by specifying a logging
-level of `NOTSET` or a level greater than `DEBUG` for logger name `geopy`.
-geopy does no logging above DEBUG.
+Default logging level is `NOTSET`, which delegates the messages processing to
+the root logger. See docs for :meth:`logging.Logger.setLevel` for more
+information.
+geopy does no logging above `DEBUG`.
 
 
 Changelog

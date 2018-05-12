@@ -126,8 +126,8 @@ class Baidu(Geocoder):
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
-        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`

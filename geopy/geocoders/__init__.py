@@ -32,11 +32,11 @@ To find the address corresponding to a set of coordinates:
     >>> print(location.raw)
     {'place_id': '654513', 'osm_type': 'node', ...}
 
-Locators' ``geolocate`` and ``reverse`` methods require the argument ``query``,
+Locators' ``geocode`` and ``reverse`` methods require the argument ``query``,
 and also accept at least the argument ``exactly_one``, which is ``True`` by
 default.
 Geocoders may have additional attributes, e.g., Bing accepts ``user_location``,
-the effect of which is to bias results near that location. ``geolocate``
+the effect of which is to bias results near that location. ``geocode``
 and ``reverse`` methods  may return three types of values:
 
 - When there are no results found, returns ``None``.
@@ -47,14 +47,14 @@ and ``reverse`` methods  may return three types of values:
 
     ``(address<String>, (latitude<Float>, longitude<Float>))``
 
-  Or can be accessed as ``Location.address``, ``Location.latitude``,
-  ``Location.longitude``, ``Location.altitude``, and ``Location.raw``. The
+  Or can be accessed as ``location.address``, ``location.latitude``,
+  ``location.longitude``, ``location.altitude``, and ``location.raw``. The
   last contains the full geocoder's response for this result.
 
-- When ``exactly_one`` is False, and there is at least one result, returns a
+- When ``exactly_one`` is ``False``, and there is at least one result, returns a
   list of :class:`geopy.location.Location` objects, as above:
 
-    ``[Location, [...]]``
+    ``[location, [...]]``
 
 If a service is unavailable or otherwise returns a non-OK response, or doesn't
 receive a response in the allotted timeout, you will receive one of the
@@ -62,7 +62,7 @@ receive a response in the allotted timeout, you will receive one of the
 
 Every geocoder accepts an argument ``format_string`` that defaults to ``'%s'``
 where the input string to geocode is interpolated. For example, if you only
-need to geocode locations in Cleveland, Ohio, you could do::
+need to geocode locations in `Cleveland, Ohio`, you could do::
 
     >>> from geopy.geocoders import GoogleV3
     >>> geolocator = GoogleV3(format_string="%s, Cleveland OH")

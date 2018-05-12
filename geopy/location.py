@@ -13,8 +13,9 @@ def _location_tuple(location):
 class Location(object): # pylint: disable=R0903,R0921
     """
     Contains a parsed geocoder response. Can be iterated over as
-    (location<String>, (latitude<float>, longitude<Float)). Or one can access
-    the properties `address`, `latitude`, `longitude`, or `raw`. The last
+    ``(location<String>, (latitude<float>, longitude<Float))``.
+    Or one can access the properties ``address``, ``latitude``,
+    ``longitude``, or ``raw``. The last
     is a dictionary of the geocoder's response for this item.
     """
 

@@ -39,8 +39,8 @@ __all__ = (
 
 
 class options(object):
-    """The ``options`` object contains default configuration values for
-    geocoders, e.g. timeout and User-Agent.
+    """The `options` object contains default configuration values for
+    geocoders, e.g. `timeout` and `User-Agent`.
     Instead of passing a custom value to each geocoder individually, you can
     override a default value in this object.
 
@@ -52,10 +52,9 @@ class options(object):
     Example for overriding default ``timeout`` and ``user_agent``::
 
         >>> import geopy.geocoders
+        >>> from geopy.geocoders import Nominatim
         >>> geopy.geocoders.options.default_user_agent = 'my_app/1'
         >>> geopy.geocoders.options.default_timeout = 7
-        >>>
-        >>> from geopy.geocoders import Nominatim
         >>> geolocator = Nominatim()
         >>> print(geolocator.headers)
         {'User-Agent': 'my_app/1'}
@@ -63,20 +62,20 @@ class options(object):
         7
 
     Attributes:
-        ``default_format_string``
+        default_format_string
             String containing ``'%s'`` where the string to geocode should
-            be interpolated before querying the geocoder. Used by ``geocode``
+            be interpolated before querying the geocoder. Used by `geocode`
             calls only. For example: ``'%s, Mountain View, CA'``.
 
-        ``default_proxies``
+        default_proxies
             If specified, tunnel requests through the specified proxy.
             E.g., ``{"https": "192.0.2.0"}``. For more information, see
-            documentation on :class:`urllib2.ProxyHandler`.
+            documentation on :class:`urllib.request.ProxyHandler`.
 
-        ``default_scheme``
+        default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
 
-        ``default_ssl_context``
+        default_ssl_context
             An :class:`ssl.SSLContext` instance with custom TLS
             verification settings. Pass ``None`` to use the interpreter's
             defaults (starting from Python 2.7.9 and 3.4.3 that is to use
@@ -84,34 +83,34 @@ class options(object):
             support TLS verification completely).
 
             For older versions of Python (before 2.7.9 and 3.4.3) this
-            argument is ignored, as ``urlopen`` doesn't accept an ssl
+            argument is ignored, as `urlopen` doesn't accept an ssl
             context there, and a warning is issued.
-
-            To disable TLS certificate verification completely::
-
-                >>> import ssl
-                >>> import geopy.geocoders
-                >>> ctx = ssl.create_default_context()
-                >>> ctx.check_hostname = False
-                >>> ctx.verify_mode = ssl.CERT_NONE
-                >>> geopy.geocoders.options.default_ssl_context = ctx
 
             To use the CA bundle used by `requests` library::
 
-                >>> import ssl
-                >>> import certifi
-                >>> import geopy.geocoders
-                >>> ctx = ssl.create_default_context(cafile=certifi.where())
-                >>> geopy.geocoders.options.default_ssl_context = ctx
+                import ssl
+                import certifi
+                import geopy.geocoders
+                ctx = ssl.create_default_context(cafile=certifi.where())
+                geopy.geocoders.options.default_ssl_context = ctx
+
+            To disable TLS certificate verification completely::
+
+                import ssl
+                import geopy.geocoders
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                geopy.geocoders.options.default_ssl_context = ctx
 
             See docs for the :class:`ssl.SSLContext` class for more examples.
 
-        ``default_timeout``
+        default_timeout
             Time, in seconds, to wait for the geocoding service to respond
             before raising a :class:`geopy.exc.GeocoderTimedOut` exception.
-            Pass ``None`` to disable timeout.
+            Pass `None` to disable timeout.
 
-        ``default_user_agent``
+        default_user_agent
             User-Agent header to send with the requests to geocoder API.
     """
 

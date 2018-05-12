@@ -136,7 +136,7 @@ class Point(object):
         >>> p.altitude == p[2]
         True
 
-    When unpacking (or iterating), a (latitude, longitude, altitude) tuple is
+    When unpacking (or iterating), a ``(latitude, longitude, altitude)`` tuple is
     returned::
 
         >>> latitude, longitude, altitude = p
@@ -349,16 +349,16 @@ class Point(object):
             - ``ft`` (feet)
             - ``nm``, ``nmi`` (nautical miles)
 
-        Some example strings the will work include:
+        Some example strings that will work include:
 
-            - 41.5;-81.0
-            - 41.5,-81.0
-            - 41.5 -81.0
-            - 41.5 N -81.0 W
-            - -41.5 S;81.0 E
-            - 23 26m 22s N 23 27m 30s E
-            - 23 26' 22" N 23 27' 30" E
-            - UT: N 39°20' 0'' / W 74°35' 0''
+            - ``41.5;-81.0``
+            - ``41.5,-81.0``
+            - ``41.5 -81.0``
+            - ``41.5 N -81.0 W``
+            - ``-41.5 S;81.0 E``
+            - ``23 26m 22s N 23 27m 30s E``
+            - ``23 26' 22" N 23 27' 30" E``
+            - ``UT: N 39°20' 0'' / W 74°35' 0''``
 
         """
         match = re.match(cls.POINT_PATTERN, re.sub(r"''", r'"', string))

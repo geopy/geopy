@@ -5,7 +5,7 @@ Geopy can calculate geodesic distance between two points using the
 `great-circle distance
 <https://en.wikipedia.org/wiki/Great-circle_distance>`_,
 with a default of the geodesic distance available as the function
-`geopy.distance.distance`.
+``geopy.distance.distance``.
 
 Great-circle distance (:class:`.great_circle`) uses a spherical model of
 the earth, using the mean earth radius as defined by the International
@@ -26,13 +26,13 @@ this is accurate to round-off and always converges.  An older
 and the distance calculation fails to converge for nearly antipodal
 points.
 
-`geopy.distance.distance` uses :class:`.geodesic`.
+``geopy.distance.distance`` currently uses :class:`.geodesic`.
 
 There are multiple popular ellipsoidal models,
 and which one will be the most accurate depends on where your points are
 located on the earth.  The default is the WGS-84 ellipsoid, which is the
 most globally accurate.  geopy includes a few other models in the
-distance.ELLIPSOIDS dictionary::
+:const:`distance.ELLIPSOIDS` dictionary::
 
                   model             major (km)   minor (km)     flattening
     ELLIPSOIDS = {'WGS-84':        (6378.137,    6356.7523142,  1 / 298.257223563),
@@ -43,7 +43,7 @@ distance.ELLIPSOIDS dictionary::
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
                   }
 
-Here are examples of distance.distance::
+Here are examples of ``distance.distance`` usage::
 
     >>> from geopy import distance
     >>> newport_ri = (41.49008, -71.312796)
@@ -56,9 +56,9 @@ Here are examples of distance.distance::
     >>> print(distance.distance(wellington, salamanca).km)
     19959.6792674
 
-The second example above fails with `distance.vincenty`.
+The second example above fails with :class:`.vincenty`.
 
-Using great-circle distance::
+Using :class:`.great_circle` distance::
 
     >>> print(distance.great_circle(newport_ri, cleveland_oh).miles)
     536.997990696
@@ -66,13 +66,13 @@ Using great-circle distance::
 You can change the ellipsoid model used by the geodesic formulas like so::
 
     >>> ne, cl = newport_ri, cleveland_oh
-    >>> print(distance.distance(ne, cl, ellipsoid='GRS-80').miles)
+    >>> print(distance.geodesic(ne, cl, ellipsoid='GRS-80').miles)
 
 The above model name will automatically be retrieved from the
-ELLIPSOIDS dictionary. Alternatively, you can specify the model values
-directly::
+:const:`distance.ELLIPSOIDS` dictionary. Alternatively, you can specify
+the model values directly::
 
-    >>> distance.distance(ne, cl, ellipsoid=(6377., 6356., 1 / 297.)).miles
+    >>> distance.geodesic(ne, cl, ellipsoid=(6377., 6356., 1 / 297.)).miles
 
 Distances support simple arithmetic, making it easy to do things like
 calculate the length of a path::
@@ -121,11 +121,12 @@ ELLIPSOIDS = {
 
 def lonlat(x, y, z=0):
     """
-    `geopy.distance.distance` accepts coordinates in ``(y, x)/(lat, lon)``
-    order, while some other libraries/systems might use ``(x, y)/(lon, lat)``.
+    ``geopy.distance.distance`` accepts coordinates in ``(y, x)``/``(lat, lon)``
+    order, while some other libraries and systems might use
+    ``(x, y)``/``(lon, lat)``.
 
     This function provides a convenient way to convert coordinates of the
-    ``(x, y)/(lon, lat)`` format to a :class:`geopy.point.Point` instance.
+    ``(x, y)``/``(lon, lat)`` format to a :class:`geopy.point.Point` instance.
 
     Example::
 
@@ -278,7 +279,7 @@ class great_circle(Distance):
     Use spherical geometry to calculate the surface distance between two
     points.
 
-    Set which radius of the earth to use by specifying a 'radius' keyword
+    Set which radius of the earth to use by specifying a ``radius`` keyword
     argument. It must be in kilometers. The default is to use the module
     constant `EARTH_RADIUS`, which uses the average great-circle radius.
 
