@@ -30,9 +30,6 @@ class What3WordsTestCase(GeocoderTestBase):
         cls.delta = 0.7
 
     def test_geocode(self):
-        """
-        What3Words.geocode - '3 Words' and 'OneWord'
-        """
         self.geocode_run(
             {"query": u("piped.gains.jangle")},
             {"latitude": 53.037611, "longitude": 11.565012},
@@ -84,9 +81,6 @@ class What3WordsTestCase(GeocoderTestBase):
         )
 
     def test_check_query(self):
-        """
-        What3Wors.check_query - 'OneWord' and '3 Words' regex
-        """
         result_check_oneword_query = self.geocoder._check_query("*LibertyTech")
         result_check_threeword_query = self.geocoder._check_query(
             u(

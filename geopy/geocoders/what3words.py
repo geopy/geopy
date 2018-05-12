@@ -35,8 +35,7 @@ class What3Words(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a What3Words geocoder with 3-word or OneWord-address and
-        What3Words API key.
+        Initialize a What3Words geocoder.
 
             .. versionadded:: 1.5.0
 
@@ -95,9 +94,9 @@ class What3Words(Geocoder):
                 timeout=DEFAULT_SENTINEL):
 
         """
-        Geocode a "3 words" or "OneWord" query.
+        Geocode a "3 words" query.
 
-        :param str query: The 3-word or OneWord-address you wish to geocode.
+        :param str query: The 3-word address you wish to geocode.
 
         :param str lang: two character language codes as supported by
             the API (http://what3words.com/api/reference/languages).
@@ -160,6 +159,8 @@ class What3Words(Geocoder):
 
                 return Location(words, (latitude, longitude), resource)
             elif resource['type'] == 'OneWord':
+                # TODO this branch probably needs to be removed, as OneWord
+                # addresses have been canceled.
                 words = resource['words']
                 words = join_filter(".", [words[0], words[1], words[2]])
                 oneword = resource['oneword']
