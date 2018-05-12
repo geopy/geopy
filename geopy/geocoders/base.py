@@ -251,9 +251,11 @@ class Geocoder(object):
         if timeout is None:
             warnings.warn(
                 ('`timeout=None` has been passed to a geocoder call. Using '
-                 'default geocoder timeout. In future versions of geopy the '
+                 'default geocoder timeout. In geopy 2.0 the '
                  'behavior will be different: None will mean "no timeout" '
-                 'instead of "default geocoder timeout".'), DeprecationWarning)
+                 'instead of "default geocoder timeout". Pass '
+                 'geopy.geocoders.base.DEFAULT_SENTINEL instead of None '
+                 'to get rid of this warning.'), DeprecationWarning)
             timeout = DEFAULT_SENTINEL
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
