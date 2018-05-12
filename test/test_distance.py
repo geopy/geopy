@@ -6,7 +6,6 @@ import unittest
 import warnings
 from mock import patch
 
-from geopy import distance as geopy_distance
 from geopy.point import Point
 from geopy.distance import (Distance,
                             GreatCircleDistance,
@@ -335,12 +334,6 @@ class TestWhenComputingVincentyDistance(CommonDistanceCases,
                                            math.pi * distance.ELLIPSOID[0])
         self.assertAlmostEqual(destination.latitude, 0, 8)
         self.assertAlmostEqual(abs(destination.longitude), 180, 8)
-
-    def test_should_compute_same_destination_as_other_libraries(self):
-        distance = self.cls(54.972271)
-        destination = distance.destination((-37.95103, 144.42487), 306.86816)
-        self.assertAlmostEqual(destination.latitude, -37.6528177174, 10)
-        self.assertAlmostEqual(destination.longitude, 143.9264976682, 10)
 
     def test_should_compute_same_destination_as_other_libraries(self):
         distance = self.cls(54.972271)
