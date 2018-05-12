@@ -1,5 +1,5 @@
-
 import unittest
+import warnings
 
 from geopy import exc
 from geopy.compat import u
@@ -94,10 +94,22 @@ class ArcGISTestCase(GeocoderTestBase):
         """
         ArcGIS.reverse using point
         """
-        self.reverse_run(
+        location = self.reverse_run(
             {"query": Point(40.753898, -73.985071)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
+        self.assertIn('New York', location.address)
+
+    def test_custom_wkid(self):
+        with warnings.catch_warnings(record=True) as w:
+            # Custom wkid should be ignored and a warning should be issued.
+            location = self.reverse_run(
+                {"query": Point(40.753898, -73.985071), "wkid": 2000},
+                {"latitude": 40.75376406311989,
+                 "longitude": -73.98489005863667},
+            )
+            self.assertIn('New York', location.address)
+            self.assertEqual(1, len(w))
 
 
 @unittest.skipUnless(  # pylint: disable=R0904,C0111

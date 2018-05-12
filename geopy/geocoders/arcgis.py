@@ -3,6 +3,7 @@
 """
 
 import json
+import warnings
 from time import time
 
 from geopy.compat import Request, string_compare, urlencode
@@ -223,13 +224,29 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             specified.
 
         :param str wkid: WKID to use for both input and output coordinates.
+
+            .. deprecated:: 1.14.0
+               It wasn't working before because it was specified incorrectly
+               in the request parameters, and won't work even if we fix the
+               request, because :class:`geopy.point.Point` normalizes the
+               coordinates according to WKID 4326. Please open an issue in
+               the geopy issue tracker if you believe that custom wkid values
+               should be supported.
         """
         # ArcGIS is lon,lat; maintain lat,lon convention of geopy
         point = self._coerce_point_to_string(query).split(",")
         if wkid != DEFAULT_WKID:
-            location = {"x": point[1], "y": point[0], "spatialReference": wkid}
-        else:
-            location = ",".join((point[1], point[0]))
+            warnings.warn("%s.reverse: custom wkid value has been ignored.  "
+                          "It wasn't working before because it was specified "
+                          "incorrectly in the request parameters, and won't "
+                          "work even if we fix the request, because geopy.Point "
+                          "normalizes the coordinates according to WKID %s. "
+                          "Please open an issue in the geopy issue tracker "
+                          "if you believe that custom wkid values should be "
+                          "supported." % (type(self).__name__, DEFAULT_WKID),
+                          DeprecationWarning)
+            wkid = DEFAULT_WKID
+        location = ",".join((point[1], point[0]))
         params = {'location': location, 'f': 'json', 'outSR': wkid}
         if distance is not None:
             params['distance'] = distance
