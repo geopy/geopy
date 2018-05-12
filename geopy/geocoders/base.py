@@ -234,8 +234,15 @@ class Geocoder(object):
         """
 
         if requester:
-            req = url  # Don't construct an urllib's Request for a custom requester
+            req = url  # Don't construct an urllib's Request for a custom requester.
+
+            # `requester` might be anything which can issue an HTTP request.
+            # Assume that `requester` is a method of the `requests` library.
+            # Requests, however, doesn't accept SSL context in its HTTP
+            # request methods. A custom HTTP adapter has to be created for that.
+            # So the current usage is not directly compatible with `requests`.
             requester = functools.partial(requester, context=self.ssl_context,
+                                          proxies=self.proxies,
                                           headers=self.headers)
         else:
             if isinstance(url, Request):
