@@ -102,6 +102,7 @@ class ArcGISTestCase(GeocoderTestBase):
 
     def test_custom_wkid(self):
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
             # Custom wkid should be ignored and a warning should be issued.
             location = self.reverse_run(
                 {"query": Point(40.753898, -73.985071), "wkid": 2000},
