@@ -344,9 +344,8 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         )
 
     def addSimpleHTTPAuthHeader(self):
-        """
-        Create Urllib request object embedding HTTP simple authentication
-        """
+        # TODO make this a private API
+        # Create Urllib request object embedding HTTP simple authentication
         sub_request = """
         <GeocodeRequest returnFreeForm="{is_freeform}">
             <Address countryCode="{query_type}">

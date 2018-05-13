@@ -116,9 +116,8 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
 
     @classmethod
     def parse_resource(cls, resource):
-        """
-        Return location and coordinates tuple from dict.
-        """
+        # TODO make this a private API
+        # Return location and coordinates tuple from dict.
         location = resource['display_name']
 
         latitude = resource['lat'] or None

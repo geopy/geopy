@@ -172,9 +172,8 @@ class Mapzen(Geocoder):
 
     @staticmethod
     def parse_code(feature):
-        """
-        Parse each resource.
-        """
+        # TODO make this a private API
+        # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
         placename = feature.get('properties', {}).get('name')

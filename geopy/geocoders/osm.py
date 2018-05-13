@@ -296,9 +296,8 @@ class Nominatim(Geocoder):
 
     @staticmethod
     def parse_code(place):
-        """
-        Parse each resource.
-        """
+        # TODO make this a private API
+        # Parse each resource.
         latitude = place.get('lat', None)
         longitude = place.get('lon', None)
         placename = place.get('display_name', None)

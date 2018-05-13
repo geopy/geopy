@@ -142,9 +142,8 @@ class GeocodeFarm(Geocoder):
 
     @staticmethod
     def parse_code(results):
-        """
-        Parse each resource.
-        """
+        # TODO make this a private API
+        # Parse each resource.
         places = []
         for result in results.get('RESULTS'):
             coordinates = result.get('COORDINATES', {})

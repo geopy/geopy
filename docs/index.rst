@@ -17,55 +17,91 @@ Geocoders
 .. autofunction:: geopy.geocoders.get_geocoder_for_service
 
 .. autoclass:: geopy.geocoders.ArcGIS
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Baidu
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Bing
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.DataBC
-    :members: __init__, geocode
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.GeocodeFarm
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.GeoNames
-    :members: __init__, geocode
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.GoogleV3
-    :members: __init__, geocode, reverse, timezone
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.IGNFrance
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Mapzen
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.OpenCage
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.OpenMapQuest
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Nominatim
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Photon
-    :members: __init__, geocode
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.PickPoint
-    :members: __init__, geocode, reverse
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.LiveAddress
-    :members: __init__, geocode
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.What3Words
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Yandex
-    :members: __init__, geocode, reverse
+   :members:
+
+   .. automethod:: __init__
 
 Calculating Distance
 ~~~~~~~~~~~~~~~~~~~~

@@ -214,9 +214,8 @@ class Photon(Geocoder):  # pylint: disable=W0223
 
     @classmethod
     def parse_resource(cls, resource):
-        """
-        Return location and coordinates tuple from dict.
-        """
+        # TODO make this a private API
+        # Return location and coordinates tuple from dict.
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',
                          'state', 'country']
