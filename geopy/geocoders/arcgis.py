@@ -262,16 +262,28 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
                 return self.reverse(query, exactly_one=exactly_one,
                                     timeout=timeout, distance=distance,
                                     wkid=wkid)
+            # https://developers.arcgis.com/rest/geocode/api-reference/geocoding-service-output.htm
+            if response['error']['code'] == 400:
+                # 'details': ['Unable to find address for the specified location.']}
+                try:
+                    if 'Unable to find' in response['error']['details'][0]:
+                        return None
+                except (KeyError, IndexError):
+                    pass
             raise GeocoderServiceError(str(response['error']))
         address = (
             "%(Address)s, %(City)s, %(Region)s %(Postal)s,"
             " %(CountryCode)s" % response['address']
         )
-        return Location(
+        location = Location(
             address,
             (response['location']['y'], response['location']['x']),
             response['address']
         )
+        if exactly_one:
+            return location
+        else:
+            return [location]
 
     def _refresh_authentication_token(self):
         """

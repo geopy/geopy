@@ -100,6 +100,20 @@ class ArcGISTestCase(GeocoderTestBase):
         )
         self.assertIn('New York', location.address)
 
+    def test_reverse_not_exactly_one(self):
+        self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "exactly_one": False},
+            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        )
+
+    def test_reverse_no_result(self):
+        self.reverse_run(
+            # North Atlantic Ocean
+            {"query": (35.173809, -37.485351)},
+            {},
+            expect_failure=True
+        )
+
     def test_custom_wkid(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
