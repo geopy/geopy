@@ -12,8 +12,9 @@ __all__ = ("Nominatim", )
 
 
 class Nominatim(Geocoder):
-    """
-    Nominatim geocoder for OpenStreetMap servers. Documentation at:
+    """Nominatim geocoder for OpenStreetMap servers.
+
+    Documentation at:
         https://wiki.openstreetmap.org/wiki/Nominatim
 
     .. attention::
@@ -62,8 +63,8 @@ class Nominatim(Geocoder):
             See :attr:`geopy.geocoders.options.default_proxies`.
 
         :param str domain: Should be the localized Openstreetmap domain to
-            connect to. The default is 'nominatim.openstreetmap.org', but you
-            can change it to a domain of your own.
+            connect to. The default is ``'nominatim.openstreetmap.org'``,
+            but you can change it to a domain of your own.
 
             .. versionadded:: 1.8.2
 
@@ -125,16 +126,16 @@ class Nominatim(Geocoder):
             geometry=None
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
-        :param query: The address, query or structured query to geocode
+        :param query: The address, query or a structured query
             you wish to geocode.
 
             .. versionchanged:: 1.0.0
                 For a structured query, provide a dictionary whose keys
                 are one of: `street`, `city`, `county`, `state`, `country`, or
                 `postalcode`. For more information, see Nominatim's
-                documentation for "structured requests":
+                documentation for `structured requests`:
 
                     https://wiki.openstreetmap.org/wiki/Nominatim
 
@@ -171,6 +172,9 @@ class Nominatim(Geocoder):
             object.
 
             .. versionadded:: 1.3.0
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
 
@@ -241,7 +245,7 @@ class Nominatim(Geocoder):
             addressdetails=True
     ):
         """
-        Returns a reverse geocoded location.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -268,6 +272,9 @@ class Nominatim(Geocoder):
             such as city, county, state, etc. in *Location.raw*
 
             .. versionadded:: 1.14.0
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         try:

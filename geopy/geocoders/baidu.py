@@ -16,9 +16,12 @@ __all__ = ("Baidu", )
 
 
 class Baidu(Geocoder):
-    """
-    Geocoder using the Baidu Maps v2 API. Documentation at:
-        http://developer.baidu.com/map/webservice-geocoding.htm
+    """Geocoder using the Baidu Maps v2 API.
+
+    Documentation at:
+        http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
+
+    .. versionadded:: 1.0.0
     """
 
     def __init__(
@@ -32,9 +35,6 @@ class Baidu(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a customized Baidu geocoder using the v2 API.
-
-        .. versionadded:: 1.0.0
 
         :param str api_key: The API key required by Baidu Map to perform
             geocoding requests. API keys are managed through the Baidu APIs
@@ -95,7 +95,7 @@ class Baidu(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -106,6 +106,9 @@ class Baidu(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         params = {
@@ -122,7 +125,7 @@ class Baidu(Geocoder):
 
     def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -138,6 +141,9 @@ class Baidu(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         params = {

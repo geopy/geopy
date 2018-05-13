@@ -10,8 +10,9 @@ __all__ = ("PickPoint",)
 
 
 class PickPoint(Nominatim):
-    """
-    PickPoint geocoder is a commercial version of Nominatim. Documentation at:
+    """PickPoint geocoder is a commercial version of Nominatim.
+
+    Documentation at:
        https://pickpoint.io/api-reference
 
     .. versionadded:: 1.13.0
@@ -50,7 +51,7 @@ class PickPoint(Nominatim):
             See :attr:`geopy.geocoders.options.default_proxies`.
 
         :param str domain: Should be the localized Openstreetmap domain to
-            connect to. The default is 'api.pickpoint.io', but you
+            connect to. The default is ``'api.pickpoint.io'``, but you
             can change it to a domain of your own.
 
         :param str scheme:

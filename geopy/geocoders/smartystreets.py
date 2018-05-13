@@ -12,11 +12,10 @@ __all__ = ("LiveAddress", )
 
 
 class LiveAddress(Geocoder):  # pylint: disable=W0223
-    """
-    Initialize a customized LiveAddress geocoder provided by SmartyStreets.
+    """Geocoder using the LiveAddress API provided by SmartyStreets.
 
-    More information regarding the LiveAddress API can be found here:
-        https://smartystreets.com/products/liveaddress-api
+    Documentation at:
+        https://smartystreets.com/docs/cloud/us-street-api
     """
 
     def __init__(
@@ -32,7 +31,6 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a customized SmartyStreets LiveAddress geocoder.
 
         :param str auth_id: Valid `Auth ID` from SmartyStreets.
 
@@ -99,7 +97,7 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -110,6 +108,9 @@ class LiveAddress(Geocoder):  # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         url = self._compose_url(self.format_string % query)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

@@ -12,8 +12,9 @@ __all__ = ("DataBC", )
 
 
 class DataBC(Geocoder):
-    """
-    Geocoder using the Physical Address Geocoder from DataBC. Documentation at:
+    """Geocoder using the Physical Address Geocoder from DataBC.
+
+    Documentation at:
         http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.page
     """
 
@@ -27,7 +28,6 @@ class DataBC(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Create a DataBC-based geocoder.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -74,7 +74,7 @@ class DataBC(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -96,6 +96,9 @@ class DataBC(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {'addressString': self.format_string % query}
         if set_back != 0:

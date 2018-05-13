@@ -15,9 +15,10 @@ __all__ = ("IGNFrance", )
 
 
 class IGNFrance(Geocoder):   # pylint: disable=W0223
-    """
-    Geocoder using the IGN France GeoCoder OpenLS API. Documentation at:
-        http://api.ign.fr/tech-docs-js/fr/developpeur/search.html
+    """Geocoder using the IGN France GeoCoder OpenLS API.
+
+    Documentation at:
+        https://geoservices.ign.fr/documentation/geoservices/index.html
     """
 
     xml_request = """<?xml version="1.0" encoding="UTF-8"?>
@@ -51,11 +52,11 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a customized IGN France geocoder.
 
         :param str api_key: The API key required by IGN France API
             to perform geocoding requests. You can get your key here:
-            http://api.ign.fr. Mandatory. For authentication with referer
+            https://geoservices.ign.fr/documentation/services-acces.html.
+            Mandatory. For authentication with referer
             and with username/password, the api key always differ.
 
         :param str username: When making a call need HTTP simple
@@ -67,9 +68,9 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
         :param str referer: When making a call need HTTP referer.
             Mandatory if no password and username
 
-        :param str domain: Currently it is 'wxs.ign.fr', can
+        :param str domain: Currently it is ``'wxs.ign.fr'``, can
             be changed for testing purposes for developer API
-            e.g gpp3-wxs.ign.fr at the moment.
+            e.g ``'gpp3-wxs.ign.fr'`` at the moment.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -147,13 +148,13 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The query string to be geocoded.
 
         :param str query_type: The type to provide for geocoding. It can be
-            PositionOfInterest, StreetAddress or CadastralParcel.
-            StreetAddress is the default choice if none provided.
+            `PositionOfInterest`, `StreetAddress` or `CadastralParcel`.
+            `StreetAddress` is the default choice if none provided.
 
         :param int maximum_responses: The maximum number of responses
             to ask to the API in the query body.
@@ -173,6 +174,9 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
 
@@ -250,7 +254,7 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -258,8 +262,8 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param list reverse_geocode_preference: Enable to set expected results
-            type. It can be StreetAddress or PositionOfInterest.
-            Default is set to StreetAddress
+            type. It can be `StreetAddress` or `PositionOfInterest`.
+            Default is set to `StreetAddress`.
 
         :param int maximum_responses: The maximum number of responses
             to ask to the API in the query body.
@@ -281,6 +285,9 @@ class IGNFrance(Geocoder):   # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         if exactly_one is DEFAULT_SENTINEL:

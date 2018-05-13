@@ -12,8 +12,9 @@ __all__ = ("OpenMapQuest", )
 
 
 class OpenMapQuest(Geocoder): # pylint: disable=W0223
-    """
-    Geocoder using MapQuest Open Platform Web Services. Documentation at:
+    """Geocoder using MapQuest Open Platform Web Services.
+
+    Documentation at:
         https://developer.mapquest.com/documentation/open/
     """
 
@@ -28,8 +29,6 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize an Open MapQuest geocoder with location-specific
-        address information.
 
         :param str api_key: API key provided by MapQuest, required.
 
@@ -76,7 +75,7 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -87,6 +86,9 @@ class OpenMapQuest(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {
             'key': self.api_key,

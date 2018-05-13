@@ -22,8 +22,9 @@ DEFAULT_WKID = 4326
 
 
 class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
-    """
-    Geocoder using the ERSI ArcGIS API. Documentation at:
+    """Geocoder using the ERSI ArcGIS API.
+
+    Documentation at:
         https://developers.arcgis.com/rest/geocode/api-reference/overview-world-geocoding-service.htm
     """
 
@@ -45,7 +46,6 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Create a ArcGIS-based geocoder.
 
         :param str username: ArcGIS username. Required if authenticated
             mode is desired.
@@ -54,8 +54,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             mode is desired.
 
         :param str referer: Required if authenticated mode is desired.
-            'Referer' HTTP header to send with each request,
-            e.g., 'http://www.example.com'. This is tied to an issued token,
+            `Referer` HTTP header to send with each request,
+            e.g., ``'http://www.example.com'``. This is tied to an issued token,
             so fielding queries for multiple referrers should be handled by
             having multiple ArcGIS geocoder instances.
 
@@ -114,7 +114,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
         self.referer = referer
 
         self.token = None
-        self.token_lifetime = token_lifetime * 60 # store in seconds
+        self.token_lifetime = token_lifetime * 60  # store in seconds
         self.token_expiry = None
         self.retry = 1
 
@@ -142,7 +142,7 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 out_fields=None):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -164,6 +164,8 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
             .. versionadded:: 1.14.0
         :type out_fields: str or iterable
 
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {'singleLine': self.format_string % query, 'f': 'json'}
         if exactly_one:
@@ -205,14 +207,15 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
     def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 distance=None, wkid=DEFAULT_WKID):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
-        :param bool exactly_one: Return one result, or a list?
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -232,6 +235,9 @@ class ArcGIS(Geocoder):  # pylint: disable=R0921,R0902,W0223
                coordinates according to WKID 4326. Please open an issue in
                the geopy issue tracker if you believe that custom wkid values
                should be supported.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         # ArcGIS is lon,lat; maintain lat,lon convention of geopy
         point = self._coerce_point_to_string(query).split(",")

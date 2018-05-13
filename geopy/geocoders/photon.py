@@ -11,10 +11,14 @@ __all__ = ("Photon", )
 
 
 class Photon(Geocoder):  # pylint: disable=W0223
-    """
-    Geocoder using Photon geocoding service (data based on OpenStreetMap and
-    service provided by Komoot on https://photon.komoot.de).
-    Documentation at https://github.com/komoot/photon
+    """Geocoder using Photon geocoding service (data based on OpenStreetMap
+    and service provided by Komoot on https://photon.komoot.de).
+
+    Documentation at:
+        https://github.com/komoot/photon
+
+    Photon/Komoot geocoder aims to let you `search as you type with
+    OpenStreetMap`. No API Key is needed by this platform.
     """
 
     def __init__(
@@ -28,8 +32,6 @@ class Photon(Geocoder):  # pylint: disable=W0223
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a Photon/Komoot geocoder which aims to let you "search as
-        you type with OpenStreetMap". No API Key is needed by this platform.
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -44,7 +46,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             See :attr:`geopy.geocoders.options.default_proxies`.
 
         :param str domain: Should be the localized Photon domain to
-            connect to. The default is 'photon.komoot.de', but you
+            connect to. The default is ``'photon.komoot.de'``, but you
             can change it to a domain of your own.
 
         :param str user_agent:
@@ -81,7 +83,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             osm_tag=None
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -94,8 +96,6 @@ class Photon(Geocoder):  # pylint: disable=W0223
             only, the value set during the geocoder's initialization.
 
         :param location_bias: The coordinates to used as location bias.
-        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param str language: Preferred language in which to return results.
 
@@ -105,9 +105,12 @@ class Photon(Geocoder):  # pylint: disable=W0223
             .. versionadded:: 1.12.0
 
         :param osm_tag: The expression to filter (include/exclude) by key and/
-            or value, str as 'key:value' or list/set of str if multiple filters
-            are required as ['key:!val', '!key', ':!value'].
+            or value, str as ``'key:value'`` or list/set of str if multiple
+            filters are required as ``['key:!val', '!key', ':!value']``.
         :type osm_tag: str or list or set
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         params = {
@@ -155,7 +158,7 @@ class Photon(Geocoder):  # pylint: disable=W0223
             limit=None,
     ):
         """
-        Returns a reverse geocoded location.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -176,6 +179,9 @@ class Photon(Geocoder):  # pylint: disable=W0223
             limit.
 
             .. versionadded:: 1.12.0
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         try:

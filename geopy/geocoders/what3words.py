@@ -14,9 +14,12 @@ __all__ = ("What3Words", )
 
 
 class What3Words(Geocoder):
-    """
-    What3Words geocoder, documentation at:
-        http://what3words.com/api/reference
+    """What3Words geocoder.
+
+    Documentation at:
+        https://what3words.com/api/reference
+
+    .. versionadded:: 1.5.0
     """
 
     word_re = re.compile(r"^\*{1,1}[^\W\d\_]+$", re.U)
@@ -35,11 +38,9 @@ class What3Words(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a What3Words geocoder.
 
-            .. versionadded:: 1.5.0
-
-        :param str api_key: Key provided by What3Words.
+        :param str api_key: Key provided by What3Words
+            (https://accounts.what3words.com/register).
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -101,7 +102,7 @@ class What3Words(Geocoder):
         :param str query: The 3-word address you wish to geocode.
 
         :param str lang: two character language codes as supported by
-            the API (http://what3words.com/api/reference/languages).
+            the API (https://docs.what3words.com/api/v2/#lang).
 
         :param bool exactly_one: Return one result or a list of results, if
             available. Due to the address scheme there is always exactly one
@@ -116,6 +117,9 @@ class What3Words(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
 
         if not self._check_query(query):
@@ -216,7 +220,7 @@ class What3Words(Geocoder):
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param str lang: two character language codes as supported by the
-            API (http://what3words.com/api/reference/languages).
+            API (https://docs.what3words.com/api/v2/#lang).
 
         :param bool exactly_one: Return one result or a list of results, if
             available. Due to the address scheme there is always exactly one
@@ -231,6 +235,9 @@ class What3Words(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         lang = lang.lower()

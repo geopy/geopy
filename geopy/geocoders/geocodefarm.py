@@ -16,8 +16,9 @@ __all__ = ("GeocodeFarm", )
 
 
 class GeocodeFarm(Geocoder):
-    """
-    Geocoder using the GeocodeFarm API. Documentation at:
+    """Geocoder using the GeocodeFarm API.
+
+    Documentation at:
         https://www.geocode.farm/geocoding/free-api-documentation/
     """
 
@@ -32,7 +33,6 @@ class GeocodeFarm(Geocoder):
             scheme=None,
     ):
         """
-        Create a geocoder for GeocodeFarm.
 
         :param str api_key: (optional) The API key required by GeocodeFarm
             to perform geocoding requests.
@@ -80,7 +80,7 @@ class GeocodeFarm(Geocoder):
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -91,6 +91,9 @@ class GeocodeFarm(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {
             'addr': self.format_string % query,
@@ -105,7 +108,7 @@ class GeocodeFarm(Geocoder):
 
     def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Returns a reverse geocoded location.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -120,6 +123,9 @@ class GeocodeFarm(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         try:
             lat, lon = [

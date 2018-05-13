@@ -17,12 +17,13 @@ __all__ = ("GeoNames", )
 
 
 class GeoNames(Geocoder): # pylint: disable=W0223
-    """
-    GeoNames geocoder, documentation at:
+    """GeoNames geocoder.
+
+    Documentation at:
         http://www.geonames.org/export/geonames-search.html
 
     Reverse geocoding documentation at:
-        http://www.geonames.org/maps/us-reverse-geocoder.html
+        http://www.geonames.org/export/web-services.html#findNearbyPlaceName
     """
 
     def __init__(
@@ -86,7 +87,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -97,6 +98,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {
             'q': self.format_string % query,
@@ -120,7 +124,7 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
             .. versionadded:: 1.2.0
 
@@ -142,6 +146,9 @@ class GeoNames(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         if exactly_one is DEFAULT_SENTINEL:

@@ -11,8 +11,9 @@ __all__ = ("Mapzen", )
 
 
 class Mapzen(Geocoder):
-    """
-    Mapzen Search geocoder. Documentation at:
+    """Mapzen Search geocoder.
+
+    Documentation at:
         https://mapzen.com/documentation/search/
 
     .. warning::
@@ -90,7 +91,7 @@ class Mapzen(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address, query or structured query to geocode
             you wish to geocode.
@@ -102,6 +103,9 @@ class Mapzen(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {'text': self.format_string % query}
 
@@ -132,7 +136,7 @@ class Mapzen(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Returns a reverse geocoded location.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -146,6 +150,9 @@ class Mapzen(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         try:
             lat, lon = [

@@ -13,9 +13,12 @@ __all__ = ("Yandex", )
 
 
 class Yandex(Geocoder): # pylint: disable=W0223
-    """
-    Yandex geocoder, documentation at:
-        http://api.yandex.com/maps/doc/geocoder/desc/concepts/input_params.xml
+    """Yandex geocoder.
+
+    Documentation at:
+        https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
+
+    .. versionadded:: 1.5.0
     """
 
     def __init__(
@@ -30,18 +33,16 @@ class Yandex(Geocoder): # pylint: disable=W0223
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Create a Yandex-based geocoder.
 
-            .. versionadded:: 1.5.0
-
-            .. versionchanged:: 1.14.0
-               Default scheme has been changed from ``http`` to ``https``.
+        .. versionchanged:: 1.14.0
+           Default scheme has been changed from ``http`` to ``https``.
 
         :param str api_key: Yandex API key (not obligatory)
             http://api.yandex.ru/maps/form.xml
 
         :param str lang: response locale, the following locales are
-            supported: "ru_RU" (default), "uk_UA", "be_BY", "en_US", "tr_TR"
+            supported: ``"ru_RU"`` (default), ``"uk_UA"``, ``"be_BY"``,
+            ``"en_US"``, ``"tr_TR"``.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -84,7 +85,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -95,6 +96,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {
             'geocode': self.format_string % query,
@@ -121,7 +125,7 @@ class Yandex(Geocoder): # pylint: disable=W0223
             kind=None,
     ):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -146,6 +150,9 @@ class Yandex(Geocoder): # pylint: disable=W0223
             `district`, `locality`.
 
             .. versionadded:: 1.14.0
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         if exactly_one is DEFAULT_SENTINEL:
             warnings.warn('%s.reverse: default value for `exactly_one` '

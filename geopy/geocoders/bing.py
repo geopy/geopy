@@ -18,8 +18,9 @@ __all__ = ("Bing", )
 
 
 class Bing(Geocoder):
-    """
-    Geocoder using the Bing Maps Locations API. Documentation at:
+    """Geocoder using the Bing Maps Locations API.
+
+    Documentation at:
         https://msdn.microsoft.com/en-us/library/ff701715.aspx
     """
 
@@ -41,10 +42,10 @@ class Bing(Geocoder):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
-        """Initialize a customized Bing geocoder with location-specific
-        address information and your Bing Maps API key.
+        """
 
-        :param str api_key: Should be a valid Bing Maps API key.
+        :param str api_key: Should be a valid Bing Maps API key
+            (https://www.microsoft.com/en-us/maps/create-a-bing-maps-key).
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -91,7 +92,7 @@ class Bing(Geocoder):
             include_country_code=False
     ):
         """
-        Geocode an address.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
@@ -126,6 +127,9 @@ class Bing(Geocoder):
             'countryRegionIso2').
 
             .. versionadded:: 1.4.0
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         if isinstance(query, dict):
             params = {
@@ -169,14 +173,15 @@ class Bing(Geocoder):
             include_country_code=False
     ):
         """
-        Reverse geocode a point.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
-        :param bool exactly_one: Return one result, or a list?
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -189,6 +194,9 @@ class Bing(Geocoder):
         :param bool include_country_code: Sets whether to include the
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         point = self._coerce_point_to_string(query)
         params = {'key': self.api_key}

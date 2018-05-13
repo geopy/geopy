@@ -13,11 +13,12 @@ __all__ = ("OpenCage", )
 
 
 class OpenCage(Geocoder):
-    """
-    Geocoder using the OpenCageData API. Documentation at:
+    """Geocoder using the OpenCageData API.
+
+    Documentation at:
         https://geocoder.opencagedata.com/api
 
-    ..versionadded:: 1.1.0
+    .. versionadded:: 1.1.0
     """
 
     def __init__(
@@ -32,13 +33,12 @@ class OpenCage(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-        Initialize a customized OpenCageData geocoder.
 
         :param str api_key: The API key required by OpenCageData
             to perform geocoding requests. You can get your key here:
             https://geocoder.opencagedata.com/
 
-        :param str domain: Currently it is 'api.opencagedata.com', can
+        :param str domain: Currently it is ``'api.opencagedata.com'``, can
             be changed for testing purposes.
 
         :param str scheme:
@@ -90,10 +90,9 @@ class OpenCage(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
-        :param str query: The query string to be geocoded; this must
-            be URL encoded.
+        :param str query: The address or query you wish to geocode.
 
         :param str language: an IETF format language code (such as `es`
             for Spanish or pt-BR for Brazilian Portuguese); if this is
@@ -107,7 +106,7 @@ class OpenCage(Geocoder):
             coordinate points forming the south-west and north-east
             corners of a bounding box. The order of the coordinates is
             `longitude,latitude,longitude,latitude`. For example,
-            `bounds=-0.563160,51.280430,0.278970,51.683979`
+            ``bounds=-0.563160,51.280430,0.278970,51.683979``.
 
         :param str country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
@@ -122,6 +121,9 @@ class OpenCage(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         params = {
@@ -150,7 +152,7 @@ class OpenCage(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -172,6 +174,9 @@ class OpenCage(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
 
         """
         if exactly_one is DEFAULT_SENTINEL:

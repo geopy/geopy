@@ -32,9 +32,12 @@ __all__ = ("GoogleV3", )
 
 
 class GoogleV3(Geocoder):  # pylint: disable=R0902
-    """
-    Geocoder using the Google Maps v3 API. Documentation at:
+    """Geocoder using the Google Maps v3 API.
+
+    Documentation at:
         https://developers.google.com/maps/documentation/geocoding/
+
+    API authentication is only required for Google Maps Premier customers.
     """
 
     def __init__(
@@ -52,9 +55,6 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             channel='',
     ):
         """
-        Initialize a customized Google geocoder.
-
-        API authentication is only required for Google Maps Premier customers.
 
         :param str api_key: The API key required by Google to perform
             geocoding requests. API keys are managed through the Google APIs
@@ -178,13 +178,14 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             sensor=False,
     ):
         """
-        Geocode a location query.
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode. Optional,
             if ``components`` param is set::
 
                 >>> g = GoogleV3()
                 >>> g.geocode(components={"city": "Paris", "country": "FR"})
+                Location(France, (46.227638, 2.213749, 0.0))
 
             .. versionchanged:: 1.14.0
                Now ``query`` is optional if ``components`` param is set.
@@ -211,6 +212,9 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {
             'sensor': str(sensor).lower()
@@ -253,7 +257,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             sensor=False,
     ):
         """
-        Given a point, find an address.
+        Return an address by location point.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -278,6 +282,9 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
 
         :param bool sensor: Whether the geocoding request comes from a
             device with a location sensor.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         if exactly_one is DEFAULT_SENTINEL:
             warnings.warn('%s.reverse: default value for `exactly_one` '
@@ -329,7 +336,7 @@ class GoogleV3(Geocoder):  # pylint: disable=R0902
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :rtype: pytz timezone
+        :rtype: pytz timezone. See :func:`pytz.timezone`.
         """
         if not pytz_available:
             raise ImportError(
