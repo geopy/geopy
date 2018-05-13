@@ -94,15 +94,23 @@ class What3Words(Geocoder):
                 timeout=DEFAULT_SENTINEL):
 
         """
-        Geocode a "3 words" query.
+        Return a location point for a `3 words` query. If the `3 words` address
+        doesn't exist, a :class:`geopy.exc.GeocoderQueryError` exception will be
+        thrown.
 
         :param str query: The 3-word address you wish to geocode.
 
         :param str lang: two character language codes as supported by
             the API (http://what3words.com/api/reference/languages).
 
-        :param bool exactly_one: Parameter has no effect for this geocoder.
-            Due to the address scheme there is always exactly one result.
+        :param bool exactly_one: Return one result or a list of results, if
+            available. Due to the address scheme there is always exactly one
+            result for each `3 words` address, so this parameter is rather
+            useless for this geocoder.
+
+            .. versionchanged:: 1.14.0
+               ``exactly_one=False`` now returns a list of a single location.
+               This option wasn't respected before.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -126,7 +134,7 @@ class What3Words(Geocoder):
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
-            exactly_one
+            exactly_one=exactly_one
         )
 
     def _parse_json(self, resources, exactly_one=True):
@@ -190,12 +198,17 @@ class What3Words(Geocoder):
             else:
                 raise exc.GeocoderParseError('Error parsing result.')
 
-        return parse_resource(resources)
+        location = parse_resource(resources)
+        if exactly_one:
+            return location
+        else:
+            return [location]
 
     def reverse(self, query, lang='en', exactly_one=True,
                 timeout=DEFAULT_SENTINEL):
         """
-        Given a point, find the 3 word address.
+        Return a `3 words` address by location point. Each point on surface has
+        a `3 words` address, so there's always a non-empty response.
 
         :param query: The coordinates for which you wish to obtain the 3 word
             address.
@@ -205,8 +218,14 @@ class What3Words(Geocoder):
         :param str lang: two character language codes as supported by the
             API (http://what3words.com/api/reference/languages).
 
-        :param bool exactly_one: Parameter has no effect for this geocoder.
-            Due to the address scheme there is always exactly one result.
+        :param bool exactly_one: Return one result or a list of results, if
+            available. Due to the address scheme there is always exactly one
+            result for each `3 words` address, so this parameter is rather
+            useless for this geocoder.
+
+            .. versionchanged:: 1.14.0
+               ``exactly_one=False`` now returns a list of a single location.
+               This option wasn't respected before.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -227,10 +246,10 @@ class What3Words(Geocoder):
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
             self._call_geocoder(url, timeout=timeout),
+            exactly_one=exactly_one
         )
 
-    @staticmethod
-    def _parse_reverse_json(resources):
+    def _parse_reverse_json(self, resources, exactly_one=True):
         """
         Parses a location from a single-result reverse API call.
         """
@@ -253,4 +272,8 @@ class What3Words(Geocoder):
 
             return Location(words, (latitude, longitude), resource)
 
-        return parse_resource(resources)
+        location = parse_resource(resources)
+        if exactly_one:
+            return location
+        else:
+            return [location]

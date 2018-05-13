@@ -1,5 +1,6 @@
 import unittest
 
+import geopy.exc
 from geopy.compat import u
 from geopy.geocoders import What3Words
 from test.geocoders.util import GeocoderTestBase, env
@@ -43,7 +44,6 @@ class What3WordsTestCase(GeocoderTestBase):
             self.geocoder.reverse,
             "53.037611,11.565012",
             lang='DE',
-
         )
         self.assertEqual(
             result_reverse.address,
@@ -65,6 +65,24 @@ class What3WordsTestCase(GeocoderTestBase):
             {"latitude": 53.037611, "longitude": 11.565012},
         )
 
+    def test_empty_response(self):
+        with self.assertRaises(geopy.exc.GeocoderQueryError):
+            self.geocode_run(
+                {"query": "definitely.not.existingiswearrrr"},
+                {},
+                expect_failure=True
+            )
+
+    def test_not_exactly_one(self):
+        self.geocode_run(
+            {"query": "piped.gains.jangle", "exactly_one": False},
+            {"latitude": 53.037611, "longitude": 11.565012},
+        )
+        self.reverse_run(
+            {"query": (53.037611, 11.565012), "exactly_one": False},
+            {"address": "piped.gains.jangle"},
+        )
+
     def test_result_language(self):
         """
         What3Words.geocode result language
@@ -73,7 +91,6 @@ class What3WordsTestCase(GeocoderTestBase):
             self.geocoder.geocode,
             "piped.gains.jangle",
             lang='DE',
-
         )
         self.assertEqual(
             result_geocode.address,
