@@ -26,8 +26,8 @@ class BaiduTestCase(GeocoderTestBase):
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Baidu(
-            scheme='http',
-            api_key=env['BAIDU_KEY']
+            api_key=env['BAIDU_KEY'],
+            timeout=3,
         )
         cls.delta_exact = 0.02
 
@@ -49,5 +49,9 @@ class BaiduTestCase(GeocoderTestBase):
         """
         self.reverse_run(
             {"query": Point(39.983615544507, 116.32295155093)},
+            {"latitude": 39.983615544507, "longitude": 116.32295155093},
+        )
+        self.reverse_run(
+            {"query": Point(39.983615544507, 116.32295155093), "exactly_one": False},
             {"latitude": 39.983615544507, "longitude": 116.32295155093},
         )

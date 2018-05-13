@@ -120,7 +120,7 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    def reverse(self, query, timeout=DEFAULT_SENTINEL):
+    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Given a point, find an address.
 
@@ -128,6 +128,11 @@ class Baidu(Geocoder):
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available. Baidu's API will always return at most one result.
+
+            .. versionadded:: 1.14.0
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -145,11 +150,10 @@ class Baidu(Geocoder):
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout)
+            self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    @staticmethod
-    def _parse_reverse_json(page):
+    def _parse_reverse_json(self, page, exactly_one=True):
         """
         Parses a location from a single-result reverse API call.
         """
@@ -159,7 +163,11 @@ class Baidu(Geocoder):
         latitude = place['location']['lat']
         longitude = place['location']['lng']
 
-        return Location(location, (latitude, longitude), place)
+        location = Location(location, (latitude, longitude), place)
+        if exactly_one:
+            return location
+        else:
+            return [location]
 
     def _parse_json(self, page, exactly_one=True):
         """
