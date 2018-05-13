@@ -4,7 +4,7 @@ Changelog
 =========
 1.14.0
 ------
-2018-05-TBD
+2018-05-13
 
 This release contains a lot of public API cleanup. Also make sure to
 check out the updated docs! A new `Semver` doc section has been added,
