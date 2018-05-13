@@ -1,30 +1,22 @@
-
 import unittest
-import types
+from mock import patch
 
 from geopy import exc
-from geopy.point import Point
 from geopy.geocoders import GeocodeFarm
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 
-class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
+class GeocodeFarmTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
         cls.delta = 0.04
         cls.geocoder = GeocodeFarm(
-            api_key=env.get('GEOCODEFARM_KEY'), # None api_key will use free tier on GeocodeFarm
+            # None api_key will use free tier on GeocodeFarm.
+            api_key=env.get('GEOCODEFARM_KEY'),
             timeout=10,
         )
-
-    def setUp(self):
-        # Store the original _call_geocoder in case we replace it with a mock
-        self._original_call_geocoder = self.geocoder._call_geocoder
-
-    def tearDown(self):
-        # Restore the original _call_geocoder in case we replaced it with a mock
-        self.geocoder._call_geocoder = self._original_call_geocoder
 
     def test_user_agent_custom(self):
         geocoder = GeocodeFarm(
@@ -36,28 +28,38 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
         GeocodeFarm.geocode
         """
-        self.geocode_run(
+        location = self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
+        )
+        self.assertIn("chicago", location.address.lower())
+
+    def test_location_address(self):
+        self.geocode_run(
+            {"query": "moscow"},
+            {"address": "Moscow, Russia",
+             "latitude": 55.7558913503453, "longitude": 37.6172961632184}
         )
 
     def test_reverse_string(self):
         """
         GeocodeFarm.reverse string
         """
-        self.reverse_run(
+        location = self.reverse_run(
             {"query": "40.75376406311989,-73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
+        self.assertIn("new york", location.address.lower())
 
     def test_reverse_point(self):
         """
         GeocodeFarm.reverse Point
         """
-        self.reverse_run(
+        location = self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
+        self.assertIn("new york", location.address.lower())
 
     def test_authentication_failure(self):
         """
@@ -77,9 +79,6 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
 
         def mock_call_geocoder(*args, **kwargs):
-            """
-            Mock API call to return bad response.
-            """
             return {
                 "geocoding_results": {
                     "STATUS": {
@@ -88,36 +87,15 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
                     }
                 }
             }
-        self.geocoder._call_geocoder = types.MethodType(
-            mock_call_geocoder,
-            self.geocoder
-        )
 
-        with self.assertRaises(exc.GeocoderQuotaExceeded):
+        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
+                self.assertRaises(exc.GeocoderQuotaExceeded):
             self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
     def test_no_results(self):
-        def mock_call_geocoder(*args, **kwargs):
-            """
-            Mock API call to return bad response.
-            """
-            return {
-                "geocoding_results": {
-                    "STATUS": {
-                        "access": "KEY_VALID, ACCESS_GRANTED",
-                        "status": "FAILED, NO_RESULTS"
-                    }
-                }
-            }
-
-        self.geocoder._call_geocoder = types.MethodType(
-            mock_call_geocoder,
-            self.geocoder
-        )
-
         self.geocode_run(
-            {"query": "435 north michigan ave, tampa fl 60611 usa"},
-            None,
+            {"query": "gibberish kdjhsakdjh skjdhsakjdh"},
+            {},
             expect_failure=True
         )
 
@@ -127,9 +105,6 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
         """
 
         def mock_call_geocoder(*args, **kwargs):
-            """
-            Mock API call to return bad response.
-            """
             return {
                 "geocoding_results": {
                     "STATUS": {
@@ -138,10 +113,7 @@ class GeocodeFarmTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
                     }
                 }
             }
-        self.geocoder._call_geocoder = types.MethodType(
-            mock_call_geocoder,
-            self.geocoder
-        )
 
-        with self.assertRaises(exc.GeocoderServiceError):
+        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
+                self.assertRaises(exc.GeocoderServiceError):
             self.geocoder.geocode('435 north michigan ave, chicago il 60611')

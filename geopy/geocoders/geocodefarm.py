@@ -29,12 +29,13 @@ class GeocodeFarm(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            scheme=None,
     ):
         """
         Create a geocoder for GeocodeFarm.
 
-        :param str api_key: The API key required by GeocodeFarm to perform
-            geocoding requests.
+        :param str api_key: (optional) The API key required by GeocodeFarm
+            to perform geocoding requests.
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -55,10 +56,15 @@ class GeocodeFarm(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
             .. versionadded:: 1.14.0
+
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
+
+            .. versionadded:: 1.14.0
         """
         super(GeocodeFarm, self).__init__(
             format_string=format_string,
-            scheme='https',
+            scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
@@ -148,6 +154,8 @@ class GeocodeFarm(Geocoder):
             placename = address.get('address_returned', None)
             if placename is None:
                 placename = address.get('address', None)
+            if placename is None:
+                placename = result.get('formatted_address', None)
             if latitude and longitude:
                 latitude = float(latitude)
                 longitude = float(longitude)
@@ -160,7 +168,8 @@ class GeocodeFarm(Geocoder):
         geocoding_results = api_result["geocoding_results"]
         self._check_for_api_errors(geocoding_results)
 
-        if "NO_RESULTS" in geocoding_results.get("STATUS", {}).get("status", ""): return None
+        if "NO_RESULTS" in geocoding_results.get("STATUS", {}).get("status", ""):
+            return None
 
         places = self.parse_code(geocoding_results)
         if exactly_one:
@@ -175,7 +184,8 @@ class GeocodeFarm(Geocoder):
         in the api response.
         """
         status_result = geocoding_results.get("STATUS", {})
-        if "NO_RESULTS" in status_result.get("status", ""): return
+        if "NO_RESULTS" in status_result.get("status", ""):
+            return
         api_call_success = status_result.get("status", "") == "SUCCESS"
         if not api_call_success:
             access_error = status_result.get("access")
