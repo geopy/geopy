@@ -6,6 +6,10 @@ Changelog
 ------
 2018-05-TBD
 
+This release contains a lot of public API cleanup. Also make sure to
+check out the updated docs! A new `Semver` doc section has been added,
+explaining the geopy's policy on breaking changes.
+
 *   ADDED: Nominatim geocoder now supports an `addressdetails` option in
     the `reverse` method.
     Contributed by Serphentas. (#285)
@@ -20,8 +24,9 @@ Changelog
 *   ADDED: Some geocoders were missing `format_string` option. Now all
     geocoders support it.
 
-*   ADDED: `lonlat` function for conveniently converting ``(x, y, [z])``
-    coordinate tuples to the `Point` instances, which use ``(y, x, [z])``.
+*   ADDED: `geopy.distance.lonlat` function for conveniently converting
+    `(x, y, [z])` coordinate tuples to the `Point` instances, which use
+    `(y, x, [z])`.
     Contributed by svalee. (#282)
 
 *   ADDED: `geopy.geocoders.options` object, which allows to configure
@@ -31,11 +36,16 @@ Changelog
 *   ADDED: Support for supplying a custom SSL context. See docs for
     `geopy.geocoders.options.default_ssl_context`. (#291)
 
+*   ADDED: Baidu geocoder was missing the `exactly_one` option in its `reverse`
+    method.
+
+*   ADDED: GeocodeFarm now supports a `scheme` option.
+
 *   CHANGED: Baidu and Yandex geocoders now use https scheme by default
     instead of http.
 
 *   CHANGED: ArcGIS geocoder was updated to use the latest API.
-    Please note that ``Location.raw`` results for `geocode` have changed
+    Please note that `Location.raw` results for `geocode` have changed
     a little due to that.
     Contributed by Jonathan Batchelor. (#227)
 
@@ -62,8 +72,16 @@ Changelog
     because it was never working properly, and it won't, due to
     the coordinates normalization in Point.
 
-*   FIXED: `GeocodeFarm` was raising an exception on empty responce instead
+*   FIXED: ArcGIS and What3Words did not respect `exactly_one=False`.
+    Now they respect it and return a list of a single location in this case.
+
+*   FIXED: ArcGIS was throwing an exception on empty response of `reverse`.
+    Now `None` is returned, as expected.
+
+*   FIXED: `GeocodeFarm` was raising an exception on empty response instead
     of returning `None`. Contributed by Arthur Pemberton. (#240)
+
+*   FIXED: `GeocodeFarm` had missing `Location.address` value sometimes.
 
 *   REMOVED: `geopy.geocoders.DEFAULT_*` constants (in favor of
     `geopy.geocoders.options.default_*` attributes). (#288)
