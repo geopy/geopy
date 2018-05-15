@@ -3,7 +3,8 @@
 geopy
 """
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
 from geopy import __version__ as version
 
 INSTALL_REQUIRES = [
@@ -27,8 +28,9 @@ setup(
     extras_require={
         "dev": [
             "coverage",
-            "pytest>=3",
+            "flake8>=3.5.0,<3.6.0",
             "mock",
+            "pytest>=3",
             "sphinx",
         ],
         "timezone": ["pytz"],

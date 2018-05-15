@@ -16,3 +16,4 @@ install:
 script:
     - coverage run -m py.test
     - coverage report
+    - flake8
