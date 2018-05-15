@@ -11,10 +11,7 @@ develop:
 	python setup.py develop && python setup.py test
 
 lint:
-	pylint --rcfile=.pylintrc --reports=n geopy
-
-pylint:
-	pylint --rcfile .pylintrc geopy
+	flake8
 
 test:
 	coverage run -m py.test
