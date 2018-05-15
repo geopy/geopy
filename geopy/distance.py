@@ -89,12 +89,14 @@ calculate the length of a path::
 from __future__ import division
 
 import warnings
-from math import atan, tan, sin, cos, pi, sqrt, atan2, asin
-from geopy.units import radians
-from geopy import units, util
-from geopy.point import Point
-from geopy.compat import string_compare, py3k, cmp
+from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
+
 from geographiclib.geodesic import Geodesic
+
+from geopy import units, util
+from geopy.compat import cmp, py3k, string_compare
+from geopy.point import Point
+from geopy.units import radians
 
 # IUGG mean earth radius in kilometers, from
 # https://en.wikipedia.org/wiki/Earth_radius#Mean_radius.  Using a
@@ -203,10 +205,10 @@ class Distance(object):
         """
         raise NotImplementedError()
 
-    def __repr__(self): # pragma: no cover
+    def __repr__(self):  # pragma: no cover
         return 'Distance(%s)' % self.kilometers
 
-    def __str__(self): # pragma: no cover
+    def __str__(self):  # pragma: no cover
         return '%s km' % self.__kilometers
 
     def __cmp__(self, other):  # py2 only
@@ -273,6 +275,7 @@ class Distance(object):
     @property
     def nm(self):
         return self.nautical
+
 
 class great_circle(Distance):
     """
@@ -344,7 +347,9 @@ class great_circle(Distance):
 
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
 
+
 GreatCircleDistance = great_circle
+
 
 class geodesic(Distance):
     """
@@ -411,8 +416,8 @@ class geodesic(Distance):
                 self.geod.f == self.ELLIPSOID[2]):
             self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
 
-        s12 =  self.geod.Inverse(lat1, lon1, lat2, lon2,
-                                 Geodesic.DISTANCE)['s12']
+        s12 = self.geod.Inverse(lat1, lon1, lat2, lon2,
+                                Geodesic.DISTANCE)['s12']
 
         return s12
 
@@ -440,7 +445,9 @@ class geodesic(Distance):
 
         return Point(r['lat2'], r['lon2'])
 
+
 GeodesicDistance = geodesic
+
 
 class vincenty(Distance):
     """
@@ -543,7 +550,7 @@ class vincenty(Distance):
             )
 
             if sin_sigma == 0:
-                return 0 # Coincident points
+                return 0  # Coincident points
 
             cos_sigma = (
                 sin_reduced1 * sin_reduced2 +
@@ -562,7 +569,7 @@ class vincenty(Distance):
                     sin_reduced1 * sin_reduced2 / cos_sq_alpha
                 )
             else:
-                cos2_sigma_m = 0.0 # Equatorial line
+                cos2_sigma_m = 0.0  # Equatorial line
 
             C = f / 16. * cos_sq_alpha * (4 + f * (4 - 3 * cos_sq_alpha))
 
@@ -691,6 +698,7 @@ class vincenty(Distance):
         lng2 = lng1 + delta_lng
 
         return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
+
 
 VincentyDistance = vincenty
 

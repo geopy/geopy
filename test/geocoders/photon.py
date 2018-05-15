@@ -1,7 +1,6 @@
 # coding: utf8
 from __future__ import unicode_literals
 
-from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import Photon
 from test.geocoders.util import GeocoderTestBase
@@ -25,11 +24,11 @@ class PhotonTestCase(GeocoderTestBase):
         """
         Photon.geocode
         """
-        self.geocode_run(
+        location = self.geocode_run(
             {"query": "14 rue pelisson villeurbanne"},
-            {"address": "Rue du 14 Juillet 1789, 69003, Villeurbanne, Auvergne-Rhône-Alpes, France",
-             "latitude": 45.7733963, "longitude": 4.88612369},
+            {"latitude": 45.7733963, "longitude": 4.88612369},
         )
+        self.assertIn("France", location.address)
 
     def test_osm_tag(self):
         """

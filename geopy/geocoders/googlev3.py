@@ -154,9 +154,7 @@ class GoogleV3(Geocoder):
         Format the components dict to something Google understands.
         """
         return "|".join(
-            (":".join(item)
-             for item in components.items()
-            )
+            (":".join(item) for item in components.items())
         )
 
     @staticmethod

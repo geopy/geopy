@@ -20,7 +20,7 @@ from geopy.distance import (Distance,
 EARTH_CIRCUMFERENCE = 2 * math.pi * EARTH_RADIUS
 NORTH_POLE = Point(90, 0)
 SOUTH_POLE = Point(-90, 0)
-FIJI = Point(-16.1333333, 180.0) # Vunikondi, Fiji
+FIJI = Point(-16.1333333, 180.0)  # Vunikondi, Fiji
 
 
 class CommonDistanceComputationCases(object):
@@ -297,6 +297,7 @@ class TestDefaultDistanceClass(unittest.TestCase):
             VincentyDistance((0, 0), (10, 10))
             self.assertEqual(1, len(w))
 
+
 class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
                                            unittest.TestCase):
     cls = GreatCircleDistance
@@ -427,16 +428,16 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
           [-29.47124, 95.14681, -163.779130441688382,
            -27.46601, -69.15955, -15.909335945554969,
            13487015.8381145492]]
-        d = self.cls(ellipsoid = 'WGS-84')
+        d = self.cls(ellipsoid='WGS-84')
         km = 1000
         for l in testcases:
             (lat1, lon1, azi1, lat2, lon2, azi2, s12) = l
             p1, p2 = Point(lat1, lon1), Point(lat2, lon2)
             s12a = d.measure(p1, p2) * km
-            self.assertAlmostEqual(s12a, s12, delta = 1e-8)
+            self.assertAlmostEqual(s12a, s12, delta=1e-8)
             p = d.destination(p1, azi1, s12/km)
-            self.assertAlmostEqual(p.latitude, p2.latitude, delta = 1e-13)
-            self.assertAlmostEqual(p.longitude, p2.longitude, delta = 1e-12)
+            self.assertAlmostEqual(p.latitude, p2.latitude, delta=1e-13)
+            self.assertAlmostEqual(p.longitude, p2.longitude, delta=1e-12)
             p = d.destination(p2, azi2, -s12/km)
-            self.assertAlmostEqual(p.latitude, p1.latitude, delta = 1e-13)
-            self.assertAlmostEqual(p.longitude, p1.longitude, delta = 1e-12)
+            self.assertAlmostEqual(p.latitude, p1.latitude, delta=1e-13)
+            self.assertAlmostEqual(p.longitude, p1.longitude, delta=1e-12)

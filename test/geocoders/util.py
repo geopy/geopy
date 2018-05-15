@@ -3,7 +3,6 @@ import os
 import json
 import unittest
 from collections import defaultdict
-from geopy.compat import string_compare, py3k
 
 from geopy import exc
 

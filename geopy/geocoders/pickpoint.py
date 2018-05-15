@@ -2,7 +2,6 @@
 PickPoint geocoder
 """
 
-from geopy.compat import urlencode
 from geopy.geocoders import Nominatim
 from geopy.geocoders.base import DEFAULT_SENTINEL
 

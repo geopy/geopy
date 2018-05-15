@@ -1,7 +1,8 @@
 
 import unittest
-from geopy.point import Point
+
 from geopy.format import format_degrees
+from geopy.point import Point
 
 
 class TestFormat(unittest.TestCase):

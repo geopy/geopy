@@ -5,11 +5,11 @@ from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
 from test.geocoders.util import GeocoderTestBase, env
 
-credentials = bool((env.get('IGNFRANCE_KEY') and
-          env.get('IGNFRANCE_USERNAME') and
-          env.get('IGNFRANCE_PASSWORD')) or
-         (env.get('IGNFRANCE_KEY') and
-          env.get('IGNFRANCE_REFERER')))
+credentials = bool(
+    (env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_USERNAME')
+     and env.get('IGNFRANCE_PASSWORD')) or (
+         env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_REFERER'))
+)
 
 
 class IGNFranceTestCaseUnitTest(GeocoderTestBase):
@@ -23,10 +23,11 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
+
 @unittest.skipUnless(
     credentials,
-    "One or more of the env variables IGNFRANCE_KEY, IGNFRANCE_USERNAME \
-    and IGNFRANCE_PASSWORD is not set"
+    "One or more of the env variables IGNFRANCE_KEY, IGNFRANCE_USERNAME "
+    "and IGNFRANCE_PASSWORD is not set"
 )
 class IGNFranceTestCase(GeocoderTestBase):
 
@@ -102,8 +103,7 @@ class IGNFranceTestCase(GeocoderTestBase):
              "exactly_one": True},
             {"latitude": 47.293048,
              "longitude": 1.718985,
-             "address": "le camp des landes, 41200 Villefranche-sur-Cher"
-            },
+             "address": "le camp des landes, 41200 Villefranche-sur-Cher"},
         )
 
     def test_geocode_freeform(self):
@@ -193,12 +193,8 @@ class IGNFranceTestCase(GeocoderTestBase):
             exactly_one=False
         )
 
-
         departements_spatial = list(
-            set([
-                i.raw['departement']
-                for i in res_spatial_filter
-            ])
+            {i.raw['departement'] for i in res_spatial_filter}
         )
 
         res_no_spatial_filter = self._make_request(

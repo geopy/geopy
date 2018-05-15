@@ -64,6 +64,7 @@ ABBR_SYMBOLS = {
     'arcsec': ABBR_ARCSEC
 }
 
+
 def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=None):
     """
     TODO docs.
@@ -79,6 +80,7 @@ def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=None):
     )
     return fmt % format_dict
 
+
 DISTANCE_FORMAT = "%(magnitude)s%(unit)s"
 DISTANCE_UNITS = {
     'km': lambda d: d,
@@ -89,12 +91,14 @@ DISTANCE_UNITS = {
     'nmi': lambda d: units.nautical(kilometers=d)
 }
 
+
 def format_distance(kilometers, fmt=DISTANCE_FORMAT, unit='km'):
     """
     TODO docs.
     """
     magnitude = DISTANCE_UNITS[unit](kilometers)
     return fmt % {'magnitude': magnitude, 'unit': unit}
+
 
 _DIRECTIONS = [
     ('north', 'N'),

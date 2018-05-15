@@ -68,7 +68,8 @@ need to geocode locations in `Cleveland, Ohio`, you could do::
     >>> geolocator = GoogleV3(format_string="%s, Cleveland OH")
     >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
     >>> print(address, latitude, longitude)
-    Thwing Center, 11111 Euclid Ave, Cleveland, OH 44106, USA 41.5074066 -81.60832649999999
+    Thwing Center, 11111 Euclid Ave, Cleveland, OH 44106, USA \
+41.5074066 -81.60832649999999
 
 """
 

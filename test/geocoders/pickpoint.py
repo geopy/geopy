@@ -6,8 +6,9 @@ from geopy.geocoders import PickPoint
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless(bool(env['PICKPOINT_KEY']),
-                     "No PICKPOINT_KEY env variable set"
+@unittest.skipUnless(
+    bool(env['PICKPOINT_KEY']),
+    "No PICKPOINT_KEY env variable set"
 )
 class PickPointTestCase(GeocoderTestBase):
 
@@ -101,7 +102,7 @@ class PickPointTestCase(GeocoderTestBase):
         """
         result_reverse_de = self._make_request(
             self.geocoder.reverse,
-             "52.51693903613385, 13.3859332733135",
+            "52.51693903613385, 13.3859332733135",
             exactly_one=True,
             language="de",
         )

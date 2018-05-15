@@ -109,8 +109,7 @@ class IGNFrance(Geocoder):
 
         # Catch if no api key with username and password
         # or no api key with referer
-        if not (api_key and username and password) \
-            and not (api_key and referer):
+        if not ((api_key and username and password) or (api_key and referer)):
             raise ConfigurationError('You should provide an api key and a '
                                      'username with a password or an api '
                                      'key with a referer depending on '

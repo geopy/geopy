@@ -3,7 +3,7 @@ from mock import patch
 
 import geopy.geocoders
 from geopy.geocoders import LiveAddress
-from geopy.exc import ConfigurationError, GeocoderAuthenticationFailure
+from geopy.exc import ConfigurationError
 from test.geocoders.util import GeocoderTestBase, env
 
 

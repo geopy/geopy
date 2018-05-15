@@ -32,12 +32,13 @@ class LocationTestCase(unittest.TestCase):
     Test :class:`geopy.location.Location`.
     """
 
-    def _location_iter_test(self,
+    def _location_iter_test(
+            self,
             loc,
             ref_address=GRAND_CENTRAL_STR,
             ref_longitude=GRAND_CENTRAL_COORDS_TUPLE[0],
             ref_latitude=GRAND_CENTRAL_COORDS_TUPLE[1]
-        ):
+    ):
         """
         Helper for equality tests on Location's __iter__.
         """
@@ -186,7 +187,7 @@ class LocationTestCase(unittest.TestCase):
         raw_unpicklable = dict(missing=some_class())
         del some_class
         loc_unpicklable = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT,
-                                    raw_unpicklable)
+                                   raw_unpicklable)
         for protocol in (0, 1, 2, -1):
             with self.assertRaises((AttributeError, pickle.PicklingError)):
                 pickle.dumps(loc_unpicklable, protocol=protocol)
