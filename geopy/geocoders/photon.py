@@ -10,7 +10,7 @@ from geopy.util import logger
 __all__ = ("Photon", )
 
 
-class Photon(Geocoder):  # pylint: disable=W0223
+class Photon(Geocoder):
     """Geocoder using Photon geocoding service (data based on OpenStreetMap
     and service provided by Komoot on https://photon.komoot.de).
 

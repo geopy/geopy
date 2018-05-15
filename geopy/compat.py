@@ -49,14 +49,14 @@ else:
 
 
 if py3k: # pragma: no cover
-    from urllib.parse import (urlencode, quote, # pylint: disable=W0611,F0401,W0611,E0611
+    from urllib.parse import (urlencode, quote,
                               urlparse, parse_qs)
-    from urllib.request import (Request, urlopen, # pylint: disable=W0611,F0401,W0611,E0611
+    from urllib.request import (Request, urlopen,
                                 build_opener, ProxyHandler, HTTPSHandler,
                                 URLError,
                                 HTTPPasswordMgrWithDefaultRealm,
                                 HTTPBasicAuthHandler)
-    from urllib.error import HTTPError # pylint: disable=W0611,F0401,W0611,E0611
+    from urllib.error import HTTPError
 
     def itervalues(d):
         """
@@ -74,8 +74,8 @@ if py3k: # pragma: no cover
         return iter(d.items())
 
 else: # pragma: no cover
-    from urllib import urlencode as original_urlencode, quote # pylint: disable=W0611,F0401,W0611,E0611
-    from urllib2 import (Request, HTTPError,   # pylint: disable=W0611,F0401,W0611,E0611
+    from urllib import urlencode as original_urlencode, quote
+    from urllib2 import (Request, HTTPError,
                          ProxyHandler, HTTPSHandler, URLError, urlopen,
                          build_opener,
                          HTTPPasswordMgrWithDefaultRealm,

@@ -127,7 +127,7 @@ class ArcGISTestCase(GeocoderTestBase):
             self.assertEqual(1, len(w))
 
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
+@unittest.skipUnless(
     env.get('ARCGIS_USERNAME') is not None \
     or env.get('ARCGIS_PASSWORD') is not None\
     or env.get('ARCGIS_REFERER') is not None,

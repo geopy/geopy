@@ -12,7 +12,7 @@ from geopy.util import logger
 __all__ = ("Yandex", )
 
 
-class Yandex(Geocoder): # pylint: disable=W0223
+class Yandex(Geocoder):
     """Yandex geocoder.
 
     Documentation at:

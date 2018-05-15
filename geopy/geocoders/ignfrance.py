@@ -14,7 +14,7 @@ from geopy.util import logger
 __all__ = ("IGNFrance", )
 
 
-class IGNFrance(Geocoder):   # pylint: disable=W0223
+class IGNFrance(Geocoder):
     """Geocoder using the IGN France GeoCoder OpenLS API.
 
     Documentation at:

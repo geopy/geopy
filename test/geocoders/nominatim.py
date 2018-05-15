@@ -7,7 +7,7 @@ from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase
 
 
-class NominatimTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
+class NominatimTestCase(GeocoderTestBase):
 
     delta = 0.04
 

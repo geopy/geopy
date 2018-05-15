@@ -38,7 +38,7 @@ except IOError:
 EMPTY = object()
 
 
-class GeocoderTestBase(unittest.TestCase): # pylint: disable=R0904
+class GeocoderTestBase(unittest.TestCase):
     """
     Base for geocoder-specific test cases.
     """

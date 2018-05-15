@@ -7,7 +7,7 @@ from geopy.geocoders import Photon
 from test.geocoders.util import GeocoderTestBase
 
 
-class PhotonTestCase(GeocoderTestBase):  # pylint: disable=R0904,C0111
+class PhotonTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):

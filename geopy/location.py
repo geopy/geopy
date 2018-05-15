@@ -10,7 +10,7 @@ def _location_tuple(location):
     return location._address, (location._point[0], location._point[1])
 
 
-class Location(object): # pylint: disable=R0903,R0921
+class Location(object):
     """
     Contains a parsed geocoder response. Can be iterated over as
     ``(location<String>, (latitude<float>, longitude<Float))``.
@@ -132,8 +132,8 @@ class Location(object): # pylint: disable=R0903,R0921
     def __eq__(self, other):
         return (
             isinstance(other, Location) and
-            self._address == other._address and  # pylint: disable=W0212
-            self._point == other._point and  # pylint: disable=W0212
+            self._address == other._address and
+            self._point == other._point and
             self.raw == other.raw
         )
 

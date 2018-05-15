@@ -11,7 +11,7 @@ from geopy.util import logger
 __all__ = ("OpenMapQuest", )
 
 
-class OpenMapQuest(Geocoder): # pylint: disable=W0223
+class OpenMapQuest(Geocoder):
     """Geocoder using MapQuest Open Platform Web Services.
 
     Documentation at:

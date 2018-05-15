@@ -11,7 +11,7 @@ from geopy.util import logger
 __all__ = ("LiveAddress", )
 
 
-class LiveAddress(Geocoder):  # pylint: disable=W0223
+class LiveAddress(Geocoder):
     """Geocoder using the LiveAddress API provided by SmartyStreets.
 
     Documentation at:

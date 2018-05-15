@@ -7,7 +7,7 @@ import math
 
 # Angles
 
-def degrees(radians=0, arcminutes=0, arcseconds=0): # pylint: disable=W0621
+def degrees(radians=0, arcminutes=0, arcseconds=0):
     """
     TODO docs.
     """
@@ -20,7 +20,7 @@ def degrees(radians=0, arcminutes=0, arcseconds=0): # pylint: disable=W0621
         deg += arcseconds / arcsec(degrees=1.)
     return deg
 
-def radians(degrees=0, arcminutes=0, arcseconds=0): # pylint: disable=W0621
+def radians(degrees=0, arcminutes=0, arcseconds=0):
     """
     TODO docs.
     """
@@ -30,7 +30,7 @@ def radians(degrees=0, arcminutes=0, arcseconds=0): # pylint: disable=W0621
         degrees += arcseconds / arcsec(degrees=1.)
     return math.radians(degrees)
 
-def arcminutes(degrees=0, radians=0, arcseconds=0): # pylint: disable=W0621
+def arcminutes(degrees=0, radians=0, arcseconds=0):
     """
     TODO docs.
     """
@@ -40,7 +40,7 @@ def arcminutes(degrees=0, radians=0, arcseconds=0): # pylint: disable=W0621
         degrees += arcseconds / arcsec(degrees=1.)
     return degrees * 60.
 
-def arcseconds(degrees=0, radians=0, arcminutes=0): # pylint: disable=W0621
+def arcseconds(degrees=0, radians=0, arcminutes=0):
     """
     TODO docs.
     """
@@ -53,7 +53,7 @@ def arcseconds(degrees=0, radians=0, arcminutes=0): # pylint: disable=W0621
 
 # Lengths
 
-def kilometers(meters=0, miles=0, feet=0, nautical=0): # pylint: disable=W0621
+def kilometers(meters=0, miles=0, feet=0, nautical=0):
     """
     TODO docs.
     """
@@ -67,13 +67,13 @@ def kilometers(meters=0, miles=0, feet=0, nautical=0): # pylint: disable=W0621
     ret += miles * 1.609344
     return ret
 
-def meters(kilometers=0, miles=0, feet=0, nautical=0): # pylint: disable=W0621
+def meters(kilometers=0, miles=0, feet=0, nautical=0):
     """
     TODO docs.
     """
     return (kilometers + km(nautical=nautical, miles=miles, feet=feet)) * 1000
 
-def miles(kilometers=0, meters=0, feet=0, nautical=0): # pylint: disable=W0621
+def miles(kilometers=0, meters=0, feet=0, nautical=0):
     """
     TODO docs.
     """
@@ -87,7 +87,7 @@ def miles(kilometers=0, meters=0, feet=0, nautical=0): # pylint: disable=W0621
     ret += kilometers / 1.609344
     return ret
 
-def feet(kilometers=0, meters=0, miles=0, nautical=0): # pylint: disable=W0621
+def feet(kilometers=0, meters=0, miles=0, nautical=0):
     """
     TODO docs.
     """
@@ -101,7 +101,7 @@ def feet(kilometers=0, meters=0, miles=0, nautical=0): # pylint: disable=W0621
     ret += miles * 5280
     return ret
 
-def nautical(kilometers=0, meters=0, miles=0, feet=0): # pylint: disable=W0621
+def nautical(kilometers=0, meters=0, miles=0, feet=0):
     """
     TODO docs.
     """
@@ -118,11 +118,11 @@ def nautical(kilometers=0, meters=0, miles=0, feet=0): # pylint: disable=W0621
 
 # Compatible names
 
-rad = radians # pylint: disable=C0103
-arcmin = arcminutes # pylint: disable=C0103
-arcsec = arcseconds # pylint: disable=C0103
-km = kilometers # pylint: disable=C0103
-m = meters # pylint: disable=C0103
-mi = miles # pylint: disable=C0103
-ft = feet # pylint: disable=C0103
-nm = nautical # pylint: disable=C0103
+rad = radians
+arcmin = arcminutes
+arcsec = arcseconds
+km = kilometers
+m = meters
+mi = miles
+ft = feet
+nm = nautical
