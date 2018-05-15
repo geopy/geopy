@@ -31,7 +31,6 @@ from geopy.exc import (
 )
 from geopy.util import decode_page, __version__
 
-
 __all__ = (
     "Geocoder",
     "options",
@@ -205,10 +204,10 @@ class Geocoder(object):
         if isinstance(point, Point):
             return ",".join((str(point.latitude), str(point.longitude)))
         elif isinstance(point, (list, tuple)):
-            return ",".join((str(point[0]), str(point[1]))) # -altitude
+            return ",".join((str(point[0]), str(point[1])))  # -altitude
         elif isinstance(point, string_compare):
             return point
-        else: # pragma: no cover
+        else:
             raise ValueError("Invalid point")
 
     def _geocoder_exception_handler(self, error, message):

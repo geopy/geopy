@@ -7,6 +7,7 @@ from geopy.point import Point
 from geopy.geocoders import ArcGIS
 from test.geocoders.util import GeocoderTestBase, env
 
+
 class ArcGISTestCaseUnitTest(GeocoderTestBase):
 
     def test_user_agent_custom(self):
@@ -128,9 +129,9 @@ class ArcGISTestCase(GeocoderTestBase):
 
 
 @unittest.skipUnless(
-    env.get('ARCGIS_USERNAME') is not None \
-    or env.get('ARCGIS_PASSWORD') is not None\
-    or env.get('ARCGIS_REFERER') is not None,
+    (env.get('ARCGIS_USERNAME') is not None
+     or env.get('ARCGIS_PASSWORD') is not None
+     or env.get('ARCGIS_REFERER') is not None),
     "No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
 )
 class ArcGISAuthenticatedTestCase(GeocoderTestBase):

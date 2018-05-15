@@ -4,8 +4,8 @@ Convert units.
 
 import math
 
-
 # Angles
+
 
 def degrees(radians=0, arcminutes=0, arcseconds=0):
     """
@@ -20,6 +20,7 @@ def degrees(radians=0, arcminutes=0, arcseconds=0):
         deg += arcseconds / arcsec(degrees=1.)
     return deg
 
+
 def radians(degrees=0, arcminutes=0, arcseconds=0):
     """
     TODO docs.
@@ -30,6 +31,7 @@ def radians(degrees=0, arcminutes=0, arcseconds=0):
         degrees += arcseconds / arcsec(degrees=1.)
     return math.radians(degrees)
 
+
 def arcminutes(degrees=0, radians=0, arcseconds=0):
     """
     TODO docs.
@@ -39,6 +41,7 @@ def arcminutes(degrees=0, radians=0, arcseconds=0):
     if arcseconds:
         degrees += arcseconds / arcsec(degrees=1.)
     return degrees * 60.
+
 
 def arcseconds(degrees=0, radians=0, arcminutes=0):
     """
@@ -67,11 +70,13 @@ def kilometers(meters=0, miles=0, feet=0, nautical=0):
     ret += miles * 1.609344
     return ret
 
+
 def meters(kilometers=0, miles=0, feet=0, nautical=0):
     """
     TODO docs.
     """
     return (kilometers + km(nautical=nautical, miles=miles, feet=feet)) * 1000
+
 
 def miles(kilometers=0, meters=0, feet=0, nautical=0):
     """
@@ -87,6 +92,7 @@ def miles(kilometers=0, meters=0, feet=0, nautical=0):
     ret += kilometers / 1.609344
     return ret
 
+
 def feet(kilometers=0, meters=0, miles=0, nautical=0):
     """
     TODO docs.
@@ -100,6 +106,7 @@ def feet(kilometers=0, meters=0, miles=0, nautical=0):
         miles += mi(kilometers=kilometers)
     ret += miles * 5280
     return ret
+
 
 def nautical(kilometers=0, meters=0, miles=0, feet=0):
     """

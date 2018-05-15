@@ -1,11 +1,7 @@
-
-import unittest
-
 from geopy.compat import u
-from geopy.point import Point
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders import DataBC
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.util import GeocoderTestBase
 
 
 class DataBCTestCase(GeocoderTestBase):
@@ -73,8 +69,8 @@ class DataBCTestCase(GeocoderTestBase):
         DataBC.geocode with bad query parameters
         """
         with self.assertRaises(GeocoderQueryError):
-          res = self._make_request(
-              self.geocoder.geocode,
-              "1 Main St, Vancouver",
-              location_descriptor="access_Point",
-          )
+            self._make_request(
+                self.geocoder.geocode,
+                "1 Main St, Vancouver",
+                location_descriptor="access_Point",
+            )

@@ -84,7 +84,8 @@ class GeocoderTestCase(unittest.TestCase):
         self.assertIsNone(geocoder.timeout)
         self.assertIsNone(geocoder.ssl_context)
 
-    @patch.object(geopy.geocoders.options, 'default_user_agent', 'mocked_user_agent/0.0.0')
+    @patch.object(geopy.geocoders.options, 'default_user_agent',
+                  'mocked_user_agent/0.0.0')
     def test_user_agent_default(self):
         geocoder = Geocoder()
         self.assertEqual(geocoder.headers['User-Agent'],

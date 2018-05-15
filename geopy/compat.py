@@ -8,34 +8,34 @@ import warnings
 
 py3k = sys.version_info >= (3, 0)
 
-if py3k: # pragma: no cover
+if py3k:  # pragma: no cover
     string_compare = str
-else: # pragma: no cover
-    string_compare = (str, unicode)
+else:  # pragma: no cover
+    string_compare = (str, unicode)  # noqa
 
 if py3k:  # pragma: no cover
     text_type = str
 else:  # pragma: no cover
-    text_type = unicode
+    text_type = unicode  # noqa
 
 # Unicode compatibility, borrowed from 'six'
-if py3k: # pragma: no cover
+if py3k:  # pragma: no cover
     def u(s):
         """
         Convert to Unicode with py3k
         """
         return s
-else: # pragma: no cover
+else:  # pragma: no cover
     def u(s):
         """
         Convert to Unicode with unicode escaping
         """
-        return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')
+        return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')  # noqa
 
-if py3k:
+if py3k:  # pragma: no cover
     def cmp(a, b):
         return (a > b) - (a < b)
-else:
+else:  # pragma: no cover
     cmp = cmp  # builtin in py2
 
 
@@ -48,15 +48,12 @@ else:
         return not isinf(x) and not isnan(x)
 
 
-if py3k: # pragma: no cover
-    from urllib.parse import (urlencode, quote,
-                              urlparse, parse_qs)
-    from urllib.request import (Request, urlopen,
-                                build_opener, ProxyHandler, HTTPSHandler,
-                                URLError,
-                                HTTPPasswordMgrWithDefaultRealm,
-                                HTTPBasicAuthHandler)
+if py3k:  # pragma: no cover
     from urllib.error import HTTPError
+    from urllib.parse import parse_qs, quote, urlencode, urlparse
+    from urllib.request import (HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm,
+                                HTTPSHandler, ProxyHandler, Request, URLError,
+                                build_opener, urlopen)
 
     def itervalues(d):
         """
@@ -65,6 +62,7 @@ if py3k: # pragma: no cover
         For Python2
         """
         return iter(d.values())
+
     def iteritems(d):
         """
         Function for iterating on items due to methods
@@ -73,20 +71,19 @@ if py3k: # pragma: no cover
         """
         return iter(d.items())
 
-else: # pragma: no cover
-    from urllib import urlencode as original_urlencode, quote
-    from urllib2 import (Request, HTTPError,
-                         ProxyHandler, HTTPSHandler, URLError, urlopen,
-                         build_opener,
-                         HTTPPasswordMgrWithDefaultRealm,
-                         HTTPBasicAuthHandler)
-    from urlparse import urlparse, parse_qs
+else:  # pragma: no cover
+    from urllib import quote  # noqa
+    from urllib import urlencode as original_urlencode
+    from urllib2 import (HTTPBasicAuthHandler, HTTPError,  # noqa
+                         HTTPPasswordMgrWithDefaultRealm, HTTPSHandler, ProxyHandler,
+                         Request, URLError, build_opener, urlopen)
+    from urlparse import parse_qs, urlparse  # noqa
 
     def force_str(str_or_unicode):
         """
         Python2-only, ensures that a string is encoding to a str.
         """
-        if isinstance(str_or_unicode, unicode):
+        if isinstance(str_or_unicode, unicode):  # noqa
             return str_or_unicode.encode('utf-8')
         else:
             return str_or_unicode
@@ -115,6 +112,7 @@ else: # pragma: no cover
         For Python3
         """
         return d.itervalues()
+
     def iteritems(d):
         """
         Function for iterating on items due to methods

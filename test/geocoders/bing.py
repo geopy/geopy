@@ -124,10 +124,8 @@ class BingTestCase(GeocoderTestBase):
 
         pennsylvania_bias = (40.922351, -75.096562)
         colorado_bias = (39.914231, -105.070104)
-        for expected, bias in (
-                (pennsylvania, pennsylvania_bias),
-                (colorado, colorado_bias)
-            ):
+        for expected, bias in ((pennsylvania, pennsylvania_bias),
+                               (colorado, colorado_bias)):
             res = self._make_request(
                 self.geocoder.geocode,
                 "20 Main Street",

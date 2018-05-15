@@ -140,6 +140,5 @@ class Location(object):
     def __ne__(self, other):
         return not (self == other)
 
-    def __len__(self):  # pragma: no cover
+    def __len__(self):
         return len(self._tuple)
-

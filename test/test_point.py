@@ -2,10 +2,10 @@
 Test Point.
 """
 
-import pickle
-import unittest
 import math
+import pickle
 import sys
+import unittest
 import warnings
 
 from geopy.compat import u
@@ -154,10 +154,12 @@ class PointTestCase(unittest.TestCase):
             point = Point(85, -185, 375)
             self.assertEqual((85, 175, 375), tuple(point))
 
+            # note that the zeros might be negative
             point = Point(-0.0, -0.0, 375)
-            self.assertEqual((0.0, 0.0, 375.0), tuple(point))  # note that the zeros might be negative
+            self.assertEqual((0.0, 0.0, 375.0), tuple(point))
             # ensure that negative zeros are normalized to the positive ones
             self.assertEqual((1.0, 1.0, 1.0), tuple(math.copysign(1.0, x) for x in point))
+
             point = Point(90, 180, 375)
             self.assertEqual((90, 180, 375), tuple(point))
             point = Point(-90, -180, 375)

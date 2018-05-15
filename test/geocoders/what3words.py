@@ -16,8 +16,9 @@ class What3WordsTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-@unittest.skipUnless(bool(env.get('WHAT3WORDS_KEY')),
-                     "No WHAT3WORDS_KEY env variable set"
+@unittest.skipUnless(
+    bool(env.get('WHAT3WORDS_KEY')),
+    "No WHAT3WORDS_KEY env variable set"
 )
 class What3WordsTestCase(GeocoderTestBase):
     @classmethod

@@ -110,7 +110,7 @@ class NominatimTestCase(GeocoderTestBase):
         """
         result_reverse_de = self._make_request(
             self.geocoder.reverse,
-             "52.51693903613385, 13.3859332733135",
+            "52.51693903613385, 13.3859332733135",
             exactly_one=True,
             language="de",
         )

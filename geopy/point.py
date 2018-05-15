@@ -6,8 +6,9 @@
 import collections
 import re
 import warnings
-from math import fmod
 from itertools import islice
+from math import fmod
+
 from geopy import util, units
 from geopy.format import (
     DEGREE,
@@ -17,7 +18,6 @@ from geopy.format import (
     format_distance,
 )
 from geopy.compat import string_compare, isfinite
-
 
 POINT_PATTERN = re.compile(r"""
     .*?
@@ -163,7 +163,7 @@ class Point(object):
             else:
                 try:
                     seq = iter(arg)
-                except TypeError: # pragma: no cover
+                except TypeError:
                     raise TypeError(
                         "Failed to create Point instance from %r." % (arg,)
                     )
@@ -314,7 +314,7 @@ class Point(object):
             }
             try:
                 return CONVERTERS[unit](distance)
-            except KeyError: # pragma: no cover
+            except KeyError:
                 raise NotImplementedError(
                     'Bad distance unit specified, valid are: %r' %
                     CONVERTERS.keys()
