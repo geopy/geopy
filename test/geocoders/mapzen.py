@@ -10,7 +10,7 @@ from test.geocoders.util import GeocoderTestBase
 
 
 @unittest.skip("Mapzen has shut down their API")
-class MapzenTestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
+class MapzenTestCase(GeocoderTestBase):
 
     delta = 0.04
 

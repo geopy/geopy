@@ -215,7 +215,7 @@ class Bing(Geocoder):
         )
 
     @staticmethod
-    def _parse_json(doc, exactly_one=True):  # pylint: disable=W0221
+    def _parse_json(doc, exactly_one=True):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """

@@ -235,43 +235,43 @@ class Distance(object):
             return self.__cmp__(other) <= 0
 
     @property
-    def kilometers(self): # pylint: disable=C0111
+    def kilometers(self):
         return self.__kilometers
 
     @property
-    def km(self): # pylint: disable=C0111
+    def km(self):
         return self.kilometers
 
     @property
-    def meters(self): # pylint: disable=C0111
+    def meters(self):
         return units.meters(kilometers=self.kilometers)
 
     @property
-    def m(self): # pylint: disable=C0111
+    def m(self):
         return self.meters
 
     @property
-    def miles(self): # pylint: disable=C0111
+    def miles(self):
         return units.miles(kilometers=self.kilometers)
 
     @property
-    def mi(self): # pylint: disable=C0111
+    def mi(self):
         return self.miles
 
     @property
-    def feet(self): # pylint: disable=C0111
+    def feet(self):
         return units.feet(kilometers=self.kilometers)
 
     @property
-    def ft(self): # pylint: disable=C0111
+    def ft(self):
         return self.feet
 
     @property
-    def nautical(self): # pylint: disable=C0111
+    def nautical(self):
         return units.nautical(kilometers=self.kilometers)
 
     @property
-    def nm(self): # pylint: disable=C0111
+    def nm(self):
         return self.nautical
 
 class great_circle(Distance):
@@ -316,7 +316,7 @@ class great_circle(Distance):
 
         return self.RADIUS * d
 
-    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
+    def destination(self, point, bearing, distance=None):
         """
         TODO docs.
         """
@@ -380,7 +380,7 @@ class geodesic(Distance):
             warnings.warn('Ignoring unused `iterations` kwarg for geodesic '
                           'distance.', UserWarning)
         kwargs.pop('iterations', 0)
-        major, minor, f = self.ELLIPSOID # pylint: disable=W0612
+        major, minor, f = self.ELLIPSOID
         super(geodesic, self).__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
@@ -416,7 +416,7 @@ class geodesic(Distance):
 
         return s12
 
-    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
+    def destination(self, point, bearing, distance=None):
         """
         TODO docs.
         """
@@ -485,7 +485,7 @@ class vincenty(Distance):
                           DeprecationWarning)
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         self.iterations = kwargs.pop('iterations', 20)
-        major, minor, f = self.ELLIPSOID # pylint: disable=W0612
+        major, minor, f = self.ELLIPSOID
         super(vincenty, self).__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
@@ -605,7 +605,7 @@ class vincenty(Distance):
         s = minor * A * (sigma - delta_sigma)
         return s
 
-    def destination(self, point, bearing, distance=None): # pylint: disable=W0621
+    def destination(self, point, bearing, distance=None):
         """
         TODO docs.
         """

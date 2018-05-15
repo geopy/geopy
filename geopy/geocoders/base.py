@@ -270,7 +270,7 @@ class Geocoder(object):
 
         try:
             page = requester(req, timeout=timeout, **kwargs)
-        except Exception as error: # pylint: disable=W0703
+        except Exception as error:
             message = (
                 str(error) if not py3k
                 else (

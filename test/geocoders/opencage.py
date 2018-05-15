@@ -16,7 +16,7 @@ class OpenCageTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
+@unittest.skipUnless(
     bool(env.get('OPENCAGE_KEY')),
     "No OPENCAGE_KEY env variables set"
 )

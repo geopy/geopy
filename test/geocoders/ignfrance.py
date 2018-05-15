@@ -23,7 +23,7 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
+@unittest.skipUnless(
     credentials,
     "One or more of the env variables IGNFRANCE_KEY, IGNFRANCE_USERNAME \
     and IGNFRANCE_PASSWORD is not set"

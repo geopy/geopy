@@ -9,7 +9,7 @@ from geopy.geocoders import GoogleV3
 from test.geocoders.util import GeocoderTestBase
 
 
-class GoogleV3TestCase(GeocoderTestBase): # pylint: disable=R0904,C0111
+class GoogleV3TestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):

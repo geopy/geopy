@@ -31,7 +31,7 @@ except ImportError:
 __all__ = ("GoogleV3", )
 
 
-class GoogleV3(Geocoder):  # pylint: disable=R0902
+class GoogleV3(Geocoder):
     """Geocoder using the Google Maps v3 API.
 
     Documentation at:

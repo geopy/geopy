@@ -29,7 +29,7 @@ class YandexTestCase(GeocoderTestBase):
             {"latitude": 48.002104, "longitude": 37.805186},
         )
 
-    @unittest.skipUnless(  # pylint: disable=R0904,C0111
+    @unittest.skipUnless(
         bool(env.get('YANDEX_KEY')),
         "No YANDEX_KEY env variable set"
     )

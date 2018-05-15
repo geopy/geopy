@@ -18,7 +18,7 @@ except ImportError: # pragma: no cover
 
 __version__ = "1.14.0"
 
-logger = logging.getLogger('geopy') # pylint: disable=C0103
+logger = logging.getLogger('geopy')
 
 
 def pairwise(seq):

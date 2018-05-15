@@ -16,7 +16,7 @@ class GeoNamesTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-@unittest.skipUnless(  # pylint: disable=R0904,C0111
+@unittest.skipUnless(
     bool(env.get('GEONAMES_USERNAME')),
     "No GEONAMES_USERNAME env variable set"
 )

@@ -27,7 +27,7 @@ GRAND_CENTRAL_RAW = {
 }
 
 
-class LocationTestCase(unittest.TestCase): # pylint: disable=R0904
+class LocationTestCase(unittest.TestCase):
     """
     Test :class:`geopy.location.Location`.
     """

@@ -20,7 +20,7 @@ class DummyGeocoder(Geocoder):
         return geo_html if geo_html else None
 
 
-class ProxyTestCase(unittest.TestCase): # pylint: disable=R0904,C0111
+class ProxyTestCase(unittest.TestCase):
     remote_website_http = "http://example.org/"
     remote_website_https = "https://example.org/"
     timeout = 5
