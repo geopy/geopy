@@ -18,7 +18,8 @@ geopy runs on both Python 2 and Python 3 on both the CPython and PyPy
 interpreters. You should handle any compatibility in `geopy/compat.py`.
 
 The new code should follow [PEP8](https://pep8.org/) coding style (except
-the line length limit) and adhere to the style of the surrounding code.
+the line length limit, which is 90) and adhere to the style of 
+the surrounding code.
 
 You must document any functionality using Sphinx-compatible RST, and
 implement tests for any functionality in the `test` directory.
@@ -55,6 +56,11 @@ To run a specific test module, pass a path as an argument to pytest.
 For example:
 
     pytest test/geocoders/nominatim.py
+
+Before pushing your code, make sure that linting passes, otherwise Travis
+build would fail:
+
+    flake8
 
 
 ### Geocoder credentials
