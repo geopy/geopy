@@ -27,6 +27,7 @@ class BaiduTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = Baidu(
             api_key=env['BAIDU_KEY'],
+            security_key=env['BAIDU_SEC_KEY'],
             timeout=3,
         )
         cls.delta_exact = 0.02

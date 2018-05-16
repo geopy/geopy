@@ -21,6 +21,7 @@ except IOError:
         'LIVESTREETS_AUTH_TOKEN',
         'GEOCODEFARM_KEY',
         'BAIDU_KEY',
+        'BAIDU_SEC_KEY',
         'OPENCAGE_KEY',
         'OPENMAPQUEST_APIKEY',
         'PICKPOINT_KEY',
