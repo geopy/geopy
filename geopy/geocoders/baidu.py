@@ -255,11 +255,11 @@ class Baidu(Geocoder):
             raise GeocoderQueryError(
                 'IP/SN/SCODE/REFERER Illegal:'
             )
-        elif status in range(200,300):
+        elif status in range(200, 300):
             raise GeocoderQueryError(
                 'Has No Privilleges.'
             )
-        elif status in range(300,400):
+        elif status in range(300, 400):
             raise GeocoderQuotaExceeded(
                 'Quota Error.'
             )
