@@ -1,14 +1,19 @@
+.PHONY: develop
 .PHONY: lint
 .PHONY: test
 .PHONY: clean
 .PHONY: docs
+.PHONY: authors
 .PHONY: dist
+.PHONY: pypi-release
 .PHONY: release
 
+version := $(shell python -c 'from geopy import __version__; print(__version__)')
+
 develop:
-	virtualenv .venv --distribute
+	[ -d .venv ] || virtualenv .venv --python=python3
 	. .venv/bin/activate
-	python setup.py develop && python setup.py test
+	pip install -e '.[dev]'
 
 lint:
 	flake8
@@ -18,23 +23,30 @@ test:
 	coverage report
 
 clean:
-	find . -name "*.pyc" -print0 | xargs -0 rm -rf
+	find . -name "*.pyc" -print0 | xargs -0 rm -f
+	rm -Rf dist
+	rm -Rf *.egg-info
 
 docs:
 	touch docs/_build/html/index.rst
 	cd docs && make html
 
+authors:
+	git log --format='%aN <%aE>' `git describe --abbrev=0 --tags`..@ | sort | uniq >> AUTHORS
+	cat AUTHORS | sort --ignore-case | uniq >> AUTHORS_
+	mv AUTHORS_ AUTHORS
+
 dist:
-	rm -rf dist
-	pandoc -f markdown -t rst README.md > README
-	python setup.py sdist --format=gztar
-	pip wheel --no-index --no-deps --wheel-dir dist dist/*.tar.gz
-	rm README
-	rm -rf *.egg-info
+	make clean
+	./setup.py sdist --format=gztar bdist_wheel
+
+pypi-release:
+	twine --version
+	twine upload -s dist/*
 
 release:
 	make dist
-	git tag -a $(version)
+	git tag -s $(version)
+	git push origin $(version)
+	make pypi-release
 
-remote-docs:
-	curl -X POST http://readthedocs.org/build/geopy
