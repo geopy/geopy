@@ -56,7 +56,7 @@ class Nominatim(Geocoder):
 
         :param tuple view_box: Coordinates to restrict search within.
             Accepts instances of the Point [Point(22, 180), Point(-22, -180)],
-            or iterables of numeric or string type [180, 22, -180, -22],
+            or iterables of numeric and string type [180, 22, -180, -22],
             ["180", "22", "-180", "-22"]
 
         :param str country_bias: Bias results to this country.
