@@ -207,3 +207,20 @@ class NominatimTestCase(GeocoderTestBase):
             'address',
             res
         )
+
+    def test_view_box(self):
+        box_tuple = tuple([180, 22, -180, -22])
+        geolocator = Nominatim(view_box=box_tuple)
+        location2 = geolocator.geocode("Peru")
+        self.assertEqual((location2.latitude, location2.longitude),
+                         (-6.8699697, -75.0458515))
+        box_tuple = [Point(22, 180), Point(-22, -180)]
+        geolocator = Nominatim(view_box=box_tuple)
+        location2 = geolocator.geocode("Peru")
+        self.assertEqual((location2.latitude, location2.longitude),
+                         (-6.8699697, -75.0458515))
+        box_tuple = tuple(["180", "22", "-180", "-22"])
+        geolocator = Nominatim(view_box=box_tuple)
+        location2 = geolocator.geocode("Peru")
+        self.assertEqual((location2.latitude, location2.longitude),
+                         (-6.8699697, -75.0458515))
