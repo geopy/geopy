@@ -83,8 +83,8 @@ class Baidu(Geocoder):
             ssl_context=ssl_context,
         )
         self.api_key = api_key
-        self.api = '%s://api.map.baidu.com/geocoder/v2/' % self.scheme
-        self.api_path = self.api.split('baidu.com')[1]
+        self.api_path = '/geocoder/v2/'
+        self.api = '%s://api.map.baidu.com%s' % (self.scheme, self.api_path)
         self.security_key = security_key
 
     @staticmethod
@@ -255,11 +255,11 @@ class Baidu(Geocoder):
             raise GeocoderQueryError(
                 'IP/SN/SCODE/REFERER Illegal:'
             )
-        elif status in range(200, 300):
+        elif 200 <= status <= 300:
             raise GeocoderQueryError(
                 'Has No Privilleges.'
             )
-        elif status in range(300, 400):
+        elif 301 <= status <= 402:
             raise GeocoderQuotaExceeded(
                 'Quota Error.'
             )
