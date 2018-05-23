@@ -22,8 +22,11 @@ class BaiduTestCaseUnitTest(GeocoderTestBase):
 
     def test_invalid_ak(self):
         try:
-            self.geocoder.geocode(query=u("Baidu"))
-            self.geocoder.reverse(query=Point(39.983615544507, 116.32295155093))
+            self.geocode_run({"query": u("baidu")}, None)
+            self.reverse_run(
+                {"query": Point(39.983615544507, 116.32295155093)},
+                None
+            )
         except GeocoderAuthenticationFailure:
             pass
 
