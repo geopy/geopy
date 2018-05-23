@@ -5,16 +5,27 @@ from geopy.compat import u
 from geopy.point import Point
 from geopy.geocoders import Baidu
 from test.geocoders.util import GeocoderTestBase, env
+from geopy.exc import GeocoderAuthenticationFailure
 
 
 class BaiduTestCaseUnitTest(GeocoderTestBase):
 
-    def test_user_agent_custom(self):
-        geocoder = Baidu(
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = Baidu(
             api_key='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_user_agent_custom(self):
+        self.assertEqual(self.geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_invalid_ak(self):
+        try:
+            self.geocoder.geocode(
+                query=u("Baidu"))
+        except GeocoderAuthenticationFailure:
+            pass
 
 
 @unittest.skipUnless(
