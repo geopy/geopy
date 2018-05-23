@@ -21,14 +21,12 @@ class BaiduTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(self.geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_invalid_ak(self):
-        try:
+        with self.assertRaisesRegex(GeocoderAuthenticationFailure, 'Invalid AK'):
             self.geocode_run({"query": u("baidu")}, None)
             self.reverse_run(
                 {"query": Point(39.983615544507, 116.32295155093)},
                 None
             )
-        except GeocoderAuthenticationFailure:
-            pass
 
 
 @unittest.skipUnless(
