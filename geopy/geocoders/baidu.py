@@ -4,6 +4,7 @@
 
 from geopy.compat import urlencode, quote_plus
 from geopy.exc import (
+    GeocoderServiceError,
     GeocoderAuthenticationFailure,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
@@ -228,7 +229,7 @@ class Baidu(Geocoder):
             # When there are no results, just return.
             return
         if status == 1:
-            raise GeocoderQueryError(
+            raise GeocoderServiceError(
                 'Internal server error.'
             )
         elif status == 2:
@@ -248,16 +249,24 @@ class Baidu(Geocoder):
                 'AK Illegal or Not Exist.'
             )
         elif status == 101:
-            raise GeocoderQueryError(
-                'Your request was denied.'
+            raise GeocoderAuthenticationFailure(
+                'No AK'
             )
         elif status == 102:
-            raise GeocoderQueryError(
-                'IP/SN/SCODE/REFERER Illegal:'
+            raise GeocoderAuthenticationFailure(
+                'MCODE Error'
+            )
+        elif status == 200:
+            raise GeocoderAuthenticationFailure(
+                'Invalid AK'
+            )
+        elif status == 211:
+            raise GeocoderAuthenticationFailure(
+                'Invalid SK'
             )
         elif 200 <= status <= 300:
-            raise GeocoderQueryError(
-                'Has No Privilleges.'
+            raise GeocoderAuthenticationFailure(
+                'Authentication Failure'
             )
         elif 301 <= status <= 402:
             raise GeocoderQuotaExceeded(
