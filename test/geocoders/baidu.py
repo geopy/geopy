@@ -107,4 +107,3 @@ class BaiduSKTestCase(GeocoderTestBase):
             {"query": Point(39.983615544507, 116.32295155093), "exactly_one": False},
             {"latitude": 39.983615544507, "longitude": 116.32295155093},
         )
-
