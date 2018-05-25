@@ -2,7 +2,7 @@
 :class:`.Baidu` is the Baidu Maps geocoder.
 """
 
-from geopy.compat import urlencode, quote_plus
+from geopy.compat import urlencode, quote, quote_plus
 from geopy.exc import (
     GeocoderServiceError,
     GeocoderAuthenticationFailure,
@@ -125,11 +125,12 @@ class Baidu(Geocoder):
             'output': 'json',
             'address': self.format_string % query,
         }
+        params = urlencode(params, safe="!*'();:@&=+$,/?#[]", quote_via=quote)
 
         if self.security_key is None:
-            url = "?".join((self.api, urlencode(params)))
+            url = "?".join((self.api, params))
         else:
-            url = self._url_with_signature(urlencode(params))
+            url = self._url_with_signature(params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -164,11 +165,12 @@ class Baidu(Geocoder):
             'output': 'json',
             'location': self._coerce_point_to_string(query),
         }
+        params = urlencode(params, safe="!*'();:@&=+$,/?#[]", quote_via=quote)
 
         if self.security_key is None:
-            url = "?".join((self.api, urlencode(params)))
+            url = "?".join((self.api, params))
         else:
-            url = self._url_with_signature(urlencode(params))
+            url = self._url_with_signature(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
