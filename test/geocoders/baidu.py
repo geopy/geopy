@@ -6,7 +6,6 @@ from geopy.point import Point
 from geopy.geocoders import Baidu
 from test.geocoders.util import GeocoderTestBase, env
 from geopy.exc import GeocoderAuthenticationFailure
-from geopy.compat import py3k
 
 
 class BaiduTestCaseUnitTest(GeocoderTestBase):
@@ -22,17 +21,9 @@ class BaiduTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(self.geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_invalid_ak(self):
-        if py3k:
-            assert_raise_msg = self.assertRaisesRegex
-        else:
-            assert_raise_msg = self.assertRaisesRegexp
-
-        with assert_raise_msg(GeocoderAuthenticationFailure, 'Invalid AK'):
+        with self.assertRaises(GeocoderAuthenticationFailure) as cm:
             self.geocode_run({"query": u("baidu")}, None)
-            self.reverse_run(
-                {"query": Point(39.983615544507, 116.32295155093)},
-                None
-            )
+        self.assertEqual(str(cm.exception), 'Invalid AK')
 
 
 @unittest.skipUnless(
