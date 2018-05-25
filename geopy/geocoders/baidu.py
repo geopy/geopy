@@ -2,7 +2,7 @@
 :class:`.Baidu` is the Baidu Maps geocoder.
 """
 
-from geopy.compat import urlencode, quote, quote_plus
+from geopy.compat import quote, quote_plus
 from geopy.exc import (
     GeocoderServiceError,
     GeocoderAuthenticationFailure,
@@ -123,9 +123,9 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'address': self.format_string % query,
+            'address': quote(self.format_string % query, safe="!*'();:@&=+$,/?#[]"),
         }
-        params = urlencode(params, safe="!*'();:@&=+$,/?#[]", quote_via=quote)
+        params = "&".join(["{}={}".format(k, v) for k, v in params.items()])
 
         if self.security_key is None:
             url = "?".join((self.api, params))
@@ -163,9 +163,12 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'location': self._coerce_point_to_string(query),
+            'location': quote(
+                self._coerce_point_to_string(query),
+                safe="!*'();:@&=+$,/?#[]"
+                ),
         }
-        params = urlencode(params, safe="!*'();:@&=+$,/?#[]", quote_via=quote)
+        params = "&".join(["{}={}".format(k, v) for k, v in params.items()])
 
         if self.security_key is None:
             url = "?".join((self.api, params))
