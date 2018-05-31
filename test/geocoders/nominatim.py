@@ -15,6 +15,12 @@ class NominatimTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = Nominatim()
 
+    def tearDown(self):
+        try:
+            del self.geocoder
+        except AttributeError:
+            pass
+
     def test_geocode(self):
         """
         Nominatim.geocode
@@ -209,18 +215,16 @@ class NominatimTestCase(GeocoderTestBase):
         )
 
     def test_view_box(self):
-        box_tuple = tuple([180, 22, -180, -22])
-        geolocator = Nominatim(view_box=box_tuple)
-        location2 = geolocator.geocode("Peru")
-        self.assertEqual((location2.latitude, location2.longitude),
-                         (-6.8699697, -75.0458515))
-        box_tuple = [Point(22, 180), Point(-22, -180)]
-        geolocator = Nominatim(view_box=box_tuple)
-        location2 = geolocator.geocode("Peru")
-        self.assertEqual((location2.latitude, location2.longitude),
-                         (-6.8699697, -75.0458515))
-        box_tuple = tuple(["180", "22", "-180", "-22"])
-        geolocator = Nominatim(view_box=box_tuple)
-        location2 = geolocator.geocode("Peru")
-        self.assertEqual((location2.latitude, location2.longitude),
-                         (-6.8699697, -75.0458515))
+        without_viewbox = self.geocode_run(
+            {"query": "Maple Street"},
+            {"latitude": 36.809551, "longitude": -97.050604},
+        )
+        for view_box in [(-0.9, 52, -0.11, 50),
+                         [Point(52, -0.9), Point(50, -0.11)],
+                         ("-0.9", "52", "-0.11", "50")]:
+            self.geocoder = Nominatim(view_box=view_box)
+            with_viewbox = self.geocode_run(
+                {"query": "Maple Street"},
+                {"latitude": 51.5223513, "longitude": -0.1382104}
+            )
+            self.assertNotEqual(with_viewbox, without_viewbox)

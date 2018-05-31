@@ -55,9 +55,10 @@ class Nominatim(Geocoder):
             See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param tuple view_box: Coordinates to restrict search within.
-            Accepts instances of the Point [Point(22, 180), Point(-22, -180)],
-            or iterables of numeric and string types [180, 22, -180, -22],
-            ["180", "22", "-180", "-22"]
+            Accepts instances of the :class:`geopy.point.Point`
+            ``[Point(22, 180), Point(-22, -180)]``,
+            or iterables of numeric and string types ``[180, 22, -180, -22]``,
+            ``["180", "22", "-180", "-22"]``
 
         :param str country_bias: Bias results to this country.
 
@@ -209,11 +210,9 @@ class Nominatim(Geocoder):
         if self.view_box:
             if all(isinstance(point, Point) for point in self.view_box):
                 p1, p2 = self.view_box
-                params['viewbox'] = ','.join(str(p) for p in chain(p1[1::-1],
-                                                                   p2[1::-1]))
+                params['viewbox'] = ','.join(str(p) for p in chain(p1[1::-1], p2[1::-1]))
             else:
-                params['viewbox'] = ','.join(str(coord) for
-                                             coord in self.view_box)
+                params['viewbox'] = ','.join(str(coord) for coord in self.view_box)
 
         if self.country_bias:
             params['countrycodes'] = self.country_bias
