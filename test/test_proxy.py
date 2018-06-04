@@ -76,3 +76,15 @@ class ProxyTestCase(unittest.TestCase):
             geocoder_dummy.geocode(self.remote_website_https)
         self.assertIn('SSL', str(cm.exception))
         self.assertEqual(1, len(self.proxy_server.requests))
+
+    def test_geocoder_constructor_uses_str_proxy(self):
+        base_http = urlopen(self.remote_website_http, timeout=self.timeout)
+        base_html = base_http.read()
+        geocoder_dummy = DummyGeocoder(proxies=self.proxy_url,
+                                       timeout=self.timeout)
+        self.assertEqual(0, len(self.proxy_server.requests))
+        self.assertEqual(
+            base_html,
+            geocoder_dummy.geocode(self.remote_website_http)
+        )
+        self.assertEqual(1, len(self.proxy_server.requests))
