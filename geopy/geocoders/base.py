@@ -188,6 +188,7 @@ class Geocoder(object):
 
         if self.proxies:
             if isinstance(self.proxies, str):
+                print(self.scheme, 'scheme')
                 self.proxies = {self.scheme if self.scheme else
                                 self.proxies.split('://')[0]: self.proxies}
 
