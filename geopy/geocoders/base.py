@@ -187,7 +187,7 @@ class Geocoder(object):
                             else options.default_ssl_context)
 
         if self.proxies:
-            if isinstance(self.proxies, str):
+            if isinstance(self.proxies, string_compare):
                 self.proxies = {self.scheme: self.proxies}
 
             opener = build_opener_with_context(
