@@ -188,8 +188,8 @@ class Geocoder(object):
 
         if self.proxies:
             if isinstance(self.proxies, str):
-                self.scheme = self.proxies.split('://')[0]
-                self.proxies = {self.scheme: self.proxies}
+                self.proxies = {self.scheme if self.scheme else
+                                self.proxies.split('://')[0]: self.proxies}
 
             opener = build_opener_with_context(
                 self.ssl_context,
