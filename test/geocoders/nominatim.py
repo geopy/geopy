@@ -215,16 +215,15 @@ class NominatimTestCase(GeocoderTestBase):
         )
 
     def test_view_box(self):
-        without_viewbox = self.geocode_run(
+        self.geocode_run(
             {"query": "Maple Street"},
             {"latitude": 36.809551, "longitude": -97.050604},
         )
-        for view_box in [(-0.9, 52, -0.11, 50),
-                         [Point(52, -0.9), Point(50, -0.11)],
-                         ("-0.9", "52", "-0.11", "50")]:
+        for view_box in [(-0.11, 52, -0.15, 50),
+                         [Point(52, -0.11), Point(50, -0.15)],
+                         ("-0.11", "52", "-0.15", "50")]:
             self.geocoder = Nominatim(view_box=view_box)
-            with_viewbox = self.geocode_run(
+            self.geocode_run(
                 {"query": "Maple Street"},
                 {"latitude": 51.5223513, "longitude": -0.1382104}
             )
-            self.assertNotEqual(with_viewbox, without_viewbox)
