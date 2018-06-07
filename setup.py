@@ -32,6 +32,7 @@ setup(
             "mock",
             "pytest>=3",
             "sphinx",
+            "sphinx_rtd_theme>=0.4.0",
         ],
         "timezone": ["pytz"],
     },

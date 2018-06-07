@@ -10,10 +10,14 @@
 
 version := $(shell python -c 'from geopy import __version__; print(__version__)')
 
-develop:
+venv:
 	[ -d .venv ] || virtualenv .venv --python=python3
 	. .venv/bin/activate
+
+piplocal:
 	pip install -e '.[dev]'
+
+develop: venv piplocal
 
 lint:
 	flake8
