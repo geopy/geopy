@@ -15,6 +15,12 @@ class NominatimTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = Nominatim()
 
+    def tearDown(self):
+        try:
+            del self.geocoder
+        except AttributeError:
+            pass
+
     def test_geocode(self):
         """
         Nominatim.geocode
@@ -207,3 +213,17 @@ class NominatimTestCase(GeocoderTestBase):
             'address',
             res
         )
+
+    def test_view_box(self):
+        self.geocode_run(
+            {"query": "Maple Street"},
+            {"latitude": 36.809551, "longitude": -97.050604},
+        )
+        for view_box in [(-0.11, 52, -0.15, 50),
+                         [Point(52, -0.11), Point(50, -0.15)],
+                         ("-0.11", "52", "-0.15", "50")]:
+            self.geocoder = Nominatim(view_box=view_box)
+            self.geocode_run(
+                {"query": "Maple Street"},
+                {"latitude": 51.5223513, "longitude": -0.1382104}
+            )
