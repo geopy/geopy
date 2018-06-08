@@ -51,6 +51,11 @@ Geocoders
 
    .. automethod:: __init__
 
+.. autoclass:: geopy.geocoders.Here
+   :members:
+
+   .. automethod:: __init__
+
 .. autoclass:: geopy.geocoders.IGNFrance
    :members:
 

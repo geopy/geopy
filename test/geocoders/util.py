@@ -20,6 +20,8 @@ except IOError:
         'LIVESTREETS_AUTH_ID',
         'LIVESTREETS_AUTH_TOKEN',
         'GEOCODEFARM_KEY',
+        'HERE_APP_ID',
+        'HERE_APP_CODE',
         'BAIDU_KEY',
         'OPENCAGE_KEY',
         'OPENMAPQUEST_APIKEY',
@@ -32,7 +34,6 @@ except IOError:
         'YANDEX_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
-
 
 EMPTY = object()
 
