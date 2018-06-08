@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 
 from geopy.compat import u
@@ -77,7 +75,7 @@ class HereTestCase(GeocoderTestBase):
 
     def test_geocode_unicode_name(self):
         """
-        Here.geocode unicode in Japanese for Paris ("パリ"). (POIs not included.)
+        Here.geocode unicode in Japanese for Paris. (POIs not included.)
         """
         self.geocode_run(
             {"query": u("\u30d1\u30ea")},
