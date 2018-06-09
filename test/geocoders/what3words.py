@@ -1,5 +1,7 @@
 import unittest
+from mock import patch
 
+import geopy.geocoders
 import geopy.exc
 from geopy.compat import u
 from geopy.geocoders import What3Words
@@ -7,13 +9,28 @@ from test.geocoders.util import GeocoderTestBase, env
 
 
 class What3WordsTestCaseUnitTest(GeocoderTestBase):
+    dummy_api_key = 'DUMMYKEY1234'
 
     def test_user_agent_custom(self):
         geocoder = What3Words(
-            api_key='DUMMYKEY1234',
+            api_key=self.dummy_api_key,
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_http_scheme_is_disallowed(self):
+        with self.assertRaises(geopy.exc.ConfigurationError):
+            What3Words(
+                api_key=self.dummy_api_key,
+                scheme='http',
+            )
+
+    @patch.object(geopy.geocoders.options, 'default_scheme', 'http')
+    def test_default_scheme_is_ignored(self):
+        geocoder = What3Words(api_key=self.dummy_api_key)
+        self.assertEqual(geocoder.scheme, 'https')
+        geocoder = What3Words(api_key=self.dummy_api_key, scheme=None)
+        self.assertEqual(geocoder.scheme, 'https')
 
 
 @unittest.skipUnless(
