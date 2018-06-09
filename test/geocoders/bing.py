@@ -35,85 +35,59 @@ class BingTestCase(GeocoderTestBase):
         """
         Bing.geocode
         """
-        res = self._make_request(
-            self.geocoder.geocode,
-            "435 north michigan ave, chicago il 60611 usa",
+        self.geocode_run(
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890, "longitude": -87.624},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            self.assertAlmostEqual(res.latitude, 41.890, delta=self.delta)
-            self.assertAlmostEqual(res.longitude, -87.624, delta=self.delta)
 
     def test_unicode_name(self):
         """
         Bing.geocode unicode
         """
-        res = self._make_request(
-            self.geocoder.geocode,
-            u("\u6545\u5bab"),
+        self.geocode_run(
+            {"query": u("\u043c\u043e\u0441\u043a\u0432\u0430")},
+            {"latitude": 55.756, "longitude": 37.615},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            self.assertAlmostEqual(res.latitude, 39.916, delta=self.delta)
-            self.assertAlmostEqual(res.longitude, 116.390, delta=self.delta)
 
     def test_reverse_point(self):
         """
         Bing.reverse using point
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            Point(40.753898, -73.985071)
+        self.reverse_run(
+            {"query": Point(40.753898, -73.985071)},
+            {"latitude": 40.753, "longitude": -73.984},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            self.assertAlmostEqual(res.latitude, 40.753, delta=self.delta)
-            self.assertAlmostEqual(res.longitude, -73.984, delta=self.delta)
 
     def test_reverse_with_culture_de(self):
         """
         Bing.reverse using point and culture parameter to get a non english response
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            Point(40.753898, -73.985071),
-            culture="DE"
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "culture": "DE"},
+            {},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            self.assertIn("Vereinigte Staaten von Amerika", res.address)
+        self.assertIn("Vereinigte Staaten von Amerika", res.address)
 
     def test_reverse_with_culture_en(self):
         """
         Bing.reverse using point and culture parameter to get an english response
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            Point(40.753898, -73.985071),
-            culture="EN"
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "culture": "EN"},
+            {},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            self.assertIn("United States", res.address)
+        self.assertIn("United States", res.address)
 
     def test_reverse_with_include_country_code(self):
         """
         Bing.reverse using point and include country-code in the response
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            Point(40.753898, -73.985071),
-            include_country_code=True
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071),
+             "include_country_code": True},
+            {},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            self.assertEqual(res.raw["address"].get("countryRegionIso2", 'missing'), 'US')
+        self.assertEqual(res.raw["address"].get("countryRegionIso2", 'missing'), 'US')
 
     def test_user_location(self):
         """
@@ -126,36 +100,23 @@ class BingTestCase(GeocoderTestBase):
         colorado_bias = (39.914231, -105.070104)
         for expected, bias in ((pennsylvania, pennsylvania_bias),
                                (colorado, colorado_bias)):
-            res = self._make_request(
-                self.geocoder.geocode,
-                "20 Main Street",
-                user_location=Point(bias),
+            self.geocode_run(
+                {"query": "20 Main Street", "user_location": Point(bias)},
+                {"latitude": expected[0], "longitude": expected[1]},
             )
-            if res is None:
-                unittest.SkipTest("Bing sometimes returns no result")
-            else:
-                self._verify_request(res,
-                                     latitude=expected[0],
-                                     longitude=expected[1])
 
     def test_optional_params(self):
         """
         Bing.geocode using optional params
         """
-        address_string = "Badeniho 1, Prague, Czech Republic"
-
-        res = self._make_request(
-            self.geocoder.geocode,
-            query=address_string,
-            culture='cs',
-            include_neighborhood=True,
-            include_country_code=True
+        res = self.geocode_run(
+            {"query": "Badeniho 1, Prague, Czech Republic",
+             "culture": 'cs',
+             "include_neighborhood": True,
+             "include_country_code": True},
+            {},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            address = res.raw['address']
-
+        address = res.raw['address']
         self.assertEqual(address['neighborhood'], "Praha 6")
         self.assertEqual(address['countryRegionIso2'], "CZ")
 
@@ -163,13 +124,9 @@ class BingTestCase(GeocoderTestBase):
         """
         Bing.geocode using structured query
         """
-        address_dict = {'postalCode': '80020', 'countryRegion': 'United States'}
-        res = self._make_request(
-            self.geocoder.geocode,
-            query=address_dict
+        res = self.geocode_run(
+            {"query": {'postalCode': '80020', 'countryRegion': 'United States'}},
+            {},
         )
-        if res is None:
-            unittest.SkipTest("Bing sometimes returns no result")
-        else:
-            address = res.raw['address']
-            self.assertEqual(address['locality'], "Broomfield")
+        address = res.raw['address']
+        self.assertEqual(address['locality'], "Broomfield")
