@@ -105,3 +105,16 @@ class BaiduSKTestCase(GeocoderTestBase):
             {"query": Point(39.983615544507, 116.32295155093), "exactly_one": False},
             {"latitude": 39.983615544507, "longitude": 116.32295155093},
         )
+
+    def test_safe_within_signature(self):
+        """
+        Baidu signature calculation with safe characters
+        """
+        self.geocode_run(
+            {"query": u(
+                "\u5317\u4eac\u5e02\u6d77\u6dc0\u533a"
+                "\u4e2d\u5173\u6751\u5927\u885727\u53f7"
+                "!*'();:@&=+$,/?[] %"
+            )},
+            {"latitude": 39.983615544507, "longitude": 116.32295155093},
+        )
