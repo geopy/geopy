@@ -1,4 +1,3 @@
-import unittest
 from mock import patch
 
 from geopy import exc
@@ -66,12 +65,12 @@ class GeocodeFarmTestCase(GeocoderTestBase):
         GeocodeFarm authentication failure
         """
         self.geocoder = GeocodeFarm(api_key="invalid")
-        try:
-            with self.assertRaises(exc.GeocoderAuthenticationFailure):
-                address = '435 north michigan ave, chicago il 60611'
-                self.geocoder.geocode(address)
-        except exc.GeocoderTimedOut:
-            raise unittest.SkipTest("GeocodeFarm timed out")
+        with self.assertRaises(exc.GeocoderAuthenticationFailure):
+            self.geocode_run(
+                {"query": '435 north michigan ave, chicago il 60611'},
+                {},
+                expect_failure=True,
+            )
 
     def test_quota_exceeded(self):
         """

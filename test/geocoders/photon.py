@@ -76,10 +76,9 @@ class PhotonTestCase(GeocoderTestBase):
         """
         Photon.geocode using `language`
         """
-        result_geocode = self._make_request(
-            self.geocoder.geocode,
-            self.known_country_fr,
-            language="it",
+        result_geocode = self.geocode_run(
+            {"query": self.known_country_fr, "language": "it"},
+            {},
         )
         self.assertEqual(
             result_geocode.raw['properties']['country'],
@@ -90,22 +89,23 @@ class PhotonTestCase(GeocoderTestBase):
         """
         Photon.reverse using `language`
         """
-        result_reverse_it = self._make_request(
-            self.geocoder.reverse,
-            "45.7733105, 4.8869339",
-            exactly_one=True,
-            language="it",
+
+        result_reverse_it = self.reverse_run(
+            {"query": "45.7733105, 4.8869339",
+             "exactly_one": True,
+             "language": "it"},
+            {},
         )
         self.assertEqual(
             result_reverse_it.raw['properties']['country'],
             self.known_country_it
         )
 
-        result_reverse_fr = self._make_request(
-            self.geocoder.reverse,
-            "45.7733105, 4.8869339",
-            exactly_one=True,
-            language="fr"
+        result_reverse_fr = self.reverse_run(
+            {"query": "45.7733105, 4.8869339",
+             "exactly_one": True,
+             "language": "fr"},
+            {},
         )
         self.assertEqual(
             result_reverse_fr.raw['properties']['country'],

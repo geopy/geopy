@@ -17,6 +17,10 @@ class GoogleV3TestCase(GeocoderTestBase):
         cls.new_york_point = Point(40.75376406311989, -73.98489005863667)
         cls.america_new_york = timezone("America/New_York")
 
+    def timezone_run(self, payload, expected):
+        tz = self._make_request(self.geocoder.timezone, **payload)
+        self.assertEqual(tz, expected)
+
     def test_user_agent_custom(self):
         geocoder = GoogleV3(
             user_agent='my_user_agent/1.0'
@@ -192,39 +196,39 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3.geocode returns None for no result
         """
         with self.assertRaises(exc.GeocoderQueryError):
-            self._make_request(self.geocoder.geocode, '')
+            self.geocode_run(
+                {"query": ''},
+                {},
+                expect_failure=True,
+            )
 
     def test_timezone_datetime(self):
         """
         GoogleV3.timezone returns pytz object from datetime
         """
-        tz = self._make_request(
-            self.geocoder.timezone,
-            self.new_york_point,
-            datetime.utcfromtimestamp(0)
+        self.timezone_run(
+            {"location": self.new_york_point,
+             "at_time": datetime.utcfromtimestamp(0)},
+            self.america_new_york,
         )
-        self.assertEqual(tz, self.america_new_york)
 
     def test_timezone_integer(self):
         """
         GoogleV3.timezone returns pytz object from epoch integer
         """
-        tz = self._make_request(
-            self.geocoder.timezone,
-            self.new_york_point,
-            0
+        self.timezone_run(
+            {"location": self.new_york_point, "at_time": 0},
+            self.america_new_york,
         )
-        self.assertEqual(tz, self.america_new_york)
 
     def test_timezone_no_date(self):
         """
         GoogleV3.timezone defaults `at_time`
         """
-        tz = self._make_request(
-            self.geocoder.timezone,
-            self.new_york_point,
+        self.timezone_run(
+            {"location": self.new_york_point},
+            self.america_new_york,
         )
-        self.assertEqual(tz, self.america_new_york)
 
     def test_timezone_invalid_at_time(self):
         """
