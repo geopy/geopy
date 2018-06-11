@@ -45,6 +45,22 @@ class GeocoderTestBase(unittest.TestCase):
     geocoder = None
     delta = 0.5
 
+    def tearDown(self):
+        # Typically geocoder instance is created in the setUpClass
+        # method and is assigned to the TestCase as a class attribute.
+        #
+        # Individual test methods might assign a custom instance of
+        # geocoder to the `self.geocoder` instance attribute, which
+        # will shadow the class's `geocoder` attribute, used by
+        # the `geocode_run`/`reverse_run` methods.
+        #
+        # The code below cleans up the possibly assigned instance
+        # attribute.
+        try:
+            del self.geocoder
+        except AttributeError:
+            pass
+
     def geocode_run(self, payload, expected, expect_failure=False):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
@@ -73,19 +89,19 @@ class GeocoderTestBase(unittest.TestCase):
                              **expected)
         return result
 
-    @staticmethod
-    def _make_request(call, *args, **kwargs):
+    @classmethod
+    def _make_request(cls, call, *args, **kwargs):
         """
         Handles remote service errors.
         """
         try:
             result = call(*args, **kwargs)
         except exc.GeocoderQuotaExceeded:
-            raise unittest.SkipTest("Quota exceeded")
+            raise unittest.SkipTest("%s: Quota exceeded" % cls.__name__)
         except exc.GeocoderTimedOut:
-            raise unittest.SkipTest("Service timed out")
+            raise unittest.SkipTest("%s: Service timed out" % cls.__name__)
         except exc.GeocoderUnavailable:
-            raise unittest.SkipTest("Service unavailable")
+            raise unittest.SkipTest("%s: Service unavailable" % cls.__name__)
         return result
 
     def _verify_request(

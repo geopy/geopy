@@ -31,6 +31,7 @@ setup(
             "flake8>=3.5.0,<3.6.0",
             "mock",
             "pytest>=3",
+            "six",
             "sphinx",
             "sphinx_rtd_theme>=0.4.0",
         ],
