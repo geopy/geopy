@@ -188,7 +188,7 @@ class Geocoder(object):
 
         if self.proxies:
             if isinstance(self.proxies, string_compare):
-                self.proxies = {self.scheme: self.proxies}
+                self.proxies = {'http': self.proxies, 'https': self.proxies}
 
             opener = build_opener_with_context(
                 self.ssl_context,

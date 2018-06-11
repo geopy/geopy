@@ -89,7 +89,8 @@ class ProxyTestCase(unittest.TestCase):
             geocoder_dummy.geocode(self.remote_website_http)
         )
         self.assertEqual(1, len(self.proxy_server.requests))
+
+    def test_geocoder_constructor_have_both_schemes_proxy(self):
         g = DummyGeocoder(proxies=self.proxy_url, scheme='http')
-        self.assertDictEqual(g.proxies, {'http': self.proxy_url})
-        g = DummyGeocoder(proxies=self.proxy_url, scheme='https')
-        self.assertDictEqual(g.proxies, {'https': self.proxy_url})
+        self.assertDictEqual(g.proxies, {'http': self.proxy_url,
+                                         'https': self.proxy_url})
