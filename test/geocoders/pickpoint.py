@@ -1,7 +1,7 @@
 import unittest
 
 from geopy.geocoders import PickPoint
-from test.geocoders.nominatim_base import BaseNominatimTestCase
+from test.geocoders.nominatim import BaseNominatimTestCase
 from test.geocoders.util import GeocoderTestBase, env
 
 
