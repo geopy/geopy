@@ -80,9 +80,8 @@ class ProxyTestCase(unittest.TestCase):
     def test_geocoder_constructor_uses_str_proxy(self):
         base_http = urlopen(self.remote_website_http, timeout=self.timeout)
         base_html = base_http.read()
-        geocoder_dummy = DummyGeocoder(proxies=self.proxy_url, scheme='http',
+        geocoder_dummy = DummyGeocoder(proxies=self.proxy_url,
                                        timeout=self.timeout)
-        print(geocoder_dummy.scheme, geocoder_dummy.proxies, 'proxy')
         self.assertEqual(0, len(self.proxy_server.requests))
         self.assertEqual(
             base_html,
