@@ -50,7 +50,7 @@ else:
 
 if py3k:  # pragma: no cover
     from urllib.error import HTTPError
-    from urllib.parse import parse_qs, quote, urlencode, urlparse
+    from urllib.parse import parse_qs, quote, quote_plus, urlencode, urlparse
     from urllib.request import (HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm,
                                 HTTPSHandler, ProxyHandler, Request, URLError,
                                 build_opener, urlopen)
@@ -72,7 +72,7 @@ if py3k:  # pragma: no cover
         return iter(d.items())
 
 else:  # pragma: no cover
-    from urllib import quote  # noqa
+    from urllib import quote, quote_plus  # noqa
     from urllib import urlencode as original_urlencode
     from urllib2 import (HTTPBasicAuthHandler, HTTPError,  # noqa
                          HTTPPasswordMgrWithDefaultRealm, HTTPSHandler, ProxyHandler,

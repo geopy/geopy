@@ -2,8 +2,9 @@
 :class:`.Baidu` is the Baidu Maps geocoder.
 """
 
-from geopy.compat import urlencode
+from geopy.compat import quote, quote_plus
 from geopy.exc import (
+    GeocoderServiceError,
     GeocoderAuthenticationFailure,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
@@ -11,6 +12,7 @@ from geopy.exc import (
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
+import hashlib
 
 __all__ = ("Baidu", )
 
@@ -33,6 +35,7 @@ class Baidu(Geocoder):
             user_agent=None,
             format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            security_key=None,
     ):
         """
 
@@ -67,6 +70,10 @@ class Baidu(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
             .. versionadded:: 1.14.0
+
+        :param str security_key: The security key to calculate <sn> parameter
+            in request if authentication setting requires.
+            (http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix)
         """
         super(Baidu, self).__init__(
             format_string=format_string,
@@ -77,7 +84,9 @@ class Baidu(Geocoder):
             ssl_context=ssl_context,
         )
         self.api_key = api_key
-        self.api = '%s://api.map.baidu.com/geocoder/v2/' % self.scheme
+        self.api_path = '/geocoder/v2/'
+        self.api = '%s://api.map.baidu.com%s' % (self.scheme, self.api_path)
+        self.security_key = security_key
 
     @staticmethod
     def _format_components_param(components):
@@ -114,10 +123,15 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'address': self.format_string % query,
+            'address': quote(self.format_string % query, safe="!*'();:@&=+$,/?#[]"),
         }
+        params = "&".join(["{}={}".format(k, v) for k, v in params.items()])
 
-        url = "?".join((self.api, urlencode(params)))
+        if self.security_key is None:
+            url = "?".join((self.api, params))
+        else:
+            url = self._url_with_signature(params)
+
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
@@ -149,10 +163,17 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'location': self._coerce_point_to_string(query),
+            'location': quote(
+                self._coerce_point_to_string(query),
+                safe="!*'();:@&=+$,/?#[]"
+                ),
         }
+        params = "&".join(["{}={}".format(k, v) for k, v in params.items()])
 
-        url = "?".join((self.api, urlencode(params)))
+        if self.security_key is None:
+            url = "?".join((self.api, params))
+        else:
+            url = self._url_with_signature(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
@@ -163,7 +184,11 @@ class Baidu(Geocoder):
         """
         Parses a location from a single-result reverse API call.
         """
-        place = page.get('result')
+        place = page.get('result', None)
+
+        if not place:
+            self._check_status(page.get('status'))
+            return None
 
         location = place.get('formatted_address').encode('utf-8')
         latitude = place['location']['lat']
@@ -205,44 +230,63 @@ class Baidu(Geocoder):
         """
         Validates error statuses.
         """
-        if status == '0':
+        if status == 0:
             # When there are no results, just return.
             return
-        if status == '1':
-            raise GeocoderQueryError(
+        if status == 1:
+            raise GeocoderServiceError(
                 'Internal server error.'
             )
-        elif status == '2':
+        elif status == 2:
             raise GeocoderQueryError(
                 'Invalid request.'
             )
-        elif status == '3':
+        elif status == 3:
             raise GeocoderAuthenticationFailure(
                 'Authentication failure.'
             )
-        elif status == '4':
+        elif status == 4:
             raise GeocoderQuotaExceeded(
                 'Quota validate failure.'
             )
-        elif status == '5':
+        elif status == 5:
             raise GeocoderQueryError(
                 'AK Illegal or Not Exist.'
             )
-        elif status == '101':
-            raise GeocoderQueryError(
-                'Your request was denied.'
+        elif status == 101:
+            raise GeocoderAuthenticationFailure(
+                'No AK'
             )
-        elif status == '102':
-            raise GeocoderQueryError(
-                'IP/SN/SCODE/REFERER Illegal:'
+        elif status == 102:
+            raise GeocoderAuthenticationFailure(
+                'MCODE Error'
             )
-        elif status == '2xx':
-            raise GeocoderQueryError(
-                'Has No Privilleges.'
+        elif status == 200:
+            raise GeocoderAuthenticationFailure(
+                'Invalid AK'
             )
-        elif status == '3xx':
+        elif status == 211:
+            raise GeocoderAuthenticationFailure(
+                'Invalid SK'
+            )
+        elif 200 <= status <= 300:
+            raise GeocoderAuthenticationFailure(
+                'Authentication Failure'
+            )
+        elif 301 <= status <= 402:
             raise GeocoderQuotaExceeded(
                 'Quota Error.'
             )
         else:
             raise GeocoderQueryError('Unknown error')
+
+    def _url_with_signature(self, quoted_params):
+        """
+        Return the request url with signature.
+        qutoted_params is the escaped str of params in request.
+        """
+
+        # Since quoted_params is escaped by urlencode, don't apply quote twice
+        raw = self.api_path + '?' + quoted_params + self.security_key
+        sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
+        return self.api + '?' + quoted_params + '&sn=' + sn
