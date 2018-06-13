@@ -70,6 +70,8 @@ class options(object):
             If specified, tunnel requests through the specified proxy.
             E.g., ``{"https": "192.0.2.0"}``. For more information, see
             documentation on :class:`urllib.request.ProxyHandler`.
+            Can be sent as a string ``"https://192.0.2.0"``, this will
+            automatically set the scheme to the ``https``
 
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
@@ -185,6 +187,9 @@ class Geocoder(object):
                             else options.default_ssl_context)
 
         if self.proxies:
+            if isinstance(self.proxies, string_compare):
+                self.proxies = {'http': self.proxies, 'https': self.proxies}
+
             opener = build_opener_with_context(
                 self.ssl_context,
                 ProxyHandler(self.proxies),
