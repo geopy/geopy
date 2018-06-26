@@ -2,7 +2,9 @@
 :class:`.Baidu` is the Baidu Maps geocoder.
 """
 
-from geopy.compat import quote, quote_plus
+import hashlib
+
+from geopy.compat import quote_plus, urlencode
 from geopy.exc import (
     GeocoderServiceError,
     GeocoderAuthenticationFailure,
@@ -12,7 +14,6 @@ from geopy.exc import (
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
-import hashlib
 
 __all__ = ("Baidu", )
 
@@ -39,7 +40,7 @@ class Baidu(Geocoder):
     ):
         """
 
-        :param str api_key: The API key required by Baidu Map to perform
+        :param str api_key: The API key (AK) required by Baidu Map to perform
             geocoding requests. API keys are managed through the Baidu APIs
             console (http://lbsyun.baidu.com/apiconsole/key).
 
@@ -71,9 +72,9 @@ class Baidu(Geocoder):
 
             .. versionadded:: 1.14.0
 
-        :param str security_key: The security key to calculate <sn> parameter
-            in request if authentication setting requires.
-            (http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix)
+        :param str security_key: The security key (SK) to calculate
+            the SN parameter in request if authentication setting requires
+            (http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix).
         """
         super(Baidu, self).__init__(
             format_string=format_string,
@@ -123,14 +124,10 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'address': quote(self.format_string % query, safe="!*'();:@&=+$,/?#[]"),
+            'address': self.format_string % query,
         }
-        params = "&".join(["{}={}".format(k, v) for k, v in params.items()])
 
-        if self.security_key is None:
-            url = "?".join((self.api, params))
-        else:
-            url = self._url_with_signature(params)
+        url = self._construct_url(params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -163,17 +160,10 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'location': quote(
-                self._coerce_point_to_string(query),
-                safe="!*'();:@&=+$,/?#[]"
-                ),
+            'location': self._coerce_point_to_string(query),
         }
-        params = "&".join(["{}={}".format(k, v) for k, v in params.items()])
 
-        if self.security_key is None:
-            url = "?".join((self.api, params))
-        else:
-            url = self._url_with_signature(params)
+        url = self._construct_url(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
@@ -184,7 +174,7 @@ class Baidu(Geocoder):
         """
         Parses a location from a single-result reverse API call.
         """
-        place = page.get('result', None)
+        place = page.get('result')
 
         if not place:
             self._check_status(page.get('status'))
@@ -205,7 +195,7 @@ class Baidu(Geocoder):
         Returns location, (latitude, longitude) from JSON feed.
         """
 
-        place = page.get('result', None)
+        place = page.get('result')
 
         if not place:
             self._check_status(page.get('status'))
@@ -267,26 +257,25 @@ class Baidu(Geocoder):
             )
         elif status == 211:
             raise GeocoderAuthenticationFailure(
-                'Invalid SK'
+                'Invalid SN'
             )
-        elif 200 <= status <= 300:
+        elif 200 <= status < 300:
             raise GeocoderAuthenticationFailure(
                 'Authentication Failure'
             )
-        elif 301 <= status <= 402:
+        elif 300 <= status < 500:
             raise GeocoderQuotaExceeded(
                 'Quota Error.'
             )
         else:
-            raise GeocoderQueryError('Unknown error')
+            raise GeocoderQueryError('Unknown error. Status: %r' % status)
 
-    def _url_with_signature(self, quoted_params):
-        """
-        Return the request url with signature.
-        qutoted_params is the escaped str of params in request.
-        """
-
-        # Since quoted_params is escaped by urlencode, don't apply quote twice
-        raw = self.api_path + '?' + quoted_params + self.security_key
-        sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
-        return self.api + '?' + quoted_params + '&sn=' + sn
+    def _construct_url(self, params):
+        query_string = urlencode(params)
+        if self.security_key is None:
+            return "%s?%s" % (self.api, query_string)
+        else:
+            # http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix
+            raw = "%s?%s%s" % (self.api_path, query_string, self.security_key)
+            sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
+            return "%s?%s&sn=%s" % (self.api, query_string, sn)
