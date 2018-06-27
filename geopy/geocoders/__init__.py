@@ -91,15 +91,16 @@ __all__ = (
     "Baidu",
     "Bing",
     "DataBC",
+    "GeocodeEarth",
     "GeocodeFarm",
     "GeoNames",
     "GoogleV3",
     "IGNFrance",
-    "Mapzen",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
     "Nominatim",
+    "Pelias",
     "Photon",
     "LiveAddress",
     "What3Words",
@@ -111,14 +112,15 @@ from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.baidu import Baidu
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
+from geopy.geocoders.geocodeearth import GeocodeEarth
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.ignfrance import IGNFrance
-from geopy.geocoders.mapzen import Mapzen
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
+from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
@@ -134,16 +136,17 @@ SERVICE_TO_GEOCODER = {
     "baidu": Baidu,
     "bing": Bing,
     "databc": DataBC,
+    "geocodeearth": GeocodeEarth,
     "geocodefarm": GeocodeFarm,
     "geonames": GeoNames,
     "google": GoogleV3,
     "googlev3": GoogleV3,
     "ignfrance": IGNFrance,
-    "mapzen": Mapzen,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
     "nominatim": Nominatim,
+    "pelias": Pelias,
     "photon": Photon,
     "liveaddress": LiveAddress,
     "what3words": What3Words,

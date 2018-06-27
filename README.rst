@@ -24,7 +24,8 @@ third-party geocoders and other data sources.
 geopy includes geocoder classes for the `OpenStreetMap Nominatim`_,
 `ESRI ArcGIS`_, `Google Geocoding API (V3)`_, `Baidu Maps`_,
 `Bing Maps API`_, `Yandex`_, `IGN France`_, `GeoNames`_,
-`Mapzen Search`_, `OpenMapQuest`_, `PickPoint`_, `What3Words`_, `OpenCage`_,
+`Pelias`_, `geocode.earth`_,
+`OpenMapQuest`_, `PickPoint`_, `What3Words`_, `OpenCage`_,
 `SmartyStreets`_, and `GeocodeFarm`_ geocoder services.
 The various geocoder classes are located in `geopy.geocoders`_.
 
@@ -36,7 +37,8 @@ The various geocoder classes are located in `geopy.geocoders`_.
 .. _Yandex: http://api.yandex.com/maps/doc/intro/concepts/intro.xml
 .. _IGN France: http://api.ign.fr/tech-docs-js/fr/developpeur/search.html
 .. _GeoNames: http://www.geonames.org/
-.. _Mapzen Search: https://mapzen.com/projects/search/
+.. _Pelias: https://pelias.io/
+.. _geocode.earth: https://geocode.earth/
 .. _OpenMapQuest: http://developer.mapquest.com/web/products/open/geocoding-service
 .. _PickPoint: https://pickpoint.io
 .. _What3Words: http://what3words.com/api/reference
