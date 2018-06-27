@@ -36,6 +36,13 @@ Geocoders
 
    .. automethod:: __init__
 
+.. autoclass:: geopy.geocoders.GeocodeEarth
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+   .. automethod:: __init__
+
 .. autoclass:: geopy.geocoders.GeocodeFarm
    :members:
 
@@ -56,11 +63,6 @@ Geocoders
 
    .. automethod:: __init__
 
-.. autoclass:: geopy.geocoders.Mapzen
-   :members:
-
-   .. automethod:: __init__
-
 .. autoclass:: geopy.geocoders.OpenCage
    :members:
 
@@ -72,6 +74,11 @@ Geocoders
    .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.Nominatim
+   :members:
+
+   .. automethod:: __init__
+
+.. autoclass:: geopy.geocoders.Pelias
    :members:
 
    .. automethod:: __init__
