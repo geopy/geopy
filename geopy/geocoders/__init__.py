@@ -88,6 +88,7 @@ __all__ = (
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
     "ArcGIS",
+    "AzureMaps",
     "Baidu",
     "Bing",
     "DataBC",
@@ -102,12 +103,14 @@ __all__ = (
     "Nominatim",
     "Photon",
     "LiveAddress",
+    "TomTom",
     "What3Words",
     "Yandex",
 )
 
 
 from geopy.geocoders.arcgis import ArcGIS
+from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
@@ -122,6 +125,7 @@ from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
+from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 
@@ -131,6 +135,7 @@ from geopy.exc import GeocoderNotFound
 
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
+    "azure": AzureMaps,
     "baidu": Baidu,
     "bing": Bing,
     "databc": DataBC,
@@ -146,6 +151,7 @@ SERVICE_TO_GEOCODER = {
     "nominatim": Nominatim,
     "photon": Photon,
     "liveaddress": LiveAddress,
+    "tomtom": TomTom,
     "what3words": What3Words,
     "yandex": Yandex,
 }
