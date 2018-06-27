@@ -1,7 +1,3 @@
-"""
-:class:`.DataBC` geocoder.
-"""
-
 from geopy.compat import urlencode
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder

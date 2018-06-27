@@ -1,6 +1,3 @@
-"""
-:class:`Yandex` geocoder.
-"""
 import warnings
 
 from geopy.compat import urlencode

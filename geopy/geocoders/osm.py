@@ -1,6 +1,3 @@
-"""
-OpenStreetMap geocoder, contributed by Alessandro Pasotti of ItOpen.
-"""
 from itertools import chain
 
 from geopy.compat import urlencode

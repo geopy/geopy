@@ -1,7 +1,3 @@
-"""
-:class:`.Baidu` is the Baidu Maps geocoder.
-"""
-
 import hashlib
 
 from geopy.compat import quote_plus, urlencode

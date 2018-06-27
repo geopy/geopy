@@ -1,6 +1,3 @@
-"""
-:class:`GeoNames` geocoder.
-"""
 import warnings
 
 from geopy.compat import urlencode

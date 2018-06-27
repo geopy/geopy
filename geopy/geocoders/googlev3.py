@@ -1,7 +1,3 @@
-"""
-:class:`.GoogleV3` is the Google Maps V3 geocoder.
-"""
-
 import base64
 import hashlib
 import hmac

@@ -1,7 +1,3 @@
-"""
-:class:`.GeoCoder` base object from which other geocoders are templated.
-"""
-
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 import functools

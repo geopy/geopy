@@ -1,7 +1,3 @@
-"""
-:class:`.ArcGIS` geocoder.
-"""
-
 import json
 import warnings
 from time import time

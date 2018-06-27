@@ -1,7 +1,3 @@
-"""
-Mapzen geocoder, contributed by Michal Migurski of Mapzen.
-"""
-
 from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location

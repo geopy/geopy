@@ -1,7 +1,3 @@
-"""
-PickPoint geocoder
-"""
-
 from geopy.geocoders import Nominatim
 from geopy.geocoders.base import DEFAULT_SENTINEL
 

@@ -1,7 +1,3 @@
-"""
-:class:`.What3Words` geocoder.
-"""
-
 import re
 
 from geopy import exc

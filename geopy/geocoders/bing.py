@@ -1,7 +1,3 @@
-"""
-:class:`.Bing` geocoder.
-"""
-
 from geopy.compat import urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
