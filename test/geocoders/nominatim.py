@@ -186,6 +186,23 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
                 {"latitude": 51.5223513, "longitude": -0.1382104}
             )
 
+    def test_bounded(self):
+        bb = ('84.719353', '56.588456', '85.296822', '56.437293')
+        query = u('\u0441\u0442\u0440\u043e\u0438\u0442\u0435\u043b\u044c '
+                  '\u0442\u043e\u043c\u0441\u043a')
+
+        self.geocoder = self.make_geocoder(view_box=bb)
+        self.geocode_run(
+            {"query": query},
+            {"latitude": 56.4129459, "longitude": 84.847831069814},
+        )
+
+        self.geocoder = self.make_geocoder(view_box=bb, bounded=True)
+        self.geocode_run(
+            {"query": query},
+            {"latitude": 56.4803224, "longitude": 85.0060457653324},
+        )
+
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
