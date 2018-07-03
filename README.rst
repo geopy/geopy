@@ -48,7 +48,7 @@ The various geocoder classes are located in `geopy.geocoders`_.
 geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6), PyPy, and
 PyPy3. geopy does not and will not support CPython 2.6.
 
-© geopy contributors 2006-2015 (see AUTHORS) under the `MIT
+© geopy contributors 2006-2018 (see AUTHORS) under the `MIT
 License <https://github.com/geopy/geopy/blob/master/LICENSE>`__.
 
 Installation
@@ -68,7 +68,7 @@ Geocoding
 
 To geolocate a query to an address and coordinates:
 
-::
+.. code:: python
 
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim()
@@ -82,7 +82,7 @@ To geolocate a query to an address and coordinates:
 
 To find the address corresponding to a set of coordinates:
 
-::
+.. code:: python
 
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim()
@@ -107,7 +107,7 @@ with a default of the geodesic distance available as the function
 
 Here's an example usage of the geodesic distance:
 
-::
+.. code:: python
 
     >>> from geopy.distance import geodesic
     >>> newport_ri = (41.49008, -71.312796)
@@ -117,7 +117,7 @@ Here's an example usage of the geodesic distance:
 
 Using great-circle distance:
 
-::
+.. code:: python
 
     >>> from geopy.distance import great_circle
     >>> newport_ri = (41.49008, -71.312796)
