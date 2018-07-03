@@ -144,6 +144,7 @@ ERROR_CODE_MAP = {
     412: GeocoderQueryError,
     413: GeocoderQueryError,
     414: GeocoderQueryError,
+    429: GeocoderQuotaExceeded,
     502: GeocoderServiceError,
     503: GeocoderTimedOut,
     504: GeocoderTimedOut
