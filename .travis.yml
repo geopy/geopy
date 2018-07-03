@@ -1,16 +1,23 @@
-sudo: false
 language: python
-python:
-    - "2.7"
-    - "3.4"
-    - "3.5"
-    - "3.6"
-    - "3.7-dev"
-    - "pypy"
-    - "pypy3"
+sudo: false
+
 matrix:
+    include:
+        - python: "2.7"
+        - python: "3.4"
+        - python: "3.5"
+        - python: "3.6"
+        - python: "3.7"
+          # See: https://github.com/travis-ci/travis-ci/issues/9815
+          dist: xenial
+          sudo: required
+        - python: "3.8-dev"
+          dist: xenial
+          sudo: required
+        - python: "pypy"
+        - python: "pypy3"
     allow_failures:
-        - python: "3.7-dev"
+        - python: "3.8-dev"
 install:
     - travis_retry pip install -e ".[dev,timezone]"
 script:

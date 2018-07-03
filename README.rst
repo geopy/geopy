@@ -47,7 +47,7 @@ The various geocoder classes are located in `geopy.geocoders`_.
 .. _GeocodeFarm: https://www.geocodefarm.com/
 .. _geopy.geocoders: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
-geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6), PyPy, and
+geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6, 3.7), PyPy, and
 PyPy3. geopy does not and will not support CPython 2.6.
 
 © geopy contributors 2006-2018 (see AUTHORS) under the `MIT
