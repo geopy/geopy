@@ -63,30 +63,38 @@ class GeocoderTestBase(unittest.TestCase):
         except AttributeError:
             pass
 
-    def geocode_run(self, payload, expected, expect_failure=False):
+    def geocode_run(self, payload, expected, expect_failure=False,
+                    skiptest_on_failure=False):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
         """
         result = self._make_request(self.geocoder.geocode, **payload)
         if result is None:
-            if not expect_failure:
-                self.fail('No result found')
-            else:
+            cls = type(self)
+            if expect_failure:
                 return
+            elif skiptest_on_failure:
+                self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
+            else:
+                self.fail('%s: No result found' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
 
-    def reverse_run(self, payload, expected, expect_failure=False):
+    def reverse_run(self, payload, expected, expect_failure=False,
+                    skiptest_on_failure=False):
         """
         Calls geocoder.reverse(**payload), then checks against `expected`.
         """
         result = self._make_request(self.geocoder.reverse, **payload)
         if result is None:
-            if not expect_failure:
-                self.fail('No result found')
-            else:
+            cls = type(self)
+            if expect_failure:
                 return
+            elif skiptest_on_failure:
+                self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
+            else:
+                self.fail('%s: No result found' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
