@@ -21,6 +21,13 @@ Geocoders
 
    .. automethod:: __init__
 
+.. autoclass:: geopy.geocoders.AzureMaps
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+   .. automethod:: __init__
+
 .. autoclass:: geopy.geocoders.Baidu
    :members:
 
@@ -96,6 +103,11 @@ Geocoders
    .. automethod:: __init__
 
 .. autoclass:: geopy.geocoders.LiveAddress
+   :members:
+
+   .. automethod:: __init__
+
+.. autoclass:: geopy.geocoders.TomTom
    :members:
 
    .. automethod:: __init__
