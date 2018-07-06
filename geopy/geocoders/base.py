@@ -63,11 +63,46 @@ class options(object):
             calls only. For example: ``'%s, Mountain View, CA'``.
 
         default_proxies
-            If specified, tunnel requests through the specified proxy.
-            E.g., ``{"https": "192.0.2.0"}``. For more information, see
+            Tunnel requests through HTTP proxy.
+
+            By default the system proxies are respected (e.g.
+            `HTTP_PROXY` and `HTTPS_PROXY` env vars or platform-specific
+            proxy settings, such as macOS or Windows native
+            preferences -- see :class:`urllib.request.ProxyHandler` for
+            more details). The `proxies` value for using system proxies
+            is ``None``.
+
+            To disable system proxies and issue requests directly,
+            explicitly pass an empty dict as a value for `proxies`: ``{}``.
+
+            To use a custom HTTP proxy location, pass a string.
+            Valid examples are:
+
+            - ``"192.0.2.0:8080"``
+            - ``"john:passw0rd@192.0.2.0:8080"``
+            - ``"http://john:passw0rd@192.0.2.0:8080"``
+
+            Please note:
+
+            - Scheme part (``http://``) of the proxy is ignored.
+            - Only `http` proxy is supported. Even if the proxy scheme
+              is `https`, it will be ignored, and the connection between
+              client and proxy would still be unencrypted.
+              However, `https` requests via `http` proxy are still
+              supported (via `HTTP CONNECT` method).
+
+
+            Raw urllib-style `proxies` dict might be provided instead of
+            a string:
+
+            - ``{"https": "192.0.2.0:8080"}`` -- means that HTTP proxy
+              would be used only for requests having `https` scheme.
+              String `proxies` value is automatically used for both
+              schemes, and is provided as a shorthand for the urllib-style
+              `proxies` dict.
+
+            For more information, see
             documentation on :class:`urllib.request.ProxyHandler`.
-            Can be sent as a string ``"https://192.0.2.0"``, this will
-            automatically set the scheme to the ``https``
 
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
