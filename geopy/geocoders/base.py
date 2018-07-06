@@ -183,18 +183,20 @@ class Geocoder(object):
         self.ssl_context = (ssl_context if ssl_context is not DEFAULT_SENTINEL
                             else options.default_ssl_context)
 
-        if self.proxies:
-            if isinstance(self.proxies, string_compare):
-                self.proxies = {'http': self.proxies, 'https': self.proxies}
+        if isinstance(self.proxies, string_compare):
+            self.proxies = {'http': self.proxies, 'https': self.proxies}
 
-            opener = build_opener_with_context(
-                self.ssl_context,
-                ProxyHandler(self.proxies),
-            )
-        else:
-            opener = build_opener_with_context(
-                self.ssl_context,
-            )
+        # `ProxyHandler` should be present even when actually there're
+        # no proxies. `build_opener` contains it anyway. By specifying
+        # it here explicitly we can disable system proxies (i.e.
+        # from HTTP_PROXY env var) by setting `self.proxies` to `{}`.
+        # Otherwise, if we didn't specify ProxyHandler for empty
+        # `self.proxies` here, build_opener would have used one internally
+        # which could have unwillingly picked up the system proxies.
+        opener = build_opener_with_context(
+            self.ssl_context,
+            ProxyHandler(self.proxies),
+        )
         self.urlopen = opener.open
 
     @staticmethod
