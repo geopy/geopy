@@ -2,6 +2,48 @@
 
 Changelog
 =========
+1.15.0
+------
+2018-07-TBD
+
+*   ADDED: GeocodeEarth geocoder based on Pelias (ex-Mapzen). (#309)
+
+*   ADDED: TomTom and AzureMaps (based on TomTom) geocoders. (#312)
+
+*   ADDED: HERE geocoder. Contributed by deeplook. (#304)
+
+*   ADDED: Baidu now supports authentication using SK via a new
+    `security_key` option.
+    Contributed by tony. (#298)
+
+*   ADDED: Nominatim's and Pickpoint's `view_box` option now accepts
+    a list of Points or numbers instead of just stringified coordinates.
+    Contributed by svalee. (#299)
+
+*   ADDED: Nominatim and Pickpoint geocoders now support a `bounded`
+    option, which restricts results to the items strictly contained
+    within the `view_box`.
+    Contributed by Karimov Dmitriy. (#182)
+
+*   ADDED: `proxies` param of geocoders can now accept a single string
+    instead of a dict. See the updated docs for
+    the ``geopy.geocoders.options.default_proxies`` attribute for
+    more details.
+    Contributed by svalee. (#300)
+
+*   CHANGED: Mapzen has been renamed to Pelias, `domain` parameter has
+    been made required. (#309)
+
+*   CHANGED: What3Words API has been updated from v1 to v2.
+    Please note that `Location.raw` results have changed due to that.
+    Contributed by Jonathan Batchelor. (#226)
+
+*   FIXED: Baidu mistakenly didn't process the returned errors correctly.
+    Contributed by tony. (#298)
+
+*   FIXED: `proxies={}` didn't reset system proxies as expected.
+
+
 1.14.0
 ------
 2018-05-13
