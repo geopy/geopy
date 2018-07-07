@@ -11,6 +11,8 @@ class TomTom(Geocoder):
 
     Documentation at:
         https://developer.tomtom.com/online-search/online-search-documentation
+
+    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/2/geocode/%(query)s.json'

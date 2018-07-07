@@ -71,6 +71,8 @@ class Baidu(Geocoder):
         :param str security_key: The security key (SK) to calculate
             the SN parameter in request if authentication setting requires
             (http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix).
+
+            .. versionadded:: 1.15.0
         """
         super(Baidu, self).__init__(
             format_string=format_string,

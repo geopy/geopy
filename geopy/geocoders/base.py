@@ -104,6 +104,9 @@ class options(object):
             For more information, see
             documentation on :class:`urllib.request.ProxyHandler`.
 
+            .. versionchanged:: 1.15.0
+               Added support for the string value.
+
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
 

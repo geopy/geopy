@@ -58,10 +58,15 @@ class Nominatim(Geocoder):
             or iterables of numeric and string types ``[180, 22, -180, -22]``,
             ``["180", "22", "-180", "-22"]``
 
+            .. versionchanged:: 1.15.0
+               Previously only a list of stringified coordinates was supported.
+
         :param str country_bias: Bias results to this country.
 
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box.
+
+            .. versionadded:: 1.15.0
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
