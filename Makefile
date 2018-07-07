@@ -32,7 +32,6 @@ clean:
 	rm -Rf *.egg-info
 
 docs:
-	touch docs/_build/html/index.rst
 	cd docs && make html
 
 authors:
