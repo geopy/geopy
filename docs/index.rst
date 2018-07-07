@@ -10,6 +10,14 @@ Welcome to GeoPy's documentation!
 .. automodule:: geopy
    :members: __doc__
 
+
+Installation
+~~~~~~~~~~~~
+
+::
+
+    pip install geopy
+
 Geocoders
 ~~~~~~~~~
 
