@@ -10,6 +10,12 @@ Welcome to GeoPy's documentation!
 .. automodule:: geopy
    :members: __doc__
 
+.. toctree::
+    :maxdepth: 3
+    :caption: Contents
+
+    index
+
 
 Installation
 ~~~~~~~~~~~~
@@ -30,10 +36,16 @@ Geocoders
 
 .. autofunction:: geopy.geocoders.get_geocoder_for_service
 
+ArcGIS
+------
+
 .. autoclass:: geopy.geocoders.ArcGIS
    :members:
 
    .. automethod:: __init__
+
+AzureMaps
+---------
 
 .. autoclass:: geopy.geocoders.AzureMaps
    :members:
@@ -42,20 +54,32 @@ Geocoders
 
    .. automethod:: __init__
 
+Baidu
+-----
+
 .. autoclass:: geopy.geocoders.Baidu
    :members:
 
    .. automethod:: __init__
+
+Bing
+----
 
 .. autoclass:: geopy.geocoders.Bing
    :members:
 
    .. automethod:: __init__
 
+DataBC
+------
+
 .. autoclass:: geopy.geocoders.DataBC
    :members:
 
    .. automethod:: __init__
+
+GeocodeEarth
+------------
 
 .. autoclass:: geopy.geocoders.GeocodeEarth
    :members:
@@ -64,50 +88,80 @@ Geocoders
 
    .. automethod:: __init__
 
+GeocodeFarm
+-----------
+
 .. autoclass:: geopy.geocoders.GeocodeFarm
    :members:
 
    .. automethod:: __init__
+
+GeoNames
+--------
 
 .. autoclass:: geopy.geocoders.GeoNames
    :members:
 
    .. automethod:: __init__
 
+GoogleV3
+--------
+
 .. autoclass:: geopy.geocoders.GoogleV3
    :members:
 
    .. automethod:: __init__
+
+IGNFrance
+---------
 
 .. autoclass:: geopy.geocoders.IGNFrance
    :members:
 
    .. automethod:: __init__
 
+OpenCage
+--------
+
 .. autoclass:: geopy.geocoders.OpenCage
    :members:
 
    .. automethod:: __init__
+
+OpenMapQuest
+------------
 
 .. autoclass:: geopy.geocoders.OpenMapQuest
    :members:
 
    .. automethod:: __init__
 
+Nominatim
+---------
+
 .. autoclass:: geopy.geocoders.Nominatim
    :members:
 
    .. automethod:: __init__
+
+Pelias
+------
 
 .. autoclass:: geopy.geocoders.Pelias
    :members:
 
    .. automethod:: __init__
 
+Photon
+------
+
 .. autoclass:: geopy.geocoders.Photon
    :members:
 
    .. automethod:: __init__
+
+PickPoint
+---------
 
 .. autoclass:: geopy.geocoders.PickPoint
    :members:
@@ -116,20 +170,32 @@ Geocoders
 
    .. automethod:: __init__
 
+LiveAddress
+-----------
+
 .. autoclass:: geopy.geocoders.LiveAddress
    :members:
 
    .. automethod:: __init__
+
+TomTom
+------
 
 .. autoclass:: geopy.geocoders.TomTom
    :members:
 
    .. automethod:: __init__
 
+What3Words
+----------
+
 .. autoclass:: geopy.geocoders.What3Words
    :members:
 
    .. automethod:: __init__
+
+Yandex
+------
 
 .. autoclass:: geopy.geocoders.Yandex
    :members:
