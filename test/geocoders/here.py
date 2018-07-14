@@ -87,15 +87,50 @@ class HereTestCase(GeocoderTestBase):
         Here.geocode using additional data parameter (postal code shapes)
         """
         address_string = "435 north michigan ave, chicago il 60611 usa"
-        res = self._make_request(
-            self.geocoder.geocode,
-            query=address_string,
-            additional_data="IncludeShapeLevel,postalCode"
+        res = self.geocode_run(
+            {"query": address_string, "additional_data": "IncludeShapeLevel,postalCode"},
+            {"latitude": 41.89035, "longitude": -87.62333},
         )
-        self.assertAlmostEqual(res.latitude, 41.89035, delta=0.01)
-        self.assertAlmostEqual(res.longitude, -87.62333, delta=0.01)
         shape_value = res.raw['Location']['Shape']['Value']
         self.assertTrue(shape_value.startswith('MULTIPOLYGON ((('))
+
+    def test_geocode_with_language_de(self):
+        """
+        Here.geocode using language parameter to get a non-English response
+        """
+        address_string = "435 north michigan ave, chicago il 60611 usa"
+        res = self.geocode_run(
+            {"query": address_string, "language": "de-DE"},
+            {}
+        )
+        self.assertIn("Vereinigte Staaten", res.address)
+
+    def test_geocode_with_language_en(self):
+        """
+        Here.geocode using language parameter to get an English response
+        """
+        address_string = "435 north michigan ave, chicago il 60611 usa"
+        res = self.geocode_run(
+            {"query": address_string, "language": "en-US"},
+            {}
+        )
+        self.assertIn("United States", res.address)
+
+    def test_geocode_with_paging(self):
+        """
+        Here.geocode using simple paging "ouside" geopy
+        """
+        address_string = "Hauptstr., Berlin, Germany"
+        input = {"query": address_string, "maxresults": 12, "exactly_one": False}
+        res = self.geocode_run(input, {})
+        self.assertEqual(len(res), 12)
+
+        input["pageinformation"] = 2
+        res = self.geocode_run(input, {})
+        self.assertEqual(len(res), 3)
+
+        input["pageinformation"] = 3
+        res = self.geocode_run(input, {}, expect_failure=True)
 
     def test_reverse_string(self):
         """
@@ -115,14 +150,35 @@ class HereTestCase(GeocoderTestBase):
             {"latitude": 40.753898, "longitude": -73.985071}
         )
 
+    def test_reverse_point_radius_1000(self):
+        """
+        Here.reverse Point with radius
+        """
+        # needs more testing
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "radius": 1000, "exactly_one": False},
+            {"latitude": 40.753898, "longitude": -73.985071}
+        )
+        self.assertEqual(len(res), 10)
+
+    def test_reverse_point_radius_10(self):
+        """
+        Here.reverse Point with radius
+        """
+        # needs more testing
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "radius": 10, "exactly_one": False},
+            {"latitude": 40.753898, "longitude": -73.985071}
+        )
+        self.assertEqual(len(res), 10)
+
     def test_reverse_with_language_de(self):
         """
-        Here.reverse using point and language parameter to get a non English response
+        Here.reverse using point and language parameter to get a non-English response
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            Point(40.753898, -73.985071),
-            language="de-DE"
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "language": "de-DE"},
+            {}
         )
         self.assertIn("Vereinigte Staaten", res.address)
 
@@ -130,9 +186,28 @@ class HereTestCase(GeocoderTestBase):
         """
         Here.reverse using point and language parameter to get an English response
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            Point(40.753898, -73.985071),
-            language="en-US"
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "language": "en-US"},
+            {}
         )
         self.assertIn("United States", res.address)
+
+    def test_reverse_with_mode_areas(self):
+        """
+        Here.reverse using mode parameter 'retrieveAreas'.
+        """
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "mode": "retrieveAreas"},
+            {}
+        )
+        self.assertIn("Theater District-Times Square", res.address)
+
+    def test_reverse_with_maxresults_5(self):
+        """
+        Here.reverse using maxresults parameter 5.
+        """
+        res = self.reverse_run(
+            {"query": Point(40.753898, -73.985071), "maxresults": 5, "exactly_one": False},
+            {}
+        )
+        self.assertEqual(len(res), 5)

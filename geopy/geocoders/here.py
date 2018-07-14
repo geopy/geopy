@@ -86,23 +86,25 @@ class Here(Geocoder):
         self.api = "%s://geocoder.api.here.com/6.2/geocode.json" % self.scheme
         self.reverse_api = "%s://reverse.geocoder.api.here.com/6.2/reversegeocode.json" \
             % self.scheme
-        # FIXME(?): add multi-reverse geocode
-        # FIXME(?): add landmark geocode
 
     def geocode(
             self,
             query,
+            bbox=None,
+            mapview=None,
             exactly_one=True,
+            maxresults=None,
+            pageinformation=None,
             language=None,
             additional_data=False,
-            other=None,
             timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
 
-        Documentation at:
-            https://developer.here.com/documentation/geocoder/topics/resource-geocode.html
+        This implementation supports only a subset of all available parameters.
+        A list of all parameters of the pure REST API is available here:
+        https://developer.here.com/documentation/geocoder/topics/resource-geocode.html
 
         :param str query: The address or query you wish to geocode.
 
@@ -110,13 +112,30 @@ class Here(Geocoder):
             are one of: `city`, `county`, `district`, `country`, `state`,
             `street`, `housenumber`, or `postalcode`.
 
+        :param bbox: A type of spatial filter, limits the search for any other attributes
+            in the request. Specified by two coordinate (lat/lon) pairs, top-left and
+            bottom-right, respectively.
+        :type bbox: list or tuple of :class:`geopy.point.Point`, list or tuple
+            of ``(latitude, longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
+        :param mapview: The app's viewport, given as two coordinate pairs, specified by
+            two lat/lon pairs, top-left and bottom-right of the bounding box, respectively.
+            Matches from within the set map view plus an extended area are ranked highest.
+            Relevant global results are also returned.
+        :type mapview: list or tuple of :class:`geopy.point.Point`, list or tuple
+            of ``(latitude, longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call
-            only, the value set during the geocoder's initialization.
+        :param int maxresults: Defines the maximum number of items in the
+            response structure. If not provided and there are multiple results
+            the HERE API will return 10 results by default. This will be reset
+            to one if ``èxactly_one`` is True.
+
+        :param int pageinformation: A key which identifies the page to be returned
+            when the response is separated into multiple pages. Only useful when
+            ``maxresults`` is also provided.
 
         :param str language: Affects the language of the response,
             must be a RFC 4647 language code, e.g. 'en-US'.
@@ -125,9 +144,10 @@ class Here(Geocoder):
             https://developer.here.com/documentation/geocoder/topics/resource-params-additional.html.
             These will be added as one query parameter to the URL.
 
-        :param dict other: A dictionary with additional key/values as described
-            in the online documentation. These will be added as individual query
-            parameters to the URL.
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -147,16 +167,29 @@ class Here(Geocoder):
                 'app_id': self.app_id,
                 'app_code': self.app_code
             }
+        if bbox:
+            # untested
+            top_left = self._coerce_point_to_string(mapview[0])
+            bottom_right = self._coerce_point_to_string(mapview[1])
+            params['bbox'] = '%s;%s' % (top_left, bottom_right)
+        if mapview:
+            # untested
+            top_left = self._coerce_point_to_string(mapview[0])
+            bottom_right = self._coerce_point_to_string(mapview[1])
+            params['mapview'] = '%s;%s' % (top_left, bottom_right)
+        if pageinformation:
+            params['pageinformation'] = pageinformation
+        if maxresults:
+            params['maxresults'] = maxresults
         if exactly_one:
             params['maxresults'] = 1
         if language:
             params['language'] = language
         if additional_data:
             params['additionaldata'] = additional_data
-        if other:
-            params.update(other)
 
         url = "?".join((self.api, urlencode(params)))
+        print(url)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -166,36 +199,52 @@ class Here(Geocoder):
     def reverse(
             self,
             query,
+            radius=None,
             exactly_one=True,
+            maxresults=None,
+            pageinformation=None,
             language=None,
-            other=None,
+            mode='retrieveAddresses',
             timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
 
-        Documentation at:
-            https://developer.here.com/documentation/geocoder/topics/resource-reverse-geocode.html
+        This implementation supports only a subset of all available parameters.
+        A list of all parameters of the pure REST API is available here:
+        https://developer.here.com/documentation/geocoder/topics/resource-reverse-geocode.html
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
+        :param float radius: Proximity radius in meters.
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+        :param int maxresults: Defines the maximum number of items in the
+            response structure. If not provided and there are multiple results
+            the HERE API will return 10 results by default. This will be reset
+            to one if ``èxactly_one`` is True.
+
+        :param int pageinformation: A key which identifies the page to be returned
+            when the response is separated into multiple pages. Only useful when
+            ``maxresults`` is also provided.
+
+        :param str language: Affects the language of the response,
+            must be a RFC 4647 language code, e.g. 'en-US'.
+
+        :param str mode: Affects the type of returned response items, must be
+            one of: 'retrieveAddresses' (default), 'retrieveAreas', 'retrieveLandmarks',
+            'retrieveAll', or 'trackPosition'. See online documentation for more
+            information.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-        :param str language: Affects the language of the response,
-            must be a RFC 4647 language code, e.g. 'en-US'.
-
-        :param dict other: A dictionary with additional key/values as described
-            in the online documentation. These will be added as individual query
-            parameters to the URL.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -204,17 +253,19 @@ class Here(Geocoder):
         params = {
             'app_id': self.app_id,
             'app_code': self.app_code,
-            'maxresults': 1,
-            'mode': 'retrieveAddresses',  # can be overwritten using `other`
-            'prox': point + ',1000',
+            'mode': mode,
+            'prox': point,
         }
+        if radius and float(radius) >= 0:
+            params['prox'] = params['prox'] + ',' + str(radius)
+        if pageinformation:
+            params['pageinformation'] = pageinformation
+        if maxresults:
+            params['maxresults'] = maxresults
         if exactly_one:
             params['maxresults'] = 1
         if language:
             params['language'] = language
-        if other:
-            params.update(other)
-
         url = "%s?%s" % (
             self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
@@ -246,7 +297,7 @@ class Here(Geocoder):
             resources = doc['Response']['View'][0]['Result']
         except IndexError:
             resources = None
-        if resources is None or not len(resources):
+        if not resources or not len(resources):
             return None
 
         def parse_resource(resource):
@@ -267,11 +318,8 @@ class Here(Geocoder):
             location = join_filter(", ", [address, place, country])
 
             display_pos = resource['Location']['DisplayPosition']
-            latitude = display_pos['Latitude'] or None
-            longitude = display_pos['Longitude'] or None
-            if latitude and longitude:
-                latitude = float(latitude)
-                longitude = float(longitude)
+            latitude = float(display_pos['Latitude'])
+            longitude = float(display_pos['Longitude'])
 
             return Location(location, (latitude, longitude), resource)
 
