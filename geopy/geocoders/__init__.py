@@ -96,6 +96,7 @@ __all__ = (
     "GeocodeFarm",
     "GeoNames",
     "GoogleV3",
+    "Here",
     "IGNFrance",
     "OpenCage",
     "OpenMapQuest",
@@ -119,6 +120,7 @@ from geopy.geocoders.geocodeearth import GeocodeEarth
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
+from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
@@ -146,6 +148,7 @@ SERVICE_TO_GEOCODER = {
     "geonames": GeoNames,
     "google": GoogleV3,
     "googlev3": GoogleV3,
+    "here": Here,
     "ignfrance": IGNFrance,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,

@@ -112,6 +112,14 @@ GoogleV3
 
    .. automethod:: __init__
 
+HERE
+----
+
+.. autoclass:: geopy.geocoders.Here
+   :members:
+
+   .. automethod:: __init__
+
 IGNFrance
 ---------
 
