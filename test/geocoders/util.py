@@ -24,6 +24,7 @@ except IOError:
         'GEOCODEFARM_KEY',
         'HERE_APP_ID',
         'HERE_APP_CODE',
+        'GEOCODEFARM_SKIP',
         'BAIDU_KEY',
         'BAIDU_KEY_REQUIRES_SK',
         'BAIDU_SEC_KEY',
