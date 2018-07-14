@@ -207,7 +207,11 @@ class HereTestCase(GeocoderTestBase):
         Here.reverse using maxresults parameter 5.
         """
         res = self.reverse_run(
-            {"query": Point(40.753898, -73.985071), "maxresults": 5, "exactly_one": False},
+            {
+                "query": Point(40.753898, -73.985071),
+                "maxresults": 5,
+                "exactly_one": False
+            },
             {}
         )
         self.assertEqual(len(res), 5)

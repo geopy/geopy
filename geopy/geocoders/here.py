@@ -118,10 +118,10 @@ class Here(Geocoder):
         :type bbox: list or tuple of :class:`geopy.point.Point`, list or tuple
             of ``(latitude, longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
-        :param mapview: The app's viewport, given as two coordinate pairs, specified by
-            two lat/lon pairs, top-left and bottom-right of the bounding box, respectively.
-            Matches from within the set map view plus an extended area are ranked highest.
-            Relevant global results are also returned.
+        :param mapview: The app's viewport, given as two coordinate pairs, specified
+            by two lat/lon pairs, top-left and bottom-right of the bounding box,
+            respectively. Matches from within the set map view plus an extended area
+            are ranked highest. Relevant global results are also returned.
         :type mapview: list or tuple of :class:`geopy.point.Point`, list or tuple
             of ``(latitude, longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
