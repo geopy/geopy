@@ -22,6 +22,7 @@ except IOError:
         'LIVESTREETS_AUTH_TOKEN',
         'GEOCODEEARTH_KEY',
         'GEOCODEFARM_KEY',
+        'GEOCODEFARM_SKIP',
         'BAIDU_KEY',
         'BAIDU_KEY_REQUIRES_SK',
         'BAIDU_SEC_KEY',
