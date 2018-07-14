@@ -110,28 +110,25 @@ class IGNFranceTestCase(GeocoderTestBase):
         """
         IGNFrance.geocode with freeform and StreetAddress
         """
-        res = self._make_request(
-            self.geocoder.geocode,
-            query="8 rue Général Buat, Nantes",
-            query_type="StreetAddress",
-            is_freeform=True,
-            exactly_one=True
-        )
-        self.assertEqual(
-            res.address,
-            "8 r general buat , 44000 Nantes"
+        self.geocode_run(
+            {"query": "8 rue Général Buat, Nantes",
+             "query_type": "StreetAddress",
+             "is_freeform": True,
+             "exactly_one": True},
+            {"address": "8 r general buat , 44000 Nantes"},
         )
 
     def test_geocode_position_of_interest(self):
         """
         IGNFrance.geocode with PositionOfInterest
         """
-        res = self._make_request(
-            self.geocoder.geocode,
-            query="Chambéry",
-            query_type="PositionOfInterest",
-            exactly_one=False
+        res = self.geocode_run(
+            {"query": "Chambéry",
+             "query_type": "PositionOfInterest",
+             "exactly_one": False},
+            {},
         )
+
         self.assertEqual(
             res[0].address,
             "02000 Chambry"
@@ -145,26 +142,20 @@ class IGNFranceTestCase(GeocoderTestBase):
         """
         IGNFrance.geocode with filter by attribute
         """
-        res = self._make_request(
-            self.geocoder.geocode,
-            query="Les Molettes",
-            query_type="PositionOfInterest",
-            maximum_responses=10,
-            filtering='<Place type="Departement">38</Place>',
-            exactly_one=False
+        res = self.geocode_run(
+            {"query": "Les Molettes",
+             "query_type": "PositionOfInterest",
+             "maximum_responses": 10,
+             "filtering": '<Place type="Departement">38</Place>',
+             "exactly_one": False},
+            {},
         )
 
         departements = [location.raw['departement'] for location in res]
         unique = list(set(departements))
 
-        self.assertEqual(
-            len(unique),
-            1
-        )
-        self.assertEqual(
-            unique[0],
-            "38"
-        )
+        self.assertEqual(len(unique), 1)
+        self.assertEqual(unique[0], "38")
 
     def test_geocode_filter_by_envelope(self):
         """
@@ -184,25 +175,25 @@ class IGNFranceTestCase(GeocoderTestBase):
             lng_max=lng_max
         )
 
-        res_spatial_filter = self._make_request(
-            self.geocoder.geocode,
-            'Les Molettes',
-            'PositionOfInterest',
-            maximum_responses=10,
-            filtering=spatial_filtering_envelope,
-            exactly_one=False
+        res_spatial_filter = self.geocode_run(
+            {"query": 'Les Molettes',
+             "query_type": 'PositionOfInterest',
+             "maximum_responses": 10,
+             "filtering": spatial_filtering_envelope,
+             "exactly_one": False},
+            {},
         )
 
         departements_spatial = list(
             {i.raw['departement'] for i in res_spatial_filter}
         )
 
-        res_no_spatial_filter = self._make_request(
-            self.geocoder.geocode,
-            'Les Molettes',
-            'PositionOfInterest',
-            maximum_responses=10,
-            exactly_one=False
+        res_no_spatial_filter = self.geocode_run(
+            {"query": 'Les Molettes',
+             "query_type": 'PositionOfInterest',
+             "maximum_responses": 10,
+             "exactly_one": False},
+            {},
         )
 
         departements_no_spatial = list(
@@ -221,10 +212,10 @@ class IGNFranceTestCase(GeocoderTestBase):
         """
         IGNFrance.reverse simple
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            query='47.229554,-1.541519',
-            exactly_one=True
+        res = self.reverse_run(
+            {"query": '47.229554,-1.541519',
+             "exactly_one": True},
+            {},
         )
         self.assertEqual(
             res.address,
@@ -246,11 +237,11 @@ class IGNFranceTestCase(GeocoderTestBase):
         """
         IGNFrance.reverse preference
         """
-        res = self._make_request(
-            self.geocoder.reverse,
-            query='47.229554,-1.541519',
-            exactly_one=False,
-            reverse_geocode_preference=['StreetAddress', 'PositionOfInterest']
+        res = self.reverse_run(
+            {"query": '47.229554,-1.541519',
+             "exactly_one": False,
+             "reverse_geocode_preference": ['StreetAddress', 'PositionOfInterest']},
+            {},
         )
         self.assertEqual(
             res[0].address,
@@ -272,18 +263,19 @@ class IGNFranceTestCase(GeocoderTestBase):
         </gml:CircleByCenterPoint>
         """.format(coord='48.8033333 2.3241667', radius='50')
 
-        res_call_radius = self._make_request(
-            self.geocoder.reverse,
-            query='48.8033333,2.3241667',
-            exactly_one=False,
-            maximum_responses=10,
-            filtering=spatial_filtering_radius)
+        res_call_radius = self.reverse_run(
+            {"query": '48.8033333,2.3241667',
+             "exactly_one": False,
+             "maximum_responses": 10,
+             "filtering": spatial_filtering_radius},
+            {},
+        )
 
-        res_call = self._make_request(
-            self.geocoder.reverse,
-            query='48.8033333,2.3241667',
-            exactly_one=False,
-            maximum_responses=10
+        res_call = self.reverse_run(
+            {"query": '48.8033333,2.3241667',
+             "exactly_one": False,
+             "maximum_responses": 10},
+            {},
         )
 
         coordinates_couples_radius = set([

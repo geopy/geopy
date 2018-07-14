@@ -1,7 +1,3 @@
-"""
-PickPoint geocoder
-"""
-
 from geopy.geocoders import Nominatim
 from geopy.geocoders.base import DEFAULT_SENTINEL
 
@@ -23,6 +19,7 @@ class PickPoint(Nominatim):
             api_key,
             format_string=None,
             view_box=None,
+            bounded=False,
             country_bias=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -42,6 +39,9 @@ class PickPoint(Nominatim):
         :param tuple view_box: Coordinates to restrict search within.
 
         :param string country_bias: Bias results to this country.
+
+        :param bool bounded: Restrict the results to only items contained
+            within the bounding view_box.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -69,6 +69,7 @@ class PickPoint(Nominatim):
         super(PickPoint, self).__init__(
             format_string=format_string,
             view_box=view_box,
+            bounded=bounded,
             country_bias=country_bias,
             timeout=timeout,
             proxies=proxies,

@@ -1,7 +1,3 @@
-"""
-:class:`.OpenMapQuest` geocoder.
-"""
-
 from geopy.compat import urlencode
 from geopy.exc import ConfigurationError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder

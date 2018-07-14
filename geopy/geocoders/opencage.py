@@ -1,6 +1,3 @@
-"""
-:class:`.OpenCage` is the Opencagedata geocoder.
-"""
 import warnings
 
 from geopy.compat import urlencode

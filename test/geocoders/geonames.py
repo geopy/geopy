@@ -35,12 +35,14 @@ class GeoNamesTestCase(GeocoderTestBase):
         self.geocode_run(
             {"query": "Mount Everest, Nepal"},
             {"latitude": 27.987, "longitude": 86.925},
+            skiptest_on_failure=True,  # sometimes the result is empty
         )
 
     def test_query_urlencoding(self):
         location = self.geocode_run(
             {"query": u("Ry\u016b\u014d")},
-            {"latitude": 35.65, "longitude": 138.5}
+            {"latitude": 35.65, "longitude": 138.5},
+            skiptest_on_failure=True,  # sometimes the result is empty
         )
         self.assertIn(u("Ry\u016b\u014d"), location.address)
 

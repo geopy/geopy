@@ -1,5 +1,7 @@
 import unittest
+from mock import patch
 
+import geopy.geocoders
 import geopy.exc
 from geopy.compat import u
 from geopy.geocoders import What3Words
@@ -7,13 +9,28 @@ from test.geocoders.util import GeocoderTestBase, env
 
 
 class What3WordsTestCaseUnitTest(GeocoderTestBase):
+    dummy_api_key = 'DUMMYKEY1234'
 
     def test_user_agent_custom(self):
         geocoder = What3Words(
-            api_key='DUMMYKEY1234',
+            api_key=self.dummy_api_key,
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_http_scheme_is_disallowed(self):
+        with self.assertRaises(geopy.exc.ConfigurationError):
+            What3Words(
+                api_key=self.dummy_api_key,
+                scheme='http',
+            )
+
+    @patch.object(geopy.geocoders.options, 'default_scheme', 'http')
+    def test_default_scheme_is_ignored(self):
+        geocoder = What3Words(api_key=self.dummy_api_key)
+        self.assertEqual(geocoder.scheme, 'https')
+        geocoder = What3Words(api_key=self.dummy_api_key, scheme=None)
+        self.assertEqual(geocoder.scheme, 'https')
 
 
 @unittest.skipUnless(
@@ -25,7 +42,7 @@ class What3WordsTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = What3Words(
             env['WHAT3WORDS_KEY'],
-            scheme='http',
+            scheme='https',
             timeout=3
 
         )
@@ -41,14 +58,9 @@ class What3WordsTestCase(GeocoderTestBase):
         """
         What3Words.reverse - '3 Words'
         """
-        result_reverse = self._make_request(
-            self.geocoder.reverse,
-            "53.037611,11.565012",
-            lang='DE',
-        )
-        self.assertEqual(
-            result_reverse.address,
-            'fortschrittliche.voll.schnitt'
+        self.reverse_run(
+            {"query": "53.037611,11.565012", "lang": 'DE'},
+            {"address": 'fortschrittliche.voll.schnitt'},
         )
 
     def test_unicode_query(self):
@@ -88,18 +100,12 @@ class What3WordsTestCase(GeocoderTestBase):
         """
         What3Words.geocode result language
         """
-        result_geocode = self._make_request(
-            self.geocoder.geocode,
-            "piped.gains.jangle",
-            lang='DE',
-        )
-        self.assertEqual(
-            result_geocode.address,
-            'fortschrittliche.voll.schnitt'
+        self.geocode_run(
+            {"query": "piped.gains.jangle", "lang": 'DE'},
+            {"address": 'fortschrittliche.voll.schnitt'},
         )
 
     def test_check_query(self):
-        result_check_oneword_query = self.geocoder._check_query("*LibertyTech")
         result_check_threeword_query = self.geocoder._check_query(
             u(
                 "\u0066\u0061\u0068\u0072\u0070\u0072"
@@ -109,5 +115,4 @@ class What3WordsTestCase(GeocoderTestBase):
             )
         )
 
-        self.assertTrue(result_check_oneword_query)
         self.assertTrue(result_check_threeword_query)

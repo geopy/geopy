@@ -88,42 +88,48 @@ __all__ = (
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
     "ArcGIS",
+    "AzureMaps",
     "Baidu",
     "Bing",
     "DataBC",
+    "GeocodeEarth",
     "GeocodeFarm",
     "GeoNames",
     "GoogleV3",
     "Here",
     "IGNFrance",
-    "Mapzen",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
     "Nominatim",
+    "Pelias",
     "Photon",
     "LiveAddress",
+    "TomTom",
     "What3Words",
     "Yandex",
 )
 
 
 from geopy.geocoders.arcgis import ArcGIS
+from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
+from geopy.geocoders.geocodeearth import GeocodeEarth
 from geopy.geocoders.geocodefarm import GeocodeFarm
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
-from geopy.geocoders.mapzen import Mapzen
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
+from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
+from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 
@@ -133,22 +139,25 @@ from geopy.exc import GeocoderNotFound
 
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
+    "azure": AzureMaps,
     "baidu": Baidu,
     "bing": Bing,
     "databc": DataBC,
+    "geocodeearth": GeocodeEarth,
     "geocodefarm": GeocodeFarm,
     "geonames": GeoNames,
     "google": GoogleV3,
     "googlev3": GoogleV3,
     "here": Here,
     "ignfrance": IGNFrance,
-    "mapzen": Mapzen,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
     "nominatim": Nominatim,
+    "pelias": Pelias,
     "photon": Photon,
     "liveaddress": LiveAddress,
+    "tomtom": TomTom,
     "what3words": What3Words,
     "yandex": Yandex,
 }

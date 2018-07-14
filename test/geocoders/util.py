@@ -15,17 +15,24 @@ except IOError:
         'ARCGIS_USERNAME',
         'ARCGIS_PASSWORD',
         'ARCGIS_REFERER',
+        'AZURE_SUBSCRIPTION_KEY',
         'BING_KEY',
         'GEONAMES_USERNAME',
         'LIVESTREETS_AUTH_ID',
         'LIVESTREETS_AUTH_TOKEN',
+        'GEOCODEEARTH_KEY',
         'GEOCODEFARM_KEY',
         'HERE_APP_ID',
         'HERE_APP_CODE',
         'BAIDU_KEY',
+        'BAIDU_KEY_REQUIRES_SK',
+        'BAIDU_SEC_KEY',
         'OPENCAGE_KEY',
         'OPENMAPQUEST_APIKEY',
+        'PELIAS_DOMAIN',
+        'PELIAS_KEY',
         'PICKPOINT_KEY',
+        'TOMTOM_KEY',
         'WHAT3WORDS_KEY',
         'IGNFRANCE_KEY',
         'IGNFRANCE_USERNAME',
@@ -34,6 +41,7 @@ except IOError:
         'YANDEX_KEY',
     )
     env = {key: os.environ.get(key, None) for key in keys}
+
 
 EMPTY = object()
 
@@ -46,47 +54,71 @@ class GeocoderTestBase(unittest.TestCase):
     geocoder = None
     delta = 0.5
 
-    def geocode_run(self, payload, expected, expect_failure=False):
+    def tearDown(self):
+        # Typically geocoder instance is created in the setUpClass
+        # method and is assigned to the TestCase as a class attribute.
+        #
+        # Individual test methods might assign a custom instance of
+        # geocoder to the `self.geocoder` instance attribute, which
+        # will shadow the class's `geocoder` attribute, used by
+        # the `geocode_run`/`reverse_run` methods.
+        #
+        # The code below cleans up the possibly assigned instance
+        # attribute.
+        try:
+            del self.geocoder
+        except AttributeError:
+            pass
+
+    def geocode_run(self, payload, expected, expect_failure=False,
+                    skiptest_on_failure=False):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
         """
         result = self._make_request(self.geocoder.geocode, **payload)
         if result is None:
-            if not expect_failure:
-                self.fail('No result found')
-            else:
+            cls = type(self)
+            if expect_failure:
                 return
+            elif skiptest_on_failure:
+                self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
+            else:
+                self.fail('%s: No result found' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
 
-    def reverse_run(self, payload, expected, expect_failure=False):
+    def reverse_run(self, payload, expected, expect_failure=False,
+                    skiptest_on_failure=False):
         """
         Calls geocoder.reverse(**payload), then checks against `expected`.
         """
         result = self._make_request(self.geocoder.reverse, **payload)
         if result is None:
-            if not expect_failure:
-                self.fail('No result found')
-            else:
+            cls = type(self)
+            if expect_failure:
                 return
+            elif skiptest_on_failure:
+                self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
+            else:
+                self.fail('%s: No result found' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
 
-    @staticmethod
-    def _make_request(call, *args, **kwargs):
+    @classmethod
+    def _make_request(cls, call, *args, **kwargs):
         """
         Handles remote service errors.
         """
         try:
             result = call(*args, **kwargs)
         except exc.GeocoderQuotaExceeded:
-            raise unittest.SkipTest("Quota exceeded")
+            raise unittest.SkipTest("%s: Quota exceeded" % cls.__name__)
         except exc.GeocoderTimedOut:
-            raise unittest.SkipTest("Service timed out")
+            raise unittest.SkipTest("%s: Service timed out" % cls.__name__)
         except exc.GeocoderUnavailable:
-            raise unittest.SkipTest("Service unavailable")
+            raise unittest.SkipTest("%s: Service unavailable" % cls.__name__)
         return result
 
     def _verify_request(

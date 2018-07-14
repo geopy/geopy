@@ -1,28 +1,28 @@
-"""
-Mapzen geocoder, contributed by Michal Migurski of Mapzen.
-"""
-
 from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
-__all__ = ("Mapzen", )
+__all__ = ("Pelias", )
 
 
-class Mapzen(Geocoder):
-    """Mapzen Search geocoder.
+class Pelias(Geocoder):
+    """Pelias geocoder.
 
     Documentation at:
-        https://mapzen.com/documentation/search/
+        https://github.com/pelias/documentation
 
-    .. warning::
-       Please note that Mapzen has shut down their API so this geocoder
-       class might be removed in future releases.
+    See also :class:`geopy.geocoders.GeocodeEarth` which is a Pelias-based
+    service provided by the developers of Pelias itself.
+
+    .. versionchanged:: 1.15.0
+       ``Mapzen`` geocoder has been renamed to ``Pelias``.
+
     """
 
     def __init__(
             self,
+            domain,
             api_key=None,
             format_string=None,
             boundary_rect=None,
@@ -30,12 +30,15 @@ class Mapzen(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            domain='search.mapzen.com',
             scheme=None,
             ssl_context=DEFAULT_SENTINEL,
+            # Make sure to synchronize the changes of this signature in the
+            # inheriting classes (e.g. GeocodeEarth).
     ):
         """
-        :param str api_key: Mapzen API key, optional.
+        :param str domain: Specify a domain for Pelias API.
+
+        :param str api_key: Pelias API key, optional.
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -54,10 +57,6 @@ class Mapzen(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str domain: Specify a custom domain for Mapzen API.
-
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
 
@@ -65,10 +64,8 @@ class Mapzen(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
-
         """
-        super(Mapzen, self).__init__(
+        super(Pelias, self).__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

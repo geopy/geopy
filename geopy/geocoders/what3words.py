@@ -1,14 +1,10 @@
-"""
-:class:`.What3Words` geocoder.
-"""
-
 import re
 
 from geopy import exc
 from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.util import join_filter, logger
+from geopy.util import logger
 
 __all__ = ("What3Words", )
 
@@ -17,12 +13,14 @@ class What3Words(Geocoder):
     """What3Words geocoder.
 
     Documentation at:
-        https://what3words.com/api/reference
+        https://docs.what3words.com/api/v2/
 
     .. versionadded:: 1.5.0
+
+    .. versionchanged:: 1.15.0
+       API has been updated to v2.
     """
 
-    word_re = re.compile(r"^\*{1,1}[^\W\d\_]+$", re.U)
     multiple_word_re = re.compile(
         r"[^\W\d\_]+\.{1,1}[^\W\d\_]+\.{1,1}[^\W\d\_]+$", re.U
         )
@@ -31,7 +29,7 @@ class What3Words(Geocoder):
             self,
             api_key,
             format_string=None,
-            scheme=None,
+            scheme='https',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -45,8 +43,13 @@ class What3Words(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param str scheme:
-            See :attr:`geopy.geocoders.options.default_scheme`.
+        :param str scheme: Must be ``https``.
+
+            .. deprecated:: 1.15.0
+               API v2 requires https. Don't use this parameter,
+               it's going to be removed in the future versions of
+               geopy. Scheme other than ``https`` would result in a
+               :class:`geopy.exc.ConfigurationError` being thrown.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -67,23 +70,28 @@ class What3Words(Geocoder):
         """
         super(What3Words, self).__init__(
             format_string=format_string,
-            scheme=scheme,
+            # The `scheme` argument is present for the legacy reasons only.
+            # If a custom value has been passed, it should be validated.
+            # Otherwise use `https` instead of the `options.default_scheme`.
+            scheme=(scheme or 'https'),
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        if self.scheme != "https":
+            raise exc.ConfigurationError("What3Words now requires `https`.")
+
         self.api_key = api_key
         self.api = (
-            "%s://api.what3words.com/" % self.scheme
+            "%s://api.what3words.com/v2/" % self.scheme
         )
 
     def _check_query(self, query):
         """
         Check query validity with regex
         """
-        if not (self.word_re.match(query) or
-                self.multiple_word_re.match(query)):
+        if not self.multiple_word_re.match(query):
             return False
         else:
             return True
@@ -124,17 +132,16 @@ class What3Words(Geocoder):
 
         if not self._check_query(query):
             raise exc.GeocoderQueryError(
-                "Search string must be either like "
-                "'word.word.word' or '*word' "
+                "Search string must be 'word.word.word'"
             )
 
         params = {
-            'string': self.format_string % query,
+            'addr': self.format_string % query,
             'lang': lang.lower(),
             'key': self.api_key,
         }
 
-        url = "?".join(((self.api + "w3w"), urlencode(params)))
+        url = "?".join(((self.api + "forward"), urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -146,59 +153,31 @@ class What3Words(Geocoder):
         Parse type, words, latitude, and longitude and language from a
         JSON response.
         """
-        if resources.get('error') == "X1":
-            raise exc.GeocoderAuthenticationFailure()
 
-        if resources.get('error') == "11":
-            raise exc.GeocoderQueryError(
-                "Address (Word(s)) not recognised by What3Words."
-            )
+        code = resources['status'].get('code')
+
+        if code:
+            # https://docs.what3words.com/api/v2/#errors
+            exc_msg = "Error returned by What3Words: %s" % resources['status']['message']
+            if code == 401:
+                raise exc.GeocoderAuthenticationFailure(exc_msg)
+
+            raise exc.GeocoderQueryError(exc_msg)
 
         def parse_resource(resource):
             """
             Parse record.
             """
 
-            if resource['type'] == '3 words':
+            if 'geometry' in resource:
                 words = resource['words']
-                words = join_filter(".", [words[0], words[1], words[2]])
-                position = resource['position']
-                latitude, longitude = position[0], position[1]
-
+                position = resource['geometry']
+                latitude, longitude = position['lat'], position['lng']
                 if latitude and longitude:
                     latitude = float(latitude)
                     longitude = float(longitude)
 
                 return Location(words, (latitude, longitude), resource)
-            elif resource['type'] == 'OneWord':
-                # TODO this branch probably needs to be removed, as OneWord
-                # addresses have been canceled.
-                words = resource['words']
-                words = join_filter(".", [words[0], words[1], words[2]])
-                oneword = resource['oneword']
-                info = resource['info']
-
-                address = join_filter(", ", [
-                    oneword,
-                    words,
-                    info['name'],
-                    info['address1'],
-                    info['address2'],
-                    info['address3'],
-                    info['city'],
-                    info['county'],
-                    info['postcode'],
-                    info['country_id']
-                ])
-
-                position = resource['position']
-                latitude, longitude = position[0], position[1]
-
-                if latitude and longitude:
-                    latitude = float(latitude)
-                    longitude = float(longitude)
-
-                return Location(address, (latitude, longitude), resource)
             else:
                 raise exc.GeocoderParseError('Error parsing result.')
 
@@ -243,12 +222,12 @@ class What3Words(Geocoder):
         lang = lang.lower()
 
         params = {
-            'position': self._coerce_point_to_string(query),
+            'coords': self._coerce_point_to_string(query),
             'lang': lang.lower(),
             'key': self.api_key,
         }
 
-        url = "?".join(((self.api + "position"), urlencode(params)))
+        url = "?".join(((self.api + "reverse"), urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
@@ -260,27 +239,4 @@ class What3Words(Geocoder):
         """
         Parses a location from a single-result reverse API call.
         """
-
-        if resources.get('error') == "21":
-            raise exc.GeocoderQueryError("Invalid coordinates")
-
-        def parse_resource(resource):
-            """
-            Parse resource to return Geopy Location object
-            """
-            words = resource['words']
-            words = join_filter(".", [words[0], words[1], words[2]])
-            position = resource['position']
-            latitude, longitude = position[0], position[1]
-
-            if latitude and longitude:
-                latitude = float(latitude)
-                longitude = float(longitude)
-
-            return Location(words, (latitude, longitude), resource)
-
-        location = parse_resource(resources)
-        if exactly_one:
-            return location
-        else:
-            return [location]
+        return self._parse_json(resources, exactly_one)

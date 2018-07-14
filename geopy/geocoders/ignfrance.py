@@ -1,6 +1,3 @@
-"""
-:class:`.IGNFrance` is the IGN France Geocoder.
-"""
 import warnings
 import xml.etree.ElementTree as ET
 

@@ -1,7 +1,3 @@
-"""
-:class:`.Photon` geocoder.
-"""
-
 from geopy.compat import string_compare, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location

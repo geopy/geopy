@@ -1,7 +1,3 @@
-"""
-:class:`.GeoCoder` base object from which other geocoders are templated.
-"""
-
 from ssl import SSLError
 from socket import timeout as SocketTimeout
 import functools
@@ -67,8 +63,45 @@ class options(object):
             calls only. For example: ``'%s, Mountain View, CA'``.
 
         default_proxies
-            If specified, tunnel requests through the specified proxy.
-            E.g., ``{"https": "192.0.2.0"}``. For more information, see
+            Tunnel requests through HTTP proxy.
+
+            By default the system proxies are respected (e.g.
+            `HTTP_PROXY` and `HTTPS_PROXY` env vars or platform-specific
+            proxy settings, such as macOS or Windows native
+            preferences -- see :class:`urllib.request.ProxyHandler` for
+            more details). The `proxies` value for using system proxies
+            is ``None``.
+
+            To disable system proxies and issue requests directly,
+            explicitly pass an empty dict as a value for `proxies`: ``{}``.
+
+            To use a custom HTTP proxy location, pass a string.
+            Valid examples are:
+
+            - ``"192.0.2.0:8080"``
+            - ``"john:passw0rd@192.0.2.0:8080"``
+            - ``"http://john:passw0rd@192.0.2.0:8080"``
+
+            Please note:
+
+            - Scheme part (``http://``) of the proxy is ignored.
+            - Only `http` proxy is supported. Even if the proxy scheme
+              is `https`, it will be ignored, and the connection between
+              client and proxy would still be unencrypted.
+              However, `https` requests via `http` proxy are still
+              supported (via `HTTP CONNECT` method).
+
+
+            Raw urllib-style `proxies` dict might be provided instead of
+            a string:
+
+            - ``{"https": "192.0.2.0:8080"}`` -- means that HTTP proxy
+              would be used only for requests having `https` scheme.
+              String `proxies` value is automatically used for both
+              schemes, and is provided as a shorthand for the urllib-style
+              `proxies` dict.
+
+            For more information, see
             documentation on :class:`urllib.request.ProxyHandler`.
 
         default_scheme
@@ -146,6 +179,7 @@ ERROR_CODE_MAP = {
     412: GeocoderQueryError,
     413: GeocoderQueryError,
     414: GeocoderQueryError,
+    429: GeocoderQuotaExceeded,
     502: GeocoderServiceError,
     503: GeocoderTimedOut,
     504: GeocoderTimedOut
@@ -184,15 +218,20 @@ class Geocoder(object):
         self.ssl_context = (ssl_context if ssl_context is not DEFAULT_SENTINEL
                             else options.default_ssl_context)
 
-        if self.proxies:
-            opener = build_opener_with_context(
-                self.ssl_context,
-                ProxyHandler(self.proxies),
-            )
-        else:
-            opener = build_opener_with_context(
-                self.ssl_context,
-            )
+        if isinstance(self.proxies, string_compare):
+            self.proxies = {'http': self.proxies, 'https': self.proxies}
+
+        # `ProxyHandler` should be present even when actually there're
+        # no proxies. `build_opener` contains it anyway. By specifying
+        # it here explicitly we can disable system proxies (i.e.
+        # from HTTP_PROXY env var) by setting `self.proxies` to `{}`.
+        # Otherwise, if we didn't specify ProxyHandler for empty
+        # `self.proxies` here, build_opener would have used one internally
+        # which could have unwillingly picked up the system proxies.
+        opener = build_opener_with_context(
+            self.ssl_context,
+            ProxyHandler(self.proxies),
+        )
         self.urlopen = opener.open
 
     @staticmethod
