@@ -189,7 +189,6 @@ class Here(Geocoder):
             params['additionaldata'] = additional_data
 
         url = "?".join((self.api, urlencode(params)))
-        print(url)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -256,8 +255,8 @@ class Here(Geocoder):
             'mode': mode,
             'prox': point,
         }
-        if radius and float(radius) >= 0:
-            params['prox'] = params['prox'] + ',' + str(radius)
+        if radius is not None:
+            params['prox'] = '%s,%s' % (params['prox'], float(radius))
         if pageinformation:
             params['pageinformation'] = pageinformation
         if maxresults:
@@ -297,7 +296,7 @@ class Here(Geocoder):
             resources = doc['Response']['View'][0]['Result']
         except IndexError:
             resources = None
-        if not resources or not len(resources):
+        if not resources:
             return None
 
         def parse_resource(resource):
