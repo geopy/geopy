@@ -131,7 +131,7 @@ class Here(Geocoder):
         :param int maxresults: Defines the maximum number of items in the
             response structure. If not provided and there are multiple results
             the HERE API will return 10 results by default. This will be reset
-            to one if ``èxactly_one`` is True.
+            to one if ``exactly_one`` is True.
 
         :param int pageinformation: A key which identifies the page to be returned
             when the response is separated into multiple pages. Only useful when
@@ -227,7 +227,7 @@ class Here(Geocoder):
         :param int maxresults: Defines the maximum number of items in the
             response structure. If not provided and there are multiple results
             the HERE API will return 10 results by default. This will be reset
-            to one if ``èxactly_one`` is True.
+            to one if ``exactly_one`` is True.
 
         :param int pageinformation: A key which identifies the page to be returned
             when the response is separated into multiple pages. Only useful when
