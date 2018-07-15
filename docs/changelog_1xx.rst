@@ -4,7 +4,7 @@ Changelog
 =========
 1.15.0
 ------
-2018-07-TBD
+2018-07-15
 
 *   ADDED: GeocodeEarth geocoder based on Pelias (ex-Mapzen). (#309)
 
