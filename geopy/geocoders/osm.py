@@ -1,13 +1,16 @@
+import warnings
 from itertools import chain
 
 from geopy.compat import urlencode
 from geopy.exc import GeocoderQueryError
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder, _DEFAULT_USER_AGENT
 from geopy.location import Location
 from geopy.util import logger
 from geopy.point import Point
 
 __all__ = ("Nominatim", )
+
+_DEFAULT_NOMINATIM_DOMAIN = 'nominatim.openstreetmap.org'
 
 
 class Nominatim(Geocoder):
@@ -17,11 +20,20 @@ class Nominatim(Geocoder):
         https://wiki.openstreetmap.org/wiki/Nominatim
 
     .. attention::
-       Nominatim requires each application to provide their own custom
-       user-agent:
-       ``geolocator = Nominatim(user_agent="my-application")``.
-       Nominatim usage policy:
+       Using Nominatim with the default `user_agent` is strongly discouraged,
+       as it violates Nominatim's Usage Policy
        https://operations.osmfoundation.org/policies/nominatim/
+       and may possibly cause 403 and 429 HTTP errors. Please make sure
+       to specify a custom `user_agent` with
+       ``Nominatim(user_agent="my-application")`` or by
+       overriding the default `user_agent`:
+       ``geopy.geocoders.options.default_user_agent = "my-application"``.
+       In geopy 2.0 an exception will be thrown when a custom
+       `user_agent` is not specified.
+
+    .. versionchanged:: 1.16.0
+       A warning is now issued when a default `user_agent` is used
+       which restates the `Attention` block above.
     """
 
     structured_query_params = {
@@ -41,7 +53,7 @@ class Nominatim(Geocoder):
             country_bias=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
-            domain='nominatim.openstreetmap.org',
+            domain=_DEFAULT_NOMINATIM_DOMAIN,
             scheme=None,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
@@ -109,6 +121,22 @@ class Nominatim(Geocoder):
         self.view_box = view_box
         self.bounded = bounded
         self.domain = domain.strip('/')
+
+        if (self.domain == _DEFAULT_NOMINATIM_DOMAIN
+                and self.headers['User-Agent'] == _DEFAULT_USER_AGENT):
+            warnings.warn(
+                'Using Nominatim with the default "%s" `user_agent` is '
+                'strongly discouraged, as it violates Nominatim\'s ToS '
+                'https://operations.osmfoundation.org/policies/nominatim/ '
+                'and may possibly cause 403 and 429 HTTP errors. '
+                'Please specify a custom `user_agent` with '
+                '`Nominatim(user_agent="my-application")` or by '
+                'overriding the default `user_agent`: '
+                '`geopy.geocoders.options.default_user_agent = "my-application"`. '
+                'In geopy 2.0 this will become an exception.'
+                % _DEFAULT_USER_AGENT,
+                UserWarning
+            )
 
         self.api = "%s://%s/search" % (self.scheme, self.domain)
         self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)

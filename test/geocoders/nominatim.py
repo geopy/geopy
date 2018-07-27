@@ -1,3 +1,4 @@
+import warnings
 from abc import ABCMeta, abstractmethod
 from mock import patch
 from six import with_metaclass
@@ -38,7 +39,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
     @patch.object(geopy.geocoders.options, 'default_user_agent',
                   'mocked_user_agent/0.0.0')
     def test_user_agent_default(self):
-        geocoder = self.make_geocoder()
+        geocoder = self.make_geocoder(user_agent=None)
         self.assertEqual(geocoder.headers['User-Agent'],
                          'mocked_user_agent/0.0.0')
 
@@ -208,4 +209,23 @@ class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
+        kwargs.setdefault('user_agent', 'geopy-test')
         return Nominatim(**kwargs)
+
+    def test_default_user_agent_warning(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            Nominatim()
+            self.assertEqual(1, len(w))
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            Nominatim(user_agent='my_application')
+            self.assertEqual(0, len(w))
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            with patch.object(geopy.geocoders.options, 'default_user_agent',
+                              'my_application'):
+                Nominatim()
+            self.assertEqual(0, len(w))

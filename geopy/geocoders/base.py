@@ -32,6 +32,8 @@ __all__ = (
     "options",
 )
 
+_DEFAULT_USER_AGENT = "geopy/%s" % __version__
+
 
 class options(object):
     """The `options` object contains default configuration values for
@@ -165,7 +167,7 @@ class options(object):
     default_scheme = 'https'
     default_ssl_context = None
     default_timeout = 1
-    default_user_agent = "geopy/%s" % __version__
+    default_user_agent = _DEFAULT_USER_AGENT
 
 
 # Create an object which `repr` returns 'DEFAULT_SENTINEL'. Sphinx (docs) uses

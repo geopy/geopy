@@ -74,7 +74,7 @@ To geolocate a query to an address and coordinates:
 .. code:: python
 
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim()
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.geocode("175 5th Avenue NYC")
     >>> print(location.address)
     Flatiron Building, 175, 5th Avenue, Flatiron, New York, NYC, New York, ...
@@ -88,7 +88,7 @@ To find the address corresponding to a set of coordinates:
 .. code:: python
 
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim()
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.reverse("52.509669, 13.376294")
     >>> print(location.address)
     Potsdamer Platz, Mitte, Berlin, 10117, Deutschland, European Union

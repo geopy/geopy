@@ -79,7 +79,7 @@ calculate the length of a path::
 
     >>> from geopy import Nominatim
     >>> d = distance.distance
-    >>> g = Nominatim()
+    >>> g = Nominatim(user_agent="specify_your_app_name_here")
     >>> _, wa = g.geocode('Washington, DC')
     >>> _, pa = g.geocode('Palo Alto, CA')
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
