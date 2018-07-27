@@ -30,11 +30,44 @@ Geocoders
 .. automodule:: geopy.geocoders
    :members: __doc__
 
+.. autofunction:: geopy.geocoders.get_geocoder_for_service
+
+Default Options Object
+----------------------
+
 .. autoclass:: geopy.geocoders.options
    :members:
    :undoc-members:
 
-.. autofunction:: geopy.geocoders.get_geocoder_for_service
+Usage with Pandas
+-----------------
+
+It's possible to geocode a pandas DataFrame with geopy, however,
+rate-limiting must be taken into account.
+
+A large number of DataFrame rows might produce a significant amount of
+geocoding requests to a Geocoding service, which might be throttled
+by the service (e.g. by returning `Too Many Requests` 429 HTTP error
+or timing out).
+
+:class:`geopy.extra.rate_limiter.RateLimiter` class provides a convenient
+wrapper, which can be used to automatically add delays between geocoding
+calls to reduce the load on the Geocoding service. Also it can retry
+failed requests and swallow errors for individual rows.
+
+If you're having the `Too Many Requests` error, you may try the following:
+
+- Use :class:`geopy.extra.rate_limiter.RateLimiter` with non-zero
+  ``min_delay_seconds``.
+- Try a different Geocoding service (please consult with their ToS first,
+  as some services prohibit bulk geocoding).
+- Take a paid plan on the chosen Geocoding service, which provides
+  higher quota.
+- Provision your own local copy of the Geocoding service (such as Nominatim).
+
+.. autoclass:: geopy.extra.rate_limiter.RateLimiter
+
+   .. automethod:: __init__
 
 ArcGIS
 ------
