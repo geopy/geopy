@@ -5,6 +5,8 @@ Compatibility...
 import inspect
 import sys
 import warnings
+from time import sleep
+from timeit import default_timer
 
 py3k = sys.version_info >= (3, 0)
 
@@ -148,3 +150,15 @@ def build_opener_with_context(context=None, *handlers):
             UserWarning)
         https_handler = HTTPSHandler()
     return build_opener(https_handler, *handlers)
+
+
+def sleep_at_least(secs):
+    # Before Python 3.5 time.sleep(secs) can be interrupted by os signals.
+    # See https://docs.python.org/3/library/time.html#time.sleep
+    # This function ensures that the sleep took *at least* `secs`.
+
+    now = default_timer()
+    deadline = now + secs
+    while deadline > now:
+        sleep(max(deadline - now, 0.1))
+        now = default_timer()

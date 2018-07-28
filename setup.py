@@ -28,6 +28,7 @@ setup(
     extras_require={
         "dev": [
             "coverage",
+            "contextlib2; python_version<'3.0'",
             "flake8>=3.5.0,<3.6.0",
             "mock",
             "pytest>=3",
