@@ -4,7 +4,7 @@ Changelog
 =========
 1.16.0
 ------
-2018-07-TBD
+2018-07-28
 
 *   ADDED: ``geopy.extra.rate_limiter.RateLimiter`` class, useful for
     bulk-geocoding a pandas DataFrame. See also the new
