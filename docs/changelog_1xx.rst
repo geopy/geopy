@@ -2,6 +2,19 @@
 
 Changelog
 =========
+1.16.0
+------
+2018-07-TBD
+
+*   ADDED: ``geopy.extra.rate_limiter.RateLimiter`` class, useful for
+    bulk-geocoding a pandas DataFrame. See also the new
+    `Usage with Pandas` doc section. (#317)
+
+*   CHANGED: Nominatim now issues a warning when the default user_agent
+    is used against `nominatim.openstreetmap.org`. Please always specify
+    a custom user-agent when using Nominatim. (#316)
+
+
 1.15.0
 ------
 2018-07-15
