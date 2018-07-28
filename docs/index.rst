@@ -1,6 +1,11 @@
 Welcome to GeoPy's documentation!
 =================================
 
+.. image:: _static/logo-wide.png
+   :width: 80%
+   :align: center
+   :alt: GeoPy logo
+
 :Documentation: https://geopy.readthedocs.io/
 :Source Code: https://github.com/geopy/geopy
 :Issue Tracker: https://github.com/geopy/geopy/issues
