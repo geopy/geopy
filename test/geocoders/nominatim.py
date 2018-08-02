@@ -12,6 +12,7 @@ from test.geocoders.util import GeocoderTestBase
 
 class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
     # Common test cases for Nominatim-based geocoders.
+    # Assumes that Nominatim uses the OSM data.
 
     delta = 0.04
 
@@ -63,6 +64,35 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
         self.assertIn("New York", location.address)
 
+    def test_country_bias(self):
+        self.geocoder = self.make_geocoder(country_bias='RU')
+        self.geocode_run(
+            {"query": "moscow"},
+            {"latitude": 55.7507178, "longitude": 37.6176606,
+             "delta": 0.3},
+        )
+
+        self.geocoder = self.make_geocoder(country_bias='US')
+        location = self.geocode_run(
+            {"query": "moscow"},
+            # There are two possible results:
+            # Moscow Idaho: 46.7323875,-117.0001651
+            # Moscow Penn: 41.3367497,-75.5185191
+            {},
+        )
+        # We don't care which Moscow is returned, unless it's
+        # the Russian one. We can sort this out by asserting
+        # the longitudes. The Russian Moscow has positive longitudes.
+        self.assertLess(-119, location.longitude)
+        self.assertLess(location.longitude, -70)
+
+    def test_structured_query(self):
+        self.geocode_run(
+            {"query": {"country": "us", "city": "moscow",
+                       "state": "idaho"}},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
     def test_city_district_with_dict_query(self):
         self.geocoder = self.make_geocoder(country_bias='DE')
         query = {'postalcode': 10117}
@@ -70,7 +100,14 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query, "addressdetails": True},
             {},
         )
-        self.assertEqual(result.raw['address']['city_district'], 'Mitte')
+        try:
+            # For some queries `city_district` might be missing in the response.
+            # For this specific query on OpenMapQuest the key is also missing.
+            city_district = result.raw['address']['city_district']
+        except KeyError:
+            # MapQuest
+            city_district = result.raw['address']['suburb']
+        self.assertEqual(city_district, 'Mitte')
 
     def test_geocode_language_parameter(self):
         query = "Mohrenstrasse Berlin"
@@ -144,9 +181,6 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode_geometry_geojson(self):
-        """
-        Nominatim.geocode with full geometry (response in geojson format)
-        """
         result_geocode = self.geocode_run(
             {"query": "Halensee,Berlin", "geometry": 'geojson'},
             {},

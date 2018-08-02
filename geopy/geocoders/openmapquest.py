@@ -1,26 +1,34 @@
-from geopy.compat import urlencode
 from geopy.exc import ConfigurationError
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
-from geopy.location import Location
-from geopy.util import logger
+from geopy.geocoders.base import DEFAULT_SENTINEL
+from geopy.geocoders.osm import Nominatim
 
 __all__ = ("OpenMapQuest", )
 
 
-class OpenMapQuest(Geocoder):
+class OpenMapQuest(Nominatim):
     """Geocoder using MapQuest Open Platform Web Services.
 
     Documentation at:
         https://developer.mapquest.com/documentation/open/
+
+    .. versionchanged:: 1.17.0
+       OpenMapQuest now extends the Nominatim class.
     """
+
+    geocode_path = '/nominatim/v1/search'
+    reverse_path = '/nominatim/v1/reverse'
 
     def __init__(
             self,
             api_key=None,
             format_string=None,
-            scheme=None,
+            view_box=None,
+            bounded=False,
+            country_bias=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
+            domain='open.mapquestapi.com',
+            scheme=None,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
@@ -35,14 +43,36 @@ class OpenMapQuest(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param str scheme:
-            See :attr:`geopy.geocoders.options.default_scheme`.
+        :param tuple view_box: Coordinates to restrict search within.
+            Accepts instances of the :class:`geopy.point.Point`
+            ``[Point(22, 180), Point(-22, -180)]``,
+            or iterables of numeric and string types ``[180, 22, -180, -22]``,
+            ``["180", "22", "-180", "-22"]``
+
+            .. versionadded:: 1.17.0
+
+        :param bool bounded: Restrict the results to only items contained
+            within the bounding view_box.
+
+            .. versionadded:: 1.17.0
+
+        :param str country_bias: Bias results to this country.
+
+            .. versionadded:: 1.17.0
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
 
         :param dict proxies:
             See :attr:`geopy.geocoders.options.default_proxies`.
+
+        :param str domain: Domain where the target Nominatim service
+            is hosted.
+
+            .. versionadded:: 1.17.0
+
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
@@ -57,71 +87,30 @@ class OpenMapQuest(Geocoder):
         """
         super(OpenMapQuest, self).__init__(
             format_string=format_string,
-            scheme=scheme,
+            view_box=view_box,
+            bounded=bounded,
+            country_bias=country_bias,
             timeout=timeout,
             proxies=proxies,
+            domain=domain,
+            scheme=scheme,
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
         if not api_key:
             raise ConfigurationError('OpenMapQuest requires an API key')
         self.api_key = api_key
-        self.api = ("%s://open.mapquestapi.com/nominatim/v1/search"
-                    "?format=json" % self.scheme)
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def _construct_url(self, base_api, params):
         """
-        Return a location point by address.
+        Construct geocoding request url. Overridden.
 
-        :param str query: The address or query you wish to geocode.
+        :param string base_api: Geocoding function base address - self.api
+            or self.reverse_api.
 
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
+        :param dict params: Geocoding params.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call
-            only, the value set during the geocoder's initialization.
-
-        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
-            ``exactly_one=False``.
+        :return: string URL.
         """
-        params = {
-            'key': self.api_key,
-            'q': self.format_string % query
-        }
-        if exactly_one:
-            params['maxResults'] = 1
-        url = "&".join((self.api, urlencode(params)))
-
-        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
-
-    @classmethod
-    def _parse_json(cls, resources, exactly_one=True):
-        """
-        Parse display name, latitude, and longitude from an JSON response.
-        """
-        if not len(resources):
-            return None
-        if exactly_one:
-            return cls.parse_resource(resources[0])
-        else:
-            return [cls.parse_resource(resource) for resource in resources]
-
-    @classmethod
-    def parse_resource(cls, resource):
-        # TODO make this a private API
-        # Return location and coordinates tuple from dict.
-        location = resource['display_name']
-
-        latitude = resource['lat'] or None
-        longitude = resource['lon'] or None
-        if latitude and longitude:
-            latitude = float(latitude)
-            longitude = float(longitude)
-
-        return Location(location, (latitude, longitude), resource)
+        params['key'] = self.api_key
+        return super(OpenMapQuest, self)._construct_url(base_api, params)
