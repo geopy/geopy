@@ -14,6 +14,9 @@ class PickPoint(Nominatim):
 
     """
 
+    geocode_path = '/v1/forward'
+    reverse_path = '/v1/reverse'
+
     def __init__(
             self,
             api_key,
@@ -49,9 +52,8 @@ class PickPoint(Nominatim):
         :param dict proxies:
             See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str domain: Should be the localized Openstreetmap domain to
-            connect to. The default is ``'api.pickpoint.io'``, but you
-            can change it to a domain of your own.
+        :param str domain: Domain where the target Nominatim service
+            is hosted.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -79,12 +81,10 @@ class PickPoint(Nominatim):
             ssl_context=ssl_context,
         )
         self.api_key = api_key
-        self.api = "%s://%s/v1/forward" % (self.scheme, self.domain)
-        self.reverse_api = "%s://%s/v1/reverse" % (self.scheme, self.domain)
 
     def _construct_url(self, base_api, params):
         """
-        Construct geocoding request url. Overriden.
+        Construct geocoding request url. Overridden.
 
         :param string base_api: Geocoding function base address - self.api
             or self.reverse_api.

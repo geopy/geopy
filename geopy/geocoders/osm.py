@@ -14,7 +14,7 @@ _DEFAULT_NOMINATIM_DOMAIN = 'nominatim.openstreetmap.org'
 
 
 class Nominatim(Geocoder):
-    """Nominatim geocoder for OpenStreetMap servers.
+    """Nominatim geocoder for OpenStreetMap data.
 
     Documentation at:
         https://wiki.openstreetmap.org/wiki/Nominatim
@@ -45,6 +45,9 @@ class Nominatim(Geocoder):
         'postalcode',
     }
 
+    geocode_path = '/search'
+    reverse_path = '/reverse'
+
     def __init__(
             self,
             format_string=None,
@@ -73,12 +76,12 @@ class Nominatim(Geocoder):
             .. versionchanged:: 1.15.0
                Previously only a list of stringified coordinates was supported.
 
-        :param str country_bias: Bias results to this country.
-
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box.
 
             .. versionadded:: 1.15.0
+
+        :param str country_bias: Bias results to this country.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -86,9 +89,8 @@ class Nominatim(Geocoder):
         :param dict proxies:
             See :attr:`geopy.geocoders.options.default_proxies`.
 
-        :param str domain: Should be the localized Openstreetmap domain to
-            connect to. The default is ``'nominatim.openstreetmap.org'``,
-            but you can change it to a domain of your own.
+        :param str domain: Domain where the target Nominatim service
+            is hosted.
 
             .. versionadded:: 1.8.2
 
@@ -138,8 +140,8 @@ class Nominatim(Geocoder):
                 UserWarning
             )
 
-        self.api = "%s://%s/search" % (self.scheme, self.domain)
-        self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
+        self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
+        self.reverse_api = "%s://%s%s" % (self.scheme, self.domain, self.reverse_path)
 
     def _construct_url(self, base_api, params):
         """
@@ -356,7 +358,7 @@ class Nominatim(Geocoder):
         latitude = place.get('lat', None)
         longitude = place.get('lon', None)
         placename = place.get('display_name', None)
-        if latitude and longitude:
+        if latitude is not None and longitude is not None:
             latitude = float(latitude)
             longitude = float(longitude)
         return Location(placename, (latitude, longitude), place)
