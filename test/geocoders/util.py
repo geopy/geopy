@@ -125,26 +125,40 @@ class GeocoderTestBase(unittest.TestCase):
     def _verify_request(
             self,
             result,
-            raw=EMPTY,
             latitude=EMPTY,
             longitude=EMPTY,
             address=EMPTY,
             exactly_one=True,
+            delta=None,
     ):
         """
-        Verifies that a a result matches the kwargs given.
+        Verifies that result matches the kwargs given.
         """
         item = result if exactly_one else result[0]
+        delta = delta or self.delta
+        exceptions = []
 
-        if raw is not EMPTY:
-            self.assertEqual(item.raw, raw)
         if latitude is not EMPTY:
-            self.assertAlmostEqual(
-                item.latitude, latitude, delta=self.delta
-            )
+            try:
+                self.assertAlmostEqual(
+                    item.latitude, latitude, delta=delta,
+                    msg="latitude differs",
+                )
+            except AssertionError as e:
+                exceptions.append(e)
         if longitude is not EMPTY:
-            self.assertAlmostEqual(
-                item.longitude, longitude, delta=self.delta
-            )
+            try:
+                self.assertAlmostEqual(
+                    item.longitude, longitude, delta=delta,
+                    msg="longitude differs",
+                )
+            except AssertionError as e:
+                exceptions.append(e)
         if address is not EMPTY:
-            self.assertEqual(item.address, address)
+            try:
+                self.assertEqual(item.address, address,
+                                 msg="address differs")
+            except AssertionError as e:
+                exceptions.append(e)
+
+        self.assertFalse(exceptions)
