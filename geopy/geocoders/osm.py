@@ -237,7 +237,7 @@ class Nominatim(Geocoder):
 
         if exactly_one:
             params['limit'] = 1
-        elif limit:
+        elif limit is not None:
             limit = int(limit)
             if limit < 1:
                 raise ValueError("Limit cannot be less than 1")
@@ -364,12 +364,10 @@ class Nominatim(Geocoder):
         return Location(placename, (latitude, longitude), place)
 
     def _parse_json(self, places, exactly_one):
-        if places is None:
+        if not places:
             return None
         if not isinstance(places, list):
             places = [places]
-        if not len(places):
-            return None
         if exactly_one:
             return self.parse_code(places[0])
         else:

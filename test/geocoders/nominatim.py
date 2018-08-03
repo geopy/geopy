@@ -37,6 +37,26 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
+    def test_geocode_empty_result(self):
+        self.geocode_run(
+            {"query": "dsadjkasdjasd"},
+            {},
+            expect_failure=True,
+        )
+
+    def test_limit(self):
+        with self.assertRaises(ValueError):  # non-positive limit
+            self.geocode_run(
+                {"query": "does not matter", "limit": 0, "exactly_one": False},
+                {}
+            )
+
+        result = self.geocode_run(
+            {"query": "second street", "limit": 4, "exactly_one": False},
+            {}
+        )
+        self.assertEqual(4, len(result))
+
     @patch.object(geopy.geocoders.options, 'default_user_agent',
                   'mocked_user_agent/0.0.0')
     def test_user_agent_default(self):
