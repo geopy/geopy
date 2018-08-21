@@ -259,24 +259,17 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_extratags(self):
-        """
-        Nominatim.geocode using `extratags`
-        """
-        geocoder = Nominatim(user_agent='my_user_agent/1.0')
         query = "175 5th Avenue NYC"
-        result = self._make_request(
-            geocoder.geocode,
-            query,
+        location = self.geocode_run(
+            {"query": query},
+            {},
         )
-        self.assertEqual(result.raw['extratags']['wikidata'], 'Q220728')
-        query = "175 5th Avenue NYC"
-        extratags = False
-        result = self._make_request(
-            geocoder.geocode,
-            query,
-            extratags=extratags
+        self.assertIsNone(location.raw.get('extratags'))
+        location = self.geocode_run(
+            {"query": query, "extratags": True},
+            {},
         )
-        self.assertEqual(result.raw.get('extratags'), None)
+        self.assertEqual(location.raw['extratags']['wikidata'], 'Q220728')
 
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
