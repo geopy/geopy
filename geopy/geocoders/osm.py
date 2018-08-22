@@ -166,7 +166,8 @@ class Nominatim(Geocoder):
             limit=None,
             addressdetails=False,
             language=False,
-            geometry=None
+            geometry=None,
+            extratags=False,
     ):
         """
         Return a location point by address.
@@ -216,6 +217,11 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.3.0
 
+        :param bool extratags: Include additional information in the result if available,
+            e.g. wikipedia link, opening hours.
+
+            .. versionadded:: 1.17.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
 
@@ -262,6 +268,9 @@ class Nominatim(Geocoder):
 
         if language:
             params['accept-language'] = language
+
+        if extratags:
+            params['extratags'] = True
 
         if geometry is not None:
             geometry = geometry.lower()
