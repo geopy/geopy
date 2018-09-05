@@ -166,6 +166,14 @@ IGNFrance
 
    .. automethod:: __init__
 
+MapBox
+--------
+
+.. autoclass:: geopy.geocoders.MapBox
+   :members:
+
+   .. automethod:: __init__
+
 OpenCage
 --------
 
@@ -181,14 +189,6 @@ OpenMapQuest
    :members:
    :inherited-members:
    :show-inheritance:
-
-   .. automethod:: __init__
-
-MapBox
---------
-
-.. autoclass:: geopy.geocoders.MapBox
-   :members:
 
    .. automethod:: __init__
 

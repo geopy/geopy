@@ -98,10 +98,10 @@ __all__ = (
     "GoogleV3",
     "Here",
     "IGNFrance",
+    "MapBox",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
-    "MapBox",
     "Nominatim",
     "Pelias",
     "Photon",
@@ -123,9 +123,9 @@ from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
+from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
-from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
@@ -152,11 +152,11 @@ SERVICE_TO_GEOCODER = {
     "googlev3": GoogleV3,
     "here": Here,
     "ignfrance": IGNFrance,
+    "mapbox": MapBox,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
     "nominatim": Nominatim,
-    "mapbox": MapBox,
     "pelias": Pelias,
     "photon": Photon,
     "liveaddress": LiveAddress,
