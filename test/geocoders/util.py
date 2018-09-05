@@ -28,6 +28,7 @@ except IOError:
         'BAIDU_KEY',
         'BAIDU_KEY_REQUIRES_SK',
         'BAIDU_SEC_KEY',
+        'MAPBOX_KEY',
         'OPENCAGE_KEY',
         'OPENMAPQUEST_APIKEY',
         'PELIAS_DOMAIN',

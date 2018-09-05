@@ -9,7 +9,7 @@ from test.geocoders.util import GeocoderTestBase, env
 
 @unittest.skipUnless(
     bool(env.get('MAPBOX_KEY')),
-    "No MAPBOX env variable set"
+    "No MAPBOX_KEY env variable set"
 )
 class MapBoxTestCase(GeocoderTestBase):
     @classmethod
