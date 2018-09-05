@@ -185,7 +185,12 @@ class MapBox(Geocoder):
             timeout=DEFAULT_SENTINEL,
     ):
         """
-        Return an address by location
+        Return an address by location point.
+
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
