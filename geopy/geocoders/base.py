@@ -245,14 +245,20 @@ class Geocoder(object):
         Do the right thing on "point" input. For geocoders with reverse
         methods.
         """
-        if isinstance(point, Point):
-            return ",".join((str(point.latitude), str(point.longitude)))
-        elif isinstance(point, (list, tuple)):
-            return ",".join((str(point[0]), str(point[1])))  # -altitude
-        elif isinstance(point, string_compare):
-            return point
+        try:
+            point = Point(point)
+        except ValueError as e:
+            if isinstance(point, string_compare):
+                warnings.warn(
+                    'Unable to parse the string as Point: "%s". Using the value '
+                    'as-is for the query. In geopy 2.0 this will become an '
+                    'exception.' % str(e), UserWarning
+                )
+                return point
+            raise
         else:
-            raise ValueError("Invalid point")
+            # Altitude is silently dropped.
+            return ",".join((str(point.latitude), str(point.longitude)))
 
     def _geocoder_exception_handler(self, error, message):
         """

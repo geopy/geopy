@@ -1,4 +1,4 @@
-from geopy.compat import urlencode, quote, string_compare
+from geopy.compat import urlencode, quote
 from geopy.exc import (
     GeocoderQueryError,
 )
@@ -107,14 +107,11 @@ class MapBox(Geocoder):
         Do the right thing on "point" input. For geocoders with reverse
         methods.
         """
-        if isinstance(point, Point):
-            return ",".join((str(point.longitude), str(point.latitude)))
-        elif isinstance(point, (list, tuple)):
-            return ",".join((str(point[1]), str(point[2])))  # -altitude
-        elif isinstance(point, string_compare):
-            return ",".join(point.split(",")[::-1])
-        else:
-            raise ValueError("Invalid point")
+        # This method overrides the one defined in the base Geocoder class.
+        # Notice the swapped longitude and latitude.
+        point = Point(point)
+        # Altitude is silently dropped.
+        return ",".join((str(point.longitude), str(point.latitude)))
 
     def geocode(
             self,

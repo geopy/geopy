@@ -215,7 +215,16 @@ class GeocoderTestCase(unittest.TestCase):
         """
         Geocoder._coerce_point_to_string address string
         """
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            point = self.geocoder._coerce_point_to_string(self.coordinates_address)
+
+            # 1 for latitude normalization (first string char being
+            # treated as latitude).
+            # 2 for the deprecated as-is input bypass.
+            self.assertEqual(2, len(w))
+
         self.assertEqual(
-            self.geocoder._coerce_point_to_string(self.coordinates_address),
+            point,
             self.coordinates_address
         )
