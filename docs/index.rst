@@ -184,6 +184,14 @@ OpenMapQuest
 
    .. automethod:: __init__
 
+MapBox
+--------
+
+.. autoclass:: geopy.geocoders.MapBox
+   :members:
+
+   .. automethod:: __init__
+
 Nominatim
 ---------
 

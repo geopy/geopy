@@ -26,7 +26,7 @@ geopy includes geocoder classes for the `OpenStreetMap Nominatim`_,
 `Bing Maps API`_, `Yandex`_, `IGN France`_, `GeoNames`_,
 `Pelias`_, `geocode.earth`_,
 `OpenMapQuest`_, `PickPoint`_, `What3Words`_, `OpenCage`_,
-`SmartyStreets`_, `GeocodeFarm`_, and `Here`_ geocoder services.
+`SmartyStreets`_, `GeocodeFarm`_, `Here`_ and `MapBox`_ geocoder services.
 The various geocoder classes are located in `geopy.geocoders`_.
 
 .. _OpenStreetMap Nominatim: https://wiki.openstreetmap.org/wiki/Nominatim
@@ -46,6 +46,7 @@ The various geocoder classes are located in `geopy.geocoders`_.
 .. _SmartyStreets: https://smartystreets.com/products/liveaddress-api
 .. _GeocodeFarm: https://www.geocodefarm.com/
 .. _Here: https://developer.here.com/documentation/geocoder/
+.. _MapBox: https://www.mapbox.com/api-documentation/#geocoding
 .. _geopy.geocoders: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
 geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6, 3.7), PyPy, and
