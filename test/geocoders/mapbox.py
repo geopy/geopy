@@ -89,3 +89,9 @@ class MapBoxTestCase(GeocoderTestBase):
             {"query": "200 queen street", "proximity": [45.3, -66.1]},
             {"latitude": -33.994267, "longitude": 138.881142},
         )
+
+    def test_geocode_country(self):
+        self.geocode_run(
+            {"query": "kazan", "country": "TR"},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
