@@ -13,7 +13,7 @@ class OpenCage(Geocoder):
     """Geocoder using the OpenCageData API.
 
     Documentation at:
-        https://geocoder.opencagedata.com/api
+        https://opencagedata.com/api
 
     .. versionadded:: 1.1.0
     """
@@ -33,7 +33,7 @@ class OpenCage(Geocoder):
 
         :param str api_key: The API key required by OpenCageData
             to perform geocoding requests. You can get your key here:
-            https://geocoder.opencagedata.com/
+            https://opencagedata.com/
 
         :param str domain: Currently it is ``'api.opencagedata.com'``, can
             be changed for testing purposes.

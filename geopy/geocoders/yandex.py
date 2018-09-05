@@ -35,7 +35,7 @@ class Yandex(Geocoder):
            Default scheme has been changed from ``http`` to ``https``.
 
         :param str api_key: Yandex API key (not obligatory)
-            http://api.yandex.ru/maps/form.xml
+            https://tech.yandex.ru/maps/keys/get/
 
         :param str lang: response locale, the following locales are
             supported: ``"ru_RU"`` (default), ``"uk_UA"``, ``"be_BY"``,
