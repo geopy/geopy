@@ -240,7 +240,7 @@ class Geocoder(object):
         self.urlopen = opener.open
 
     @staticmethod
-    def _coerce_point_to_string(point):
+    def _coerce_point_to_string(point, output_format="%(lat)s,%(lon)s"):
         """
         Do the right thing on "point" input. For geocoders with reverse
         methods.
@@ -258,7 +258,8 @@ class Geocoder(object):
             raise
         else:
             # Altitude is silently dropped.
-            return ",".join((str(point.latitude), str(point.longitude)))
+            return output_format % dict(lat=point.latitude,
+                                        lon=point.longitude)
 
     def _geocoder_exception_handler(self, error, message):
         """

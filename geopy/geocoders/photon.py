@@ -120,9 +120,7 @@ class Photon(Geocoder):
             params['lang'] = language
         if location_bias:
             try:
-                lat, lon = [x.strip() for x
-                            in self._coerce_point_to_string(location_bias)
-                            .split(',')]
+                lat, lon = self._coerce_point_to_string(location_bias).split(',')
                 params['lon'] = lon
                 params['lat'] = lat
             except ValueError:
@@ -181,8 +179,7 @@ class Photon(Geocoder):
 
         """
         try:
-            lat, lon = [x.strip() for x in
-                        self._coerce_point_to_string(query).split(',')]
+            lat, lon = self._coerce_point_to_string(query).split(',')
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
         params = {

@@ -29,9 +29,6 @@ class GeoNamesTestCase(GeocoderTestBase):
         cls.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
 
     def test_unicode_name(self):
-        """
-        GeoNames.geocode unicode
-        """
         self.geocode_run(
             {"query": "Mount Everest, Nepal"},
             {"latitude": 27.987, "longitude": 86.925},
@@ -47,9 +44,6 @@ class GeoNamesTestCase(GeocoderTestBase):
         self.assertIn(u("Ry\u016b\u014d"), location.address)
 
     def test_reverse(self):
-        """
-        GeoNames.reverse
-        """
         self.reverse_run(
             {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},

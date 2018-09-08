@@ -160,14 +160,11 @@ class Yandex(Geocoder):
             exactly_one = False
 
         try:
-            lat, lng = [
-                x.strip() for x in
-                self._coerce_point_to_string(query).split(',')
-            ]
+            point = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
         params = {
-            'geocode': '{0},{1}'.format(lng, lat),
+            'geocode': point,
             'format': 'json'
         }
         if self.api_key:

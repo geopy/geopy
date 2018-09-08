@@ -319,7 +319,7 @@ class IGNFrance(Geocoder):
                     'one or more of: StreetAddress, PositionOfInterest'
                 )
 
-        point = self._coerce_point_to_string(query).replace(',', ' ')
+        point = self._coerce_point_to_string(query, "%(lat)s %(lon)s")
         reverse_geocode_preference = '\n'.join((
             '<ReverseGeocodePreference>%s</ReverseGeocodePreference>' % pref
             for pref

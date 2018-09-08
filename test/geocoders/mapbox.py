@@ -37,16 +37,7 @@ class MapBoxTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-    def test_reverse_string(self):
-        """
-        MapBox.reverse string
-        """
-        self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
-        )
-
-    def test_reverse_point(self):
+    def test_reverse(self):
         """
         MapBox.reverse Point
         """

@@ -53,19 +53,7 @@ class PhotonTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-    def test_reverse_string(self):
-        """
-        Photon.reverse string
-        """
-        self.reverse_run(
-            {"query": "45.7733105, 4.8869339"},
-            {"latitude": 45.7733105, "longitude": 4.8869339}
-        )
-
-    def test_reverse_point(self):
-        """
-        Photon.reverse Point
-        """
+    def test_reverse(self):
         result = self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
             {"latitude": 45.7733105, "longitude": 4.8869339}

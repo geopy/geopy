@@ -130,19 +130,7 @@ class HereTestCase(GeocoderTestBase):
         input["pageinformation"] = 3
         res = self.geocode_run(input, {}, expect_failure=True)
 
-    def test_reverse_string(self):
-        """
-        Here.reverse string
-        """
-        self.reverse_run(
-            {"query": "40.753898, -73.985071"},
-            {"latitude": 40.753898, "longitude": -73.985071}
-        )
-
-    def test_reverse_point(self):
-        """
-        Here.reverse Point
-        """
+    def test_reverse(self):
         self.reverse_run(
             {"query": Point(40.753898, -73.985071)},
             {"latitude": 40.753898, "longitude": -73.985071}

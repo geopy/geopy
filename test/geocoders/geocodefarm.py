@@ -45,20 +45,7 @@ class GeocodeFarmTestCase(GeocoderTestBase):
              "latitude": 55.7558913503453, "longitude": 37.6172961632184}
         )
 
-    def test_reverse_string(self):
-        """
-        GeocodeFarm.reverse string
-        """
-        location = self.reverse_run(
-            {"query": "40.75376406311989,-73.98489005863667"},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
-        )
-        self.assertIn("new york", location.address.lower())
-
-    def test_reverse_point(self):
-        """
-        GeocodeFarm.reverse Point
-        """
+    def test_reverse(self):
         location = self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},

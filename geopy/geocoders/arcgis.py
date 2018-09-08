@@ -235,8 +235,7 @@ class ArcGIS(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        # ArcGIS is lon,lat; maintain lat,lon convention of geopy
-        point = self._coerce_point_to_string(query).split(",")
+        location = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         if wkid != DEFAULT_WKID:
             warnings.warn("%s.reverse: custom wkid value has been ignored.  "
                           "It wasn't working before because it was specified "
@@ -248,7 +247,6 @@ class ArcGIS(Geocoder):
                           "supported." % (type(self).__name__, DEFAULT_WKID),
                           DeprecationWarning)
             wkid = DEFAULT_WKID
-        location = ",".join((point[1], point[0]))
         params = {'location': location, 'f': 'json', 'outSR': wkid}
         if distance is not None:
             params['distance'] = distance

@@ -37,13 +37,7 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
             {"latitude": 37.33939, "longitude": -121.89496},
         )
 
-    def test_reverse_string(self):
-        self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667"},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
-        )
-
-    def test_reverse_point(self):
+    def test_reverse(self):
         self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}

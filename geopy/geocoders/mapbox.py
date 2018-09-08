@@ -4,7 +4,6 @@ from geopy.exc import (
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.point import Point
 from geopy.util import logger
 
 __all__ = ("MapBox", )
@@ -101,18 +100,6 @@ class MapBox(Geocoder):
         else:
             return [parse_feature(feature) for feature in features]
 
-    @staticmethod
-    def _coerce_point_to_string(point):
-        """
-        Do the right thing on "point" input. For geocoders with reverse
-        methods.
-        """
-        # This method overrides the one defined in the base Geocoder class.
-        # Notice the swapped longitude and latitude.
-        point = Point(point)
-        # Altitude is silently dropped.
-        return ",".join((str(point.longitude), str(point.latitude)))
-
     def geocode(
             self,
             query,
@@ -206,7 +193,7 @@ class MapBox(Geocoder):
         params = {}
         params['access_token'] = self.api_key
 
-        point = self._coerce_point_to_string(query)
+        point = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         quoted_query = quote(point.encode('utf-8'))
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))

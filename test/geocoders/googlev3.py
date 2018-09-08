@@ -10,12 +10,12 @@ from test.geocoders.util import GeocoderTestBase, env
 
 
 class GoogleV3TestCase(GeocoderTestBase):
+    new_york_point = Point(40.75376406311989, -73.98489005863667)
+    america_new_york = timezone("America/New_York")
 
     @classmethod
     def setUpClass(cls):
         cls.geocoder = GoogleV3(api_key=env.get('GOOGLE_KEY'))
-        cls.new_york_point = Point(40.75376406311989, -73.98489005863667)
-        cls.america_new_york = timezone("America/New_York")
 
     def timezone_run(self, payload, expected):
         tz = self._make_request(self.geocoder.timezone, **payload)
@@ -176,19 +176,7 @@ class GoogleV3TestCase(GeocoderTestBase):
             {"latitude": 46.227638, "longitude": 2.213749},
         )
 
-    def test_reverse_string(self):
-        """
-        GoogleV3.reverse string
-        """
-        self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
-        )
-
-    def test_reverse_point(self):
-        """
-        GoogleV3.reverse Point
-        """
+    def test_reverse(self):
         self.reverse_run(
             {"query": self.new_york_point, "exactly_one": True},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},

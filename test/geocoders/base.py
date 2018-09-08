@@ -13,17 +13,11 @@ from geopy.point import Point
 
 class GetGeocoderTestCase(unittest.TestCase):
 
-    def test_ok(self):
-        """
-        get_geocoder_for_service
-        """
+    def test_get_geocoder_for_service(self):
         self.assertEqual(get_geocoder_for_service("google"), GoogleV3)
         self.assertEqual(get_geocoder_for_service("googlev3"), GoogleV3)
 
-    def test_fail(self):
-        """
-        get_geocoder_for_service unknown service
-        """
+    def test_get_geocoder_for_service_raises_for_unknown(self):
         with self.assertRaises(GeocoderNotFound):
             get_geocoder_for_service("")
 
@@ -185,36 +179,31 @@ class GeocoderTestCase(unittest.TestCase):
             self.assertEqual(0, len(w))
 
     def test_point_coercion_point(self):
-        """
-        Geocoder._coerce_point_to_string Point
-        """
         self.assertEqual(
             self.geocoder._coerce_point_to_string(Point(*self.coordinates)),
             self.coordinates_str
         )
 
-    def test_point_coercion_floats(self):
-        """
-        Geocoder._coerce_point_to_string tuple of coordinates
-        """
+    def test_point_coercion_tuple_of_floats(self):
         self.assertEqual(
             self.geocoder._coerce_point_to_string(self.coordinates),
             self.coordinates_str
         )
 
     def test_point_coercion_string(self):
-        """
-        Geocoder._coerce_point_to_string string of coordinates
-        """
         self.assertEqual(
             self.geocoder._coerce_point_to_string(self.coordinates_str),
             self.coordinates_str
         )
 
+    def test_point_coercion_string_is_trimmed(self):
+        coordinates_str_spaces = "  %s  ,  %s  " % self.coordinates
+        self.assertEqual(
+            self.geocoder._coerce_point_to_string(coordinates_str_spaces),
+            self.coordinates_str
+        )
+
     def test_point_coercion_address(self):
-        """
-        Geocoder._coerce_point_to_string address string
-        """
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             point = self.geocoder._coerce_point_to_string(self.coordinates_address)

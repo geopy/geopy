@@ -70,14 +70,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
-    def test_reverse_string(self):
-        location = self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667"},
-            {"latitude": 40.753, "longitude": -73.984}
-        )
-        self.assertIn("New York", location.address)
-
-    def test_reverse_point(self):
+    def test_reverse(self):
         location = self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.753, "longitude": -73.984}
