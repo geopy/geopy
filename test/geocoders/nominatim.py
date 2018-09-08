@@ -55,7 +55,8 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": "second street", "limit": 4, "exactly_one": False},
             {}
         )
-        self.assertEqual(4, len(result))
+        self.assertGreaterEqual(len(result), 3)  # PickPoint sometimes returns 3
+        self.assertGreaterEqual(4, len(result))
 
     @patch.object(geopy.geocoders.options, 'default_user_agent',
                   'mocked_user_agent/0.0.0')
