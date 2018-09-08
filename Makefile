@@ -26,6 +26,14 @@ test:
 	coverage run -m py.test
 	coverage report
 
+readme_check:
+	./setup.py check --restructuredtext --strict
+
+rst_check:
+	make readme_check
+	# Doesn't generate any output but prints out errors and warnings.
+	make -C docs dummy
+
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -f
 	rm -Rf dist
