@@ -1,4 +1,5 @@
 import base64
+import warnings
 from datetime import datetime
 from pytz import timezone
 
@@ -233,9 +234,18 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3.geocode check bounds restriction
         """
         self.geocode_run(
-            {"query": "221b Baker St", "bounds": [50, -2, 55, 2]},
+            {"query": "221b Baker St", "bounds": [[50, -2], [55, 2]]},
             {"latitude": 51.52, "longitude": -0.15},
         )
+
+    def test_geocode_bounds_deprecated(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.geocode_run(
+                {"query": "221b Baker St", "bounds": [50, -2, 55, 2]},
+                {"latitude": 51.52, "longitude": -0.15},
+            )
+            self.assertEqual(1, len(w))
 
     def test_geocode_bounds_invalid(self):
         """

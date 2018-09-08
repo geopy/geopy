@@ -115,17 +115,21 @@ class Here(Geocoder):
             `street`, `housenumber`, or `postalcode`.
 
         :param bbox: A type of spatial filter, limits the search for any other attributes
-            in the request. Specified by two coordinate (lat/lon) pairs, top-left and
-            bottom-right, respectively.
-        :type bbox: list or tuple of :class:`geopy.point.Point`, list or tuple
-            of ``(latitude, longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+            in the request. Specified by two coordinate (lat/lon)
+            pairs -- corners of the box. `The bbox search is currently similar
+            to mapview but it is not extended` (cited from the REST API docs).
+            Relevant global results are also returned.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+        :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :param mapview: The app's viewport, given as two coordinate pairs, specified
-            by two lat/lon pairs, top-left and bottom-right of the bounding box,
+            by two lat/lon pairs -- corners of the bounding box,
             respectively. Matches from within the set map view plus an extended area
             are ranked highest. Relevant global results are also returned.
-        :type mapview: list or tuple of :class:`geopy.point.Point`, list or tuple
-            of ``(latitude, longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+        :type mapview: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -170,15 +174,11 @@ class Here(Geocoder):
                 'app_code': self.app_code
             }
         if bbox:
-            # untested
-            top_left = self._coerce_point_to_string(mapview[0])
-            bottom_right = self._coerce_point_to_string(mapview[1])
-            params['bbox'] = '%s;%s' % (top_left, bottom_right)
+            params['bbox'] = self._format_bounding_box(
+                bbox, "%(lat2)s,%(lon1)s;%(lat1)s,%(lon2)s")
         if mapview:
-            # untested
-            top_left = self._coerce_point_to_string(mapview[0])
-            bottom_right = self._coerce_point_to_string(mapview[1])
-            params['mapview'] = '%s;%s' % (top_left, bottom_right)
+            params['mapview'] = self._format_bounding_box(
+                mapview, "%(lat2)s,%(lon1)s;%(lat1)s,%(lon2)s")
         if pageinformation:
             params['pageinformation'] = pageinformation
         if maxresults:

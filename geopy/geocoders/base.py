@@ -246,7 +246,8 @@ class Geocoder(object):
         methods.
         """
         try:
-            point = Point(point)
+            if not isinstance(point, Point):
+                point = Point(point)
         except ValueError as e:
             if isinstance(point, string_compare):
                 warnings.warn(
@@ -260,6 +261,27 @@ class Geocoder(object):
             # Altitude is silently dropped.
             return output_format % dict(lat=point.latitude,
                                         lon=point.longitude)
+
+    @staticmethod
+    def _format_bounding_box(bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"):
+        """
+        Transform bounding box boundaries to a string matching
+        `output_format` from the following formats:
+
+            - [Point(lat1, lon1), Point(lat2, lon2)]
+            - [[lat1, lon1], [lat2, lon2]]
+            - ["lat1,lon1", "lat2,lon2"]
+
+        It is guaranteed that lat1 <= lat2 and lon1 <= lon2.
+        """
+        if len(bbox) != 2:
+            raise GeocoderQueryError("Unsupported format for a bounding box")
+        p1, p2 = bbox
+        p1, p2 = Point(p1), Point(p2)
+        return output_format % dict(lat1=min(p1.latitude, p2.latitude),
+                                    lon1=min(p1.longitude, p2.longitude),
+                                    lat2=max(p1.latitude, p2.latitude),
+                                    lon2=max(p1.longitude, p2.longitude))
 
     def _geocoder_exception_handler(self, error, message):
         """

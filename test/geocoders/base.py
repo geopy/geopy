@@ -5,7 +5,7 @@ import warnings
 
 import geopy.compat
 import geopy.geocoders
-from geopy.exc import GeocoderNotFound
+from geopy.exc import GeocoderNotFound, GeocoderQueryError
 from geopy.geocoders import GoogleV3, get_geocoder_for_service
 from geopy.geocoders.base import Geocoder
 from geopy.point import Point
@@ -27,9 +27,6 @@ class GeocoderTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Geocoder()
-        cls.coordinates = (40.74113, -73.989656)
-        cls.coordinates_str = "40.74113,-73.989656"
-        cls.coordinates_address = "175 5th Avenue, NYC, USA"
 
     def test_init_with_args(self):
         format_string = '%s Los Angeles, CA USA'
@@ -178,42 +175,92 @@ class GeocoderTestCase(unittest.TestCase):
                 self.assertIs(kwargs['context'], ssl_context)
             self.assertEqual(0, len(w))
 
-    def test_point_coercion_point(self):
-        self.assertEqual(
-            self.geocoder._coerce_point_to_string(Point(*self.coordinates)),
-            self.coordinates_str
-        )
 
-    def test_point_coercion_tuple_of_floats(self):
-        self.assertEqual(
-            self.geocoder._coerce_point_to_string(self.coordinates),
-            self.coordinates_str
-        )
+class GeocoderPointCoercionTestCase(unittest.TestCase):
+    coordinates = (40.74113, -73.989656)
+    coordinates_str = "40.74113,-73.989656"
+    coordinates_address = "175 5th Avenue, NYC, USA"
 
-    def test_point_coercion_string(self):
-        self.assertEqual(
-            self.geocoder._coerce_point_to_string(self.coordinates_str),
-            self.coordinates_str
-        )
+    def setUp(self):
+        self.method = Geocoder._coerce_point_to_string
 
-    def test_point_coercion_string_is_trimmed(self):
+    def test_point(self):
+        latlon = self.method(Point(*self.coordinates))
+        self.assertEqual(latlon, self.coordinates_str)
+
+    def test_tuple_of_floats(self):
+        latlon = self.method(self.coordinates)
+        self.assertEqual(latlon, self.coordinates_str)
+
+    def test_string(self):
+        latlon = self.method(self.coordinates_str)
+        self.assertEqual(latlon, self.coordinates_str)
+
+    def test_string_is_trimmed(self):
         coordinates_str_spaces = "  %s  ,  %s  " % self.coordinates
-        self.assertEqual(
-            self.geocoder._coerce_point_to_string(coordinates_str_spaces),
-            self.coordinates_str
-        )
+        latlon = self.method(coordinates_str_spaces)
+        self.assertEqual(latlon, self.coordinates_str)
 
-    def test_point_coercion_address(self):
+    def test_output_format_is_respected(self):
+        expected = "  %s  %s  " % self.coordinates[::-1]
+        lonlat = self.method(self.coordinates_str, "  %(lon)s  %(lat)s  ")
+        self.assertEqual(lonlat, expected)
+
+    def test_address(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
-            point = self.geocoder._coerce_point_to_string(self.coordinates_address)
+            latlon = self.method(self.coordinates_address)
 
             # 1 for latitude normalization (first string char being
             # treated as latitude).
             # 2 for the deprecated as-is input bypass.
             self.assertEqual(2, len(w))
 
-        self.assertEqual(
-            point,
-            self.coordinates_address
-        )
+        self.assertEqual(latlon, self.coordinates_address)
+
+
+class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.method = Geocoder._format_bounding_box
+
+    def test_string_raises(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.method("5,5,5,5")
+
+    def test_list_of_1_raises(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.method([5])
+
+    # TODO maybe raise for `[5, 5]` too?
+
+    def test_list_of_3_raises(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.method([5, 5, 5])
+
+    def test_list_of_4_raises(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.method([5, 5, 5, 5])
+
+    def test_list_of_5_raises(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.method([5, 5, 5, 5, 5])
+
+    def test_points(self):
+        bbox = self.method([Point(50, 160), Point(30, 170)])
+        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+
+    def test_lists(self):
+        bbox = self.method([[50, 160], [30, 170]])
+        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+        bbox = self.method([["50", "160"], ["30", "170"]])
+        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+
+    def test_strings(self):
+        bbox = self.method(["50, 160", "30,170"])
+        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+
+    def test_output_format(self):
+        bbox = self.method([Point(50, 160), Point(30, 170)],
+                           " %(lon2)s|%(lat2)s -- %(lat1)s|%(lon1)s ")
+        self.assertEqual(bbox, " 170.0|50.0 -- 30.0|160.0 ")

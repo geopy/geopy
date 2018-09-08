@@ -1,6 +1,6 @@
 import warnings
 
-from geopy.compat import urlencode
+from geopy.compat import string_compare, urlencode
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -96,14 +96,20 @@ class OpenCage(Geocoder):
             omitted a code of `en` (English) will be assumed by the remote
             service.
 
-        :param str bounds: Provides the geocoder with a hint to the region
+        :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
+        :param bounds: Provides the geocoder with a hint to the region
             that the query resides in. This value will help the geocoder
             but will not restrict the possible results to the supplied
-            region. The bounds parameter should be specified as 4
-            coordinate points forming the south-west and north-east
-            corners of a bounding box. The order of the coordinates is
-            `longitude,latitude,longitude,latitude`. For example,
-            ``bounds=-0.563160,51.280430,0.278970,51.683979``.
+            region. The bounds parameter should be specified as 2
+            coordinate points -- corners of a bounding box.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+
+            .. versionchanged:: 1.17.0
+                Previously the only supported format for bounds was a
+                string of ``"longitude,latitude,longitude,latitude"``.
+                This format is now deprecated in favor of a list/tuple
+                of a pair of geopy Points and will be removed in geopy 2.0.
 
         :param str country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
@@ -128,7 +134,19 @@ class OpenCage(Geocoder):
             'q': self.format_string % query,
         }
         if bounds:
-            params['bounds'] = bounds
+            if isinstance(bounds, string_compare):
+                warnings.warn(
+                    'OpenCage `bounds` format of '
+                    '`"longitude,latitude,longitude,latitude"` is now '
+                    'deprecated and will be not supported in geopy 2.0. '
+                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
+                    'instead.',
+                    UserWarning
+                )
+                lon1, lat1, lon2, lat2 = bounds.split(',')
+                bounds = [[lat1, lon1], [lat2, lon2]]
+            params['bounds'] = self._format_bounding_box(
+                bounds, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
         if language:
             params['language'] = language
         if country:

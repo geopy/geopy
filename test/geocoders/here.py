@@ -80,6 +80,20 @@ class HereTestCase(GeocoderTestBase):
             {"latitude": 48.85718, "longitude": 2.34141}
         )
 
+    def test_bbox(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "bbox": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
+    def test_mapview(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "mapview": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
     def test_geocode_shapes(self):
         """
         Here.geocode using additional data parameter (postal code shapes)

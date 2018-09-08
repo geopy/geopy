@@ -1,9 +1,7 @@
 from geopy.compat import urlencode, quote
-from geopy.exc import (
-    GeocoderQueryError,
-)
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
+from geopy.point import Point
 from geopy.util import logger
 
 __all__ = ("MapBox", )
@@ -69,20 +67,6 @@ class MapBox(Geocoder):
         self.domain = domain.strip('/')
         self.api = "%s://%s%s" % (self.scheme, self.domain, self.api_path)
 
-    @staticmethod
-    def _format_bbox_param(bbox):
-        """
-        Format the bbox to something Mapbox understands.
-        """
-        return '%f,%f,%f,%f' % (bbox[0], bbox[1], bbox[2], bbox[3])
-
-    @staticmethod
-    def _format_proximity_param(proximity):
-        """
-        Format the proximity to something Mapbox understands.
-        """
-        return '%f,%f' % (proximity[0], proximity[1])
-
     def _parse_json(self, json, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
         features = json['features']
@@ -122,15 +106,19 @@ class MapBox(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param proximity: a coordinate to bias local results based on a provided location.
-        :type proximity: list of tuple
+        :param proximity: A coordinate to bias local results based on a provided
+            location.
+        :type proximity: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param string country: Country to filter result in form of
             ISO 3166-1 alpha-2 country code.
 
         :param bbox: The bounding box of the viewport within which
             to bias geocode results more prominently.
-        :type bbox: list or tuple
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+        :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -140,21 +128,15 @@ class MapBox(Geocoder):
         params['access_token'] = self.api_key
         query = self.format_string % query
         if bbox:
-            if len(bbox) != 4:
-                raise GeocoderQueryError(
-                    "bbox must be a four-item iterable of lat,lon,lat,lon"
-                )
-            params['bbox'] = self._format_bbox_param(bbox)
+            params['bbox'] = self._format_bounding_box(
+                bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
 
         if country:
             params['country'] = country
 
         if proximity:
-            if len(proximity) != 2:
-                raise GeocoderQueryError(
-                    "proximity must be a two-item iterable of lat,lon"
-                )
-            params['proximity'] = self._format_proximity_param(proximity)
+            p = Point(proximity)
+            params['proximity'] = "%s,%s" % (p.longitude, p.latitude)
 
         quoted_query = quote(query.encode('utf-8'))
         url = "?".join((self.api % dict(query=quoted_query),

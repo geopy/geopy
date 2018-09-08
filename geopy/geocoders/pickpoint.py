@@ -39,7 +39,16 @@ class PickPoint(Nominatim):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param tuple view_box: Coordinates to restrict search within.
+        :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
+        :param view_box: Coordinates to restrict search within.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+
+            .. versionchanged:: 1.17.0
+                Previously view_box could be a list of 4 strings or numbers
+                in the format of ``[longitude, latitude, longitude, latitude]``.
+                This format is now deprecated in favor of a list/tuple
+                of a pair of geopy Points and will be removed in geopy 2.0.
 
         :param string country_bias: Bias results to this country.
 

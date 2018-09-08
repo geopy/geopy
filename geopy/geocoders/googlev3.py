@@ -165,13 +165,6 @@ class GoogleV3(Geocoder):
             (":".join(item) for item in components.items())
         )
 
-    @staticmethod
-    def _format_bounds_param(bounds):
-        """
-        Format the bounds to something Google understands.
-        """
-        return '%f,%f|%f,%f' % (bounds[0], bounds[1], bounds[2], bounds[3])
-
     def geocode(
             self,
             query=None,
@@ -203,9 +196,17 @@ class GoogleV3(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
         :param bounds: The bounding box of the viewport within which
             to bias geocode results more prominently.
-        :type bounds: list or tuple
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+
+            .. versionchanged:: 1.17.0
+                Previously the only supported format for bounds was a
+                list like ``[latitude, longitude, latitude, longitude]``.
+                This format is now deprecated in favor of a list/tuple
+                of a pair of geopy Points and will be removed in geopy 2.0.
 
         :param str region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.
@@ -231,11 +232,19 @@ class GoogleV3(Geocoder):
         if self.api_key:
             params['key'] = self.api_key
         if bounds:
-            if len(bounds) != 4:
-                raise GeocoderQueryError(
-                    "bounds must be a four-item iterable of lat,lon,lat,lon"
+            if len(bounds) == 4:
+                warnings.warn(
+                    'GoogleV3 `bounds` format of '
+                    '`[latitude, longitude, latitude, longitude]` is now '
+                    'deprecated and will be not supported in geopy 2.0. '
+                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
+                    'instead.',
+                    UserWarning
                 )
-            params['bounds'] = self._format_bounds_param(bounds)
+                lat1, lon1, lat2, lon2 = bounds
+                bounds = [[lat1, lon1], [lat2, lon2]]
+            params['bounds'] = self._format_bounding_box(
+                bounds, "%(lat1)s,%(lon1)s|%(lat2)s,%(lon2)s")
         if region:
             params['region'] = region
         if components:

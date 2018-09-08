@@ -1,12 +1,10 @@
 import warnings
-from itertools import chain
 
 from geopy.compat import urlencode
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder, _DEFAULT_USER_AGENT
 from geopy.location import Location
 from geopy.util import logger
-from geopy.point import Point
 
 __all__ = ("Nominatim", )
 
@@ -67,14 +65,19 @@ class Nominatim(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param tuple view_box: Coordinates to restrict search within.
-            Accepts instances of the :class:`geopy.point.Point`
-            ``[Point(22, 180), Point(-22, -180)]``,
-            or iterables of numeric and string types ``[180, 22, -180, -22]``,
-            ``["180", "22", "-180", "-22"]``
+        :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
+        :param view_box: Coordinates to restrict search within.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
 
             .. versionchanged:: 1.15.0
-               Previously only a list of stringified coordinates was supported.
+                Previously only a list of stringified coordinates was supported.
+
+            .. versionchanged:: 1.17.0
+                Previously view_box could be a list of 4 strings or numbers
+                in the format of ``[longitude, latitude, longitude, latitude]``.
+                This format is now deprecated in favor of a list/tuple
+                of a pair of geopy Points and will be removed in geopy 2.0.
 
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box.
@@ -251,11 +254,20 @@ class Nominatim(Geocoder):
 
         # `viewbox` apparently replaces `view_box`
         if self.view_box:
-            if all(isinstance(point, Point) for point in self.view_box):
-                p1, p2 = self.view_box
-                params['viewbox'] = ','.join(str(p) for p in chain(p1[1::-1], p2[1::-1]))
-            else:
-                params['viewbox'] = ','.join(str(coord) for coord in self.view_box)
+            viewbox = self.view_box
+            if len(viewbox) == 4:
+                warnings.warn(
+                    '%s `view_box` format of '
+                    '`[longitude, latitude, longitude, latitude]` is now '
+                    'deprecated and will be not supported in geopy 2.0. '
+                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
+                    'instead.' % type(self).__name__,
+                    UserWarning
+                )
+                lon1, lat1, lon2, lat2 = viewbox
+                viewbox = [[lat1, lon1], [lat2, lon2]]
+            params['viewbox'] = self._format_bounding_box(
+                viewbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
 
         if self.bounded:
             params['bounded'] = 1

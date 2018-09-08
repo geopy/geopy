@@ -43,11 +43,10 @@ class OpenMapQuest(Nominatim):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
-        :param tuple view_box: Coordinates to restrict search within.
-            Accepts instances of the :class:`geopy.point.Point`
-            ``[Point(22, 180), Point(-22, -180)]``,
-            or iterables of numeric and string types ``[180, 22, -180, -22]``,
-            ``["180", "22", "-180", "-22"]``
+        :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
+        :param view_box: Coordinates to restrict search within.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
 
             .. versionadded:: 1.17.0
 

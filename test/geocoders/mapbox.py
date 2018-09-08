@@ -1,4 +1,3 @@
-from pytz import timezone
 import unittest
 
 from geopy.compat import u
@@ -14,42 +13,29 @@ from test.geocoders.util import GeocoderTestBase, env
 class MapBoxTestCase(GeocoderTestBase):
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = MapBox(api_key=env['MAPBOX_KEY'])
-        cls.new_york_point = Point(40.75376406311989, -73.98489005863667)
-        cls.america_new_york = timezone("America/New_York")
+        cls.geocoder = MapBox(api_key=env['MAPBOX_KEY'], timeout=3)
 
     def test_geocode(self):
-        """
-        MapBox.geocode
-        """
-
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
     def test_unicode_name(self):
-        """
-        MapBox.geocode unicode
-        """
         self.geocode_run(
             {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
     def test_reverse(self):
-        """
-        MapBox.reverse Point
-        """
-        self.reverse_run(
-            {"query": self.new_york_point, "exactly_one": True},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        new_york_point = Point(40.75376406311989, -73.98489005863667)
+        location = self.reverse_run(
+            {"query": new_york_point, "exactly_one": True},
+            {"latitude": 40.7537640, "longitude": -73.98489, "delta": 1},
         )
+        self.assertIn("New York", location.address)
 
     def test_zero_results(self):
-        """
-        MapBox.geocode returns None for no result
-        """
         self.geocode_run(
             {"query": 'asdfasdfasdf'},
             {},
@@ -60,7 +46,8 @@ class MapBoxTestCase(GeocoderTestBase):
         self.geocode_run(
             {
                 "query": "435 north michigan ave, chicago il 60611 usa",
-                "bbox": [-118.604794, 34.172684, -118.500938, 34.236144]
+                "bbox": [[34.172684, -118.604794],
+                         [34.236144, -118.500938]]
             },
             {},
             expect_failure=True,
@@ -70,15 +57,16 @@ class MapBoxTestCase(GeocoderTestBase):
         self.geocode_run(
             {
                 "query": "435 north michigan ave, chicago il 60611 usa",
-                "bbox": [-103.271484, 35.227672, -74.399414, 48.603858]
+                "bbox": [Point(35.227672, -103.271484),
+                         Point(48.603858, -74.399414)]
             },
             {"latitude": 41.890, "longitude": -87.624},
         )
 
     def test_geocode_proximity(self):
         self.geocode_run(
-            {"query": "200 queen street", "proximity": [45.3, -66.1]},
-            {"latitude": -33.994267, "longitude": 138.881142},
+            {"query": "200 queen street", "proximity": Point(45.3, -66.1)},
+            {"latitude": 45.270208, "longitude": -66.050289, "delta": 0.1},
         )
 
     def test_geocode_country(self):
