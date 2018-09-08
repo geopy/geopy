@@ -25,6 +25,7 @@ stages:
   - lint
   - rst
   - test
+  - doctest
 
 # Used in the `test` stage.
 before_script:
@@ -61,3 +62,11 @@ jobs:
       python: "3.8-dev"
       dist: xenial
       sudo: required
+
+    - stage: doctest
+      name: "Verification of code samples in RST files with doctest"
+      python: "3.6"
+      before_script:
+        - travis_retry pip install -e ".[dev-doctest]"
+      script:
+        - make doctest

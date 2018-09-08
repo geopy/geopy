@@ -182,7 +182,8 @@ class GoogleV3(Geocoder):
         :param str query: The address or query you wish to geocode. Optional,
             if ``components`` param is set::
 
-                >>> g.geocode(components={"city": "Paris", "country": "FR"})
+                >>> g.geocode(components={"city": "Paris", "country": "FR"})  \
+# doctest: +SKIP
                 Location(France, (46.227638, 2.213749, 0.0))
 
             .. versionchanged:: 1.14.0

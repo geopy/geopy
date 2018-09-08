@@ -48,31 +48,34 @@ Here are examples of ``distance.distance`` usage::
     >>> from geopy import distance
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
-    >>> print(distance.distance(newport_ri, cleveland_oh).miles)
+    >>> print(distance.distance(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
     538.39044536
 
     >>> wellington = (-41.32, 174.81)
     >>> salamanca = (40.96, -5.50)
-    >>> print(distance.distance(wellington, salamanca).km)
+    >>> print(distance.distance(wellington, salamanca).km)  # doctest: +SKIP
     19959.6792674
 
 The second example above fails with :class:`.vincenty`.
 
 Using :class:`.great_circle` distance::
 
-    >>> print(distance.great_circle(newport_ri, cleveland_oh).miles)
+    >>> print(distance.great_circle(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
     536.997990696
 
 You can change the ellipsoid model used by the geodesic formulas like so::
 
     >>> ne, cl = newport_ri, cleveland_oh
-    >>> print(distance.geodesic(ne, cl, ellipsoid='GRS-80').miles)
+    >>> print(distance.geodesic(ne, cl, ellipsoid='GRS-80').miles)  # doctest: +SKIP
+    538.39044537
 
 The above model name will automatically be retrieved from the
 :const:`distance.ELLIPSOIDS` dictionary. Alternatively, you can specify
 the model values directly::
 
-    >>> distance.geodesic(ne, cl, ellipsoid=(6377., 6356., 1 / 297.)).miles
+    >>> distance.geodesic(ne, cl, ellipsoid=(6377., 6356., 1 / 297.)).miles  \
+# doctest: +SKIP
+    538.29782137
 
 Distances support simple arithmetic, making it easy to do things like
 calculate the length of a path::
@@ -82,7 +85,7 @@ calculate the length of a path::
     >>> g = Nominatim(user_agent="specify_your_app_name_here")
     >>> _, wa = g.geocode('Washington, DC')
     >>> _, pa = g.geocode('Palo Alto, CA')
-    >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
+    >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)  # doctest: +SKIP
     3277.30439191
 
 """
@@ -135,7 +138,8 @@ def lonlat(x, y, z=0):
         >>> from geopy.distance import lonlat, distance
         >>> newport_ri_xy = (-71.312796, 41.49008)
         >>> cleveland_oh_xy = (-81.695391, 41.499498)
-        >>> print(distance(lonlat(*newport_ri_xy), lonlat(*cleveland_oh_xy)).miles)
+        >>> print(distance(lonlat(*newport_ri_xy), lonlat(*cleveland_oh_xy)).miles)  \
+# doctest: +SKIP
         538.3904453677203
 
     :param x: longitude
@@ -291,7 +295,7 @@ class great_circle(Distance):
         >>> from geopy.distance import great_circle
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
-        >>> print(great_circle(newport_ri, cleveland_oh).miles)
+        >>> print(great_circle(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
         536.997990696
 
     """
@@ -368,7 +372,7 @@ class geodesic(Distance):
         >>> from geopy.distance import geodesic
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
-        >>> print(geodesic(newport_ri, cleveland_oh).miles)
+        >>> print(geodesic(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
         538.390445368
 
 
@@ -471,7 +475,7 @@ class vincenty(Distance):
         >>> from geopy.distance import vincenty
         >>> newport_ri = (41.49008, -71.312796)
         >>> cleveland_oh = (41.499498, -81.695391)
-        >>> print(vincenty(newport_ri, cleveland_oh).miles)
+        >>> print(vincenty(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
         538.390445362
 
     Note: Vincenty's method for distance fails to converge for some

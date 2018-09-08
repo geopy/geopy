@@ -34,6 +34,9 @@ rst_check:
 	# Doesn't generate any output but prints out errors and warnings.
 	make -C docs dummy
 
+doctest:
+	pytest --doctest-modules --doctest-continue-on-failure geopy docs README.rst
+
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -f
 	rm -Rf dist

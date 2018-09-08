@@ -33,6 +33,12 @@ EXTRAS_DEV_DOCS = [
     "sphinx_rtd_theme>=0.4.0",
 ]
 
+EXTRAS_DEV_DOCTEST = [
+    "certifi",
+    "pandas",
+    "tqdm",
+]
+
 setup(
     name='geopy',
     version=version,
@@ -50,12 +56,16 @@ setup(
         "dev": (EXTRAS_DEV_TESTFILES_COMMON +
                 EXTRAS_DEV_LINT +
                 EXTRAS_DEV_TEST +
-                EXTRAS_DEV_DOCS),
+                EXTRAS_DEV_DOCS +
+                EXTRAS_DEV_DOCTEST),
         "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_LINT),
         "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_TEST),
         "dev-docs": EXTRAS_DEV_DOCS,
+        "dev-doctest": (EXTRAS_DEV_TESTFILES_COMMON +
+                        EXTRAS_DEV_TEST +
+                        EXTRAS_DEV_DOCTEST),
         "timezone": ["pytz"],
     },
     license='MIT',

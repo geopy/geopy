@@ -25,21 +25,22 @@ class RateLimiter(object):
     :class:`geopy.exc.GeocoderServiceError` exceptions will be retried
     (up to ``max_retries`` times)::
 
-        import pandas as pd
-        df = pd.DataFrame({'name': ['paris', 'berlin', 'london']})
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'name': ['paris', 'berlin', 'london']})
 
-        from geopy.geocoders import Nominatim
-        geolocator = Nominatim(user_agent="specify_your_app_name_here")
+        >>> from geopy.geocoders import Nominatim
+        >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
 
-        from geopy.extra.rate_limiter import RateLimiter
-        geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
-        df['location'] = df['name'].apply(geocode)
+        >>> from geopy.extra.rate_limiter import RateLimiter
+        >>> geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
+        >>> df['location'] = df['name'].apply(geocode)
 
-        df['point'] = df['location'].apply(lambda loc: tuple(loc.point) if loc else None)
+        >>> df['point'] = df['location'].apply(lambda loc: tuple(loc.point) \
+if loc else None)
 
     This would produce the following DataFrame::
 
-        >>> df
+        >>> df  # doctest: +SKIP
              name                                           location  \\
         0   paris  (Paris, Île-de-France, France métropolitaine, ...
         1  berlin  (Berlin, 10117, Deutschland, (52.5170365, 13.3...
@@ -52,14 +53,14 @@ class RateLimiter(object):
 
     To pass extra options to the `geocode` call::
 
-        from functools import partial
-        df['location'] = df['name'].apply(partial(geocode, language='de'))
+        >>> from functools import partial
+        >>> df['location'] = df['name'].apply(partial(geocode, language='de'))
 
     To see a progress bar::
 
-        from tqdm import tqdm
-        tqdm.pandas()
-        df['location'] = df['name'].progress_apply(geocode)
+        >>> from tqdm import tqdm
+        >>> tqdm.pandas()
+        >>> df['location'] = df['name'].progress_apply(geocode)
 
     Before using this class, please consult with the Geocoding service
     ToS, which might explicitly consider bulk requests (even throttled)

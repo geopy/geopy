@@ -125,20 +125,20 @@ class options(object):
 
             To use the CA bundle used by `requests` library::
 
-                import ssl
-                import certifi
-                import geopy.geocoders
-                ctx = ssl.create_default_context(cafile=certifi.where())
-                geopy.geocoders.options.default_ssl_context = ctx
+                >>> import ssl
+                >>> import certifi
+                >>> import geopy.geocoders
+                >>> ctx = ssl.create_default_context(cafile=certifi.where())
+                >>> geopy.geocoders.options.default_ssl_context = ctx
 
             To disable TLS certificate verification completely::
 
-                import ssl
-                import geopy.geocoders
-                ctx = ssl.create_default_context()
-                ctx.check_hostname = False
-                ctx.verify_mode = ssl.CERT_NONE
-                geopy.geocoders.options.default_ssl_context = ctx
+                >>> import ssl
+                >>> import geopy.geocoders
+                >>> ctx = ssl.create_default_context()
+                >>> ctx.check_hostname = False
+                >>> ctx.verify_mode = ssl.CERT_NONE
+                >>> geopy.geocoders.options.default_ssl_context = ctx
 
             See docs for the :class:`ssl.SSLContext` class for more examples.
 

@@ -12,11 +12,11 @@ To geolocate a query to an address and coordinates:
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.geocode("175 5th Avenue NYC")
-    >>> print(location.address)
+    >>> print(location.address)  # doctest: +SKIP
     Flatiron Building, 175, 5th Avenue, Flatiron, New York, NYC, New York, ...
-    >>> print((location.latitude, location.longitude))
+    >>> print((location.latitude, location.longitude))  # doctest: +SKIP
     (40.7410861, -73.9896297241625)
-    >>> print(location.raw)
+    >>> print(location.raw)  # doctest: +SKIP
     {'place_id': '9167009604', 'type': 'attraction', ...}
 
 
@@ -25,11 +25,11 @@ To find the address corresponding to a set of coordinates:
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.reverse("52.509669, 13.376294")
-    >>> print(location.address)
+    >>> print(location.address)  # doctest: +SKIP
     Potsdamer Platz, Mitte, Berlin, 10117, Deutschland, European Union
-    >>> print((location.latitude, location.longitude))
+    >>> print((location.latitude, location.longitude))  # doctest: +SKIP
     (52.5094982, 13.3765983)
-    >>> print(location.raw)
+    >>> print(location.raw)  # doctest: +SKIP
     {'place_id': '654513', 'osm_type': 'node', ...}
 
 Locators' ``geocode`` and ``reverse`` methods require the argument ``query``,
@@ -68,7 +68,7 @@ need to geocode locations in `Cleveland, Ohio`, you could do::
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here",
     ...                        format_string="%s, Cleveland OH")
     >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
-    >>> print(address, latitude, longitude)
+    >>> print(address, latitude, longitude)  # doctest: +SKIP
     Thwing Center, 11111, Euclid Avenue, Magnolia-Wade Park Historic District, \
 University Circle, Cleveland, Cuyahoga County, Ohio, 44106, USA \
 41.5074076 -81.6083649792596
@@ -174,7 +174,7 @@ def get_geocoder_for_service(service):
 
     >>> from geopy.geocoders import get_geocoder_for_service
     >>> get_geocoder_for_service("nominatim")
-    geopy.geocoders.osm.Nominatim
+    <class 'geopy.geocoders.osm.Nominatim'>
 
     If the string given is not recognized, a
     :class:`geopy.exc.GeocoderNotFound` exception is raised.

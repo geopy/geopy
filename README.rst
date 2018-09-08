@@ -77,11 +77,11 @@ To geolocate a query to an address and coordinates:
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.geocode("175 5th Avenue NYC")
-    >>> print(location.address)
+    >>> print(location.address)  # doctest: +SKIP
     Flatiron Building, 175, 5th Avenue, Flatiron, New York, NYC, New York, ...
-    >>> print((location.latitude, location.longitude))
+    >>> print((location.latitude, location.longitude))  # doctest: +SKIP
     (40.7410861, -73.9896297241625)
-    >>> print(location.raw)
+    >>> print(location.raw)  # doctest: +SKIP
     {'place_id': '9167009604', 'type': 'attraction', ...}
 
 To find the address corresponding to a set of coordinates:
@@ -91,11 +91,11 @@ To find the address corresponding to a set of coordinates:
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.reverse("52.509669, 13.376294")
-    >>> print(location.address)
+    >>> print(location.address)  # doctest: +SKIP
     Potsdamer Platz, Mitte, Berlin, 10117, Deutschland, European Union
-    >>> print((location.latitude, location.longitude))
+    >>> print((location.latitude, location.longitude))  # doctest: +SKIP
     (52.5094982, 13.3765983)
-    >>> print(location.raw)
+    >>> print(location.raw)  # doctest: +SKIP
     {'place_id': '654513', 'osm_type': 'node', ...}
 
 Measuring Distance
@@ -116,7 +116,7 @@ Here's an example usage of the geodesic distance:
     >>> from geopy.distance import geodesic
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
-    >>> print(geodesic(newport_ri, cleveland_oh).miles)
+    >>> print(geodesic(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
     538.390445368
 
 Using great-circle distance:
@@ -126,7 +126,7 @@ Using great-circle distance:
     >>> from geopy.distance import great_circle
     >>> newport_ri = (41.49008, -71.312796)
     >>> cleveland_oh = (41.499498, -81.695391)
-    >>> print(great_circle(newport_ri, cleveland_oh).miles)
+    >>> print(great_circle(newport_ri, cleveland_oh).miles)  # doctest: +SKIP
     536.997990696
 
 Documentation
