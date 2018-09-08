@@ -22,6 +22,7 @@ except IOError:
         'LIVESTREETS_AUTH_TOKEN',
         'GEOCODEEARTH_KEY',
         'GEOCODEFARM_KEY',
+        "GOOGLE_KEY",
         'HERE_APP_ID',
         'HERE_APP_CODE',
         'GEOCODEFARM_SKIP',

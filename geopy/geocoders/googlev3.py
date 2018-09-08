@@ -33,7 +33,9 @@ class GoogleV3(Geocoder):
     Documentation at:
         https://developers.google.com/maps/documentation/geocoding/
 
-    API authentication is only required for Google Maps Premier customers.
+    .. attention::
+        Since July 2018 Google requires each request to have an API key.
+        See https://developers.google.com/maps/documentation/geocoding/usage-and-billing
     """
 
     def __init__(
@@ -55,6 +57,8 @@ class GoogleV3(Geocoder):
         :param str api_key: The API key required by Google to perform
             geocoding requests. API keys are managed through the Google APIs
             console (https://code.google.com/apis/console).
+            Make sure to have both ``Geocoding API`` and ``Time Zone API``
+            services enabled for this API key.
 
         :param str domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.googleapis.com', but if you're
@@ -106,6 +110,14 @@ class GoogleV3(Geocoder):
             raise ConfigurationError('Must provide secret_key with client_id.')
         if secret_key and not client_id:
             raise ConfigurationError('Must provide client_id with secret_key.')
+
+        if not api_key:
+            warnings.warn(
+                'Since July 2018 Google requires each request to have an API key. '
+                'Pass a valid `api_key` to GoogleV3 geocoder to hide this warning. '
+                'See https://developers.google.com/maps/documentation/geocoding/usage-and-billing',  # noqa
+                UserWarning
+            )
 
         self.api_key = api_key
         self.domain = domain.strip('/')
@@ -177,7 +189,6 @@ class GoogleV3(Geocoder):
         :param str query: The address or query you wish to geocode. Optional,
             if ``components`` param is set::
 
-                >>> g = GoogleV3()
                 >>> g.geocode(components={"city": "Paris", "country": "FR"})
                 Location(France, (46.227638, 2.213749, 0.0))
 

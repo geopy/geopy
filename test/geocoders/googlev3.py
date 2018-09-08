@@ -6,14 +6,14 @@ from geopy import exc
 from geopy.compat import u, urlparse, parse_qs
 from geopy.point import Point
 from geopy.geocoders import GoogleV3
-from test.geocoders.util import GeocoderTestBase
+from test.geocoders.util import GeocoderTestBase, env
 
 
 class GoogleV3TestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = GoogleV3()
+        cls.geocoder = GoogleV3(api_key=env.get('GOOGLE_KEY'))
         cls.new_york_point = Point(40.75376406311989, -73.98489005863667)
         cls.america_new_york = timezone("America/New_York")
 
@@ -23,6 +23,7 @@ class GoogleV3TestCase(GeocoderTestBase):
 
     def test_user_agent_custom(self):
         geocoder = GoogleV3(
+            api_key='mock',
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
@@ -32,9 +33,9 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3 raises configuration errors on invalid auth params
         """
         with self.assertRaises(exc.ConfigurationError):
-            GoogleV3(client_id='a')
+            GoogleV3(api_key='mock', client_id='a')
         with self.assertRaises(exc.ConfigurationError):
-            GoogleV3(secret_key='a')
+            GoogleV3(api_key='mock', secret_key='a')
 
     def test_check_status(self):
         """
@@ -55,6 +56,7 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3._get_signed_url
         """
         geocoder = GoogleV3(
+            api_key='mock',
             client_id='my_client_id',
             secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8'))
         )
@@ -80,6 +82,7 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3._get_signed_url
         """
         geocoder = GoogleV3(
+            api_key='mock',
             client_id='my_client_id',
             secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8')),
             channel='my_channel'

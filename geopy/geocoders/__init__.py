@@ -64,12 +64,14 @@ Every geocoder accepts an argument ``format_string`` that defaults to ``'%s'``
 where the input string to geocode is interpolated. For example, if you only
 need to geocode locations in `Cleveland, Ohio`, you could do::
 
-    >>> from geopy.geocoders import GoogleV3
-    >>> geolocator = GoogleV3(format_string="%s, Cleveland OH")
+    >>> from geopy.geocoders import Nominatim
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here",
+    ...                        format_string="%s, Cleveland OH")
     >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
     >>> print(address, latitude, longitude)
-    Thwing Center, 11111 Euclid Ave, Cleveland, OH 44106, USA \
-41.5074066 -81.60832649999999
+    Thwing Center, 11111, Euclid Avenue, Magnolia-Wade Park Historic District, \
+University Circle, Cleveland, Cuyahoga County, Ohio, 44106, USA \
+41.5074076 -81.6083649792596
 
 """
 
