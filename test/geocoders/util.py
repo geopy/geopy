@@ -6,44 +6,12 @@ from collections import defaultdict
 
 from geopy import exc
 
+env = defaultdict(lambda: None)
 try:
-    env = defaultdict(lambda: None)
     with open(".test_keys") as fp:
         env.update(json.loads(fp.read()))
 except IOError:
-    keys = (
-        'ARCGIS_USERNAME',
-        'ARCGIS_PASSWORD',
-        'ARCGIS_REFERER',
-        'AZURE_SUBSCRIPTION_KEY',
-        'BING_KEY',
-        'GEONAMES_USERNAME',
-        'LIVESTREETS_AUTH_ID',
-        'LIVESTREETS_AUTH_TOKEN',
-        'GEOCODEEARTH_KEY',
-        'GEOCODEFARM_KEY',
-        "GOOGLE_KEY",
-        'HERE_APP_ID',
-        'HERE_APP_CODE',
-        'GEOCODEFARM_SKIP',
-        'BAIDU_KEY',
-        'BAIDU_KEY_REQUIRES_SK',
-        'BAIDU_SEC_KEY',
-        'MAPBOX_KEY',
-        'OPENCAGE_KEY',
-        'OPENMAPQUEST_APIKEY',
-        'PELIAS_DOMAIN',
-        'PELIAS_KEY',
-        'PICKPOINT_KEY',
-        'TOMTOM_KEY',
-        'WHAT3WORDS_KEY',
-        'IGNFRANCE_KEY',
-        'IGNFRANCE_USERNAME',
-        'IGNFRANCE_PASSWORD',
-        'IGNFRANCE_REFERER',
-        'YANDEX_KEY',
-    )
-    env = {key: os.environ.get(key, None) for key in keys}
+    env.update(os.environ)
 
 
 EMPTY = object()
