@@ -1,26 +1,63 @@
 language: python
 sudo: false
 
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  # 3.7 and 3.8 are defined separately in the jobs below.
+  # See: https://github.com/travis-ci/travis-ci/issues/9815
+  - "pypy"
+  - "pypy3"
+
 matrix:
-    include:
-        - python: "2.7"
-        - python: "3.4"
-        - python: "3.5"
-        - python: "3.6"
-        - python: "3.7"
-          # See: https://github.com/travis-ci/travis-ci/issues/9815
-          dist: xenial
-          sudo: required
-        - python: "3.8-dev"
-          dist: xenial
-          sudo: required
-        - python: "pypy"
-        - python: "pypy3"
-    allow_failures:
-        - python: "3.8-dev"
+  allow_failures:
+    - python: "3.8-dev"
+
+before_install:
+  - travis_retry pip install -U pip wheel setuptools
+
 install:
-    - travis_retry pip install -e ".[dev,timezone]"
+  - travis_retry pip install -e ".[timezone]"
+
+stages:
+  - lint
+  - rst
+  - test
+
+# Used in the `test` stage.
+before_script:
+  - travis_retry pip install -e ".[dev-test]"
 script:
-    - coverage run -m py.test
-    - coverage report
-    - flake8
+  - make test
+
+jobs:
+  include:
+    - stage: lint
+      name: "Linting"
+      python: "3.6"
+      before_script:
+        - travis_retry pip install -e ".[dev-lint]"
+      script:
+        - make lint
+
+    - stage: rst
+      name: "RST (README.rst + docs) syntax check"
+      python: "3.6"
+      before_script:
+        - travis_retry pip install -e ".[dev-docs]"
+      script:
+        - make rst_check
+
+    # The `test` stage using the `python` matrix above is included implicitly.
+
+    - stage: test
+      python: "3.7"
+      dist: xenial
+      sudo: required
+
+    - stage: test
+      python: "3.8-dev"
+      dist: xenial
+      sudo: required

@@ -11,6 +11,26 @@ INSTALL_REQUIRES = [
     'geographiclib<2,>=1.49',
 ]
 
+EXTRAS_DEV_TESTFILES_COMMON = [
+    "contextlib2; python_version<'3.0'",
+    "mock",
+    "six",
+]
+
+EXTRAS_DEV_LINT = [
+    "flake8>=3.5.0,<3.6.0",
+]
+
+EXTRAS_DEV_TEST = [
+    "coverage",
+    "pytest>=3",
+]
+
+EXTRAS_DEV_DOCS = [
+    "readme_renderer",
+    "sphinx",
+    "sphinx_rtd_theme>=0.4.0",
+]
 
 setup(
     name='geopy',
@@ -26,17 +46,15 @@ setup(
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        "dev": [
-            "coverage",
-            "contextlib2; python_version<'3.0'",
-            "flake8>=3.5.0,<3.6.0",
-            "mock",
-            "pytest>=3",
-            "readme_renderer",
-            "six",
-            "sphinx",
-            "sphinx_rtd_theme>=0.4.0",
-        ],
+        "dev": (EXTRAS_DEV_TESTFILES_COMMON +
+                EXTRAS_DEV_LINT +
+                EXTRAS_DEV_TEST +
+                EXTRAS_DEV_DOCS),
+        "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON +
+                     EXTRAS_DEV_LINT),
+        "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
+                     EXTRAS_DEV_TEST),
+        "dev-docs": EXTRAS_DEV_DOCS,
         "timezone": ["pytz"],
     },
     license='MIT',
