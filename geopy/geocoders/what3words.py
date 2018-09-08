@@ -47,8 +47,8 @@ class What3Words(Geocoder):
 
             .. deprecated:: 1.15.0
                API v2 requires https. Don't use this parameter,
-               it's going to be removed in the future versions of
-               geopy. Scheme other than ``https`` would result in a
+               it's going to be removed in geopy 2.0.
+               Scheme other than ``https`` would result in a
                :class:`geopy.exc.ConfigurationError` being thrown.
 
         :param int timeout:

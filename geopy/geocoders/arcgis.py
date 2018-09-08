@@ -231,6 +231,7 @@ class ArcGIS(Geocoder):
                coordinates according to WKID 4326. Please open an issue in
                the geopy issue tracker if you believe that custom wkid values
                should be supported.
+               This parameter is scheduled for removal in geopy 2.0.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

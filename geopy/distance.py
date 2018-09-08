@@ -453,6 +453,7 @@ class vincenty(Distance):
     """
     .. deprecated:: 1.13
        Use :class:`.geodesic` instead.
+       Vincenty will be removed in geopy 2.0.
 
     Calculate the geodesic distance between two points using the Vincenty's
     method.

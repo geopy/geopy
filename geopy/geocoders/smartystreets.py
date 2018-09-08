@@ -41,8 +41,8 @@ class LiveAddress(Geocoder):
         :param str scheme: Must be ``https``.
 
             .. deprecated:: 1.14.0
-               Don't use this parameter, it's going to be removed in the
-               future versions of geopy.
+               Don't use this parameter, it's going to be removed in
+               geopy 2.0.
 
             .. versionchanged:: 1.8.0
                LiveAddress now requires `https`. Specifying `scheme=http` will
