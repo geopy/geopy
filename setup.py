@@ -23,7 +23,8 @@ EXTRAS_DEV_LINT = [
 
 EXTRAS_DEV_TEST = [
     "coverage",
-    "pytest>=3",
+    "pytest>=3.7",
+    "statistics; python_version<'3.0'",
 ]
 
 EXTRAS_DEV_DOCS = [
