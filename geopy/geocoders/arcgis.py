@@ -26,7 +26,6 @@ class ArcGIS(Geocoder):
 
     _TOKEN_EXPIRED = 498
     _MAX_RETRIES = 3
-    auth_api = 'https://www.arcgis.com/sharing/generateToken'
 
     def __init__(
             self,
@@ -40,7 +39,8 @@ class ArcGIS(Geocoder):
             user_agent=None,
             format_string=None,
             ssl_context=DEFAULT_SENTINEL,
-            local_auth_api_url=None,
+            auth_domain='www.arcgis.com',
+            domain='geocode.arcgis.com',
     ):
         """
 
@@ -85,7 +85,11 @@ class ArcGIS(Geocoder):
 
             .. versionadded:: 1.14.0
 
-        :param str local_auth_api_url: Local ArcGIS auth api url.
+        :param str domain: Domain where the target ArcGIS service
+            is hosted.
+            
+        :param str auth_domain: Domain where the target ArcGIS auth service
+            is hosted.
         """
         super(ArcGIS, self).__init__(
             format_string=format_string,
@@ -117,17 +121,18 @@ class ArcGIS(Geocoder):
         self.token_expiry = None
         self.retry = 1
 
+        self.domain = domain.strip('/')
         self.api = (
-            '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/findAddressCandidates' % self.scheme
+            '%s://%s/arcgis/rest/services/'
+            'World/GeocodeServer/findAddressCandidates' % (self.scheme, self.domain)
         )
         self.reverse_api = (
-            '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/reverseGeocode' % self.scheme
+            '%s://%s/arcgis/rest/services/'
+            'World/GeocodeServer/reverseGeocode' % (self.scheme, self.domain)
         )
 
-        if local_auth_api_url:
-            self.auth_api = local_auth_api_url
+        self.auth_domain = auth_domain.strip('/')
+        self.auth_api = 'https://%s/sharing/generateToken' % self.auth_domain
 
     def _authenticated_call_geocoder(self, url, timeout=DEFAULT_SENTINEL):
         """
