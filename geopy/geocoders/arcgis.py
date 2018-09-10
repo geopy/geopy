@@ -40,6 +40,7 @@ class ArcGIS(Geocoder):
             user_agent=None,
             format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            local_auth_api_url=None,
     ):
         """
 
@@ -83,6 +84,8 @@ class ArcGIS(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
             .. versionadded:: 1.14.0
+
+        :param str local_auth_api_url: Local ArcGIS auth api url.
         """
         super(ArcGIS, self).__init__(
             format_string=format_string,
@@ -122,6 +125,9 @@ class ArcGIS(Geocoder):
             '%s://geocode.arcgis.com/arcgis/rest/services/'
             'World/GeocodeServer/reverseGeocode' % self.scheme
         )
+
+        if local_auth_api_url:
+            self.auth_api = local_auth_api_url
 
     def _authenticated_call_geocoder(self, url, timeout=DEFAULT_SENTINEL):
         """
