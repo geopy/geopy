@@ -2,6 +2,45 @@
 
 Changelog
 =========
+1.17.0
+------
+2018-09-TBD
+
+*   ADDED: OpenMapQuest how inherits Nominatim, which adds support for
+    all parameters and queries implemented in Nominatim (such as
+    reverse geocoding).
+
+*   ADDED: Nominatim-based geocoders now support an `extratags` option.
+    Contributed by Oleg. (#320)
+
+*   ADDED: Mapbox geocoder. Contributed by William Hammond. (#323)
+
+*   ADDED: ArcGIS now supports custom `domain` and `auth_domain` values.
+    Contributed by Albina. (#325)
+
+*   ADDED: Bodies of unsuccessful HTTP responses are now logged
+    with `INFO` level.
+
+*   CHANGED: Reverse geocoding methods now issue a warning for string
+    queries which cannot be used to construct a Point instance.
+    In geopy 2.0 this will become an exception.
+
+*   CHANGED: GoogleV3 now issues a warning when used without an API key.
+
+*   CHANGED: Parameters accepting bounding boxes have been unified to
+    accept a pair of diagonal points across all geopy. Previous
+    formats are still supported (until geopy 2.0) but now issue
+    a warning when used.
+
+*   CHANGED: Path part of the API urls has been moved to class attributes
+    in all geocoders, which allows to override them in subclasses.
+    Bing and What3Words now store api urls internally differently.
+
+*   FIXED: TomTom and AzureMaps have been passing boolean values for
+    `typeahead` in a wrong format (i.e. `0` and `1` instead of
+    `false` and `true`).
+
+
 1.16.0
 ------
 2018-07-28
