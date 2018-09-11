@@ -122,7 +122,7 @@ class ArcGIS(Geocoder):
         self.auth_domain = auth_domain.strip('/')
         self.auth_api = '%s://%s/sharing/generateToken' % (
             self.scheme,
-            self.domain
+            self.auth_domain
         )
 
         self.token = None
