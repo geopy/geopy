@@ -85,11 +85,15 @@ class ArcGIS(Geocoder):
 
             .. versionadded:: 1.14.0
 
+        :param str auth_domain: Domain where the target ArcGIS auth service
+            is hosted. Required if authenticated mode is desired.
+
+            .. versionadded:: 1.17.0
+
         :param str domain: Domain where the target ArcGIS service
             is hosted.
-            
-        :param str auth_domain: Domain where the target ArcGIS auth service
-            is hosted.
+
+            .. versionadded:: 1.17.0
         """
         super(ArcGIS, self).__init__(
             format_string=format_string,
@@ -115,6 +119,11 @@ class ArcGIS(Geocoder):
         self.username = username
         self.password = password
         self.referer = referer
+        self.auth_domain = auth_domain.strip('/')
+        self.auth_api = '%s://%s/sharing/generateToken' % (
+            self.scheme,
+            self.domain
+        )
 
         self.token = None
         self.token_lifetime = token_lifetime * 60  # store in seconds
@@ -124,15 +133,15 @@ class ArcGIS(Geocoder):
         self.domain = domain.strip('/')
         self.api = (
             '%s://%s/arcgis/rest/services/'
-            'World/GeocodeServer/findAddressCandidates' % (self.scheme, self.domain)
+            'World/GeocodeServer/findAddressCandidates' % (
+                self.scheme,
+                self.domain
+            )
         )
         self.reverse_api = (
             '%s://%s/arcgis/rest/services/'
             'World/GeocodeServer/reverseGeocode' % (self.scheme, self.domain)
         )
-
-        self.auth_domain = auth_domain.strip('/')
-        self.auth_api = 'https://%s/sharing/generateToken' % self.auth_domain
 
     def _authenticated_call_geocoder(self, url, timeout=DEFAULT_SENTINEL):
         """
