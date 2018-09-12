@@ -106,7 +106,7 @@ class TomTom(Geocoder):
         """
         query = self.format_string % query
         params = self._geocode_params(query)
-        params['typeahead'] = '1' if typeahead else '0'
+        params['typeahead'] = self._boolean_value(typeahead)
 
         if limit:
             params['limit'] = str(int(limit))
@@ -161,6 +161,10 @@ class TomTom(Geocoder):
         return self._parse_reverse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
+
+    @staticmethod
+    def _boolean_value(bool_value):
+        return 'true' if bool_value else 'false'
 
     def _geocode_params(self, formatted_query):
         return {
