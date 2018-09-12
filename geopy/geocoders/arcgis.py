@@ -86,7 +86,8 @@ class ArcGIS(Geocoder):
             .. versionadded:: 1.14.0
 
         :param str auth_domain: Domain where the target ArcGIS auth service
-            is hosted. Required if authenticated mode is desired.
+            is hosted. Used only in authenticated mode (i.e. username,
+            password and referer are set).
 
             .. versionadded:: 1.17.0
 
