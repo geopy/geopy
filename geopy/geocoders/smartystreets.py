@@ -14,6 +14,8 @@ class LiveAddress(Geocoder):
         https://smartystreets.com/docs/cloud/us-street-api
     """
 
+    geocode_path = '/street-address'
+
     def __init__(
             self,
             auth_id,
@@ -89,7 +91,8 @@ class LiveAddress(Geocoder):
             if not (1 <= candidates <= 10):
                 raise ValueError('candidates must be between 1 and 10')
         self.candidates = candidates
-        self.api = '%s://api.smartystreets.com/street-address' % self.scheme
+        domain = 'api.smartystreets.com'
+        self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """

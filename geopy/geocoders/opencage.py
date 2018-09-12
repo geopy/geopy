@@ -18,6 +18,8 @@ class OpenCage(Geocoder):
     .. versionadded:: 1.1.0
     """
 
+    api_path = '/geocode/v1/json'
+
     def __init__(
             self,
             api_key,
@@ -75,7 +77,7 @@ class OpenCage(Geocoder):
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.api = '%s://%s/geocode/v1/json' % (self.scheme, self.domain)
+        self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
 
     def geocode(
             self,

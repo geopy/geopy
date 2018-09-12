@@ -34,6 +34,8 @@ class IGNFrance(Geocoder):
         </Request>
     </XLS>"""
 
+    api_path = '/%(api_key)s/geoportail/ols'
+
     def __init__(
             self,
             api_key,
@@ -125,11 +127,8 @@ class IGNFrance(Geocoder):
         self.password = password
         self.referer = referer
         self.domain = domain.strip('/')
-        self.api = "{scheme}://{domain}/{api_key}/geoportail/ols".format(
-            scheme=self.scheme,
-            api_key=self.api_key,
-            domain=self.domain
-        )
+        api_path = self.api_path % dict(api_key=self.api_key)
+        self.api = '%s://%s%s' % (self.scheme, self.domain, api_path)
         if username and password and referer is None:
             self.addSimpleHTTPAuthHeader()
 

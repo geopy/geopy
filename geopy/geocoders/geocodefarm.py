@@ -18,6 +18,9 @@ class GeocodeFarm(Geocoder):
         https://www.geocode.farm/geocoding/free-api-documentation/
     """
 
+    geocode_path = '/v3/json/forward/'
+    reverse_path = '/v3/json/reverse/'
+
     def __init__(
             self,
             api_key=None,
@@ -67,11 +70,12 @@ class GeocodeFarm(Geocoder):
             ssl_context=ssl_context,
         )
         self.api_key = api_key
+        domain = 'www.geocode.farm'
         self.api = (
-            "%s://www.geocode.farm/v3/json/forward/" % self.scheme
+            "%s://%s%s" % (self.scheme, domain, self.geocode_path)
         )
         self.reverse_api = (
-            "%s://www.geocode.farm/v3/json/reverse/" % self.scheme
+            "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):

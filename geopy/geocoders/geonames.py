@@ -23,6 +23,9 @@ class GeoNames(Geocoder):
         http://www.geonames.org/export/web-services.html#findNearbyPlaceName
     """
 
+    geocode_path = '/searchJSON'
+    reverse_path = '/findNearbyPlaceNameJSON'
+
     def __init__(
             self,
             country_bias=None,
@@ -77,9 +80,12 @@ class GeoNames(Geocoder):
             )
         self.username = username
         self.country_bias = country_bias
-        self.api = "%s://api.geonames.org/searchJSON" % self.scheme
+        domain = 'api.geonames.org'
+        self.api = (
+            "%s://%s%s" % (self.scheme, domain, self.geocode_path)
+        )
         self.api_reverse = (
-            "%s://api.geonames.org/findNearbyPlaceNameJSON" % self.scheme
+            "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):

@@ -17,6 +17,9 @@ class Photon(Geocoder):
     OpenStreetMap`. No API Key is needed by this platform.
     """
 
+    geocode_path = '/api'
+    reverse_path = '/reverse'
+
     def __init__(
             self,
             format_string=None,
@@ -65,8 +68,8 @@ class Photon(Geocoder):
             ssl_context=ssl_context,
         )
         self.domain = domain.strip('/')
-        self.api = "%s://%s/api" % (self.scheme, self.domain)
-        self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
+        self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
+        self.reverse_api = "%s://%s%s" % (self.scheme, self.domain, self.reverse_path)
 
     def geocode(
             self,

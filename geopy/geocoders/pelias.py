@@ -22,6 +22,9 @@ class Pelias(Geocoder):
 
     """
 
+    geocode_path = '/v1/search'
+    reverse_path = '/v1/reverse'
+
     def __init__(
             self,
             domain,
@@ -88,8 +91,12 @@ class Pelias(Geocoder):
         self.api_key = api_key
         self.domain = domain.strip('/')
 
-        self.geocode_api = '%s://%s/v1/search' % (self.scheme, self.domain)
-        self.reverse_api = '%s://%s/v1/reverse' % (self.scheme, self.domain)
+        self.geocode_api = (
+            '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
+        )
+        self.reverse_api = (
+            '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
+        )
 
     def geocode(
             self,

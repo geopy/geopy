@@ -27,6 +27,10 @@ class ArcGIS(Geocoder):
     _TOKEN_EXPIRED = 498
     _MAX_RETRIES = 3
 
+    auth_path = '/sharing/generateToken'
+    geocode_path = '/arcgis/rest/services/World/GeocodeServer/findAddressCandidates'
+    reverse_path = '/arcgis/rest/services/World/GeocodeServer/reverseGeocode'
+
     def __init__(
             self,
             username=None,
@@ -121,9 +125,8 @@ class ArcGIS(Geocoder):
         self.password = password
         self.referer = referer
         self.auth_domain = auth_domain.strip('/')
-        self.auth_api = '%s://%s/sharing/generateToken' % (
-            self.scheme,
-            self.auth_domain
+        self.auth_api = (
+            '%s://%s%s' % (self.scheme, self.auth_domain, self.auth_path)
         )
 
         self.token = None
@@ -133,15 +136,10 @@ class ArcGIS(Geocoder):
 
         self.domain = domain.strip('/')
         self.api = (
-            '%s://%s/arcgis/rest/services/'
-            'World/GeocodeServer/findAddressCandidates' % (
-                self.scheme,
-                self.domain
-            )
+            '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
         )
         self.reverse_api = (
-            '%s://%s/arcgis/rest/services/'
-            'World/GeocodeServer/reverseGeocode' % (self.scheme, self.domain)
+            '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
         )
 
     def _authenticated_call_geocoder(self, url, timeout=DEFAULT_SENTINEL):

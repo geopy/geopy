@@ -18,6 +18,8 @@ class Yandex(Geocoder):
     .. versionadded:: 1.5.0
     """
 
+    api_path = '/1.x/'
+
     def __init__(
             self,
             api_key=None,
@@ -78,7 +80,8 @@ class Yandex(Geocoder):
         )
         self.api_key = api_key
         self.lang = lang
-        self.api = '%s://geocode-maps.yandex.ru/1.x/' % self.scheme
+        domain = 'geocode-maps.yandex.ru'
+        self.api = '%s://%s%s' % (self.scheme, domain, self.api_path)
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """

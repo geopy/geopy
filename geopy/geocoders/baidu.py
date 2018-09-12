@@ -23,6 +23,8 @@ class Baidu(Geocoder):
     .. versionadded:: 1.0.0
     """
 
+    api_path = '/geocoder/v2/'
+
     def __init__(
             self,
             api_key,
@@ -83,7 +85,6 @@ class Baidu(Geocoder):
             ssl_context=ssl_context,
         )
         self.api_key = api_key
-        self.api_path = '/geocoder/v2/'
         self.api = '%s://api.map.baidu.com%s' % (self.scheme, self.api_path)
         self.security_key = security_key
 

@@ -51,6 +51,8 @@ class TomTom(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param str domain: Domain where the target TomTom service
+            is hosted.
         """
         super(TomTom, self).__init__(
             format_string=format_string,

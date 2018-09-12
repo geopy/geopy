@@ -38,6 +38,9 @@ class GoogleV3(Geocoder):
         See https://developers.google.com/maps/documentation/geocoding/usage-and-billing
     """
 
+    api_path = '/maps/api/geocode/json'
+    timezone_path = '/maps/api/timezone/json'
+
     def __init__(
             self,
             api_key=None,
@@ -127,11 +130,8 @@ class GoogleV3(Geocoder):
         self.secret_key = secret_key
         self.channel = channel
 
-        self.api = '%s://%s/maps/api/geocode/json' % (self.scheme, self.domain)
-        self.tz_api = '%s://%s/maps/api/timezone/json' % (
-            self.scheme,
-            self.domain
-        )
+        self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
+        self.tz_api = '%s://%s%s' % (self.scheme, self.domain, self.timezone_path)
 
     def _get_signed_url(self, params):
         """
@@ -143,7 +143,7 @@ class GoogleV3(Geocoder):
         if self.channel:
             params['channel'] = self.channel
 
-        path = "?".join(('/maps/api/geocode/json', urlencode(params)))
+        path = "?".join((self.api_path, urlencode(params)))
         signature = hmac.new(
             base64.urlsafe_b64decode(self.secret_key),
             path.encode('utf-8'),

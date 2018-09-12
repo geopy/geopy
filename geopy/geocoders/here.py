@@ -37,6 +37,9 @@ class Here(Geocoder):
         'postalcode',
     }
 
+    geocode_path = '/6.2/geocode.json'
+    reverse_path = '/6.2/reversegeocode.json'
+
     def __init__(
             self,
             app_id,
@@ -85,9 +88,10 @@ class Here(Geocoder):
         )
         self.app_id = app_id
         self.app_code = app_code
-        self.api = "%s://geocoder.api.here.com/6.2/geocode.json" % self.scheme
-        self.reverse_api = "%s://reverse.geocoder.api.here.com/6.2/reversegeocode.json" \
-            % self.scheme
+        self.api = "%s://geocoder.api.here.com%s" % (self.scheme, self.geocode_path)
+        self.reverse_api = (
+            "%s://reverse.geocoder.api.here.com%s" % (self.scheme, self.reverse_path)
+        )
 
     def geocode(
             self,
@@ -267,8 +271,7 @@ class Here(Geocoder):
             params['maxresults'] = 1
         if language:
             params['language'] = language
-        url = "%s?%s" % (
-            self.reverse_api, urlencode(params))
+        url = "%s?%s" % (self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
