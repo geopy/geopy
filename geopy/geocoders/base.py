@@ -25,7 +25,7 @@ from geopy.exc import (
     GeocoderUnavailable,
     GeocoderParseError,
 )
-from geopy.util import decode_page, __version__
+from geopy.util import decode_page, __version__, logger
 
 __all__ = (
     "Geocoder",
@@ -354,6 +354,10 @@ class Geocoder(object):
             self._geocoder_exception_handler(error, message)
             if isinstance(error, HTTPError):
                 code = error.getcode()
+                body = self._read_http_error_body(error)
+                if body:
+                    logger.info('Received an HTTP error (%s): %s', code, body,
+                                exc_info=False)
                 try:
                     raise ERROR_CODE_MAP[code](message)
                 except KeyError:
@@ -393,6 +397,14 @@ class Geocoder(object):
                 )
         else:
             return page
+
+    def _read_http_error_body(self, error):
+        try:
+            return decode_page(error)
+        except Exception:
+            logger.debug('Unable to fetch body for a non-successful HTTP response',
+                         exc_info=True)
+            return None
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """

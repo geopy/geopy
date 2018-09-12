@@ -326,10 +326,13 @@ Logging
 
 geopy will log geocoding URLs with a logger name ``geopy`` at level `DEBUG`,
 and for some geocoders, these URLs will include authentication information.
+
+HTTP bodies of responses with unsuccessful status codes are logged
+with `INFO` level.
+
 Default logging level is `NOTSET`, which delegates the messages processing to
 the root logger. See docs for :meth:`logging.Logger.setLevel` for more
 information.
-geopy does no logging above `DEBUG`.
 
 
 Semver
