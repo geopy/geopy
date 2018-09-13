@@ -4,7 +4,7 @@ Changelog
 =========
 1.17.0
 ------
-2018-09-TBD
+2018-09-13
 
 *   ADDED: OpenMapQuest how inherits from Nominatim. This adds support
     for all parameters and queries implemented in Nominatim (such as
