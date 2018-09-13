@@ -6,9 +6,9 @@ Changelog
 ------
 2018-09-TBD
 
-*   ADDED: OpenMapQuest how inherits Nominatim, which adds support for
-    all parameters and queries implemented in Nominatim (such as
-    reverse geocoding).
+*   ADDED: OpenMapQuest how inherits from Nominatim. This adds support
+    for all parameters and queries implemented in Nominatim (such as
+    reverse geocoding). (#319)
 
 *   ADDED: Nominatim-based geocoders now support an `extratags` option.
     Contributed by Oleg. (#320)
