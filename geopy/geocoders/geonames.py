@@ -25,6 +25,7 @@ class GeoNames(Geocoder):
 
     geocode_path = '/searchJSON'
     reverse_path = '/findNearbyPlaceNameJSON'
+    timezone_path = '/timezoneJSON'
 
     def __init__(
             self,
@@ -78,6 +79,8 @@ class GeoNames(Geocoder):
                 'have a GeoNames username, sign up here: '
                 'http://www.geonames.org/login'
             )
+        # http://api.geonames.org/timezoneJSON?q=175+5th+Avenue+NYC&username=svalee&maxRows=1
+        # http://api.geonames.org/timezoneJSON?lat=47.01&lng=10.2&username=demo
         self.username = username
         self.country_bias = country_bias
         domain = 'api.geonames.org'
@@ -86,6 +89,9 @@ class GeoNames(Geocoder):
         )
         self.api_reverse = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_path)
+        )
+        self.api_timezone = (
+            "%s://%s%s" % (self.scheme, domain, self.timezone_path)
         )
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
@@ -125,6 +131,7 @@ class GeoNames(Geocoder):
             query,
             exactly_one=DEFAULT_SENTINEL,
             timeout=DEFAULT_SENTINEL,
+            timezone=False,
     ):
         """
         Return an address by location point.
@@ -149,6 +156,9 @@ class GeoNames(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+            
+        :param bool timezone: A flag signaling  to return the timezone at
+            the lat/lng with gmt offset
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -171,7 +181,11 @@ class GeoNames(Geocoder):
             'lng': lng,
             'username': self.username
         }
-        url = "?".join((self.api_reverse, urlencode(params)))
+        if timezone:
+            url = "?".join((self.api_timezone, urlencode(params)))
+            return self._call_geocoder(url, timeout=timeout)
+        else:
+            url = "?".join((self.api_reverse, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
