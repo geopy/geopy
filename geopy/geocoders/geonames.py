@@ -79,8 +79,6 @@ class GeoNames(Geocoder):
                 'have a GeoNames username, sign up here: '
                 'http://www.geonames.org/login'
             )
-        # http://api.geonames.org/timezoneJSON?q=175+5th+Avenue+NYC&username=svalee&maxRows=1
-        # http://api.geonames.org/timezoneJSON?lat=47.01&lng=10.2&username=demo
         self.username = username
         self.country_bias = country_bias
         domain = 'api.geonames.org'
