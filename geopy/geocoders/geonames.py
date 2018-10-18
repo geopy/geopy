@@ -12,9 +12,6 @@ from geopy.util import logger
 
 try:
     from pytz import timezone, UnknownTimeZoneError
-    from calendar import timegm
-    from datetime import datetime
-    from numbers import Number
     pytz_available = True
 except ImportError:
     pytz_available = False
@@ -167,7 +164,7 @@ class GeoNames(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-            
+
         :param bool find_nearby: A flag signaling to return the closest
             toponym for the lat/lng query
 
