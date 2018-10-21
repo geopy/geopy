@@ -1,0 +1,62 @@
+import unittest
+
+from geopy.geocoders import Geolake
+from test.geocoders.util import GeocoderTestBase, env
+
+
+class GeolakeTestCaseUnitTest(GeocoderTestBase):
+
+    def test_user_agent_custom(self):
+        geocoder = Geolake(
+            api_key='DUMMYKEY1234',
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+
+@unittest.skipUnless(
+    bool(env.get('GEOLAKE_KEY')),
+    "No GEOLAKE_KEY env variables set"
+)
+class GeolakeTestCase(GeocoderTestBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = Geolake(
+            api_key=env['GEOLAKE_KEY'],
+            timeout=10,
+        )
+        cls.delta_exact = 0.2
+
+    def test_geocode(self):
+        """
+        Geolake.geocode
+        """
+        self.geocode_run(
+            {"query": "435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.890344, "longitude": -87.623234, "address": "Chicago, US"},
+        )
+
+    def test_geocode_structured(self):
+        """
+        Geolake.geocode
+        """
+        query = {
+            "street": "north michigan ave",
+            "houseNumber": "435",
+            "city": "chicago",
+            "state": "il",
+            "zipcode": 60611,
+            "country": "US"
+        }
+        self.geocode_run(
+            {"query": query},
+            {"latitude": 41.890344, "longitude": -87.623234}
+        )
+
+    def test_geocode_empty_result(self):
+        self.geocode_run(
+            {"query": "xqj37"},
+            {},
+            expect_failure=True
+        )
