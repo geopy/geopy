@@ -34,10 +34,20 @@ class BaseTomTomTestCase(with_metaclass(ABCMeta, object)):
 
     def test_reverse(self):
         location = self.reverse_run(
-            {'query': '55.75587, 37.61768'},
-            {'latitude': 55.75587, 'longitude': 37.61768},
+            {'query': '51.5285057, -0.1369635', 'language': 'en-US'},
+            {'latitude': 51.5285057, 'longitude': -0.1369635,
+             "delta": 0.3},
         )
-        self.assertIn('Москва', location.address)
+        self.assertIn('London', location.address)
+        # Russian Moscow address can be reported differently, so
+        # we're querying something more ordinary, like London.
+        #
+        # For example, AzureMaps might return
+        # `Красная площадь, 109012 Moskva` instead of the expected
+        # `Красная площадь, 109012 Москва`, even when language is
+        # specified explicitly as `ru-RU`. And TomTom always returns
+        # the cyrillic variant, even when the `en-US` language is
+        # requested.
 
     def test_geocode_empty(self):
         self.geocode_run(

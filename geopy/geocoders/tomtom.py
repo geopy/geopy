@@ -130,6 +130,7 @@ class TomTom(Geocoder):
             query,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
+            language=None,
     ):
         """
         Return an address by location point.
@@ -147,11 +148,22 @@ class TomTom(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param str language: Language in which search results should be
+            returned. When data in specified language is not
+            available for a specific field, default language is used.
+            List of supported languages (case-insensitive):
+            https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
+
+            .. versionadded:: 1.18.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
         position = self._coerce_point_to_string(query)
         params = self._reverse_params(position)
+
+        if language:
+            params['language'] = language
 
         quoted_position = quote(position.encode('utf-8'))
         url = "?".join((self.api_reverse % dict(position=quoted_position),
