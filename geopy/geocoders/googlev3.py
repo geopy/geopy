@@ -382,6 +382,10 @@ class GoogleV3(Geocoder):
         logger.debug("%s.timezone: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
 
+        status = response.get('status')
+        if status != 'OK':
+            self._check_status(status)
+
         try:
             tz = timezone(response["timeZoneId"])
         except UnknownTimeZoneError:
