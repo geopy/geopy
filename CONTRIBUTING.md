@@ -122,11 +122,11 @@ A checklist for adding a new geocoder:
     adding the required imports.
 
 3.  Create a test module in the `test/geocoders` directory. If your geocoder
-    class requires credentials, then make sure to list them in the
-    `test/geocoders/util.py` module and add a unittest decorator (see
-    `test/geocoders/what3words.py` for example). Refer to the
-    [Geocoder credentials](#geocoder-credentials) section above for info
-    on how to work with credentials locally.
+    class requires credentials, make sure to add the `@unittest.skipUnless`
+    decorator to skip running tests when the required credentials
+    are not provided (see `test/geocoders/what3words.py` for example).
+    Refer to the [Geocoder credentials](#geocoder-credentials) section
+    above for info on how to work with credentials locally.
 
 4.  Complete your implementation and tests! Give TDD a try if you aren't used
     to it yet! 🎉 Please note that it's possible to run a single test module
