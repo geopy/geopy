@@ -37,6 +37,15 @@ class GeolakeTestCase(GeocoderTestBase):
             {"latitude": 41.890344, "longitude": -87.623234, "address": "Chicago, US"},
         )
 
+    def test_geocode_country_codes(self):
+        """
+        Geolake.geocode
+        """
+        self.geocode_run(
+            {"query": "Toronto", "country_codes": ["US"]},
+            {"latitude": 40.46, "longitude": -80.6, "address": "Toronto, US"},
+        )
+
     def test_geocode_structured(self):
         """
         Geolake.geocode
