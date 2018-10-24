@@ -19,8 +19,20 @@ class GoogleV3TestCase(GeocoderTestBase):
         cls.geocoder = GoogleV3(api_key=env.get('GOOGLE_KEY'))
 
     def timezone_run(self, payload, expected):
-        tz = self._make_request(self.geocoder.timezone, **payload)
-        self.assertEqual(tz, expected)
+        timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
+        self.assertEqual(timezone.pytz_timezone, expected)
+
+        # `timezone` method is deprecated, but we still support it.
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            if 'query' in payload:
+                payload['location'] = payload['query']
+                del payload['query']
+            pytz_timezone = self._make_request(self.geocoder.timezone, **payload)
+            self.assertEqual(pytz_timezone, expected)
+            self.assertLess(0, len(w))
+
+        return timezone
 
     def test_user_agent_custom(self):
         geocoder = GoogleV3(
@@ -199,7 +211,7 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3.timezone returns pytz object from datetime
         """
         self.timezone_run(
-            {"location": self.new_york_point,
+            {"query": self.new_york_point,
              "at_time": datetime.utcfromtimestamp(0)},
             self.america_new_york,
         )
@@ -228,17 +240,18 @@ class GoogleV3TestCase(GeocoderTestBase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             self.timezone_run(
-                {"location": self.new_york_point, "at_time": 0},
+                {"query": self.new_york_point, "at_time": 0},
                 self.america_new_york,
             )
-            assert len(w) > 0, "at_time as number should issue a warning"
+            # at_time as number should issue a warning
+            self.assertLess(0, len(w))
 
     def test_timezone_no_date(self):
         """
         GoogleV3.timezone defaults `at_time`
         """
         self.timezone_run(
-            {"location": self.new_york_point},
+            {"query": self.new_york_point},
             self.america_new_york,
         )
 
@@ -247,7 +260,7 @@ class GoogleV3TestCase(GeocoderTestBase):
         GoogleV3.timezone invalid `at_time`
         """
         with self.assertRaises(exc.GeocoderQueryError):
-            self.geocoder.timezone(self.new_york_point, "eek")
+            self.geocoder.reverse_timezone(self.new_york_point, "eek")
 
     def test_geocode_bounds(self):
         """
