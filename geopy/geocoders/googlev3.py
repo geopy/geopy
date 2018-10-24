@@ -2,26 +2,20 @@ import base64
 import hashlib
 import hmac
 import warnings
+from calendar import timegm
+from datetime import datetime
+from numbers import Number
 
 from geopy.compat import urlencode
 from geopy.exc import (
     ConfigurationError,
-    GeocoderParseError,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
+from geopy.timezone import from_timezone_name, ensure_pytz_is_installed
 from geopy.util import logger
-
-try:
-    from pytz import timezone, UnknownTimeZoneError
-    from calendar import timegm
-    from datetime import datetime
-    from numbers import Number
-    pytz_available = True
-except ImportError:
-    pytz_available = False
 
 
 __all__ = ("GoogleV3", )
@@ -329,12 +323,14 @@ class GoogleV3(Geocoder):
 
     def timezone(self, location, at_time=None, timeout=DEFAULT_SENTINEL):
         """
-        **This is an unstable API.**
+        Find the timezone a `location` was in for a specified `at_time`,
+        and return a pytz timezone object.
 
-        Finds the timezone a `location` was in for a specified `at_time`,
-        and returns a pytz timezone object.
+        .. versionadded:: 1.2.0
 
-            .. versionadded:: 1.2.0
+        .. deprecated:: 1.18.0
+           Use :meth:`GoogleV3.reverse_timezone` instead. This method
+           will be removed in geopy 2.0.
 
         :param location: The coordinates for which you want a timezone.
         :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
@@ -359,12 +355,41 @@ class GoogleV3(Geocoder):
 
         :rtype: pytz timezone. See :func:`pytz.timezone`.
         """
-        if not pytz_available:
-            raise ImportError(
-                'pytz must be installed in order to locate timezones. '
-                ' Install with `pip install geopy -e ".[timezone]"`.'
-            )
-        location = self._coerce_point_to_string(location)
+
+        warnings.warn('%(cls)s.timezone method is deprecated in favor of '
+                      '%(cls)s.reverse_timezone, which returns geopy.Timezone '
+                      'object containing pytz timezone and a raw response '
+                      'instead of just pytz timezone. This method will '
+                      'be removed in geopy 2.0.' % dict(cls=type(self).__name__),
+                      DeprecationWarning)
+        return self.reverse_timezone(location, at_time, timeout).pytz_timezone
+
+    def reverse_timezone(self, query, at_time=None, timeout=DEFAULT_SENTINEL):
+        """
+        Find the timezone a point in `query` was in for a specified `at_time`.
+
+        .. versionadded:: 1.18.0
+
+        :param query: The coordinates for which you want a timezone.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
+            longitude), or string as "%(latitude)s, %(longitude)s"
+
+        :param at_time: The time at which you want the timezone of this
+            location. This is optional, and defaults to the time that the
+            function is called in UTC. Timezone-aware datetimes are correctly
+            handled and naive datetimes are silently treated as UTC.
+        :type at_time: :class:`datetime.datetime` or None
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+
+        :rtype: :class:`geopy.timezone.Timezone`
+        """
+        ensure_pytz_is_installed()
+
+        location = self._coerce_point_to_string(query)
 
         timestamp = self._normalize_timezone_at_time(at_time)
 
@@ -383,19 +408,10 @@ class GoogleV3(Geocoder):
         if status != 'OK':
             self._check_status(status)
 
-        try:
-            tz = timezone(response["timeZoneId"])
-        except UnknownTimeZoneError:
-            raise GeocoderParseError(
-                "pytz could not parse the timezone identifier (%s) "
-                "returned by the service." % response["timeZoneId"]
-            )
-        except KeyError:
-            raise GeocoderParseError(
-                "geopy could not find a timezone in this response: %s" %
-                response
-            )
-        return tz
+        return self._parse_json_timezone(response)
+
+    def _parse_json_timezone(self, response):
+        return from_timezone_name(response["timeZoneId"], raw=response)
 
     def _normalize_timezone_at_time(self, at_time):
         if at_time is None:
