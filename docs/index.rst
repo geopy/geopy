@@ -134,6 +134,14 @@ GeocodeFarm
 
    .. automethod:: __init__
 
+Geolake
+--------
+
+.. autoclass:: geopy.geocoders.Geolake
+   :members:
+
+   .. automethod:: __init__
+
 GeoNames
 --------
 
