@@ -19,6 +19,7 @@ EXTRAS_DEV_TESTFILES_COMMON = [
 
 EXTRAS_DEV_LINT = [
     "flake8>=3.6.0,<3.7.0",
+    "isort>=4.3.4,<4.4.0",
 ]
 
 EXTRAS_DEV_TEST = [
