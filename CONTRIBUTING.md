@@ -41,14 +41,18 @@ If your PR remains unreviewed for a while, feel free to bug the maintainer.
 
         pip install -e ".[dev]"
 
-3.  Ensure that the tests pass
+3.  Ensure that tests pass
 
-        pytest
+        make test
 
 
 ### Running tests
 
 To run the full test suite:
+
+    make test
+
+Or simply:
 
     pytest
 
@@ -60,7 +64,7 @@ For example:
 Before pushing your code, make sure that linting passes, otherwise Travis
 build would fail:
 
-    flake8
+    make lint
 
 
 ### Geocoder credentials
@@ -95,13 +99,12 @@ Example contents of `.test_keys`:
 
 ### Building docs
 
-    cd docs
-    make html
+    make docs
 
-Open `_build/html/index.html` with a browser to see the docs. On macOS you 
+Open `docs/_build/html/index.html` with a browser to see the docs. On macOS you 
 can use the following command for that:
 
-    open _build/html/index.html
+    open docs/_build/html/index.html
 
 
 ### Adding a new geocoder
