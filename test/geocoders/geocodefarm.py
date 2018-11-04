@@ -1,5 +1,6 @@
-from mock import patch
 import unittest
+
+from mock import patch
 
 from geopy import exc
 from geopy.geocoders import GeocodeFarm

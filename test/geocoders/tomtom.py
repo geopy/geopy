@@ -1,8 +1,10 @@
 # coding: utf-8
 from __future__ import unicode_literals
-from abc import ABCMeta, abstractmethod
-from six import with_metaclass
+
 import unittest
+from abc import ABCMeta, abstractmethod
+
+from six import with_metaclass
 
 from geopy.geocoders import TomTom
 from test.geocoders.util import GeocoderTestBase, env

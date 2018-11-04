@@ -7,16 +7,11 @@ from datetime import datetime
 from numbers import Number
 
 from geopy.compat import urlencode
-from geopy.exc import (
-    ConfigurationError,
-    GeocoderQueryError,
-    GeocoderQuotaExceeded,
-)
+from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.timezone import from_timezone_name, ensure_pytz_is_installed
+from geopy.timezone import ensure_pytz_is_installed, from_timezone_name
 from geopy.util import logger
-
 
 __all__ = ("GoogleV3", )
 

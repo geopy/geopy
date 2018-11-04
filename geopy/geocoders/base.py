@@ -1,31 +1,31 @@
-from ssl import SSLError
-from socket import timeout as SocketTimeout
 import functools
 import json
 import warnings
+from socket import timeout as SocketTimeout
+from ssl import SSLError
 
 from geopy.compat import (
-    string_compare,
     HTTPError,
-    py3k,
-    build_opener_with_context,
     ProxyHandler,
-    URLError,
     Request,
+    URLError,
+    build_opener_with_context,
+    py3k,
+    string_compare,
+)
+from geopy.exc import (
+    ConfigurationError,
+    GeocoderAuthenticationFailure,
+    GeocoderInsufficientPrivileges,
+    GeocoderParseError,
+    GeocoderQueryError,
+    GeocoderQuotaExceeded,
+    GeocoderServiceError,
+    GeocoderTimedOut,
+    GeocoderUnavailable,
 )
 from geopy.point import Point
-from geopy.exc import (
-    GeocoderServiceError,
-    ConfigurationError,
-    GeocoderTimedOut,
-    GeocoderAuthenticationFailure,
-    GeocoderQuotaExceeded,
-    GeocoderQueryError,
-    GeocoderInsufficientPrivileges,
-    GeocoderUnavailable,
-    GeocoderParseError,
-)
-from geopy.util import decode_page, __version__, logger
+from geopy.util import __version__, decode_page, logger
 
 __all__ = (
     "Geocoder",

@@ -1,8 +1,15 @@
 import warnings
 import xml.etree.ElementTree as ET
 
-from geopy.compat import (HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, Request,
-                          build_opener, iteritems, u, urlencode)
+from geopy.compat import (
+    HTTPBasicAuthHandler,
+    HTTPPasswordMgrWithDefaultRealm,
+    Request,
+    build_opener,
+    iteritems,
+    u,
+    urlencode,
+)
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location

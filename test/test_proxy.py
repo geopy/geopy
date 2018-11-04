@@ -4,6 +4,10 @@ Test ability to proxy requests.
 import os
 import ssl
 import unittest
+
+from geopy.compat import urlopen
+from geopy.exc import GeocoderServiceError
+from geopy.geocoders.base import Geocoder
 from test.proxy_server import ProxyServerThread
 
 try:
@@ -11,9 +15,6 @@ try:
 except ImportError:  # py2
     from urllib2 import getproxies
 
-from geopy.compat import urlopen
-from geopy.exc import GeocoderServiceError
-from geopy.geocoders.base import Geocoder
 
 CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), 'selfsigned_ca.pem')
 

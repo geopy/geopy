@@ -1,14 +1,15 @@
 import unittest
+
+from mock import MagicMock, patch, sentinel
+
+from geopy.exc import GeocoderQuotaExceeded, GeocoderServiceError
+from geopy.extra.rate_limiter import RateLimiter
+
 try:
     from contextlib import ExitStack
 except ImportError:
     # python 2
     from contextlib2 import ExitStack
-
-from mock import patch, MagicMock, sentinel
-
-from geopy.extra.rate_limiter import RateLimiter
-from geopy.exc import GeocoderServiceError, GeocoderQuotaExceeded
 
 
 class RateLimiterTestCase(unittest.TestCase):

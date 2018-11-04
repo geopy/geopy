@@ -9,15 +9,9 @@ import warnings
 from itertools import islice
 from math import fmod
 
-from geopy import util, units
-from geopy.format import (
-    DEGREE,
-    PRIME,
-    DOUBLE_PRIME,
-    format_degrees,
-    format_distance,
-)
-from geopy.compat import string_compare, isfinite
+from geopy import units, util
+from geopy.compat import isfinite, string_compare
+from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
 
 POINT_PATTERN = re.compile(r"""
     .*?

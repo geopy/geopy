@@ -115,16 +115,18 @@ __all__ = (
 )
 
 
+from geopy.exc import GeocoderNotFound
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu
+from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
 from geopy.geocoders.geocodeearth import GeocodeEarth
 from geopy.geocoders.geocodefarm import GeocodeFarm
+from geopy.geocoders.geolake import Geolake
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
-from geopy.geocoders.geolake import Geolake
 from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
@@ -138,10 +140,6 @@ from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
-
-from geopy.geocoders.base import options
-from geopy.exc import GeocoderNotFound
-
 
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,

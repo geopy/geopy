@@ -1,12 +1,13 @@
 import base64
 import warnings
 from datetime import datetime
+
 from pytz import timezone
 
 from geopy import exc
-from geopy.compat import u, urlparse, parse_qs
-from geopy.point import Point
+from geopy.compat import parse_qs, u, urlparse
 from geopy.geocoders import GoogleV3
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 

@@ -5,10 +5,10 @@ Test Location.
 
 import pickle
 import unittest
-from geopy.compat import u, py3k
+
+from geopy.compat import py3k, u
 from geopy.location import Location
 from geopy.point import Point
-
 
 GRAND_CENTRAL_STR = "89 E 42nd St New York, NY 10017"
 

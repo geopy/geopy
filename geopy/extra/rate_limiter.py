@@ -1,10 +1,10 @@
 # coding: utf-8
+from itertools import chain, count
 from timeit import default_timer
-from itertools import count, chain
 
-from geopy.util import logger
-from geopy.exc import GeocoderServiceError
 from geopy.compat import sleep_at_least
+from geopy.exc import GeocoderServiceError
+from geopy.util import logger
 
 
 def _is_last_gen(count):

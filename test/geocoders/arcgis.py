@@ -3,8 +3,8 @@ import warnings
 
 from geopy import exc
 from geopy.compat import u
-from geopy.point import Point
 from geopy.geocoders import ArcGIS
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 

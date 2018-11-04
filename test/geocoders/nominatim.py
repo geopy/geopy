@@ -1,5 +1,6 @@
 import warnings
 from abc import ABCMeta, abstractmethod
+
 from mock import patch
 from six import with_metaclass
 

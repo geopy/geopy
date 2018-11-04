@@ -2,8 +2,8 @@
 import unittest
 
 from geopy.compat import u
-from geopy.point import Point
 from geopy.geocoders import Bing
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 

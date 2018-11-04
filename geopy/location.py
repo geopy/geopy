@@ -2,8 +2,8 @@
 :class:`.Location` returns geocoder results.
 """
 
+from geopy.compat import py3k, string_compare
 from geopy.point import Point
-from geopy.compat import string_compare, py3k
 
 
 def _location_tuple(location):

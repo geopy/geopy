@@ -2,7 +2,7 @@ import warnings
 
 from geopy.compat import urlencode
 from geopy.exc import GeocoderQueryError
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder, _DEFAULT_USER_AGENT
+from geopy.geocoders.base import _DEFAULT_USER_AGENT, DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 

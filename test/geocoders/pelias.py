@@ -1,12 +1,14 @@
 # coding: utf8
 from __future__ import unicode_literals
-from abc import ABCMeta, abstractmethod
-from six import with_metaclass
-import warnings
-import unittest
 
-from geopy.point import Point
+import unittest
+import warnings
+from abc import ABCMeta, abstractmethod
+
+from six import with_metaclass
+
 from geopy.geocoders import Pelias
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 

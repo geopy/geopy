@@ -1,4 +1,4 @@
-from geopy.compat import urlencode, quote
+from geopy.compat import quote, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point

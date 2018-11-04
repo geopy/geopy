@@ -1,4 +1,4 @@
-from geopy.compat import urlencode, quote
+from geopy.compat import quote, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,

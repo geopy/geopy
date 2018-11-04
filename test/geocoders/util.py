@@ -1,6 +1,6 @@
 
-import os
 import json
+import os
 import unittest
 from collections import defaultdict
 

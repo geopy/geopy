@@ -2,10 +2,10 @@
 import unittest
 
 from geopy.compat import u
-from geopy.point import Point
-from geopy.geocoders import Baidu
-from test.geocoders.util import GeocoderTestBase, env
 from geopy.exc import GeocoderAuthenticationFailure
+from geopy.geocoders import Baidu
+from geopy.point import Point
+from test.geocoders.util import GeocoderTestBase, env
 
 
 class BaiduTestCaseUnitTest(GeocoderTestBase):

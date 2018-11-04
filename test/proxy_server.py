@@ -1,6 +1,6 @@
-import threading
-import socket
 import select
+import socket
+import threading
 
 from geopy.compat import urlopen
 

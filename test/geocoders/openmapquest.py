@@ -1,8 +1,9 @@
-from geopy.geocoders import OpenMapQuest
+import unittest
+
 from geopy.exc import ConfigurationError
+from geopy.geocoders import OpenMapQuest
 from test.geocoders.nominatim import BaseNominatimTestCase
 from test.geocoders.util import GeocoderTestBase, env
-import unittest
 
 
 class OpenMapQuestNoNetTestCase(GeocoderTestBase):

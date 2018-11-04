@@ -1,5 +1,5 @@
-import warnings
 import unittest
+import warnings
 
 from geopy.compat import u
 from geopy.geocoders import OpenCage
