@@ -18,12 +18,12 @@ EXTRAS_DEV_TESTFILES_COMMON = [
 ]
 
 EXTRAS_DEV_LINT = [
-    "flake8>=3.5.0,<3.6.0",
+    "flake8>=3.6.0,<3.7.0",
 ]
 
 EXTRAS_DEV_TEST = [
     "coverage",
-    "pytest>=3.7",
+    "pytest>=3.10",
     "statistics; python_version<'3.0'",
 ]
 
