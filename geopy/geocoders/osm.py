@@ -140,7 +140,8 @@ class Nominatim(Geocoder):
                 '`geopy.geocoders.options.default_user_agent = "my-application"`. '
                 'In geopy 2.0 this will become an exception.'
                 % _DEFAULT_USER_AGENT,
-                UserWarning
+                UserWarning,
+                stacklevel=2
             )
 
         self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
@@ -262,7 +263,8 @@ class Nominatim(Geocoder):
                     'deprecated and will be not supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.' % type(self).__name__,
-                    UserWarning
+                    UserWarning,
+                    stacklevel=2
                 )
                 lon1, lat1, lon2, lat2 = viewbox
                 viewbox = [[lat1, lon1], [lat2, lon2]]

@@ -265,7 +265,7 @@ class ArcGIS(Geocoder):
                           "Please open an issue in the geopy issue tracker "
                           "if you believe that custom wkid values should be "
                           "supported." % (type(self).__name__, DEFAULT_WKID),
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             wkid = DEFAULT_WKID
         params = {'location': location, 'f': 'json', 'outSR': wkid}
         if distance is not None:

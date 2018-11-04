@@ -383,7 +383,7 @@ class geodesic(Distance):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         if 'iterations' in kwargs:
             warnings.warn('Ignoring unused `iterations` kwarg for geodesic '
-                          'distance.', UserWarning)
+                          'distance.', UserWarning, stacklevel=2)
         kwargs.pop('iterations', 0)
         major, minor, f = self.ELLIPSOID
         super(geodesic, self).__init__(*args, **kwargs)
@@ -490,7 +490,7 @@ class vincenty(Distance):
                           'in geopy 2.0. Use `geopy.distance.geodesic` '
                           '(or the default `geopy.distance.distance`) '
                           'instead, which is more accurate and always converges.',
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         self.iterations = kwargs.pop('iterations', 20)
         major, minor, f = self.ELLIPSOID

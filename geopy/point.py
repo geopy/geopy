@@ -78,7 +78,7 @@ def _normalize_coordinates(latitude, longitude, altitude):
                       'meant. If you pass coordinates as positional args, '
                       'please make sure that the order is '
                       '(latitude, longitude) or (y, x) in Cartesian terms.',
-                      UserWarning)
+                      UserWarning, stacklevel=3)
         raise ValueError('Latitude must be in the [-90; 90] range.')
 
     if abs(longitude) > 180:
@@ -177,7 +177,7 @@ class Point(object):
                           'seems senseless. If this is exactly what was '
                           'meant, then pass the zero longitude explicitly '
                           'to get rid of this warning.',
-                          UserWarning)
+                          UserWarning, stacklevel=2)
 
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)

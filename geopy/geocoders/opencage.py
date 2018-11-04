@@ -143,7 +143,8 @@ class OpenCage(Geocoder):
                     'deprecated and will be not supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.',
-                    UserWarning
+                    UserWarning,
+                    stacklevel=2
                 )
                 lon1, lat1, lon2, lat2 = bounds.split(',')
                 bounds = [[lat1, lon1], [lat2, lon2]]
@@ -201,7 +202,7 @@ class OpenCage(Geocoder):
                           'argument will become True in geopy 2.0. '
                           'Specify `exactly_one=False` as the argument '
                           'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             exactly_one = False
 
         params = {

@@ -253,7 +253,7 @@ class Geocoder(object):
                 warnings.warn(
                     'Unable to parse the string as Point: "%s". Using the value '
                     'as-is for the query. In geopy 2.0 this will become an '
-                    'exception.' % str(e), UserWarning
+                    'exception.' % str(e), UserWarning, stacklevel=3
                 )
                 return point
             raise
@@ -334,7 +334,7 @@ class Geocoder(object):
                  'behavior will be different: None will mean "no timeout" '
                  'instead of "default geocoder timeout". Pass '
                  'geopy.geocoders.base.DEFAULT_SENTINEL instead of None '
-                 'to get rid of this warning.'), DeprecationWarning)
+                 'to get rid of this warning.'), DeprecationWarning, stacklevel=3)
             timeout = DEFAULT_SENTINEL
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL

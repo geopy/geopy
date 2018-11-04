@@ -137,7 +137,8 @@ class Pelias(Geocoder):
                     'deprecated and will be not supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.' % type(self).__name__,
-                    UserWarning
+                    UserWarning,
+                    stacklevel=2
                 )
                 lon1, lat1, lon2, lat2 = boundary_rect
                 boundary_rect = [[lat1, lon1], [lat2, lon2]]

@@ -113,7 +113,8 @@ class GoogleV3(Geocoder):
                 'Since July 2018 Google requires each request to have an API key. '
                 'Pass a valid `api_key` to GoogleV3 geocoder to hide this warning. '
                 'See https://developers.google.com/maps/documentation/geocoding/usage-and-billing',  # noqa
-                UserWarning
+                UserWarning,
+                stacklevel=2
             )
 
         self.api_key = api_key
@@ -233,7 +234,8 @@ class GoogleV3(Geocoder):
                     'deprecated and will be not supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.',
-                    UserWarning
+                    UserWarning,
+                    stacklevel=2
                 )
                 lat1, lon1, lat2, lon2 = bounds
                 bounds = [[lat1, lon1], [lat2, lon2]]
@@ -299,7 +301,7 @@ class GoogleV3(Geocoder):
                           'argument will become True in geopy 2.0. '
                           'Specify `exactly_one=False` as the argument '
                           'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             exactly_one = False
 
         params = {
@@ -361,7 +363,7 @@ class GoogleV3(Geocoder):
                       'object containing pytz timezone and a raw response '
                       'instead of just pytz timezone. This method will '
                       'be removed in geopy 2.0.' % dict(cls=type(self).__name__),
-                      DeprecationWarning)
+                      DeprecationWarning, stacklevel=2)
         return self.reverse_timezone(location, at_time, timeout).pytz_timezone
 
     def reverse_timezone(self, query, at_time=None, timeout=DEFAULT_SENTINEL):
@@ -421,7 +423,8 @@ class GoogleV3(Geocoder):
                 'Support for `at_time` as int/float is deprecated '
                 'and will be removed in geopy 2.0. '
                 'Pass a `datetime.datetime` instance instead.',
-                DeprecationWarning
+                DeprecationWarning,
+                stacklevel=3
             )
             timestamp = at_time
         elif isinstance(at_time, datetime):

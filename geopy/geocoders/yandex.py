@@ -159,7 +159,7 @@ class Yandex(Geocoder):
                           'argument will become True in geopy 2.0. '
                           'Specify `exactly_one=False` as the argument '
                           'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             exactly_one = False
 
         try:
