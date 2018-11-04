@@ -204,14 +204,34 @@ class GoogleV3TestCase(GeocoderTestBase):
             self.america_new_york,
         )
 
+    def test_timezone_at_time_normalization(self):
+        utc_naive_dt = datetime(2010, 1, 1, 0, 0, 0)
+        utc_timestamp = 1262304000
+        self.assertEqual(
+            utc_timestamp, self.geocoder._normalize_timezone_at_time(utc_naive_dt)
+        )
+
+        self.assertLess(
+            utc_timestamp, self.geocoder._normalize_timezone_at_time(None)
+        )
+
+        tz = timezone("Etc/GMT-2")
+        local_aware_dt = tz.localize(datetime(2010, 1, 1, 2, 0, 0))
+        self.assertEqual(
+            utc_timestamp, self.geocoder._normalize_timezone_at_time(local_aware_dt)
+        )
+
     def test_timezone_integer(self):
         """
         GoogleV3.timezone returns pytz object from epoch integer
         """
-        self.timezone_run(
-            {"location": self.new_york_point, "at_time": 0},
-            self.america_new_york,
-        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.timezone_run(
+                {"location": self.new_york_point, "at_time": 0},
+                self.america_new_york,
+            )
+            assert len(w) > 0, "at_time as number should issue a warning"
 
     def test_timezone_no_date(self):
         """

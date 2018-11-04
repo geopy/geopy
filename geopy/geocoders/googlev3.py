@@ -342,8 +342,15 @@ class GoogleV3(Geocoder):
 
         :param at_time: The time at which you want the timezone of this
             location. This is optional, and defaults to the time that the
-            function is called in UTC.
-        :type at_time: int or float or datetime
+            function is called in UTC. Timezone-aware datetimes are correctly
+            handled and naive datetimes are silently treated as UTC.
+
+            .. versionchanged:: 1.18.0
+               Previously this parameter accepted raw unix timestamp as
+               int or float. This is now deprecated in favor of datetimes
+               and support for numbers will be removed in geopy 2.0.
+
+        :type at_time: :class:`datetime.datetime` or None
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -359,17 +366,7 @@ class GoogleV3(Geocoder):
             )
         location = self._coerce_point_to_string(location)
 
-        if isinstance(at_time, Number):
-            timestamp = at_time
-        elif isinstance(at_time, datetime):
-            timestamp = timegm(at_time.utctimetuple())
-        elif at_time is None:
-            timestamp = timegm(datetime.utcnow().utctimetuple())
-        else:
-            raise GeocoderQueryError(
-                "`at_time` must be an epoch integer or "
-                "datetime.datetime object"
-            )
+        timestamp = self._normalize_timezone_at_time(at_time)
 
         params = {
             "location": location,
@@ -399,6 +396,27 @@ class GoogleV3(Geocoder):
                 response
             )
         return tz
+
+    def _normalize_timezone_at_time(self, at_time):
+        if at_time is None:
+            timestamp = timegm(datetime.utcnow().utctimetuple())
+        elif isinstance(at_time, Number):
+            warnings.warn(
+                'Support for `at_time` as int/float is deprecated '
+                'and will be removed in geopy 2.0. '
+                'Pass a `datetime.datetime` instance instead.',
+                DeprecationWarning
+            )
+            timestamp = at_time
+        elif isinstance(at_time, datetime):
+            # Naive datetimes are silently treated as UTC.
+            # Timezone-aware datetimes are handled correctly.
+            timestamp = timegm(at_time.utctimetuple())
+        else:
+            raise GeocoderQueryError(
+                "`at_time` must be an instance of `datetime.datetime`"
+            )
+        return timestamp
 
     def _parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
