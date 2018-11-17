@@ -140,17 +140,6 @@ class options:
             before raising a :class:`geopy.exc.GeocoderTimedOut` exception.
             Pass `None` to disable timeout.
 
-            .. note::
-               Currently ``None`` as a value is processed correctly only
-               for the ``geopy.geocoders.options.default_timeout`` option
-               value. ``timeout=None`` as a method argument (i.e.
-               ``geocoder.geocode(..., timeout=None)``) would be treated
-               as "use timeout, as set in
-               ``geopy.geocoders.options.default_timeout``", and
-               a deprecation warning would be raised.
-               In geopy 2.0 this will change, so that ``timeout=None``
-               would actually disable timeout.
-
         default_user_agent
             User-Agent header to send with the requests to geocoder API.
     """
@@ -342,16 +331,6 @@ class Geocoder:
                 req = Request(url=url, headers=self.headers)
 
         requester = requester or self.urlopen
-
-        if timeout is None:
-            warnings.warn(
-                ('`timeout=None` has been passed to a geocoder call. Using '
-                 'default geocoder timeout. In geopy 2.0 the '
-                 'behavior will be different: None will mean "no timeout" '
-                 'instead of "default geocoder timeout". Pass '
-                 'geopy.geocoders.base.DEFAULT_SENTINEL instead of None '
-                 'to get rid of this warning.'), DeprecationWarning, stacklevel=3)
-            timeout = DEFAULT_SENTINEL
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)
