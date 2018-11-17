@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 from geopy.geocoders import OpenCage
 from test.geocoders.util import GeocoderTestBase, env
@@ -53,16 +52,6 @@ class OpenCageTestCase(GeocoderTestBase):
              "bounds": [[50.1, -130.1], [44.1, -100.9]]},
             {"latitude": 46.7323875, "longitude": -117.0001651},
         )
-
-    def test_bounds_deprecated(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            self.geocode_run(
-                {"query": "moscow",  # Idaho USA
-                 "bounds": "-130.1,50.1,-100.9,44.1"},
-                {"latitude": 46.7323875, "longitude": -117.0001651},
-            )
-            assert 1 == len(w)
 
     def test_country_str(self):
         self.geocode_run(

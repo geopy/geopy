@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -120,18 +119,6 @@ class Pelias(Geocoder):
             })
 
         if boundary_rect:
-            if len(boundary_rect) == 4:
-                warnings.warn(
-                    '%s `boundary_rect` format of '
-                    '`[longitude, latitude, longitude, latitude]` is now '
-                    'deprecated and will not be supported in geopy 2.0. '
-                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
-                    'instead.' % type(self).__name__,
-                    DeprecationWarning,
-                    stacklevel=2
-                )
-                lon1, lat1, lon2, lat2 = boundary_rect
-                boundary_rect = [[lat1, lon1], [lat2, lon2]]
             lon1, lat1, lon2, lat2 = self._format_bounding_box(
                 boundary_rect, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s").split(',')
             params['boundary.rect.min_lon'] = lon1
