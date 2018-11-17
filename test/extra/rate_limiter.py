@@ -1,6 +1,5 @@
 import unittest
-
-from mock import MagicMock, patch, sentinel
+from unittest.mock import MagicMock, patch, sentinel
 
 from geopy.exc import GeocoderQuotaExceeded, GeocoderServiceError
 from geopy.extra.rate_limiter import RateLimiter

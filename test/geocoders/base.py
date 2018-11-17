@@ -1,8 +1,8 @@
 import unittest
 import warnings
+from unittest.mock import patch, sentinel
 
 import pytest
-from mock import patch, sentinel
 
 import geopy.compat
 import geopy.geocoders

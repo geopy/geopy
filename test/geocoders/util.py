@@ -3,9 +3,9 @@ import json
 import os
 import unittest
 from collections import defaultdict
+from unittest.mock import ANY
 
 import pytest
-from mock import ANY
 
 from geopy import exc
 from geopy.location import Location
