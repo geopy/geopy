@@ -117,13 +117,13 @@ class BaseNominatimTestCase(ABC):
     def test_reverse_language_parameter(self):
         query = "52.51693903613385, 13.3859332733135"
         result_reverse_de = self.reverse_run(
-            {"query": query, "exactly_one": True, "language": "de"},
+            {"query": query, "language": "de"},
             {},
         )
         assert result_reverse_de.raw['address']['country'] == "Deutschland"
 
         result_reverse_en = self.reverse_run(
-            {"query": query, "exactly_one": True, "language": "en"},
+            {"query": query, "language": "en"},
             {},
         )
         # have had a change in the exact authority name
@@ -321,14 +321,14 @@ class BaseNominatimTestCase(ABC):
     def test_reverse_zoom_parameter(self):
         query = "40.689253199999996, -74.04454817144321"
         result_reverse = self.reverse_run(
-            {"query": query, "exactly_one": True, "zoom": 10},
+            {"query": query, "zoom": 10},
             {},
         )
         assert "New York" in result_reverse.address
         assert "Statue of Liberty" not in result_reverse.address
 
         result_reverse = self.reverse_run(
-            {"query": query, "exactly_one": True},
+            {"query": query},
             {},
         )
         assert "New York" in result_reverse.address

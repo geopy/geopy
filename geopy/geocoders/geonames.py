@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlencode
 
 from geopy.exc import (
@@ -177,7 +176,7 @@ class GeoNames(Geocoder):
     def reverse(
             self,
             query,
-            exactly_one=DEFAULT_SENTINEL,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             feature_code=None,
             lang=None,
@@ -216,13 +215,6 @@ class GeoNames(Geocoder):
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         try:
             lat, lng = self._coerce_point_to_string(query).split(',')
