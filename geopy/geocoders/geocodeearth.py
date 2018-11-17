@@ -72,7 +72,7 @@ class GeocodeEarth(Pelias):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
         """
-        super(GeocodeEarth, self).__init__(
+        super().__init__(
             api_key=api_key,
             format_string=format_string,
             boundary_rect=boundary_rect,

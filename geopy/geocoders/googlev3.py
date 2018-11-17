@@ -92,7 +92,7 @@ class GoogleV3(Geocoder):
 
             .. versionadded:: 1.12.0
         """
-        super(GoogleV3, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

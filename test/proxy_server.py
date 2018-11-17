@@ -65,7 +65,7 @@ class ProxyServerThread(threading.Thread):
         self.socket_created_future = Future()
         self.requests = []
 
-        super(ProxyServerThread, self).__init__()
+        super().__init__()
         self.daemon = True
 
     def get_proxy_url(self):

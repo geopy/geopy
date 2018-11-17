@@ -58,7 +58,7 @@ class MapBox(Geocoder):
 
         :param str domain: base api domain for mapbox
         """
-        super(MapBox, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

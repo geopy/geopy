@@ -65,7 +65,7 @@ class MapQuest(Geocoder):
 
         :param str domain: base api domain for mapquest
         """
-        super(MapQuest, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

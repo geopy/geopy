@@ -186,7 +186,7 @@ class Point:
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)
 
-        self = super(Point, cls).__new__(cls)
+        self = super().__new__(cls)
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude

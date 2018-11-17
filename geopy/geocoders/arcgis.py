@@ -103,7 +103,7 @@ class ArcGIS(Geocoder):
 
             .. versionadded:: 1.17.0
         """
-        super(ArcGIS, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

@@ -88,7 +88,7 @@ class Pelias(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
         """
-        super(Pelias, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

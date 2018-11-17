@@ -58,7 +58,7 @@ class MapTiler(Geocoder):
 
         :param str domain: base api domain for Maptiler
         """
-        super(MapTiler, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

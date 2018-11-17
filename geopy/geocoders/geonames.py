@@ -92,7 +92,7 @@ class GeoNames(Geocoder):
 
             .. versionadded:: 1.18.0
         """
-        super(GeoNames, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

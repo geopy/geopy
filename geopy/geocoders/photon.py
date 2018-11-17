@@ -62,7 +62,7 @@ class Photon(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(Photon, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

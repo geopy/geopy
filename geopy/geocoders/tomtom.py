@@ -58,7 +58,7 @@ class TomTom(Geocoder):
         :param str domain: Domain where the target TomTom service
             is hosted.
         """
-        super(TomTom, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
