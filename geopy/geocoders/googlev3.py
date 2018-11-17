@@ -364,57 +364,6 @@ class GoogleV3(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def timezone(self, location, at_time=None, timeout=DEFAULT_SENTINEL):
-        """
-        Find the timezone a `location` was in for a specified `at_time`,
-        and return a pytz timezone object.
-
-        .. versionadded:: 1.2.0
-
-        .. deprecated:: 1.18.0
-           Use :meth:`GoogleV3.reverse_timezone` instead. This method
-           will be removed in geopy 2.0.
-
-        .. versionchanged:: 1.18.1
-           Previously a :class:`KeyError` was raised for a point without
-           an assigned Olson timezone id (e.g. for Antarctica).
-           Now this method returns None for such requests.
-
-        :param location: The coordinates for which you want a timezone.
-        :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
-
-        :param at_time: The time at which you want the timezone of this
-            location. This is optional, and defaults to the time that the
-            function is called in UTC. Timezone-aware datetimes are correctly
-            handled and naive datetimes are silently treated as UTC.
-
-            .. versionchanged:: 1.18.0
-               Previously this parameter accepted raw unix timestamp as
-               int or float. This is now deprecated in favor of datetimes
-               and support for numbers will be removed in geopy 2.0.
-
-        :type at_time: :class:`datetime.datetime` or None
-
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call
-            only, the value set during the geocoder's initialization.
-
-        :rtype: ``None`` or pytz timezone. See :func:`pytz.timezone`.
-        """
-
-        warnings.warn('%(cls)s.timezone method is deprecated in favor of '
-                      '%(cls)s.reverse_timezone, which returns geopy.Timezone '
-                      'object containing pytz timezone and a raw response '
-                      'instead of just pytz timezone. This method will '
-                      'be removed in geopy 2.0.' % dict(cls=type(self).__name__),
-                      DeprecationWarning, stacklevel=2)
-        timezone = self.reverse_timezone(location, at_time, timeout)
-        if timezone is None:
-            return None
-        return timezone.pytz_timezone
-
     def reverse_timezone(self, query, at_time=None, timeout=DEFAULT_SENTINEL):
         """
         Find the timezone a point in `query` was in for a specified `at_time`.
