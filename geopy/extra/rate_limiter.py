@@ -16,10 +16,6 @@ class RateLimiter(object):
     """RateLimiter allows to perform bulk operations while gracefully
     handling error responses and adding delays when needed.
 
-    .. note::
-       This is an experimental API which might be changed in the future.
-       Please report any bugs, issues and suggestions on the issue tracker.
-
     In the example below a delay of 1 second (``min_delay_seconds=1``)
     will be added between each pair of ``geolocator.geocode`` calls; all
     :class:`geopy.exc.GeocoderServiceError` exceptions will be retried
