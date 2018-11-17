@@ -327,9 +327,6 @@ Calculating Distance
 .. autoclass:: geopy.distance.geodesic
     :members: __init__
 
-.. autoclass:: geopy.distance.vincenty
-    :members: __init__
-
 .. autoclass:: geopy.distance.great_circle
     :members: __init__
 
