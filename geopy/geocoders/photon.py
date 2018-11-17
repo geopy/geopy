@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -136,12 +137,12 @@ class Photon(Geocoder):
             if isinstance(osm_tag, str):
                 params['osm_tag'] = [osm_tag]
             else:
-                if not isinstance(osm_tag, (list, set)):
+                if not isinstance(osm_tag, collections.abc.Iterable):
                     raise ValueError(
-                        "osm_tag must be a string expression or "
-                        "a set/list of string expressions"
+                        "osm_tag must be a string or "
+                        "an iterable of strings"
                     )
-                params['osm_tag'] = osm_tag
+                params['osm_tag'] = list(osm_tag)
         url = "?".join((self.api, urlencode(params, doseq=True)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(

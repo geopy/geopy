@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import urlencode
 from urllib.request import Request
 
@@ -276,7 +277,7 @@ class AlgoliaPlaces(Geocoder):
         latitude = feature.get('_geoloc', {}).get('lat')
         longitude = feature.get('_geoloc', {}).get('lng')
 
-        if isinstance(feature['locale_names'], dict):
+        if isinstance(feature['locale_names'], collections.abc.Mapping):
             if language in feature['locale_names']:
                 placename = feature['locale_names'][language][0]
             else:

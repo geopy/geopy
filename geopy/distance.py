@@ -426,7 +426,7 @@ class geodesic(Distance):
         """
         Change the ellipsoid used in the calculation.
         """
-        if not isinstance(ellipsoid, (list, tuple)):
+        if isinstance(ellipsoid, str):
             try:
                 self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
                 self.ellipsoid_key = ellipsoid
@@ -437,7 +437,6 @@ class geodesic(Distance):
         else:
             self.ELLIPSOID = ellipsoid
             self.ellipsoid_key = None
-        return
 
     # Call geographiclib routines for measure and destination
     def measure(self, a, b):
