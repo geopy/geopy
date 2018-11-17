@@ -1,4 +1,5 @@
-from geopy.compat import string_compare, urlencode
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import join_filter, logger
@@ -143,7 +144,7 @@ class Geolake(Geocoder):
 
         if not country_codes:
             country_codes = []
-        if isinstance(country_codes, string_compare):
+        if isinstance(country_codes, str):
             country_codes = [country_codes]
         if country_codes:
             params['countryCodes'] = ",".join(country_codes)

@@ -1,8 +1,9 @@
 import json
 import warnings
 from time import time
+from urllib.parse import urlencode
+from urllib.request import Request
 
-from geopy.compat import Request, urlencode
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,

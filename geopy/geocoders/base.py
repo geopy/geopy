@@ -3,14 +3,9 @@ import json
 import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
+from urllib.error import HTTPError
+from urllib.request import HTTPSHandler, ProxyHandler, Request, URLError, build_opener
 
-from geopy.compat import (
-    HTTPError,
-    ProxyHandler,
-    Request,
-    URLError,
-    build_opener_with_context,
-)
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -119,13 +114,7 @@ class options:
         default_ssl_context
             An :class:`ssl.SSLContext` instance with custom TLS
             verification settings. Pass ``None`` to use the interpreter's
-            defaults (starting from Python 2.7.9 and 3.4.3 that is to use
-            the system's trusted CA certificates; the older versions don't
-            support TLS verification completely).
-
-            For older versions of Python (before 2.7.9 and 3.4.3) this
-            argument is ignored, as `urlopen` doesn't accept an ssl
-            context there, and a warning is issued.
+            defaults (that is to use the system's trusted CA certificates).
 
             To use the CA bundle used by `requests` library::
 
@@ -252,8 +241,8 @@ class Geocoder:
         # Otherwise, if we didn't specify ProxyHandler for empty
         # `self.proxies` here, build_opener would have used one internally
         # which could have unwillingly picked up the system proxies.
-        opener = build_opener_with_context(
-            self.ssl_context,
+        opener = build_opener(
+            HTTPSHandler(context=self.ssl_context),
             ProxyHandler(self.proxies),
         )
         self.urlopen = opener.open

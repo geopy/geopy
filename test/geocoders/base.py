@@ -1,11 +1,13 @@
 import unittest
+import urllib.request
 import warnings
+from contextlib import ExitStack
 from unittest.mock import patch, sentinel
 
 import pytest
 
-import geopy.compat
 import geopy.geocoders
+import geopy.geocoders.base
 from geopy.exc import GeocoderNotFound, GeocoderQueryError
 from geopy.geocoders import GoogleV3, get_geocoder_for_service
 from geopy.geocoders.base import Geocoder
@@ -107,9 +109,7 @@ class GeocoderTestCase(unittest.TestCase):
         g = Geocoder()
         assert g.timeout == 12
 
-        # Suppress another (unrelated) warning when running tests on an old Python.
-        with patch('geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT', True), \
-                patch.object(g, 'urlopen') as mock_urlopen:
+        with patch.object(g, 'urlopen') as mock_urlopen:
             g._call_geocoder(url, raw=True)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] == 12
@@ -125,67 +125,28 @@ class GeocoderTestCase(unittest.TestCase):
                 assert kwargs['timeout'] == 12
                 assert 1 == len(w)
 
-    def test_ssl_context_for_old_python(self):
-        # Before (exclusive) 2.7.9 and 3.4.3.
+    def test_ssl_context(self):
 
-        # Keep the reference, because `geopy.compat.HTTPSHandler` will be
-        # mocked below.
-        orig_HTTPSHandler = geopy.compat.HTTPSHandler
-
-        class HTTPSHandlerStub(geopy.compat.HTTPSHandler):
-            def __init__(self):  # No `context` arg.
-                orig_HTTPSHandler.__init__(self)
-
-        if hasattr(geopy.compat, '__warningregistry__'):
-            # If running tests on an old Python, the warning we are going
-            # to test might have been already issued and recorded in
-            # the registry. Clean it up, so we could receive the warning again.
-            del geopy.compat.__warningregistry__
-
-        with patch('geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT',
-                   geopy.compat._is_urllib_context_supported(HTTPSHandlerStub)), \
-                patch('geopy.compat.HTTPSHandler', HTTPSHandlerStub), \
-                warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            assert not geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT
-
-            assert 0 == len(w)
-            Geocoder()
-            assert 1 == len(w)
-
-    def test_ssl_context_for_newer_python(self):
-        # From (inclusive) 2.7.9 and 3.4.3.
-
-        # Keep the reference, because `geopy.compat.HTTPSHandler` will be
-        # mocked below.
-        orig_HTTPSHandler = geopy.compat.HTTPSHandler
-
-        class HTTPSHandlerStub(geopy.compat.HTTPSHandler):
+        class HTTPSHandlerStub(urllib.request.HTTPSHandler):
             def __init__(self, context=None):
-                orig_HTTPSHandler.__init__(self)
+                super().__init__()
 
-        if hasattr(geopy.compat, '__warningregistry__'):
-            # If running tests on an old Python, the warning we are going
-            # to test might have been already issued and recorded in
-            # the registry. Clean it up, so we could receive the warning again.
-            del geopy.compat.__warningregistry__
-
-        with patch('geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT',
-                   geopy.compat._is_urllib_context_supported(HTTPSHandlerStub)), \
-                patch('geopy.compat.HTTPSHandler', HTTPSHandlerStub), \
-                patch.object(HTTPSHandlerStub, '__init__', autospec=True,
-                             side_effect=HTTPSHandlerStub.__init__
-                             ) as mock_https_handler_init, \
-                warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            assert geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT
+        with ExitStack() as stack:
+            stack.enter_context(
+                patch.object(geopy.geocoders.base, 'HTTPSHandler', HTTPSHandlerStub)
+            )
+            mock_https_handler_init = stack.enter_context(
+                patch.object(
+                    HTTPSHandlerStub, '__init__', autospec=True,
+                    side_effect=HTTPSHandlerStub.__init__
+                )
+            )
 
             for ssl_context in (None, sentinel.some_ssl_context):
                 mock_https_handler_init.reset_mock()
                 Geocoder(ssl_context=ssl_context)
                 args, kwargs = mock_https_handler_init.call_args
                 assert kwargs['context'] is ssl_context
-            assert 0 == len(w)
 
 
 class GeocoderPointCoercionTestCase(unittest.TestCase):

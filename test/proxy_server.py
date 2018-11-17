@@ -3,8 +3,7 @@ import select
 import socket
 import socketserver as SocketServer
 import threading
-
-from geopy.compat import urlopen
+from urllib.request import urlopen
 
 
 def pipe_sockets(sock1, sock2, timeout):

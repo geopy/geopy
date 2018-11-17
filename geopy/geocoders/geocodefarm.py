@@ -1,4 +1,5 @@
-from geopy.compat import urlencode
+from urllib.parse import urlencode
+
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderQuotaExceeded,

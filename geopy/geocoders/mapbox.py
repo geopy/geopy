@@ -1,4 +1,5 @@
-from geopy.compat import quote, string_compare, urlencode
+from urllib.parse import quote, urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point
@@ -149,7 +150,7 @@ class MapBox(Geocoder):
 
         if not country:
             country = []
-        if isinstance(country, string_compare):
+        if isinstance(country, str):
             country = [country]
         if country:
             params['country'] = ",".join(country)

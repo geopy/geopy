@@ -1,6 +1,6 @@
 import warnings
+from urllib.parse import urlencode
 
-from geopy.compat import string_compare, urlencode
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import _DEFAULT_USER_AGENT, DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -373,7 +373,7 @@ class Nominatim(Geocoder):
             country_codes = self.country_bias
         if not country_codes:
             country_codes = []
-        if isinstance(country_codes, string_compare):
+        if isinstance(country_codes, str):
             country_codes = [country_codes]
         if country_codes:
             params['countrycodes'] = ",".join(country_codes)

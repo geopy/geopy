@@ -1,6 +1,6 @@
 import warnings
+from urllib.parse import urlencode
 
-from geopy.compat import urlencode
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,

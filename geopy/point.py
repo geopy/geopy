@@ -6,8 +6,7 @@ import collections
 import re
 import warnings
 from itertools import islice
-from math import fmod
-from math import isfinite
+from math import fmod, isfinite
 
 from geopy import units, util
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance

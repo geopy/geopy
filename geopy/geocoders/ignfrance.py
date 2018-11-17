@@ -1,8 +1,9 @@
 import base64
 import warnings
 import xml.etree.ElementTree as ET
+from urllib.parse import urlencode
+from urllib.request import Request
 
-from geopy.compat import Request, iteritems, urlencode
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -449,7 +450,7 @@ class IGNFrance(Geocoder):
             place['search_centre_distance'] = testContentAttrib(
                 adr.find('.//SearchCentreDistance'), 'value')
 
-            for key, value in iteritems(el):
+            for key, value in iter(el.items()):
                 if value is not None:
                     place[key] = value.text
                     if value.text is None:

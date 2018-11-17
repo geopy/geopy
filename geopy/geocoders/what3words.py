@@ -1,7 +1,7 @@
 import re
+from urllib.parse import urlencode
 
 from geopy import exc
-from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger

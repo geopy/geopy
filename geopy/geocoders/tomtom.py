@@ -1,4 +1,5 @@
-from geopy.compat import quote, urlencode
+from urllib.parse import quote, urlencode
+
 from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location

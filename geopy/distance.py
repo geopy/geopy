@@ -130,7 +130,6 @@ from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
 from geographiclib.geodesic import Geodesic
 
 from geopy import units, util
-from geopy.compat import cmp
 from geopy.point import Point
 from geopy.units import radians
 
@@ -155,6 +154,10 @@ ELLIPSOIDS = {
     'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
     'GRS-67':        (6378.1600, 6356.774719, 1 / 298.25)
 }
+
+
+def cmp(a, b):
+    return (a > b) - (a < b)
 
 
 def lonlat(x, y, z=0):

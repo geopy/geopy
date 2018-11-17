@@ -1,4 +1,6 @@
-from geopy.compat import Request, urlencode
+from urllib.parse import urlencode
+from urllib.request import Request
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point

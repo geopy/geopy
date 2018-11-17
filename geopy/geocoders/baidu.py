@@ -1,6 +1,6 @@
 import hashlib
+from urllib.parse import quote_plus, urlencode
 
-from geopy.compat import quote_plus, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderQueryError,

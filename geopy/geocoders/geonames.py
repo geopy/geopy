@@ -1,6 +1,6 @@
 import warnings
+from urllib.parse import urlencode
 
-from geopy.compat import string_compare, urlencode
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -180,7 +180,7 @@ class GeoNames(Geocoder):
 
         if not country:
             country = []
-        if isinstance(country, string_compare):
+        if isinstance(country, str):
             country = [country]
         for country_item in country:
             params.append(('country', country_item))
