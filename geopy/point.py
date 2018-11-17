@@ -2,7 +2,7 @@
 :class:`.Point` data structure.
 """
 
-import collections
+import collections.abc
 import re
 import warnings
 from itertools import islice
@@ -315,7 +315,7 @@ class Point:
         return self.format()
 
     def __eq__(self, other):
-        if not isinstance(other, collections.Iterable):
+        if not isinstance(other, collections.abc.Iterable):
             return NotImplemented
         return tuple(self) == tuple(other)
 

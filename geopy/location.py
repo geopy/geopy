@@ -1,6 +1,7 @@
 """
 :class:`.Location` returns geocoder results.
 """
+import collections.abc
 
 from geopy.point import Point
 
@@ -28,7 +29,7 @@ class Location:
             self._point = point
         elif isinstance(point, str):
             self._point = Point(point)
-        elif isinstance(point, (tuple, list)):
+        elif isinstance(point, collections.abc.Sequence):
             self._point = Point(point)
         else:
             raise TypeError(

@@ -1,4 +1,5 @@
 import base64
+import collections.abc
 import hashlib
 import hmac
 import warnings
@@ -156,9 +157,12 @@ class GoogleV3(Geocoder):
         """
         component_items = []
 
-        if isinstance(components, dict):
+        if isinstance(components, collections.abc.Mapping):
             component_items = components.items()
-        elif isinstance(components, list):
+        elif (
+            isinstance(components, collections.abc.Sequence)
+            and not isinstance(components, (str, bytes))
+        ):
             component_items = components
         else:
             raise ValueError(

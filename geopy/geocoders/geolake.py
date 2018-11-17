@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -128,7 +129,7 @@ class Geolake(Geocoder):
 
         """
 
-        if isinstance(query, dict):
+        if isinstance(query, collections.abc.Mapping):
             params = {
                 key: val
                 for key, val
