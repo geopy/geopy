@@ -1,3 +1,4 @@
+import warnings
 from urllib.parse import urlencode
 
 from geopy.exc import GeocoderParseError, GeocoderServiceError
@@ -24,7 +25,6 @@ class Yandex(Geocoder):
     def __init__(
             self,
             api_key=None,
-            lang=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -35,20 +35,6 @@ class Yandex(Geocoder):
 
         :param str api_key: Yandex API key, mandatory.
             The key can be created at https://developer.tech.yandex.ru/
-
-        :param str lang: Language of the response and regional settings
-            of the map. List of supported values:
-
-            - ``tr_TR`` -- Turkish (only for maps of Turkey);
-            - ``en_RU`` -- response in English, Russian map features;
-            - ``en_US`` -- response in English, American map features;
-            - ``ru_RU`` -- Russian (default);
-            - ``uk_UA`` -- Ukrainian;
-            - ``be_BY`` -- Belarusian.
-
-            .. deprecated:: 1.22.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s and `reverse`'s `lang` instead.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -82,17 +68,6 @@ class Yandex(Geocoder):
                 stacklevel=2
             )
         self.api_key = api_key
-        if lang is not None:
-            warnings.warn(
-                '`lang` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(lang=%(value)r) and '
-                '%(cls)s.reverse(lang=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=lang),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.lang = lang
         domain = 'geocode-maps.yandex.ru'
         self.api = '%s://%s%s' % (self.scheme, domain, self.api_path)
 
@@ -135,8 +110,6 @@ class Yandex(Geocoder):
         }
         if self.api_key:
             params['apikey'] = self.api_key
-        if lang is None:
-            lang = self.lang
         if lang:
             params['lang'] = lang
         if exactly_one:
@@ -199,8 +172,6 @@ class Yandex(Geocoder):
         }
         if self.api_key:
             params['apikey'] = self.api_key
-        if lang is None:
-            lang = self.lang
         if lang:
             params['lang'] = lang
         if kind:

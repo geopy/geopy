@@ -1,7 +1,6 @@
-import warnings
 from urllib.parse import urlencode
 
-from geopy.exc import ConfigurationError, GeocoderQuotaExceeded
+from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -22,8 +21,6 @@ class LiveAddress(Geocoder):
             self,
             auth_id,
             auth_token,
-            candidates=None,
-            scheme='https',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -34,20 +31,6 @@ class LiveAddress(Geocoder):
         :param str auth_id: Valid `Auth ID` from SmartyStreets.
 
         :param str auth_token: Valid `Auth Token` from SmartyStreets.
-
-        :param int candidates: An integer between 1 and 10 indicating the max
-            number of candidate addresses to return if a valid address
-            could be found. Defaults to `1`.
-
-            .. deprecated:: 1.19.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s `candidates` instead.
-
-        :param str scheme: Must be ``https``.
-
-            .. deprecated:: 1.14.0
-               Don't use this parameter, it's going to be removed in
-               geopy 2.0.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -63,33 +46,15 @@ class LiveAddress(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
         """
         super().__init__(
-            # The `scheme` argument is present for the legacy reasons only.
-            # If a custom value has been passed, it should be validated.
-            # Otherwise use `https` instead of the `options.default_scheme`.
-            scheme=(scheme or 'https'),
+            scheme='https',
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        if self.scheme != "https":
-            raise ConfigurationError("LiveAddress now requires `https`.")
         self.auth_id = auth_id
         self.auth_token = auth_token
 
-        if candidates:
-            if not (1 <= candidates <= 10):
-                raise ValueError('candidates must be between 1 and 10')
-        if candidates is not None:
-            warnings.warn(
-                '`candidates` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(candidates=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=candidates),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.candidates = candidates
         domain = 'api.smartystreets.com'
         self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
 
@@ -98,7 +63,7 @@ class LiveAddress(Geocoder):
             query,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            candidates=None,  # TODO: change default value to `1` in geopy 2.0
+            candidates=1,
     ):
         """
         Return a location point by address.
@@ -115,21 +80,14 @@ class LiveAddress(Geocoder):
 
         :param int candidates: An integer between 1 and 10 indicating the max
             number of candidate addresses to return if a valid address
-            could be found. Defaults to `1`.
+            could be found.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
 
-        if candidates is None:
-            candidates = self.candidates
-
-        if candidates is None:
-            candidates = 1  # TODO: move to default args in geopy 2.0.
-
-        if candidates:
-            if not (1 <= candidates <= 10):
-                raise ValueError('candidates must be between 1 and 10')
+        if not (1 <= candidates <= 10):
+            raise ValueError('candidates must be between 1 and 10')
 
         query = {
             'auth-id': self.auth_id,

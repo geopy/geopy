@@ -1,5 +1,4 @@
 import json
-import warnings
 from time import time
 from urllib.parse import urlencode
 from urllib.request import Request
@@ -204,7 +203,7 @@ class ArcGIS(Geocoder):
         return geocoded
 
     def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
-                distance=None, wkid=DEFAULT_WKID):
+                distance=None):
         """
         Return an address by location point.
 
@@ -225,32 +224,11 @@ class ArcGIS(Geocoder):
             within which to search. ArcGIS has a default of 100 meters, if not
             specified.
 
-        :param str wkid: WKID to use for both input and output coordinates.
-
-            .. deprecated:: 1.14.0
-               It wasn't working before because it was specified incorrectly
-               in the request parameters, and won't work even if we fix the
-               request, because :class:`geopy.point.Point` normalizes the
-               coordinates according to WKID 4326. Please open an issue in
-               the geopy issue tracker if you believe that custom wkid values
-               should be supported.
-               This parameter is scheduled for removal in geopy 2.0.
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
         location = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
-        if wkid != DEFAULT_WKID:
-            warnings.warn("%s.reverse: custom wkid value has been ignored.  "
-                          "It wasn't working before because it was specified "
-                          "incorrectly in the request parameters, and won't "
-                          "work even if we fix the request, because geopy.Point "
-                          "normalizes the coordinates according to WKID %s. "
-                          "Please open an issue in the geopy issue tracker "
-                          "if you believe that custom wkid values should be "
-                          "supported." % (type(self).__name__, DEFAULT_WKID),
-                          DeprecationWarning, stacklevel=2)
-            wkid = DEFAULT_WKID
+        wkid = DEFAULT_WKID
         params = {'location': location, 'f': 'json', 'outSR': wkid}
         if distance is not None:
             params['distance'] = distance

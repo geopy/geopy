@@ -55,7 +55,7 @@ class Here(Geocoder):
             be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
-            .. deprecated:: 1.21.0
+            .. attention::
                 App ID and App Code are being replaced by API Keys and OAuth 2.0
                 by HERE. Consider getting an ``apikey`` instead of using
                 ``app_id`` and ``app_code``.
@@ -64,7 +64,10 @@ class Here(Geocoder):
             eventually be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
-            .. deprecated:: 1.21.0
+            .. attention::
+                App ID and App Code are being replaced by API Keys and OAuth 2.0
+                by HERE. Consider getting an ``apikey`` instead of using
+                ``app_id`` and ``app_code``.
 
         :param str apikey: Should be a valid HERE Maps APIKEY. These keys were
             introduced in December 2019 and will eventually replace the legacy
