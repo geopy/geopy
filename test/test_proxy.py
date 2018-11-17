@@ -1,17 +1,12 @@
 import os
 import ssl
 import unittest
+from urllib.request import getproxies
 
 from geopy.compat import urlopen
 from geopy.exc import GeocoderServiceError
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
-
-try:
-    from urllib.request import getproxies
-except ImportError:  # py2
-    from urllib2 import getproxies
-
 
 CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), 'selfsigned_ca.pem')
 

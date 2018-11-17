@@ -1,16 +1,10 @@
+import http.server as SimpleHTTPServer
 import select
 import socket
+import socketserver as SocketServer
 import threading
 
 from geopy.compat import urlopen
-
-try:
-    # python 2
-    import SimpleHTTPServer
-    import SocketServer
-except ImportError:
-    import socketserver as SocketServer
-    import http.server as SimpleHTTPServer
 
 
 def pipe_sockets(sock1, sock2, timeout):
