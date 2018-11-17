@@ -1,6 +1,5 @@
 import unittest
 import urllib.request
-import warnings
 from contextlib import ExitStack
 from unittest.mock import patch, sentinel
 
@@ -165,12 +164,8 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
         assert lonlat == expected
 
     def test_address(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            latlon = self.method(self.coordinates_address)
-            assert 1 == len(w)
-
-        assert latlon == self.coordinates_address
+        with pytest.raises(ValueError):
+            self.method(self.coordinates_address)
 
 
 class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
