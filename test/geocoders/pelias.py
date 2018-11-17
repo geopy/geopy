@@ -73,13 +73,13 @@ class BasePeliasTestCase(ABC):
     def test_reverse_language_parameter(self):
         query = "48.198674, 16.348388"
         result_reverse_de = self.reverse_run(
-            {"query": query, "exactly_one": True, "language": "de"},
+            {"query": query, "language": "de"},
             {},
         )
         assert result_reverse_de.raw['properties']['country'] == "Österreich"
 
         result_reverse_en = self.reverse_run(
-            {"query": query, "exactly_one": True, "language": "en"},
+            {"query": query, "language": "en"},
             {},
         )
         assert result_reverse_en.raw['properties']['country'] == "Austria"

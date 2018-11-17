@@ -209,7 +209,7 @@ class GoogleV3TestCase(GeocoderTestBase):
 
     def test_reverse(self):
         self.reverse_run(
-            {"query": self.new_york_point, "exactly_one": True},
+            {"query": self.new_york_point},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 

@@ -49,7 +49,7 @@ class YandexTestCase(GeocoderTestBase):
 
     def test_reverse(self):
         self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
+            {"query": "40.75376406311989, -73.98489005863667"},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
@@ -62,13 +62,13 @@ class YandexTestCase(GeocoderTestBase):
 
     def test_reverse_kind(self):
         self.reverse_run(
-            {"query": (55.743659, 37.408055), "kind": "locality", "exactly_one": True},
+            {"query": (55.743659, 37.408055), "kind": "locality"},
             {"address": "Москва, Россия"}
         )
 
     def test_reverse_lang(self):
         self.reverse_run(
             {"query": (55.743659, 37.408055), "kind": "locality",
-             "lang": "uk_UA", "exactly_one": True},
+             "lang": "uk_UA"},
             {"address": "Москва, Росія"}
         )

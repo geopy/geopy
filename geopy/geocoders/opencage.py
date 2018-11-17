@@ -151,7 +151,7 @@ class OpenCage(Geocoder):
             self,
             query,
             language=None,
-            exactly_one=DEFAULT_SENTINEL,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
         """
@@ -176,13 +176,6 @@ class OpenCage(Geocoder):
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         params = {
             'key': self.api_key,

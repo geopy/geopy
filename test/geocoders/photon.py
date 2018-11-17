@@ -62,7 +62,6 @@ class PhotonTestCase(GeocoderTestBase):
 
         result_reverse_it = self.reverse_run(
             {"query": "45.7733105, 4.8869339",
-             "exactly_one": True,
              "language": "de"},
             {},
         )
@@ -73,7 +72,6 @@ class PhotonTestCase(GeocoderTestBase):
 
         result_reverse_fr = self.reverse_run(
             {"query": "45.7733105, 4.8869339",
-             "exactly_one": True,
              "language": "fr"},
             {},
         )

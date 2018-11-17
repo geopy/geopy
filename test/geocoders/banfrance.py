@@ -23,7 +23,7 @@ class BANFranceTestCase(GeocoderTestBase):
 
     def test_reverse(self):
         location = self.reverse_run(
-            {"query": "48.154587,3.221237", "exactly_one": True},
+            {"query": "48.154587,3.221237"},
             {"latitude": 48.154587, "longitude": 3.221237},
         )
         assert "Rue des Fontaines" in location.address
