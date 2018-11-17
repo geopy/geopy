@@ -229,7 +229,7 @@ class GoogleV3(Geocoder):
                     'deprecated and will be not supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.',
-                    UserWarning,
+                    DeprecationWarning,
                     stacklevel=2
                 )
                 lat1, lon1, lat2, lon2 = bounds

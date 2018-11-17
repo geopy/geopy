@@ -253,7 +253,7 @@ class Geocoder(object):
                 warnings.warn(
                     'Unable to parse the string as Point: "%s". Using the value '
                     'as-is for the query. In geopy 2.0 this will become an '
-                    'exception.' % str(e), UserWarning, stacklevel=3
+                    'exception.' % str(e), DeprecationWarning, stacklevel=3
                 )
                 return point
             raise

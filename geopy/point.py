@@ -170,8 +170,9 @@ class Point(object):
                           'constructing a Point with just a latitude '
                           'seems senseless. If this is exactly what was '
                           'meant, then pass the zero longitude explicitly '
-                          'to get rid of this warning.',
-                          UserWarning, stacklevel=2)
+                          'to get rid of this warning. '
+                          'In geopy 2.0 this will become an exception.',
+                          DeprecationWarning, stacklevel=2)
 
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)

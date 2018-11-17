@@ -383,7 +383,7 @@ class geodesic(Distance):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         if 'iterations' in kwargs:
             warnings.warn('Ignoring unused `iterations` kwarg for geodesic '
-                          'distance.', UserWarning, stacklevel=2)
+                          'distance.', DeprecationWarning, stacklevel=2)
         kwargs.pop('iterations', 0)
         major, minor, f = self.ELLIPSOID
         super(geodesic, self).__init__(*args, **kwargs)

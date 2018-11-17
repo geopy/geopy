@@ -143,7 +143,7 @@ class OpenCage(Geocoder):
                     'deprecated and will be not supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.',
-                    UserWarning,
+                    DeprecationWarning,
                     stacklevel=2
                 )
                 lon1, lat1, lon2, lat2 = bounds.split(',')
