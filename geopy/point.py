@@ -32,7 +32,7 @@ POINT_PATTERN = re.compile(r"""
       (?P<altitude>
         (?P<altitude_distance>-?%(FLOAT)s)[ ]*
         (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
-    .*?$
+    \s*$
 """ % {
     "FLOAT": r'\d+(?:\.\d+)?',
     "DEGREE": DEGREE,

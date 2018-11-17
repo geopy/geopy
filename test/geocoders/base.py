@@ -211,11 +211,7 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             latlon = self.method(self.coordinates_address)
-
-            # 1 for latitude normalization (first string char being
-            # treated as latitude).
-            # 2 for the deprecated as-is input bypass.
-            self.assertEqual(2, len(w))
+            self.assertEqual(1, len(w))
 
         self.assertEqual(latlon, self.coordinates_address)
 
