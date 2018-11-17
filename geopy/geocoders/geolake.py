@@ -16,8 +16,6 @@ class Geolake(Geocoder):
 
     Terms of Service at:
         https://geolake.com/terms-of-use
-
-    .. versionadded:: 1.18.0
     """
 
     structured_query_params = {
@@ -103,10 +101,6 @@ class Geolake(Geocoder):
             is a 2 character code as defined by the ISO-3166-1 alpha-2
             standard (e.g. ``FR``). Multiple countries can be specified with
             a Python list.
-
-            .. versionchanged:: 1.19.0
-                Previously only a Python list of countries could be specified.
-                Now a single country as a string can be specified as well.
 
         :type country_codes: str or list
 

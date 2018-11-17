@@ -19,8 +19,6 @@ class MapQuest(Geocoder):
       which is based on Open data from OpenStreetMap.
     - :class:`geopy.geocoders.MapQuest` (this class) MapQuest's own API
       which is based on Licensed data.
-
-    .. versionadded:: 1.22.0
     """
 
     geocode_path = '/geocoding/v1/address'

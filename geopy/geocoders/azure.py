@@ -9,8 +9,6 @@ class AzureMaps(TomTom):
 
     Documentation at:
         https://docs.microsoft.com/en-us/azure/azure-maps/index
-
-    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/address/json'

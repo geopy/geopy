@@ -76,24 +76,16 @@ class ArcGIS(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
 
         :param str auth_domain: Domain where the target ArcGIS auth service
             is hosted. Used only in authenticated mode (i.e. username,
             password and referer are set).
 
-            .. versionadded:: 1.17.0
-
         :param str domain: Domain where the target ArcGIS service
             is hosted.
-
-            .. versionadded:: 1.17.0
         """
         super().__init__(
             scheme=scheme,
@@ -169,8 +161,6 @@ class ArcGIS(Geocoder):
             https://developers.arcgis.com/rest/geocode/api-reference/geocoding-service-output.htm
             for a list of supported output fields. If you want to return all
             supported output fields, set ``out_fields="*"``.
-
-            .. versionadded:: 1.14.0
         :type out_fields: str or iterable
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if

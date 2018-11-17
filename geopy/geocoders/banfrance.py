@@ -12,8 +12,6 @@ class BANFrance(Geocoder):
 
     Documentation at:
         https://adresse.data.gouv.fr/api
-
-    .. versionadded:: 1.18.0
     """
 
     geocode_path = '/search'

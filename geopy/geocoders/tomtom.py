@@ -13,8 +13,6 @@ class TomTom(Geocoder):
 
     Documentation at:
         https://developer.tomtom.com/search-api/search-api-documentation
-
-    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/2/geocode/%(query)s.json'
@@ -149,8 +147,6 @@ class TomTom(Geocoder):
             available for a specific field, default language is used.
             List of supported languages (case-insensitive):
             https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
-
-            .. versionadded:: 1.18.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

@@ -59,8 +59,6 @@ class RateLimiter:
     Before using this class, please consult with the Geocoding service
     ToS, which might explicitly consider bulk requests (even throttled)
     a violation.
-
-    .. versionadded:: 1.16.0
     """
 
     def __init__(self, func, min_delay_seconds=0.0, max_retries=2,

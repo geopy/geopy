@@ -16,10 +16,6 @@ class Pelias(Geocoder):
 
     See also :class:`geopy.geocoders.GeocodeEarth` which is a Pelias-based
     service provided by the developers of Pelias itself.
-
-    .. versionchanged:: 1.15.0
-       ``Mapzen`` geocoder has been renamed to ``Pelias``.
-
     """
 
     geocode_path = '/v1/search'
@@ -48,12 +44,6 @@ class Pelias(Geocoder):
             or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
         :param boundary_rect: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
-
-            .. versionchanged:: 1.17.0
-                Previously boundary_rect could be a list of 4 strings or numbers
-                in the format of ``[longitude, latitude, longitude, latitude]``.
-                This format is now deprecated in favor of a list/tuple
-                of a pair of geopy Points and will be removed in geopy 2.0.
 
             .. deprecated:: 1.19.0
                 This argument will be removed in geopy 2.0.
@@ -147,19 +137,13 @@ class Pelias(Geocoder):
         :param boundary_rect: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-            .. versionadded:: 1.19.0
-
         :param str country_bias: Bias results to this country (ISO alpha-3).
-
-            .. versionadded:: 1.19.0
 
         :param str language: Preferred language in which to return results.
             Either uses standard
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-
-            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -235,8 +219,6 @@ class Pelias(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
-
-            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

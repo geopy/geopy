@@ -13,8 +13,6 @@ class MapTiler(Geocoder):
 
     Documentation at:
         https://cloud.maptiler.com/geocoding/ (requires sign-up)
-
-    .. versionadded:: 1.22.0
     """
 
     api_path = '/geocoding/%(query)s.json'

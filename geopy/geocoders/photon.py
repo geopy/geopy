@@ -49,13 +49,9 @@ class Photon(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
             scheme=scheme,
@@ -97,8 +93,6 @@ class Photon(Geocoder):
 
         :param int limit: Limit the number of returned results, defaults to no
             limit.
-
-            .. versionadded:: 1.12.0
 
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as ``'key:value'`` or list/set of str if multiple
@@ -172,11 +166,8 @@ class Photon(Geocoder):
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
-            .. versionadded:: 1.12.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
-
         """
         try:
             lat, lon = self._coerce_point_to_string(query).split(',')
