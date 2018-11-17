@@ -1,10 +1,10 @@
-import warnings
 from abc import ABC, abstractmethod
 from unittest.mock import patch
 
 import pytest
 
 import geopy.geocoders
+from geopy.exc import ConfigurationError
 from geopy.geocoders import Nominatim
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase
@@ -322,27 +322,17 @@ class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
         kwargs.setdefault('user_agent', 'geopy-test')
         return Nominatim(**kwargs)
 
-    def test_default_user_agent_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+    def test_default_user_agent_error(self):
+        with pytest.raises(ConfigurationError):
             Nominatim()
-            assert 1 == len(w)
 
-    def test_example_user_agent_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+    def test_example_user_agent_error(self):
+        with pytest.raises(ConfigurationError):
             Nominatim(user_agent="specify_your_app_name_here")
-            assert 1 == len(w)
 
     def test_custom_user_agent_works(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            Nominatim(user_agent='my_application')
-            assert 0 == len(w)
+        Nominatim(user_agent='my_application')
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            with patch.object(geopy.geocoders.options, 'default_user_agent',
-                              'my_application'):
-                Nominatim()
-            assert 0 == len(w)
+        with patch.object(geopy.geocoders.options, 'default_user_agent',
+                          'my_application'):
+            Nominatim()
