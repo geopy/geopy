@@ -2,15 +2,13 @@
 from __future__ import unicode_literals
 
 import unittest
-from abc import ABCMeta, abstractmethod
-
-from six import with_metaclass
+from abc import ABC, abstractmethod
 
 from geopy.geocoders import TomTom
 from test.geocoders.util import GeocoderTestBase, env
 
 
-class BaseTomTomTestCase(with_metaclass(ABCMeta, object)):
+class BaseTomTomTestCase(ABC):
 
     @classmethod
     @abstractmethod

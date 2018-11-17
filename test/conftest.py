@@ -4,24 +4,18 @@ from collections import defaultdict
 from statistics import mean
 from time import sleep
 from timeit import default_timer
+from urllib.parse import urlparse
+from urllib.request import HTTPHandler, HTTPSHandler
 
 import pytest
-import six
-from six.moves.urllib.parse import urlparse
 
 max_retries = int(os.getenv('GEOPY_TEST_RETRIES', 2))
 error_wait_seconds = float(os.getenv('GEOPY_TEST_ERROR_WAIT_SECONDS', 3))
 no_retries_for_hosts = set(os.getenv('GEOPY_TEST_NO_RETRIES_FOR_HOSTS', '').split(','))
 retry_status_codes = (429,)
 
-if six.PY3:
-    http_handler_do_open = 'urllib.request.HTTPHandler.do_open'
-    https_handler_do_open = 'urllib.request.HTTPSHandler.do_open'
-    from urllib.request import HTTPHandler, HTTPSHandler
-else:
-    http_handler_do_open = 'urllib2.HTTPHandler.do_open'
-    https_handler_do_open = 'urllib2.HTTPSHandler.do_open'
-    from urllib2 import HTTPHandler, HTTPSHandler
+http_handler_do_open = 'urllib.request.HTTPHandler.do_open'
+https_handler_do_open = 'urllib.request.HTTPSHandler.do_open'
 
 
 def pytest_addoption(parser):

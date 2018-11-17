@@ -1,9 +1,8 @@
 import unittest
 import warnings
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 import pytest
-from six import with_metaclass
 
 from geopy import exc
 from geopy.compat import u
@@ -41,7 +40,7 @@ class HereTestCaseUnitTest(GeocoderTestBase):
         assert len(w) == 0
 
 
-class BaseHereTestCase(with_metaclass(ABCMeta, object)):
+class BaseHereTestCase(ABC):
 
     @classmethod
     @abstractmethod

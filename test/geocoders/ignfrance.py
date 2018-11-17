@@ -1,9 +1,8 @@
 # -*- coding: utf8 -*-
 import unittest
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 import pytest
-from six import with_metaclass
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
@@ -35,7 +34,7 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
             IGNFrance(api_key="a", username="b")
 
 
-class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
+class BaseIGNFranceTestCase(ABC):
 
     @classmethod
     @abstractmethod
