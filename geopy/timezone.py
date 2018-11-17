@@ -48,8 +48,6 @@ class Timezone:
     """
     Contains a parsed response for a timezone request, which is
     implemented in few geocoders which provide such lookups.
-
-    .. versionadded:: 1.18.0
     """
 
     __slots__ = ("_pytz_timezone", "_raw")

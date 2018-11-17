@@ -37,10 +37,6 @@ class Nominatim(Geocoder):
        ``geopy.geocoders.options.default_user_agent = "my-application"``.
        In geopy 2.0 an exception will be thrown when a custom
        `user_agent` is not specified.
-
-    .. versionchanged:: 1.16.0
-       A warning is now issued when a default `user_agent` is used
-       which restates the `Attention` block above.
     """
 
     structured_query_params = {
@@ -76,23 +72,12 @@ class Nominatim(Geocoder):
         :param view_box: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-            .. versionchanged:: 1.15.0
-                Previously only a list of stringified coordinates was supported.
-
-            .. versionchanged:: 1.17.0
-                Previously view_box could be a list of 4 strings or numbers
-                in the format of ``[longitude, latitude, longitude, latitude]``.
-                This format is now deprecated in favor of a list/tuple
-                of a pair of geopy Points and will be removed in geopy 2.0.
-
             .. deprecated:: 1.19.0
                 This argument will be removed in geopy 2.0.
                 Use `geocode`'s `viewbox` instead.
 
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box.
-
-            .. versionadded:: 1.15.0
 
             .. deprecated:: 1.19.0
                 This argument will be removed in geopy 2.0.
@@ -115,24 +100,15 @@ class Nominatim(Geocoder):
         :param str domain: Domain where the target Nominatim service
             is hosted.
 
-            .. versionadded:: 1.8.2
-
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
-
-            .. versionadded:: 1.8.2
 
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
-
         """
         super().__init__(
             scheme=scheme,
@@ -234,13 +210,12 @@ class Nominatim(Geocoder):
         :param query: The address, query or a structured query
             you wish to geocode.
 
-            .. versionchanged:: 1.0.0
-                For a structured query, provide a dictionary whose keys
-                are one of: `street`, `city`, `county`, `state`, `country`, or
-                `postalcode`. For more information, see Nominatim's
-                documentation for `structured requests`:
+            For a structured query, provide a dictionary whose keys
+            are one of: `street`, `city`, `county`, `state`, `country`, or
+            `postalcode`. For more information, see Nominatim's
+            documentation for `structured requests`:
 
-                    https://nominatim.org/release-docs/develop/api/Search
+                https://nominatim.org/release-docs/develop/api/Search
 
         :type query: dict or str
 
@@ -255,8 +230,6 @@ class Nominatim(Geocoder):
         :param int limit: Maximum amount of results to return from Nominatim.
             Unless exactly_one is set to False, limit will always be 1.
 
-            .. versionadded:: 1.13.0
-
         :param bool addressdetails: If you want in *Location.raw* to include
             addressdetails such as city_district, etc set it to True
 
@@ -266,27 +239,19 @@ class Nominatim(Geocoder):
             accept-language string or a simple comma-separated
             list of language codes.
 
-            .. versionadded:: 1.0.0
-
         :param str geometry: If present, specifies whether the geocoding
             service should return the result's geometry in `wkt`, `svg`,
             `kml`, or `geojson` formats. This is available via the
             `raw` attribute on the returned :class:`geopy.location.Location`
             object.
 
-            .. versionadded:: 1.3.0
-
         :param bool extratags: Include additional information in the result if available,
             e.g. wikipedia link, opening hours.
-
-            .. versionadded:: 1.17.0
 
         :param country_codes: Limit search results
             to a specific country (or a list of countries).
             A country_code should be the ISO 3166-1alpha2 code,
             e.g. ``gb`` for the United Kingdom, ``de`` for Germany, etc.
-
-            .. versionadded:: 1.19.0
 
         :type country_codes: str or list
 
@@ -296,23 +261,15 @@ class Nominatim(Geocoder):
         :param viewbox: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-            .. versionadded:: 1.19.0
-
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box. Defaults to `False`.
-
-            .. versionadded:: 1.19.0
 
         :param str featuretype: If present, restrict results to certain type of features.
             Allowed values: `country`, `state`, `city`, `settlement`.
 
-            .. versionadded:: 1.21.0
-
         :param bool namedetails: If you want in *Location.raw* to include
             namedetails, set it to True. This will be a list of alternative names,
             including language variants, etc.
-
-            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -442,18 +399,12 @@ class Nominatim(Geocoder):
             accept-language string or a simple comma-separated
             list of language codes.
 
-            .. versionadded:: 1.0.0
-
         :param bool addressdetails: Whether or not to include address details,
             such as city, county, state, etc. in *Location.raw*
-
-            .. versionadded:: 1.14.0
 
         :param int zoom: Level of detail required for the address,
             an integer in range from 0 (country level) to 18 (building level),
             default is 18.
-
-            .. versionadded:: 1.22.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

@@ -59,13 +59,9 @@ class Bing(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
             scheme=scheme,
@@ -113,18 +109,12 @@ class Bing(Geocoder):
         :param str culture: Affects the language of the response,
             must be a two-letter country code.
 
-            .. versionadded:: 1.4.0
-
         :param bool include_neighborhood: Sets whether to include the
             neighborhood field in the response.
-
-            .. versionadded:: 1.4.0
 
         :param bool include_country_code: Sets whether to include the
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
-
-            .. versionadded:: 1.4.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

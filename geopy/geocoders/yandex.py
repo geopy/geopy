@@ -15,8 +15,6 @@ class Yandex(Geocoder):
     Documentation at:
         https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
 
-    .. versionadded:: 1.5.0
-
     .. attention::
         Since September 2019 Yandex requires each request to have an API key.
         API keys can be created at https://developer.tech.yandex.ru/
@@ -36,14 +34,8 @@ class Yandex(Geocoder):
     ):
         """
 
-        .. versionchanged:: 1.14.0
-           Default scheme has been changed from ``http`` to ``https``.
-
         :param str api_key: Yandex API key, mandatory.
             The key can be created at https://developer.tech.yandex.ru/
-
-            .. versionchanged:: 1.21.0
-                API key is mandatory since September 2019.
 
         :param str lang: Language of the response and regional settings
             of the map. List of supported values:
@@ -68,18 +60,12 @@ class Yandex(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
-
-            .. versionadded:: 1.14.0
 
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
             scheme=scheme,
@@ -141,8 +127,6 @@ class Yandex(Geocoder):
             - ``uk_UA`` -- Ukrainian;
             - ``be_BY`` -- Belarusian.
 
-            .. versionadded:: 1.22.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -184,12 +168,6 @@ class Yandex(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -197,8 +175,6 @@ class Yandex(Geocoder):
 
         :param str kind: Type of toponym. Allowed values: `house`, `street`, `metro`,
             `district`, `locality`.
-
-            .. versionadded:: 1.14.0
 
         :param str lang: Language of the response and regional settings
             of the map. List of supported values:
@@ -209,8 +185,6 @@ class Yandex(Geocoder):
             - ``ru_RU`` -- Russian (default);
             - ``uk_UA`` -- Ukrainian;
             - ``be_BY`` -- Belarusian.
-
-            .. versionadded:: 1.22.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

@@ -14,11 +14,6 @@ class What3Words(Geocoder):
 
     Documentation at:
         https://docs.what3words.com/api/v2/
-
-    .. versionadded:: 1.5.0
-
-    .. versionchanged:: 1.15.0
-       API has been updated to v2.
     """
 
     multiple_word_re = re.compile(
@@ -59,13 +54,9 @@ class What3Words(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
             # The `scheme` argument is present for the legacy reasons only.
@@ -114,10 +105,6 @@ class What3Words(Geocoder):
             available. Due to the address scheme there is always exactly one
             result for each `3 words` address, so this parameter is rather
             useless for this geocoder.
-
-            .. versionchanged:: 1.14.0
-               ``exactly_one=False`` now returns a list of a single location.
-               This option wasn't respected before.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -203,10 +190,6 @@ class What3Words(Geocoder):
             available. Due to the address scheme there is always exactly one
             result for each `3 words` address, so this parameter is rather
             useless for this geocoder.
-
-            .. versionchanged:: 1.14.0
-               ``exactly_one=False`` now returns a list of a single location.
-               This option wasn't respected before.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`

@@ -261,8 +261,6 @@ class Point:
             >>> p.format_unicode()
             '41° 30′ 0″ N, 81° 0′ 0″ W, 12.3km'
 
-        .. versionadded:: 1.23.0
-
         :param bool altitude: Whether to include ``altitude`` value.
             By default it is automatically included if it is non-zero.
         """

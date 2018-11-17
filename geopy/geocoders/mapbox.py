@@ -13,8 +13,6 @@ class MapBox(Geocoder):
 
     Documentation at:
         https://www.mapbox.com/api-documentation/
-
-    .. versionadded:: 1.17.0
     """
 
     api_path = '/geocoding/v5/mapbox.places/%(query)s.json/'
@@ -91,18 +89,10 @@ class MapBox(Geocoder):
         """
         Return a location point by address.
 
-        .. versionchanged:: 1.20.0
-            Previously due to a bug the resulting :class:`geopy.location.Location`'s
-            ``raw`` attribute contained a single string instead of a full
-            service response.
-
         :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
-
-            .. versionchanged:: 1.20.0
-                Previously due to a bug this parameter wasn't respected.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -117,10 +107,6 @@ class MapBox(Geocoder):
         :param country: Country to filter result in form of
             ISO 3166-1 alpha-2 country code (e.g. ``FR``).
             Might be a Python list of strings.
-
-            .. versionchanged:: 1.19.0
-                Previously only a single string could be specified.
-                Now a Python list of individual countries is supported.
 
         :type country: str or list
 
@@ -168,11 +154,6 @@ class MapBox(Geocoder):
     ):
         """
         Return an address by location point.
-
-        .. versionchanged:: 1.20.0
-            Previously due to a bug the resulting :class:`geopy.location.Location`'s
-            ``raw`` attribute contained a single string instead of a full
-            service response.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.

@@ -22,8 +22,6 @@ class Here(Geocoder):
 
     Documentation at:
         https://developer.here.com/documentation/geocoder/
-
-    .. versionadded:: 1.15.0
     """
 
     structured_query_params = {
@@ -75,8 +73,6 @@ class Here(Geocoder):
             More authentication details are available at
             https://developer.here.com/blog/announcing-two-new-authentication-types.
             See https://developer.here.com/authenticationpage.
-
-            .. versionadded:: 1.21.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.

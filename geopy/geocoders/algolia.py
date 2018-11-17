@@ -15,8 +15,6 @@ class AlgoliaPlaces(Geocoder):
 
     Documentation at:
         https://community.algolia.com/places/documentation.html
-
-    .. versionadded:: 1.22.0
     """
 
     geocode_path = '/1/places/query'

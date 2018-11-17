@@ -111,10 +111,8 @@ a suitable approximation::
     >>> print(euclidian_distance)
     1.359986705262199
 
-.. versionchanged:: 1.23.0
-    Calculating distances between points with different altitudes now
-    causes a deprecation warning. In geopy 2.0 this will become a
-    ``ValueError`` exception.
+An attempt to calculate distances between points with different altitudes
+would result in a ``ValueError`` exception.
 
 """
 from math import asin, atan2, cos, sin, sqrt
@@ -409,8 +407,6 @@ class geodesic(Distance):
         >>> print(geodesic(newport_ri, cleveland_oh).miles)
         538.390445368
 
-
-    .. versionadded:: 1.13.0
     """
 
     ellipsoid_key = None

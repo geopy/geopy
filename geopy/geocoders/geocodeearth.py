@@ -7,8 +7,6 @@ __all__ = ("GeocodeEarth", )
 class GeocodeEarth(Pelias):
     """geocode.earth, a Pelias-based service provided by the developers
     of Pelias itself.
-
-    .. versionadded:: 1.15.0
     """
 
     def __init__(
@@ -30,12 +28,6 @@ class GeocodeEarth(Pelias):
             or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
         :param boundary_rect: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
-
-            .. versionchanged:: 1.17.0
-                Previously boundary_rect could be a list of 4 strings or numbers
-                in the format of ``[longitude, latitude, longitude, latitude]``.
-                This format is now deprecated in favor of a list/tuple
-                of a pair of geopy Points and will be removed in geopy 2.0.
 
             .. deprecated:: 1.19.0
                 This argument will be removed in geopy 2.0.

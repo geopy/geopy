@@ -23,8 +23,6 @@ class Baidu(Geocoder):
     .. attention::
         Newly registered API keys will not work with v2 API,
         use :class:`.BaiduV3` instead.
-
-    .. versionadded:: 1.0.0
     """
 
     api_path = '/geocoder/v2/'
@@ -49,9 +47,6 @@ class Baidu(Geocoder):
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
 
-            .. versionchanged:: 1.14.0
-               Default scheme has been changed from ``http`` to ``https``.
-
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
 
@@ -61,19 +56,13 @@ class Baidu(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
-
         :param str security_key: The security key (SK) to calculate
             the SN parameter in request if authentication setting requires
             (http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix).
-
-            .. versionadded:: 1.15.0
         """
         super().__init__(
             scheme=scheme,
@@ -143,8 +132,6 @@ class Baidu(Geocoder):
 
         :param bool exactly_one: Return one result or a list of results, if
             available. Baidu's API will always return at most one result.
-
-            .. versionadded:: 1.14.0
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -284,8 +271,6 @@ class BaiduV3(Baidu):
 
     Documentation at:
         http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
-
-    .. versionadded:: 1.22.0
     """
 
     api_path = '/geocoding/v3/'
