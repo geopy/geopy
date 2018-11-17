@@ -245,15 +245,14 @@ class GoogleV3TestCase(GeocoderTestBase):
             utc_timestamp == self.geocoder._normalize_timezone_at_time(local_aware_dt)
         )
 
-    def test_timezone_integer(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+    def test_timezone_integer_raises(self):
+        # In geopy 1.x `at_time` could be an integer -- a unix timestamp.
+        # This is an error since geopy 2.0.
+        with pytest.raises(exc.GeocoderQueryError):
             self.reverse_timezone_run(
                 {"query": self.new_york_point, "at_time": 0},
                 self.america_new_york,
             )
-            # at_time as number should issue a warning
-            assert 0 < len(w)
 
     def test_timezone_no_date(self):
         self.reverse_timezone_run(

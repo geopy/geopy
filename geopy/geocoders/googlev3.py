@@ -5,7 +5,6 @@ import hmac
 import warnings
 from calendar import timegm
 from datetime import datetime
-from numbers import Number
 from urllib.parse import urlencode
 
 from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
@@ -370,15 +369,6 @@ class GoogleV3(Geocoder):
     def _normalize_timezone_at_time(self, at_time):
         if at_time is None:
             timestamp = timegm(datetime.utcnow().utctimetuple())
-        elif isinstance(at_time, Number):
-            warnings.warn(
-                'Support for `at_time` as int/float is deprecated '
-                'and will be removed in geopy 2.0. '
-                'Pass a `datetime.datetime` instance instead.',
-                DeprecationWarning,
-                stacklevel=3
-            )
-            timestamp = at_time
         elif isinstance(at_time, datetime):
             # Naive datetimes are silently treated as UTC.
             # Timezone-aware datetimes are handled correctly.
