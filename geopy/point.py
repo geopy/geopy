@@ -7,9 +7,9 @@ import re
 import warnings
 from itertools import islice
 from math import fmod
+from math import isfinite
 
 from geopy import units, util
-from geopy.compat import isfinite, string_compare
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
 
 POINT_PATTERN = re.compile(r"""
@@ -162,7 +162,7 @@ class Point:
             arg = latitude
             if isinstance(arg, Point):
                 return cls.from_point(arg)
-            elif isinstance(arg, string_compare):
+            elif isinstance(arg, str):
                 return cls.from_string(arg)
             else:
                 try:
@@ -247,7 +247,7 @@ class Point:
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, string_compare):
+            if not isinstance(altitude, str):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
@@ -290,7 +290,7 @@ class Point:
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, string_compare):
+            if not isinstance(altitude, str):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 

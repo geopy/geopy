@@ -10,7 +10,6 @@ from geopy.compat import (
     Request,
     URLError,
     build_opener_with_context,
-    string_compare,
 )
 from geopy.exc import (
     ConfigurationError,
@@ -243,7 +242,7 @@ class Geocoder:
         self.ssl_context = (ssl_context if ssl_context is not DEFAULT_SENTINEL
                             else options.default_ssl_context)
 
-        if isinstance(self.proxies, string_compare):
+        if isinstance(self.proxies, str):
             self.proxies = {'http': self.proxies, 'https': self.proxies}
 
         # `ProxyHandler` should be present even when actually there're
@@ -269,7 +268,7 @@ class Geocoder:
             if not isinstance(point, Point):
                 point = Point(point)
         except ValueError as e:
-            if isinstance(point, string_compare):
+            if isinstance(point, str):
                 warnings.warn(
                     'Unable to parse the string as Point: "%s". Using the value '
                     'as-is for the query. In geopy 2.0 this will become an '

@@ -2,7 +2,6 @@
 :class:`.Location` returns geocoder results.
 """
 
-from geopy.compat import string_compare
 from geopy.point import Point
 
 
@@ -27,14 +26,14 @@ class Location:
             self._point = (None, None, None)
         elif isinstance(point, Point):
             self._point = point
-        elif isinstance(point, string_compare):
+        elif isinstance(point, str):
             self._point = Point(point)
         elif isinstance(point, (tuple, list)):
             self._point = Point(point)
         else:
             raise TypeError(
                 "point an unsupported type: %r; use %r or Point",
-                type(point), type(string_compare)
+                type(point), type(str)
             )
         self._tuple = _location_tuple(self)
         self._raw = raw

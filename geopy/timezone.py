@@ -1,4 +1,3 @@
-from geopy.compat import text_type
 from geopy.exc import GeocoderParseError
 
 try:
@@ -79,7 +78,7 @@ class Timezone:
         return self._raw
 
     def __unicode__(self):
-        return text_type(self._pytz_timezone)
+        return str(self._pytz_timezone)
 
     __str__ = __unicode__
 

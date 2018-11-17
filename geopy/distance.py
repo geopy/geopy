@@ -130,7 +130,7 @@ from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
 from geographiclib.geodesic import Geodesic
 
 from geopy import units, util
-from geopy.compat import cmp, string_compare
+from geopy.compat import cmp
 from geopy.point import Point
 from geopy.units import radians
 
@@ -569,7 +569,7 @@ class vincenty(Distance):
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
 
-        if isinstance(self.ELLIPSOID, string_compare):
+        if isinstance(self.ELLIPSOID, str):
             major, minor, f = ELLIPSOIDS[self.ELLIPSOID]
         else:
             major, minor, f = self.ELLIPSOID
@@ -679,7 +679,7 @@ class vincenty(Distance):
             distance = distance.kilometers
 
         ellipsoid = self.ELLIPSOID
-        if isinstance(ellipsoid, string_compare):
+        if isinstance(ellipsoid, str):
             ellipsoid = ELLIPSOIDS[ellipsoid]
 
         major, minor, f = ellipsoid
