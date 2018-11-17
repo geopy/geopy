@@ -124,8 +124,6 @@ a suitable approximation::
     ``ValueError`` exception.
 
 """
-from __future__ import division
-
 import warnings
 from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
 
