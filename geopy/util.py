@@ -13,8 +13,8 @@ except ImportError:  # pragma: no cover
     pass
 
 
-__version__ = "1.22.0"
-__version_info__ = (1, 22, 0)
+__version__ = "2.0.0a0"
+__version_info__ = (2, 0, 0, "a", 0)
 
 logger = logging.getLogger('geopy')
 
