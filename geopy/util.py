@@ -1,11 +1,9 @@
 import logging
 
-from geopy.compat import py3k, text_type
+from geopy.compat import text_type
 
-if not py3k:  # pragma: no cover
-    NUMBER_TYPES = (int, long, float)  # noqa
-else:  # pragma: no cover
-    NUMBER_TYPES = (int, float)  # long -> int in Py3k
+NUMBER_TYPES = (int, float)
+
 try:
     from decimal import Decimal
     NUMBER_TYPES = NUMBER_TYPES + (Decimal, )
@@ -42,10 +40,7 @@ def decode_page(page):
     response specifies otherwise.
     """
     if hasattr(page, 'read'):  # urllib
-        if py3k:
-            encoding = page.headers.get_param("charset") or "utf-8"
-        else:
-            encoding = page.headers.getparam("charset") or "utf-8"
+        encoding = page.headers.get_param("charset") or "utf-8"
         return text_type(page.read(), encoding=encoding)
     else:  # requests?
         encoding = page.headers.get("charset") or "utf-8"

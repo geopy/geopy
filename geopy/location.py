@@ -2,7 +2,7 @@
 :class:`.Location` returns geocoder results.
 """
 
-from geopy.compat import py3k, string_compare
+from geopy.compat import string_compare
 from geopy.point import Point
 
 
@@ -113,16 +113,9 @@ class Location:
     __str__ = __unicode__
 
     def __repr__(self):
-        if py3k:
-            return "Location(%s, (%s, %s, %s))" % (
-                self._address, self.latitude, self.longitude, self.altitude
-            )
-        else:
-            # Python 2 should not return unicode in __repr__:
-            # http://bugs.python.org/issue5876
-            return "Location((%s, %s, %s))" % (
-                self.latitude, self.longitude, self.altitude
-            )
+        return "Location(%s, (%s, %s, %s))" % (
+            self._address, self.latitude, self.longitude, self.altitude
+        )
 
     def __iter__(self):
         return iter(self._tuple)

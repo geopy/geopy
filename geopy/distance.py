@@ -130,7 +130,7 @@ from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
 from geographiclib.geodesic import Geodesic
 
 from geopy import units, util
-from geopy.compat import cmp, py3k, string_compare
+from geopy.compat import cmp, string_compare
 from geopy.point import Point
 from geopy.units import radians
 
@@ -267,24 +267,23 @@ class Distance:
         else:
             return cmp(self.kilometers, other)
 
-    if py3k:
-        def __eq__(self, other):
-            return self.__cmp__(other) == 0
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
 
-        def __ne__(self, other):
-            return self.__cmp__(other) != 0
+    def __ne__(self, other):
+        return self.__cmp__(other) != 0
 
-        def __gt__(self, other):
-            return self.__cmp__(other) > 0
+    def __gt__(self, other):
+        return self.__cmp__(other) > 0
 
-        def __lt__(self, other):
-            return self.__cmp__(other) < 0
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
 
-        def __ge__(self, other):
-            return self.__cmp__(other) >= 0
+    def __ge__(self, other):
+        return self.__cmp__(other) >= 0
 
-        def __le__(self, other):
-            return self.__cmp__(other) <= 0
+    def __le__(self, other):
+        return self.__cmp__(other) <= 0
 
     @property
     def kilometers(self):

@@ -1,116 +1,48 @@
 import inspect
 import sys
 import warnings
+from math import isfinite
+from urllib.error import HTTPError
+from urllib.parse import parse_qs, quote, quote_plus, urlencode, urlparse
+from urllib.request import (
+    HTTPSHandler,
+    ProxyHandler,
+    Request,
+    URLError,
+    build_opener,
+    urlopen,
+)
 
-py3k = sys.version_info >= (3, 0)
-
-if py3k:  # pragma: no cover
-    string_compare = str
-else:  # pragma: no cover
-    string_compare = (str, unicode)  # noqa
-
-if py3k:  # pragma: no cover
-    text_type = str
-else:  # pragma: no cover
-    text_type = unicode  # noqa
-
-
-if py3k:  # pragma: no cover
-    def cmp(a, b):
-        return (a > b) - (a < b)
-else:  # pragma: no cover
-    cmp = cmp  # builtin in py2
+string_compare = str
+text_type = str
 
 
-if py3k:
-    from math import isfinite
-else:
-    from math import isinf, isnan
-
-    def isfinite(x):
-        return not isinf(x) and not isnan(x)
+def cmp(a, b):
+    return (a > b) - (a < b)
 
 
-if py3k:  # pragma: no cover
-    from urllib.error import HTTPError
-    from urllib.parse import parse_qs, quote, quote_plus, urlencode, urlparse
-    from urllib.request import (HTTPSHandler, ProxyHandler, Request, URLError,
-                                build_opener, urlopen)
+def itervalues(d):
+    """
+    Function for iterating on values due to methods
+    renaming between Python 2 and 3 versions
+    For Python2
+    """
+    return iter(d.values())
 
-    def itervalues(d):
-        """
-        Function for iterating on values due to methods
-        renaming between Python 2 and 3 versions
-        For Python2
-        """
-        return iter(d.values())
 
-    def iteritems(d):
-        """
-        Function for iterating on items due to methods
-        renaming between Python 2 and 3 versions
-        For Python2
-        """
-        return iter(d.items())
-
-else:  # pragma: no cover
-    from urllib import quote, quote_plus  # noqa
-    from urllib import urlencode as original_urlencode
-    from urllib2 import (HTTPError,  # noqa
-                         HTTPSHandler, ProxyHandler, Request, URLError,
-                         build_opener, urlopen)
-    from urlparse import parse_qs, urlparse  # noqa
-
-    def force_str(str_or_unicode):
-        """
-        Python2-only, ensures that a string is encoding to a str.
-        """
-        if isinstance(str_or_unicode, unicode):  # noqa
-            return str_or_unicode.encode('utf-8')
-        else:
-            return str_or_unicode
-
-    def urlencode(query, doseq=0):
-        """
-        A version of Python's urllib.urlencode() function that can operate on
-        unicode strings. The parameters are first cast to UTF-8 encoded strings
-        and then encoded as per normal.
-
-        Based on the urlencode from django.utils.http
-        """
-        if hasattr(query, 'items'):
-            query = query.items()
-        return original_urlencode(
-            [(force_str(k),
-              [force_str(i) for i in v]
-              if isinstance(v, (list, tuple)) else force_str(v))
-             for k, v in query],
-            doseq)
-
-    def itervalues(d):
-        """
-        Function for iterating on values due to methods
-        renaming between Python 2 and 3 versions
-        For Python3
-        """
-        return d.itervalues()
-
-    def iteritems(d):
-        """
-        Function for iterating on items due to methods
-        renaming between Python 2 and 3 versions
-        For Python3
-        """
-        return d.iteritems()
+def iteritems(d):
+    """
+    Function for iterating on items due to methods
+    renaming between Python 2 and 3 versions
+    For Python2
+    """
+    return iter(d.items())
 
 
 def _is_urllib_context_supported(HTTPSHandler_=HTTPSHandler):
     context_arg = 'context'
-    if py3k:
-        argspec = inspect.getfullargspec(HTTPSHandler_.__init__)
-        return context_arg in argspec.args or context_arg in argspec.kwonlyargs
-    else:
-        return context_arg in inspect.getargspec(HTTPSHandler_.__init__).args
+    argspec = inspect.getfullargspec(HTTPSHandler_.__init__)
+    return context_arg in argspec.args or context_arg in argspec.kwonlyargs
 
 
 _URLLIB_SUPPORTS_SSL_CONTEXT = _is_urllib_context_supported()
