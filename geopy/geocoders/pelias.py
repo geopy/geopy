@@ -25,8 +25,6 @@ class Pelias(Geocoder):
             self,
             domain,
             api_key=None,
-            boundary_rect=None,
-            country_bias=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -39,21 +37,6 @@ class Pelias(Geocoder):
         :param str domain: Specify a domain for Pelias API.
 
         :param str api_key: Pelias API key, optional.
-
-        :type boundary_rect: list or tuple of 2 items of :class:`geopy.point.Point`
-            or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
-        :param boundary_rect: Coordinates to restrict search within.
-            Example: ``[Point(22, 180), Point(-22, -180)]``.
-
-            .. deprecated:: 1.19.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s `boundary_rect` instead.
-
-        :param str country_bias: Bias results to this country (ISO alpha-3).
-
-            .. deprecated:: 1.19.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s `country_bias` instead.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -79,26 +62,7 @@ class Pelias(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        if country_bias is not None:
-            warnings.warn(
-                '`country_bias` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(country_bias=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=country_bias),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.country_bias = country_bias
-        if boundary_rect is not None:
-            warnings.warn(
-                '`boundary_rect` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(boundary_rect=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=boundary_rect),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.boundary_rect = boundary_rect
+
         self.api_key = api_key
         self.domain = domain.strip('/')
 
@@ -155,8 +119,6 @@ class Pelias(Geocoder):
                 'api_key': self.api_key
             })
 
-        if boundary_rect is None:
-            boundary_rect = self.boundary_rect
         if boundary_rect:
             if len(boundary_rect) == 4:
                 warnings.warn(
@@ -177,8 +139,6 @@ class Pelias(Geocoder):
             params['boundary.rect.max_lon'] = lon2
             params['boundary.rect.max_lat'] = lat2
 
-        if country_bias is None:
-            country_bias = self.country_bias
         if country_bias:
             params['boundary.country'] = country_bias
 
