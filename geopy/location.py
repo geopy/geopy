@@ -106,10 +106,8 @@ class Location:
         """
         return self._tuple[index]
 
-    def __unicode__(self):
+    def __str__(self):
         return self._address
-
-    __str__ = __unicode__
 
     def __repr__(self):
         return "Location(%s, (%s, %s, %s))" % (

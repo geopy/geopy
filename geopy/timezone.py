@@ -77,10 +77,8 @@ class Timezone:
         """
         return self._raw
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self._pytz_timezone)
-
-    __str__ = __unicode__
 
     def __repr__(self):
         return "Timezone(%s)" % repr(self.pytz_timezone)
