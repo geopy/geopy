@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlencode
 
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
@@ -116,18 +115,6 @@ class OpenCage(Geocoder):
             'q': query,
         }
         if bounds:
-            if isinstance(bounds, str):
-                warnings.warn(
-                    'OpenCage `bounds` format of '
-                    '`"longitude,latitude,longitude,latitude"` is now '
-                    'deprecated and will not be supported in geopy 2.0. '
-                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
-                    'instead.',
-                    DeprecationWarning,
-                    stacklevel=2
-                )
-                lon1, lat1, lon2, lat2 = bounds.split(',')
-                bounds = [[lat1, lon1], [lat2, lon2]]
             params['bounds'] = self._format_bounding_box(
                 bounds, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
         if language:

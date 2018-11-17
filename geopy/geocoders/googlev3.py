@@ -239,18 +239,6 @@ class GoogleV3(Geocoder):
         if self.api_key:
             params['key'] = self.api_key
         if bounds:
-            if len(bounds) == 4:
-                warnings.warn(
-                    'GoogleV3 `bounds` format of '
-                    '`[latitude, longitude, latitude, longitude]` is now '
-                    'deprecated and will not be supported in geopy 2.0. '
-                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
-                    'instead.',
-                    DeprecationWarning,
-                    stacklevel=2
-                )
-                lat1, lon1, lat2, lon2 = bounds
-                bounds = [[lat1, lon1], [lat2, lon2]]
             params['bounds'] = self._format_bounding_box(
                 bounds, "%(lat1)s,%(lon1)s|%(lat2)s,%(lon2)s")
         if region:

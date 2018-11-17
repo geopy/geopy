@@ -189,26 +189,6 @@ class BaseNominatimTestCase(ABC):
                 {"latitude": 51.5223513, "longitude": -0.1382104}
             )
 
-    def test_deprecated_viewbox(self):
-        res = self.geocode_run(
-            {"query": "Maple Street"},
-            {},
-        )
-        assert not (50 <= res.latitude <= 52)
-        assert not (-0.15 <= res.longitude <= -0.11)
-
-        for viewbox in [
-            (-0.11, 52, -0.15, 50),
-            ("-0.11", "52", "-0.15", "50")
-        ]:
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter('always')
-                self.geocode_run(
-                    {"query": "Maple Street", "viewbox": viewbox},
-                    {"latitude": 51.5223513, "longitude": -0.1382104}
-                )
-                assert 1 == len(w)
-
     def test_bounded(self):
         bb = (Point('56.588456', '84.719353'), Point('56.437293', '85.296822'))
         query = (
