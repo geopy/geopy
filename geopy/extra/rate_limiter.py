@@ -1,7 +1,7 @@
 from itertools import chain, count
+from time import sleep
 from timeit import default_timer
 
-from geopy.compat import sleep_at_least
 from geopy.exc import GeocoderServiceError
 from geopy.util import logger
 
@@ -109,7 +109,7 @@ class RateLimiter:
 
     def _sleep(self, seconds):  # pragma: no coverage
         logger.debug('RateLimiter sleep(%r)', seconds)
-        sleep_at_least(seconds)
+        sleep(seconds)
 
     def _sleep_between(self):
         seconds_since_last_call = self._clock() - self._last_call
