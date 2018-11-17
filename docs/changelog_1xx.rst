@@ -2,6 +2,77 @@
 
 Changelog
 =========
+1.18.0
+------
+2018-12-TBD
+
+The work on geopy 2.0 has started, see the new `geopy 2.0` doc section
+for more info. geopy 2.0 will drop support for Python 2.7 and 3.4.
+To ensure a smoother transition from 1.x to 2.0, make sure to check
+your code with warnings enabled (i.e. run python with the ``-Wd``
+switch).
+
+*   ADDED: Geolake geocoder. Contributed by Yorick Holkamp. (#329)
+
+*   ADDED: BANFrance (Base Adresse Nationale) geocoder.
+    Contributed by Sébastien Barré. (#336)
+
+*   ADDED: TomTom and AzureMaps: `language` param has been added to
+    the `reverse` method.
+
+*   ADDED: Geonames geocoder now supports both `findNearbyPlaceName`
+    and `findNearby` reverse geocoding methods, as chosen by a new
+    `find_nearby_type` parameter of the `reverse` method.
+    Contributed by svalee. (#327)
+
+*   ADDED: Geonames geocoder now supports returning a timezone
+    for a particular `Point` via a new `reverse_timezone` method.
+    Contributed by svalee. (#327)
+
+*   ADDED: Geonames geocoder's `reverse` method now supports new
+    parameters: `lang` and `feature_code`.
+    Contributed by svalee. (#327)
+
+*   ADDED: Geonames now supports `scheme` parameter. Although
+    the service itself doesn't yet support `https`, it will
+    be possible to enable `https` via this new parameter as soon
+    as they add the support, without waiting for a new release of
+    geopy.
+
+*   CHANGED: Geonames now builds `Location.address` differently:
+    previously it looked like ``Kreuzberg, 16, DE``, now it looks
+    like ``Kreuzberg, Berlin, Germany``.
+
+*   CHANGED: All warnings now specify a correct `stacklevel` so that
+    the warnings point at the place in your code that triggered it,
+    instead of the geopy internals.
+
+*   CHANGED: All warnings with `UserWarning` category which will be
+    removed in geopy 2.0 now have the `DeprecationWarning` category.
+
+*   CHANGED: `geopy.extra.rate_limiter.RateLimiter` is no longer
+    an experimental API.
+
+*   CHANGED: `GoogleV3.timezone` now issues a deprecation warning when
+    `at_time` is a number instead of a `datetime`. In geopy 2.0 this will
+    become an exception.
+
+*   CHANGED: `GoogleV3.timezone` method is now deprecated in favor of
+    `GoogleV3.reverse_timezone`, which works exactly the same, except that
+    it returns a new `geopy.Timezone` object, which is a wrapper for
+    pytz timezone similarly to `geopy.Location`. This object also
+    contains a raw response of the service. `GoogleV3.timezone` will be
+    removed in geopy 2.0. (#332)
+
+*   CHANGED: `Point` constructor silently ignored the tail of the string
+    if it couldn't be parsed, now it is not ignored. For example,
+    ``75 5th Avenue, NYC, USA`` was parsed as ``Point(75, 5)``,
+    but now it would raise a `ValueError` exception.
+
+*   FIXED: `GoogleV3.timezone` method didn't process errors returned
+    by the API.
+
+
 1.17.0
 ------
 2018-09-13
