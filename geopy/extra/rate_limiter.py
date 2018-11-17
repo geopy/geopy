@@ -12,7 +12,7 @@ def _is_last_gen(count):
     return chain((False for _ in range(count)), [True])
 
 
-class RateLimiter(object):
+class RateLimiter:
     """RateLimiter allows to perform bulk operations while gracefully
     handling error responses and adding delays when needed.
 

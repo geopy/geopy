@@ -10,7 +10,7 @@ def _location_tuple(location):
     return location._address, (location._point[0], location._point[1])
 
 
-class Location(object):
+class Location:
     """
     Contains a parsed geocoder response. Can be iterated over as
     ``(location<String>, (latitude<float>, longitude<Float))``.

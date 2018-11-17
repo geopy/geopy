@@ -83,7 +83,7 @@ def _normalize_coordinates(latitude, longitude, altitude):
     return latitude, longitude, altitude
 
 
-class Point(object):
+class Point:
     """
     A geodetic point with latitude, longitude, and altitude.
 

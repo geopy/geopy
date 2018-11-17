@@ -198,7 +198,7 @@ def _ensure_same_altitude(a, b):
     # it won't give much error.
 
 
-class Distance(object):
+class Distance:
     """
     Base for :class:`.great_circle`, :class:`.vincenty`, and
     :class:`.geodesic`.

@@ -65,7 +65,7 @@ def pretty_dict_format(heading, dict_to_format,
     return '\n'.join(s)
 
 
-class RequestsMonitor(object):
+class RequestsMonitor:
     """RequestsMonitor holds statistics of urllib requests."""
 
     def __init__(self):

@@ -35,7 +35,7 @@ __all__ = (
 _DEFAULT_USER_AGENT = "geopy/%s" % __version__
 
 
-class options(object):
+class options:
     """The `options` object contains default configuration values for
     geocoders, e.g. `timeout` and `User-Agent`.
     Instead of passing a custom value to each geocoder individually, you can
@@ -208,7 +208,7 @@ ERROR_CODE_MAP = {
 }
 
 
-class Geocoder(object):
+class Geocoder:
     """
     Template object for geocoders.
     """

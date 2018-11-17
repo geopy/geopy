@@ -34,7 +34,7 @@ def pipe_sockets(sock1, sock2, timeout):
             sock.close()
 
 
-class Future(object):
+class Future:
     # concurrent.futures.Future docs say that they shouldn't be instantiated
     # directly, so this is a simple implementation which mimics the Future
     # which can safely be instantiated!
