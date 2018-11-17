@@ -2,7 +2,7 @@ import base64
 import warnings
 import xml.etree.ElementTree as ET
 
-from geopy.compat import Request, iteritems, u, urlencode
+from geopy.compat import Request, iteritems, urlencode
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -361,7 +361,6 @@ class IGNFrance(Geocoder):
         def remove_namespace(doc, namespace):
             """Remove namespace in the document in place."""
             ns = '{%s}' % namespace
-            ns = u(ns)
             nsl = len(ns)
             for elem in doc.iter():
                 if elem.tag.startswith(ns):

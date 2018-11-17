@@ -1,6 +1,5 @@
 import unittest
 
-from geopy.compat import u
 from geopy.geocoders import Bing
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
@@ -36,7 +35,7 @@ class BingTestCase(GeocoderTestBase):
 
     def test_unicode_name(self):
         self.geocode_run(
-            {"query": u("\u043c\u043e\u0441\u043a\u0432\u0430")},
+            {"query": "\u043c\u043e\u0441\u043a\u0432\u0430"},
             {"latitude": 55.756, "longitude": 37.615},
         )
 

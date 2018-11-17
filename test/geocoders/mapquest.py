@@ -1,6 +1,5 @@
 import unittest
 
-from geopy.compat import u
 from geopy.geocoders import MapQuest
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
@@ -23,7 +22,7 @@ class MapQuestTestCase(GeocoderTestBase):
 
     def test_unicode_name(self):
         self.geocode_run(
-            {"query": u("\u6545\u5bab")},
+            {"query": "\u6545\u5bab"},
             {"latitude": 25.0968, "longitude": 121.54714},
         )
 

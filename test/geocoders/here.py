@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 import pytest
 
 from geopy import exc
-from geopy.compat import u
 from geopy.geocoders import Here
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
@@ -81,7 +80,7 @@ class BaseHereTestCase(ABC):
     def test_geocode_unicode_name(self):
         # unicode in Japanese for Paris. (POIs not included.)
         self.geocode_run(
-            {"query": u("\u30d1\u30ea")},
+            {"query": "\u30d1\u30ea"},
             {"latitude": 48.85718, "longitude": 2.34141}
         )
 

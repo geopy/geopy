@@ -1,6 +1,5 @@
 import pytest
 
-from geopy.compat import u
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders import DataBC
 from test.geocoders.util import GeocoderTestBase
@@ -26,7 +25,7 @@ class DataBCTestCase(GeocoderTestBase):
 
     def test_unicode_name(self):
         self.geocode_run(
-            {"query": u("Barri\u00e8re")},
+            {"query": "Barri\u00e8re"},
             {"latitude": 51.179, "longitude": -120.123},
         )
 

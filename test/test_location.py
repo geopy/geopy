@@ -1,7 +1,6 @@
 import pickle
 import unittest
 
-from geopy.compat import py3k, u
 from geopy.location import Location
 from geopy.point import Point
 
@@ -103,23 +102,17 @@ class LocationTestCase(unittest.TestCase):
         self.assertNotEqual(loc1, loc2)
 
     def test_location_repr(self):
-        address = u(
+        address = (
             "22, Ksi\u0119dza Paw\u0142a Po\u015bpiecha, "
             "Centrum Po\u0142udnie, Zabrze, wojew\xf3dztwo "
             "\u015bl\u0105skie, 41-800, Polska"
         )
         point = (0.0, 0.0, 0.0)
         loc = Location(address, point)
-        if py3k:
-            self.assertEqual(
-                repr(loc),
-                "Location(%s, %r)" % (address, point)
-            )
-        else:
-            self.assertEqual(
-                repr(loc),
-                "Location((%s, %s, %s))" % point
-            )
+        self.assertEqual(
+            repr(loc),
+            "Location(%s, %r)" % (address, point)
+        )
 
     def test_location_is_picklable(self):
         loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)

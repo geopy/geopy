@@ -14,19 +14,6 @@ if py3k:  # pragma: no cover
 else:  # pragma: no cover
     text_type = unicode  # noqa
 
-# Unicode compatibility, borrowed from 'six'
-if py3k:  # pragma: no cover
-    def u(s):
-        """
-        Convert to Unicode with py3k
-        """
-        return s
-else:  # pragma: no cover
-    def u(s):
-        """
-        Convert to Unicode with unicode escaping
-        """
-        return unicode(s.replace(r'\\', r'\\\\'), 'unicode_escape')  # noqa
 
 if py3k:  # pragma: no cover
     def cmp(a, b):

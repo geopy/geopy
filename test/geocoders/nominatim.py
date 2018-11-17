@@ -5,7 +5,6 @@ from unittest.mock import patch
 import pytest
 
 import geopy.geocoders
-from geopy.compat import u
 from geopy.geocoders import Nominatim
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase
@@ -34,7 +33,7 @@ class BaseNominatimTestCase(ABC):
 
     def test_unicode_name(self):
         self.geocode_run(
-            {"query": u("\u6545\u5bab \u5317\u4eac")},
+            {"query": "\u6545\u5bab \u5317\u4eac"},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
@@ -212,8 +211,10 @@ class BaseNominatimTestCase(ABC):
 
     def test_bounded(self):
         bb = (Point('56.588456', '84.719353'), Point('56.437293', '85.296822'))
-        query = u('\u0441\u0442\u0440\u043e\u0438\u0442\u0435\u043b\u044c '
-                  '\u0442\u043e\u043c\u0441\u043a')
+        query = (
+            '\u0441\u0442\u0440\u043e\u0438\u0442\u0435\u043b\u044c '
+            '\u0442\u043e\u043c\u0441\u043a'
+        )
 
         self.geocode_run(
             {"query": query, "viewbox": bb},
