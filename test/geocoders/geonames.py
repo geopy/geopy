@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 import unittest
 import uuid
 

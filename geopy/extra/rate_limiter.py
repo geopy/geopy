@@ -1,4 +1,3 @@
-# coding: utf-8
 from itertools import chain, count
 from timeit import default_timer
 

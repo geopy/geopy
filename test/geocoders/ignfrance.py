@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 import unittest
 from abc import ABC, abstractmethod
 

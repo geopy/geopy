@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Each geolocation service you might use, such as Google Maps, Bing Maps, or
 Nominatim, has its own class in ``geopy.geocoders`` abstracting the service's
