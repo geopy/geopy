@@ -14,9 +14,6 @@
 
 If you contribute code to geopy, you agree to license your code under the MIT.
 
-geopy runs on both Python 2 and Python 3 on both the CPython and PyPy
-interpreters. You should handle any compatibility in `geopy/compat.py`.
-
 The new code should follow [PEP8](https://pep8.org/) coding style (except
 the line length limit, which is 90) and adhere to the style of 
 the surrounding code.
