@@ -19,7 +19,7 @@ class GoogleV3TestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = GoogleV3(api_key=env.get('GOOGLE_KEY'))
 
-    def timezone_run(self, payload, expected):
+    def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
         self.assertEqual(timezone.pytz_timezone, expected)
 
@@ -208,10 +208,7 @@ class GoogleV3TestCase(GeocoderTestBase):
             )
 
     def test_timezone_datetime(self):
-        """
-        GoogleV3.timezone returns pytz object from datetime
-        """
-        self.timezone_run(
+        self.reverse_timezone_run(
             {"query": self.new_york_point,
              "at_time": datetime.utcfromtimestamp(0)},
             self.america_new_york,
@@ -235,12 +232,9 @@ class GoogleV3TestCase(GeocoderTestBase):
         )
 
     def test_timezone_integer(self):
-        """
-        GoogleV3.timezone returns pytz object from epoch integer
-        """
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
-            self.timezone_run(
+            self.reverse_timezone_run(
                 {"query": self.new_york_point, "at_time": 0},
                 self.america_new_york,
             )
@@ -248,18 +242,12 @@ class GoogleV3TestCase(GeocoderTestBase):
             self.assertLess(0, len(w))
 
     def test_timezone_no_date(self):
-        """
-        GoogleV3.timezone defaults `at_time`
-        """
-        self.timezone_run(
+        self.reverse_timezone_run(
             {"query": self.new_york_point},
             self.america_new_york,
         )
 
     def test_timezone_invalid_at_time(self):
-        """
-        GoogleV3.timezone invalid `at_time`
-        """
         with self.assertRaises(exc.GeocoderQueryError):
             self.geocoder.reverse_timezone(self.new_york_point, "eek")
 
