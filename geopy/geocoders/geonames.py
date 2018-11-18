@@ -11,12 +11,6 @@ from geopy.location import Location
 from geopy.timezone import ensure_pytz_is_installed, from_timezone_name
 from geopy.util import logger
 
-try:
-    from pytz import timezone, UnknownTimeZoneError
-    pytz_available = True
-except ImportError:
-    pytz_available = False
-
 __all__ = ("GeoNames", )
 
 
