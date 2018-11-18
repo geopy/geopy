@@ -96,7 +96,7 @@ class GeoNames(Geocoder):
         self.api_reverse = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
-        self.tz_api = (
+        self.api_tz = (
             "%s://%s%s" % (self.scheme, domain, self.timezone_path)
         )
         self.api_nearby = (
@@ -249,7 +249,7 @@ class GeoNames(Geocoder):
             "username": self.username,
         }
 
-        url = "?".join((self.tz_api, urlencode(params)))
+        url = "?".join((self.api_tz, urlencode(params)))
 
         logger.debug("%s.timezone: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
