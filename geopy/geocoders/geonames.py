@@ -5,9 +5,10 @@ from geopy.exc import (
     ConfigurationError,
     GeocoderInsufficientPrivileges,
     GeocoderServiceError,
-    GeocoderParseError)
+)
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
+from geopy.timezone import ensure_pytz_is_installed, from_timezone_name
 from geopy.util import logger
 
 try:
@@ -98,7 +99,7 @@ class GeoNames(Geocoder):
         self.tz_api = (
             "%s://%s%s" % (self.scheme, domain, self.timezone_path)
         )
-        self.nearby_api = (
+        self.api_nearby = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_nearby_path)
         )
 
@@ -139,7 +140,9 @@ class GeoNames(Geocoder):
             query,
             exactly_one=DEFAULT_SENTINEL,
             timeout=DEFAULT_SENTINEL,
-            find_nearby=False,
+            feature_code=None,
+            lang=None,
+            find_nearby_type='findNearbyPlaceNameJSON',
     ):
         """
         Return an address by location point.
@@ -165,8 +168,16 @@ class GeoNames(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param bool find_nearby: A flag signaling to return the closest
-            toponym for the lat/lng query
+        :param str feature_code: A GeoNames feature code
+
+        :param str lang: language of returned ``name`` element (the pseudo
+            language code 'local' will return it in local language)
+
+        :param str find_nearby_type: A flag to switch between different
+            endpoints. The default value is ``findNearbyPlaceNameJSON`` which
+            was the only option before geopy 1.18 and returns the closest
+            populated place. Another currently implemented option is
+            ``findNearbyJSON`` return the closest toponym for the lat/lng query
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -189,25 +200,34 @@ class GeoNames(Geocoder):
             'lng': lng,
             'username': self.username
         }
-        url = "?".join((self.nearby_api, urlencode(params))) if find_nearby \
-            else "?".join((self.api_reverse, urlencode(params)))
-        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+        if feature_code:
+            params['featureCode'] = feature_code
+
+        if lang:
+            params['lang'] = lang
+        if find_nearby_type == 'findNearbyJSON':
+            if lang:
+                raise ValueError("Not supported argument for this api")
+            url = "?".join((self.api_nearby, urlencode(params)))
+
+        else:
+            if feature_code:
+                raise ValueError("Not supported argument for this api")
+            url = "?".join((self.api_reverse, urlencode(params)))
+
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
             exactly_one
         )
 
-    def timezone(
-        self,
-        location,
-        timeout=DEFAULT_SENTINEL
-    ):
+    def reverse_timezone(self, query, timeout=DEFAULT_SENTINEL):
         """
-        Finds the timezone a `location` was in
-        and returns a pytz timezone object.
+        Find the timezone a point in `query`.
 
-        :param location: The coordinates for which you want a timezone.
-        :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
+        .. versionadded:: 1.18.0
+
+        :param query: The coordinates for which you want a timezone.
+        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
@@ -215,15 +235,11 @@ class GeoNames(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :rtype: pytz timezone. See :func:`pytz.timezone`.
+        :rtype: :class:`geopy.timezone.Timezone`
         """
-        if not pytz_available:
-            raise ImportError(
-                'pytz must be installed in order to locate timezones. '
-                ' Install with `pip install geopy -e ".[timezone]"`.'
-            )
+        ensure_pytz_is_installed()
         try:
-            lat, lng = self._coerce_point_to_string(location).split(',')
+            lat, lng = self._coerce_point_to_string(query).split(',')
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
 
@@ -235,20 +251,13 @@ class GeoNames(Geocoder):
 
         url = "?".join((self.tz_api, urlencode(params)))
 
+        logger.debug("%s.timezone: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
-        try:
-            tz = timezone(response["timezoneId"])
-        except UnknownTimeZoneError:
-            raise GeocoderParseError(
-                "pytz could not parse the timezone identifier (%s) "
-                "returned by the service." % response["timeZoneId"]
-            )
-        except KeyError:
-            raise GeocoderParseError(
-                "geopy could not find a timezone in this response: %s" %
-                response
-            )
-        return tz
+
+        return self._parse_json_timezone(response)
+
+    def _parse_json_timezone(self, response):
+        return from_timezone_name(response["timezoneId"], raw=response)
 
     def _parse_json(self, doc, exactly_one):
         """

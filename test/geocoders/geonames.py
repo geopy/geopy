@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
 import unittest
 
+from pytz import timezone
+
+from geopy import Point
 from geopy.compat import u
 from geopy.geocoders import GeoNames
 from test.geocoders.util import GeocoderTestBase, env
@@ -23,10 +26,17 @@ class GeoNamesTestCaseUnitTest(GeocoderTestBase):
 class GeoNamesTestCase(GeocoderTestBase):
 
     delta = 0.04
+    new_york_point = Point(40.75376406311989, -73.98489005863667)
+    america_new_york = timezone("America/New_York")
 
     @classmethod
     def setUpClass(cls):
         cls.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
+
+    def reverse_timezone_run(self, payload, expected):
+        timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
+        self.assertEqual(timezone.pytz_timezone, expected)
+        return timezone
 
     def test_unicode_name(self):
         self.geocode_run(
@@ -47,4 +57,29 @@ class GeoNamesTestCase(GeocoderTestBase):
         self.reverse_run(
             {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        )
+
+        self.assertRaises(
+            ValueError,
+            self._make_request,
+            self.geocoder.reverse,
+            **{"query": "40.75376406311989, -73.98489005863667",
+               "exactly_one": True,
+               "find_nearby_type": "findNearbyJSON",
+               "lang": 'en'}
+        )
+
+        self.assertRaises(
+            ValueError,
+            self._make_request,
+            self.geocoder.reverse,
+            **{"query": "40.75376406311989, -73.98489005863667",
+               "exactly_one": True,
+               "feature_code": 'ADM1'}
+        )
+
+    def test_reverse_timezone(self):
+        self.reverse_timezone_run(
+            {"query": self.new_york_point},
+            self.america_new_york,
         )
