@@ -1,11 +1,6 @@
-"""
-Base Adresse Nationale
-https://github.com/etalab/adresse.data.gouv.fr
-"""
 import warnings
 
-from geopy.compat import string_compare, urlencode
-from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
+from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -21,9 +16,8 @@ class BANFrance(Geocoder):
 
     """
 
-    # api_path = '/search'
     geocode_path = '/search'
-    reverse_path = '/reverse'    
+    reverse_path = '/reverse'
 
     def __init__(
             self,
@@ -75,7 +69,7 @@ class BANFrance(Geocoder):
             ssl_context=ssl_context,
         )
         self.domain = domain.strip('/')
-        
+
         self.geocode_api = (
             '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
         )
@@ -96,7 +90,7 @@ class BANFrance(Geocoder):
         :param str query: The address or query you wish to geocode.
 
         :param int limit: Defines the maximum number of items in the
-            response structure. If not provided and there are multiple 
+            response structure. If not provided and there are multiple
             results the BAN API will return 5 results by default.
             This will be reset to one if ``exactly_one`` is True.
 
@@ -115,7 +109,7 @@ class BANFrance(Geocoder):
         params = {
             'q': self.format_string % query,
         }
-        
+
         url = "?".join((self.geocode_api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -178,7 +172,6 @@ class BANFrance(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-
     @staticmethod
     def parse_code(feature):
         # TODO make this a private API
@@ -186,7 +179,7 @@ class BANFrance(Geocoder):
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
         placename = feature.get('properties', {}).get('label')
-                    
+
         # placename = place.get('name')
         # state = place.get('adminCode1', None)
         # country = place.get('countryCode', None)
