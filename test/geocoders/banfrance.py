@@ -1,5 +1,3 @@
-# coding: utf8
-
 from abc import ABCMeta, abstractmethod
 
 from six import with_metaclass
@@ -37,13 +35,13 @@ class BaseBANFranceTestCase(with_metaclass(ABCMeta, object)):
         BANFrance.reverse simple
         """
         res = self.reverse_run(
-            {"query": '47.229554,-1.541519',
+            {"query": '48.154587,3.221237',
                 "exactly_one": True},
             {},
         )
         self.assertEqual(
             res.address,
-            '7 Avenue Camille Guérin 44000 Nantes'
+            '15 Rue des Fontaines 89100 Collemiers'
         )
 
 
