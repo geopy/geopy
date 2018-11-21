@@ -1,8 +1,9 @@
 # coding: utf8
-from __future__ import unicode_literals
 
 from abc import ABCMeta, abstractmethod
+
 from six import with_metaclass
+
 from geopy.geocoders import banfrance
 from test.geocoders.util import GeocoderTestBase
 

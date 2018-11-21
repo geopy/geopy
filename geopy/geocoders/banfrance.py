@@ -5,6 +5,7 @@ from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
+
 __all__ = ("BANFrance", )
 
 
@@ -179,16 +180,6 @@ class BANFrance(Geocoder):
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
         placename = feature.get('properties', {}).get('label')
-
-        # placename = place.get('name')
-        # state = place.get('adminCode1', None)
-        # country = place.get('countryCode', None)
-
-        # location = ', '.join(
-        #         [x for x in [placename, state, country] if x]
-        #     )
-
-        # return Location(location, (latitude, longitude), place)
 
         return Location(placename, (latitude, longitude), feature)
 
