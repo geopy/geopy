@@ -6,7 +6,7 @@ geopy
     :alt: Latest Version
 
 .. image:: https://img.shields.io/travis/geopy/geopy.svg?style=flat-square
-    :target: https://travis-ci.org/geopy/geopy
+    :target: https://travis-ci.org/sheub/geopy
     :alt: Build Status
 
 .. image:: https://img.shields.io/github/license/geopy/geopy.svg?style=flat-square
