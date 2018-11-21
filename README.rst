@@ -5,7 +5,7 @@ geopy
     :target: https://pypi.python.org/pypi/geopy/
     :alt: Latest Version
 
-.. image:: https://img.shields.io/travis/geopy/geopy.svg?style=flat-square
+.. image:: https://img.shields.io/travis/sheub/geopy.svg?style=flat-square
     :target: https://travis-ci.org/sheub/geopy
     :alt: Build Status
 
