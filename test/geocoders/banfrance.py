@@ -21,7 +21,7 @@ class BaseBANFranceTestCase(with_metaclass(ABCMeta, object)):
 
     def test_geocode_with_address(self):
         """
-        BANFrance.geocode Address
+        banfrance.geocode Address
         """
         self.geocode_run(
             {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER"},
@@ -32,7 +32,7 @@ class BaseBANFranceTestCase(with_metaclass(ABCMeta, object)):
 
     def test_reverse(self):
         """
-        BANFrance.reverse simple
+        banfrance.reverse simple
         """
         res = self.reverse_run(
             {"query": '48.154587,3.221237',

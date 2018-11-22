@@ -100,6 +100,14 @@ Baidu
 
    .. automethod:: __init__
 
+BANFrance
+-----
+
+.. autoclass:: geopy.geocoders.BANFrance
+   :members:
+
+   .. automethod:: __init__
+
 Bing
 ----
 
