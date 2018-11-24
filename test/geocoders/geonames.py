@@ -19,10 +19,10 @@ class GeoNamesTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-@unittest.skipUnless(
-    bool(env.get('GEONAMES_USERNAME')),
-    "No GEONAMES_USERNAME env variable set"
-)
+# @unittest.skipUnless(
+#     bool(env.get('GEONAMES_USERNAME')),
+#     "No GEONAMES_USERNAME env variable set"
+# )
 class GeoNamesTestCase(GeocoderTestBase):
 
     delta = 0.04
@@ -31,7 +31,7 @@ class GeoNamesTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
+        cls.geocoder = GeoNames(username='svalee')
 
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
@@ -55,19 +55,61 @@ class GeoNamesTestCase(GeocoderTestBase):
 
     def test_reverse(self):
         self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+            {
+                "query": "40.75376406311989, -73.98489005863667",
+                "exactly_one": True,
+            },
+            {
+                "latitude": 40.75376406311989,
+                "longitude": -73.98489005863667,
+                "address": "Times Square, NY, US",
+            },
         )
 
-        self.assertRaises(
-            ValueError,
-            self._make_request,
-            self.geocoder.reverse,
-            **{"query": "40.75376406311989, -73.98489005863667",
-               "exactly_one": True,
-               "find_nearby_type": "findNearbyJSON",
-               "lang": 'en'}
+        self.reverse_run(
+            {
+                "query": "40.75376406311989, -73.98489005863667",
+                "exactly_one": True,
+                "find_nearby_type": 'findNearbyJSON',
+            },
+            {
+                "latitude": 40.75376406311989,
+                "longitude": -73.98489005863667,
+                "address": "Bryant Park Studios, NY, US",
+            },
         )
+
+        self.reverse_run(
+            {
+                "query": "40.75376406311989, -73.98489005863667",
+                "exactly_one": True,
+                "find_nearby_type": 'findNearbyJSON',
+                "feature_code": "ADM1"
+            },
+            {
+                "latitude": 40.16706,
+                "longitude": -74.49987,
+            },
+        )
+
+        loc = self._make_request(
+                self.geocoder.reverse,
+                **{
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "lang": 'ru'
+                }
+            )
+        self.assertEqual(loc.raw['adminName1'], 'Нью-Йорк')
+
+        with self.assertRaises(ValueError):
+            self._make_request(
+                self.geocoder.reverse,
+                **{"query": "40.75376406311989, -73.98489005863667",
+                   "exactly_one": True,
+                   "find_nearby_type": "findNearbyJSON",
+                   "lang": 'en'}
+            )
 
         self.assertRaises(
             ValueError,

@@ -5,6 +5,7 @@ from geopy.exc import (
     ConfigurationError,
     GeocoderInsufficientPrivileges,
     GeocoderServiceError,
+    GeocoderQueryError,
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -26,8 +27,8 @@ class GeoNames(Geocoder):
 
     geocode_path = '/searchJSON'
     reverse_path = '/findNearbyPlaceNameJSON'
-    timezone_path = '/timezoneJSON'
     reverse_nearby_path = '/findNearbyJSON'
+    timezone_path = '/timezoneJSON'
 
     def __init__(
             self,
@@ -90,10 +91,10 @@ class GeoNames(Geocoder):
         self.api_reverse = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
-        self.api_tz = (
+        self.api_timezone = (
             "%s://%s%s" % (self.scheme, domain, self.timezone_path)
         )
-        self.api_nearby = (
+        self.api_reverse_nearby = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_nearby_path)
         )
 
@@ -163,9 +164,12 @@ class GeoNames(Geocoder):
             only, the value set during the geocoder's initialization.
 
         :param str feature_code: A GeoNames feature code
+            .. versionadded:: 1.18.0
 
         :param str lang: language of returned ``name`` element (the pseudo
             language code 'local' will return it in local language)
+            Full list of supported languages ISO639-2 can be found here:
+            http://www.loc.gov/standards/iso639-2/php/English_list.php
 
         :param str find_nearby_type: A flag to switch between different
             endpoints. The default value is ``findNearbyPlaceNameJSON`` which
@@ -202,12 +206,15 @@ class GeoNames(Geocoder):
         if find_nearby_type == 'findNearbyJSON':
             if lang:
                 raise ValueError("Not supported argument for this api")
-            url = "?".join((self.api_nearby, urlencode(params)))
-
-        else:
+            url = "?".join((self.api_reverse_nearby, urlencode(params)))
+        elif find_nearby_type == 'findNearbyPlaceNameJSON':
             if feature_code:
                 raise ValueError("Not supported argument for this api")
             url = "?".join((self.api_reverse, urlencode(params)))
+        else:
+            raise GeocoderQueryError(
+                '%s type is not supported by geopy yet' % find_nearby_type
+            )
 
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -243,7 +250,7 @@ class GeoNames(Geocoder):
             "username": self.username,
         }
 
-        url = "?".join((self.api_tz, urlencode(params)))
+        url = "?".join((self.api_timezone, urlencode(params)))
 
         logger.debug("%s.timezone: %s", self.__class__.__name__, url)
         response = self._call_geocoder(url, timeout=timeout)
