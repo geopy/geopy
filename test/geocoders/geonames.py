@@ -19,10 +19,10 @@ class GeoNamesTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-# @unittest.skipUnless(
-#     bool(env.get('GEONAMES_USERNAME')),
-#     "No GEONAMES_USERNAME env variable set"
-# )
+@unittest.skipUnless(
+    bool(env.get('GEONAMES_USERNAME')),
+    "No GEONAMES_USERNAME env variable set"
+)
 class GeoNamesTestCase(GeocoderTestBase):
 
     delta = 0.04
@@ -31,7 +31,7 @@ class GeoNamesTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = GeoNames(username='svalee')
+        cls.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
 
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
