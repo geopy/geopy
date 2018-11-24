@@ -4,8 +4,8 @@ from geopy.compat import urlencode
 from geopy.exc import (
     ConfigurationError,
     GeocoderInsufficientPrivileges,
-    GeocoderServiceError,
     GeocoderQueryError,
+    GeocoderServiceError,
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
