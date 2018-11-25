@@ -169,7 +169,7 @@ class GeoNames(Geocoder):
         :param str lang: language of returned ``name`` element (the pseudo
             language code 'local' will return it in local language)
             Full list of supported languages ISO639-2 can be found here:
-            http://www.loc.gov/standards/iso639-2/php/English_list.php
+            https://www.geonames.org/countries/
 
         :param str find_nearby_type: A flag to switch between different
             endpoints. The default value is ``findNearbyPlaceNameJSON`` which

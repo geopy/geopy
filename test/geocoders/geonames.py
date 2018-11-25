@@ -66,6 +66,38 @@ class GeoNamesTestCase(GeocoderTestBase):
             },
         )
 
+        with self.assertRaises(ValueError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "feature_code": 'ADM1'
+                },
+                {},
+            )
+
+        loc = self._make_request(
+                self.geocoder.reverse,
+                **{
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "lang": 'ru'
+                }
+            )
+        self.assertEqual(loc.raw['adminName1'], 'Нью-Йорк')
+
+    def test_find_nearby_json(self):
+        with self.assertRaises(ValueError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "find_nearby_type": 'findNearbyJSON',
+                    "lang": 'en',
+                },
+                {},
+            )
+
         self.reverse_run(
             {
                 "query": "40.75376406311989, -73.98489005863667",
@@ -90,34 +122,6 @@ class GeoNamesTestCase(GeocoderTestBase):
                 "latitude": 40.16706,
                 "longitude": -74.49987,
             },
-        )
-
-        loc = self._make_request(
-                self.geocoder.reverse,
-                **{
-                    "query": "40.75376406311989, -73.98489005863667",
-                    "exactly_one": True,
-                    "lang": 'ru'
-                }
-            )
-        self.assertEqual(loc.raw['adminName1'], 'Нью-Йорк')
-
-        with self.assertRaises(ValueError):
-            self._make_request(
-                self.geocoder.reverse,
-                **{"query": "40.75376406311989, -73.98489005863667",
-                   "exactly_one": True,
-                   "find_nearby_type": "findNearbyJSON",
-                   "lang": 'en'}
-            )
-
-        self.assertRaises(
-            ValueError,
-            self._make_request,
-            self.geocoder.reverse,
-            **{"query": "40.75376406311989, -73.98489005863667",
-               "exactly_one": True,
-               "feature_code": 'ADM1'}
         )
 
     def test_reverse_timezone(self):
