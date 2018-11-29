@@ -1,5 +1,3 @@
-import warnings
-
 from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -46,18 +44,12 @@ class BANFrance(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
 
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
 
         """
         super(BANFrance, self).__init__(
@@ -80,7 +72,7 @@ class BANFrance(Geocoder):
     def geocode(
             self,
             query,
-            limit=None,
+            limit=5,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
@@ -106,8 +98,10 @@ class BANFrance(Geocoder):
             ``exactly_one=False``.
 
         """
+
         params = {
             'q': self.format_string % query,
+            'limit': limit
         }
 
         url = "?".join((self.geocode_api, urlencode(params)))
@@ -120,7 +114,7 @@ class BANFrance(Geocoder):
     def reverse(
             self,
             query,
-            exactly_one=DEFAULT_SENTINEL,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
         """
@@ -134,12 +128,6 @@ class BANFrance(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -149,13 +137,6 @@ class BANFrance(Geocoder):
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         try:
             lat, lng = self._coerce_point_to_string(query).split(',')
@@ -173,8 +154,7 @@ class BANFrance(Geocoder):
         )
 
     @staticmethod
-    def parse_code(feature):
-        # TODO make this a private API
+    def _parse_code(feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -182,13 +162,14 @@ class BANFrance(Geocoder):
 
         return Location(placename, (latitude, longitude), feature)
 
+    @classmethod
     def _parse_json(self, response, exactly_one):
-        if response is None:
+        if response is None or 'features' not in response:
             return None
         features = response['features']
         if not len(features):
             return None
         if exactly_one:
-            return self.parse_code(features[0])
+            return self._parse_code(features[0])
         else:
-            return [self.parse_code(feature) for feature in features]
+            return [self._parse_code(feature) for feature in features]
