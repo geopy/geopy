@@ -12,6 +12,7 @@ class BANFrance(Geocoder):
     Documentation at:
         https://adresse.data.gouv.fr/api
 
+    .. versionadded:: 1.18.0
     """
 
     geocode_path = '/search'
@@ -20,17 +21,20 @@ class BANFrance(Geocoder):
     def __init__(
             self,
             domain='api-adresse.data.gouv.fr',
+            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
 
         :param str domain: Currently it is ``'api-adresse.data.gouv.fr'``, can
             be changed for testing purposes.
+
+        :param str format_string:
+            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -43,9 +47,6 @@ class BANFrance(Geocoder):
 
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
@@ -72,7 +73,7 @@ class BANFrance(Geocoder):
     def geocode(
             self,
             query,
-            limit=5,
+            limit=None,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
@@ -101,8 +102,10 @@ class BANFrance(Geocoder):
 
         params = {
             'q': self.format_string % query,
-            'limit': limit
         }
+
+        if limit is not None:
+            params['limit'] = limit
 
         url = "?".join((self.geocode_api, urlencode(params)))
 
@@ -142,9 +145,10 @@ class BANFrance(Geocoder):
             lat, lng = self._coerce_point_to_string(query).split(',')
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
+
         params = {
             'lat': lat,
-            'lng': lng
+            'lng': lng,
         }
 
         url = "?".join((self.reverse_api, urlencode(params)))
@@ -154,7 +158,7 @@ class BANFrance(Geocoder):
         )
 
     @staticmethod
-    def _parse_code(feature):
+    def _parse_feature(feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -170,6 +174,6 @@ class BANFrance(Geocoder):
         if not len(features):
             return None
         if exactly_one:
-            return self._parse_code(features[0])
+            return self._parse_feature(features[0])
         else:
-            return [self._parse_code(feature) for feature in features]
+            return [self._parse_feature(feature) for feature in features]
