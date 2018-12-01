@@ -92,6 +92,7 @@ __all__ = (
     "ArcGIS",
     "AzureMaps",
     "Baidu",
+    "BANFrance",
     "Bing",
     "DataBC",
     "GeocodeEarth",
@@ -119,6 +120,7 @@ from geopy.exc import GeocoderNotFound
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu
+from geopy.geocoders.banfrance import BANFrance
 from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
@@ -145,6 +147,7 @@ SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
     "azure": AzureMaps,
     "baidu": Baidu,
+    "banfrance": BANFrance,
     "bing": Bing,
     "databc": DataBC,
     "geocodeearth": GeocodeEarth,
