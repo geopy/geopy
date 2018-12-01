@@ -144,9 +144,7 @@ A checklist for adding a new geocoder:
     ([Building docs](#building-docs) section above) to make sure that you've
     done them right!
 
-7.  Almost done! The last step: add the service name and a homepage link to
-    the `README.rst` file.
-
+That's all!
 
 ### Improving a geocoder
 
