@@ -96,7 +96,7 @@ class GeoNamesTestCase(GeocoderTestBase):
             },
             {},
         )
-        self.assertIn('Берлин, Германия', location.address)
+        self.assertIn(u'Берлин, Германия', location.address)
 
     def test_reverse_find_nearby_raises_for_lang(self):
         with self.assertRaises(ValueError):
