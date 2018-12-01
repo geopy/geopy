@@ -287,8 +287,8 @@ class GeoNames(Geocoder):
                 return None
 
             placename = place.get('name')
-            state = place.get('adminCode1', None)
-            country = place.get('countryCode', None)
+            state = place.get('adminName1', None)
+            country = place.get('countryName', None)
 
             location = ', '.join(
                 [x for x in [placename, state, country] if x]
