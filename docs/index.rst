@@ -101,7 +101,7 @@ Baidu
    .. automethod:: __init__
 
 BANFrance
------
+---------
 
 .. autoclass:: geopy.geocoders.BANFrance
    :members:
