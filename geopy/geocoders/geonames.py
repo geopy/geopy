@@ -39,6 +39,7 @@ class GeoNames(Geocoder):
             user_agent=None,
             format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            scheme='http',
     ):
         """
         :param str country_bias:
@@ -67,10 +68,20 @@ class GeoNames(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
             .. versionadded:: 1.14.0
+
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`. Note that
+            at the time of writing GeoNames doesn't support `https`, so
+            the default scheme is `http`. The value of
+            :attr:`geopy.geocoders.options.default_scheme` is not respected.
+            This parameter is present to make it possible to switch to
+            `https` once GeoNames adds support for it.
+
+            .. versionadded:: 1.18.0
         """
         super(GeoNames, self).__init__(
             format_string=format_string,
-            scheme='http',
+            scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
