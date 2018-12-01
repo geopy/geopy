@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 import unittest
 
-from pytz import timezone
+import pytz
 
 from geopy import Point
 from geopy.compat import u
+from geopy.exc import GeocoderQueryError
 from geopy.geocoders import GeoNames
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -26,8 +27,6 @@ class GeoNamesTestCaseUnitTest(GeocoderTestBase):
 class GeoNamesTestCase(GeocoderTestBase):
 
     delta = 0.04
-    new_york_point = Point(40.75376406311989, -73.98489005863667)
-    america_new_york = timezone("America/New_York")
 
     @classmethod
     def setUpClass(cls):
@@ -54,7 +53,7 @@ class GeoNamesTestCase(GeocoderTestBase):
         self.assertIn(u("Ry\u016b\u014d"), location.address)
 
     def test_reverse(self):
-        self.reverse_run(
+        location = self.reverse_run(
             {
                 "query": "40.75376406311989, -73.98489005863667",
                 "exactly_one": True,
@@ -62,61 +61,76 @@ class GeoNamesTestCase(GeocoderTestBase):
             {
                 "latitude": 40.75376406311989,
                 "longitude": -73.98489005863667,
-                "address": "Times Square, NY, US",
             },
         )
+        self.assertIn("Times Square", location.address)
 
+    def test_reverse_nearby_place_name_raises_for_feature_code(self):
         with self.assertRaises(ValueError):
             self.reverse_run(
                 {
                     "query": "40.75376406311989, -73.98489005863667",
                     "exactly_one": True,
-                    "feature_code": 'ADM1'
+                    "feature_code": "ADM1",
                 },
                 {},
             )
 
-        loc = self._make_request(
-                self.geocoder.reverse,
-                **{
-                    "query": "40.75376406311989, -73.98489005863667",
-                    "exactly_one": True,
-                    "lang": 'ru'
-                }
-            )
-        self.assertEqual(loc.raw['adminName1'], 'Нью-Йорк')
-
-    def test_find_nearby_json(self):
         with self.assertRaises(ValueError):
             self.reverse_run(
                 {
                     "query": "40.75376406311989, -73.98489005863667",
                     "exactly_one": True,
-                    "find_nearby_type": 'findNearbyJSON',
+                    "feature_code": "ADM1",
+                    "find_nearby_type": "findNearbyPlaceName",
+                },
+                {},
+            )
+
+    def test_reverse_nearby_place_name_lang(self):
+        location = self.reverse_run(
+            {
+                "query": "52.50, 13.41",
+                "exactly_one": True,
+                "lang": 'ru',
+            },
+            {},
+        )
+        self.assertIn('Берлин, Германия', location.address)
+
+    def test_reverse_find_nearby_raises_for_lang(self):
+        with self.assertRaises(ValueError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "find_nearby_type": 'findNearby',
                     "lang": 'en',
                 },
                 {},
             )
 
-        self.reverse_run(
+    def test_reverse_find_nearby(self):
+        location = self.reverse_run(
             {
                 "query": "40.75376406311989, -73.98489005863667",
                 "exactly_one": True,
-                "find_nearby_type": 'findNearbyJSON',
+                "find_nearby_type": 'findNearby',
             },
             {
                 "latitude": 40.75376406311989,
                 "longitude": -73.98489005863667,
-                "address": "Bryant Park Studios, NY, US",
             },
         )
+        self.assertIn("New York, United States", location.address)
 
+    def test_reverse_find_nearby_feature_code(self):
         self.reverse_run(
             {
                 "query": "40.75376406311989, -73.98489005863667",
                 "exactly_one": True,
-                "find_nearby_type": 'findNearbyJSON',
-                "feature_code": "ADM1"
+                "find_nearby_type": 'findNearby',
+                "feature_code": "ADM1",
             },
             {
                 "latitude": 40.16706,
@@ -124,8 +138,23 @@ class GeoNamesTestCase(GeocoderTestBase):
             },
         )
 
+    def test_reverse_raises_for_unknown_find_nearby_type(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "find_nearby_type": "findSomethingNonExisting",
+                },
+                {},
+            )
+
     def test_reverse_timezone(self):
-        self.reverse_timezone_run(
-            {"query": self.new_york_point},
-            self.america_new_york,
+        new_york_point = Point(40.75376406311989, -73.98489005863667)
+        america_new_york = pytz.timezone("America/New_York")
+
+        timezone = self.reverse_timezone_run(
+            {"query": new_york_point},
+            america_new_york,
         )
+        self.assertEqual(timezone.raw['countryCode'], 'US')

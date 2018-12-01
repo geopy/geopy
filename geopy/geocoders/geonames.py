@@ -91,11 +91,11 @@ class GeoNames(Geocoder):
         self.api_reverse = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
-        self.api_timezone = (
-            "%s://%s%s" % (self.scheme, domain, self.timezone_path)
-        )
         self.api_reverse_nearby = (
             "%s://%s%s" % (self.scheme, domain, self.reverse_nearby_path)
+        )
+        self.api_timezone = (
+            "%s://%s%s" % (self.scheme, domain, self.timezone_path)
         )
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
@@ -137,7 +137,7 @@ class GeoNames(Geocoder):
             timeout=DEFAULT_SENTINEL,
             feature_code=None,
             lang=None,
-            find_nearby_type='findNearbyPlaceNameJSON',
+            find_nearby_type='findNearbyPlaceName',
     ):
         """
         Return an address by location point.
@@ -164,18 +164,23 @@ class GeoNames(Geocoder):
             only, the value set during the geocoder's initialization.
 
         :param str feature_code: A GeoNames feature code
+
             .. versionadded:: 1.18.0
 
-        :param str lang: language of returned ``name`` element (the pseudo
+        :param str lang: language of the returned ``name`` element (the pseudo
             language code 'local' will return it in local language)
-            Full list of supported languages ISO639-2 can be found here:
+            Full list of supported languages can be found here:
             https://www.geonames.org/countries/
 
+            .. versionadded:: 1.18.0
+
         :param str find_nearby_type: A flag to switch between different
-            endpoints. The default value is ``findNearbyPlaceNameJSON`` which
-            was the only option before geopy 1.18 and returns the closest
-            populated place. Another currently implemented option is
-            ``findNearbyJSON`` return the closest toponym for the lat/lng query
+            GeoNames API endpoints. The default value is ``findNearbyPlaceName``
+            which returns the closest populated place. Another currently
+            implemented option is ``findNearby`` which returns
+            the closest toponym for the lat/lng query.
+
+            .. versionadded:: 1.18.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -193,27 +198,33 @@ class GeoNames(Geocoder):
             lat, lng = self._coerce_point_to_string(query).split(',')
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
-        params = {
-            'lat': lat,
-            'lng': lng,
-            'username': self.username
-        }
-        if feature_code:
-            params['featureCode'] = feature_code
 
-        if lang:
-            params['lang'] = lang
-        if find_nearby_type == 'findNearbyJSON':
-            if lang:
-                raise ValueError("Not supported argument for this api")
-            url = "?".join((self.api_reverse_nearby, urlencode(params)))
-        elif find_nearby_type == 'findNearbyPlaceNameJSON':
+        if find_nearby_type == 'findNearbyPlaceName':  # default
             if feature_code:
-                raise ValueError("Not supported argument for this api")
+                raise ValueError(
+                    "find_nearby_type=findNearbyPlaceName doesn't support "
+                    "the `feature_code` param"
+                )
+            params = self._reverse_find_nearby_place_name_params(
+                lat=lat,
+                lng=lng,
+                lang=lang,
+            )
             url = "?".join((self.api_reverse, urlencode(params)))
+        elif find_nearby_type == 'findNearby':
+            if lang:
+                raise ValueError(
+                    "find_nearby_type=findNearby doesn't support the `lang` param"
+                )
+            params = self._reverse_find_nearby_params(
+                lat=lat,
+                lng=lng,
+                feature_code=feature_code,
+            )
+            url = "?".join((self.api_reverse_nearby, urlencode(params)))
         else:
             raise GeocoderQueryError(
-                '%s type is not supported by geopy yet' % find_nearby_type
+                '`%s` find_nearby_type is not supported by geopy' % find_nearby_type
             )
 
         return self._parse_json(
@@ -221,9 +232,29 @@ class GeoNames(Geocoder):
             exactly_one
         )
 
+    def _reverse_find_nearby_params(self, lat, lng, feature_code):
+        params = {
+            'lat': lat,
+            'lng': lng,
+            'username': self.username,
+        }
+        if feature_code:
+            params['featureCode'] = feature_code
+        return params
+
+    def _reverse_find_nearby_place_name_params(self, lat, lng, lang):
+        params = {
+            'lat': lat,
+            'lng': lng,
+            'username': self.username,
+        }
+        if lang:
+            params['lang'] = lang
+        return params
+
     def reverse_timezone(self, query, timeout=DEFAULT_SENTINEL):
         """
-        Find the timezone a point in `query`.
+        Find the timezone for a point in `query`.
 
         .. versionadded:: 1.18.0
 
@@ -239,6 +270,7 @@ class GeoNames(Geocoder):
         :rtype: :class:`geopy.timezone.Timezone`
         """
         ensure_pytz_is_installed()
+
         try:
             lat, lng = self._coerce_point_to_string(query).split(',')
         except ValueError:
