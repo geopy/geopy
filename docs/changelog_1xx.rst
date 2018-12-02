@@ -4,7 +4,7 @@ Changelog
 =========
 1.18.0
 ------
-2018-12-TBD
+2018-12-02
 
 The work on geopy 2.0 has started, see the new `geopy 2.0` doc section
 for more info. geopy 2.0 will drop support for Python 2.7 and 3.4.
