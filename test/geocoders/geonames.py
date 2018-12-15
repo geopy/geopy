@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
 import unittest
+import uuid
 
 import pytz
 
 from geopy import Point
 from geopy.compat import u
-from geopy.exc import GeocoderQueryError
+from geopy.exc import GeocoderAuthenticationFailure, GeocoderQueryError
 from geopy.geocoders import GeoNames
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -64,6 +65,13 @@ class GeoNamesTestCase(GeocoderTestBase):
             },
         )
         self.assertIn("Times Square", location.address)
+
+    def test_geocode_empty_response(self):
+        self.geocode_run(
+            {"query": "sdlahaslkhdkasldhkjsahdlkash"},
+            {},
+            expect_failure=True,
+        )
 
     def test_reverse_nearby_place_name_raises_for_feature_code(self):
         with self.assertRaises(ValueError):
@@ -158,3 +166,30 @@ class GeoNamesTestCase(GeocoderTestBase):
             america_new_york,
         )
         self.assertEqual(timezone.raw['countryCode'], 'US')
+
+
+class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = GeoNames(username="geopy-not-existing-%s" % uuid.uuid4())
+
+    def reverse_timezone_run(self, payload, expected):
+        timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
+        self.assertEqual(timezone.pytz_timezone, expected)
+        return timezone
+
+    def test_geocode(self):
+        with self.assertRaises(GeocoderAuthenticationFailure):
+            self.geocode_run(
+                {"query": "moscow"},
+                {},
+                expect_failure=True,
+            )
+
+    def test_reverse_timezone(self):
+        with self.assertRaises(GeocoderAuthenticationFailure):
+            self.reverse_timezone_run(
+                {"query": "40.6997716, -73.9753359"},
+                None,
+            )
