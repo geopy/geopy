@@ -35,7 +35,10 @@ class GeoNamesTestCase(GeocoderTestBase):
 
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
-        self.assertEqual(timezone.pytz_timezone, expected)
+        if expected is None:
+            self.assertIsNone(timezone)
+        else:
+            self.assertEqual(timezone.pytz_timezone, expected)
         return timezone
 
     def test_unicode_name(self):
@@ -167,6 +170,19 @@ class GeoNamesTestCase(GeocoderTestBase):
         )
         self.assertEqual(timezone.raw['countryCode'], 'US')
 
+    def test_reverse_timezone_unknown(self):
+        self.reverse_timezone_run(
+            # Geonames doesn't return `timezoneId` for Antarctica,
+            # but it provides GMT offset which can be used
+            # to create a FixedOffset pytz timezone.
+            {"query": "89.0, 1.0"},
+            pytz.UTC,
+        )
+        self.reverse_timezone_run(
+            {"query": "89.0, 80.0"},
+            pytz.FixedOffset(5 * 60),
+        )
+
 
 class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
 
@@ -176,7 +192,10 @@ class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
 
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
-        self.assertEqual(timezone.pytz_timezone, expected)
+        if expected is None:
+            self.assertIsNone(timezone)
+        else:
+            self.assertEqual(timezone.pytz_timezone, expected)
         return timezone
 
     def test_geocode(self):

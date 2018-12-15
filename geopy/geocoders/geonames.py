@@ -11,7 +11,11 @@ from geopy.exc import (
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.timezone import ensure_pytz_is_installed, from_timezone_name
+from geopy.timezone import (
+    ensure_pytz_is_installed,
+    from_fixed_gmt_offset,
+    from_timezone_name,
+)
 from geopy.util import logger
 
 __all__ = ("GeoNames", )
@@ -270,6 +274,10 @@ class GeoNames(Geocoder):
         """
         Find the timezone for a point in `query`.
 
+        GeoNames always returns a timezone: if the point being queried
+        doesn't have an assigned Olson timezone id, a ``pytz.FixedOffset``
+        timezone is used to produce the :class:`geopy.timezone.Timezone`.
+
         .. versionadded:: 1.18.0
 
         :param query: The coordinates for which you want a timezone.
@@ -319,7 +327,17 @@ class GeoNames(Geocoder):
 
     def _parse_json_timezone(self, response):
         self._raise_for_error(response)
-        return from_timezone_name(response["timezoneId"], raw=response)
+
+        timezone_id = response.get("timezoneId")
+        if timezone_id is None:
+            # Sometimes (e.g. for Antarctica) GeoNames doesn't return
+            # a `timezoneId` value, but it returns GMT offsets.
+            # Apparently GeoNames always returns these offsets -- for
+            # every single point on the globe.
+            raw_offset = response["rawOffset"]
+            return from_fixed_gmt_offset(raw_offset, raw=response)
+        else:
+            return from_timezone_name(timezone_id, raw=response)
 
     def _parse_json(self, doc, exactly_one):
         """
