@@ -329,6 +329,11 @@ class GoogleV3(Geocoder):
            Use :meth:`GoogleV3.reverse_timezone` instead. This method
            will be removed in geopy 2.0.
 
+        .. versionchanged:: 1.18.1
+           Previously a :class:`KeyError` was raised for a point without
+           an assigned Olson timezone id (e.g. for Antarctica).
+           Now this method returns None for such requests.
+
         :param location: The coordinates for which you want a timezone.
         :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
             longitude), or string as "%(latitude)s, %(longitude)s"
@@ -350,7 +355,7 @@ class GoogleV3(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :rtype: pytz timezone. See :func:`pytz.timezone`.
+        :rtype: ``None`` or pytz timezone. See :func:`pytz.timezone`.
         """
 
         warnings.warn('%(cls)s.timezone method is deprecated in favor of '
@@ -359,13 +364,21 @@ class GoogleV3(Geocoder):
                       'instead of just pytz timezone. This method will '
                       'be removed in geopy 2.0.' % dict(cls=type(self).__name__),
                       DeprecationWarning, stacklevel=2)
-        return self.reverse_timezone(location, at_time, timeout).pytz_timezone
+        timezone = self.reverse_timezone(location, at_time, timeout)
+        if timezone is None:
+            return None
+        return timezone.pytz_timezone
 
     def reverse_timezone(self, query, at_time=None, timeout=DEFAULT_SENTINEL):
         """
         Find the timezone a point in `query` was in for a specified `at_time`.
 
         .. versionadded:: 1.18.0
+
+        .. versionchanged:: 1.18.1
+           Previously a :class:`KeyError` was raised for a point without
+           an assigned Olson timezone id (e.g. for Antarctica).
+           Now this method returns None for such requests.
 
         :param query: The coordinates for which you want a timezone.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
@@ -382,7 +395,7 @@ class GoogleV3(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :rtype: :class:`geopy.timezone.Timezone`
+        :rtype: ``None`` or :class:`geopy.timezone.Timezone`
         """
         ensure_pytz_is_installed()
 
@@ -398,17 +411,24 @@ class GoogleV3(Geocoder):
             params['key'] = self.api_key
         url = "?".join((self.tz_api, urlencode(params)))
 
-        logger.debug("%s.timezone: %s", self.__class__.__name__, url)
-        response = self._call_geocoder(url, timeout=timeout)
+        logger.debug("%s.reverse_timezone: %s", self.__class__.__name__, url)
+        return self._parse_json_timezone(
+            self._call_geocoder(url, timeout=timeout)
+        )
 
+    def _parse_json_timezone(self, response):
         status = response.get('status')
         if status != 'OK':
             self._check_status(status)
 
-        return self._parse_json_timezone(response)
-
-    def _parse_json_timezone(self, response):
-        return from_timezone_name(response["timeZoneId"], raw=response)
+        timezone_id = response.get("timeZoneId")
+        if timezone_id is None:
+            # Google returns `status: ZERO_RESULTS` for uncovered
+            # points (e.g. for Antarctica), so there's nothing
+            # meaningful to be returned as the `raw` response,
+            # hence we return `None`.
+            return None
+        return from_timezone_name(timezone_id, raw=response)
 
     def _normalize_timezone_at_time(self, at_time):
         if at_time is None:

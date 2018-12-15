@@ -21,7 +21,10 @@ class GoogleV3TestCase(GeocoderTestBase):
 
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
-        self.assertEqual(timezone.pytz_timezone, expected)
+        if expected is None:
+            self.assertIsNone(timezone)
+        else:
+            self.assertEqual(timezone.pytz_timezone, expected)
 
         # `timezone` method is deprecated, but we still support it.
         with warnings.catch_warnings(record=True) as w:
@@ -30,7 +33,10 @@ class GoogleV3TestCase(GeocoderTestBase):
                 payload['location'] = payload['query']
                 del payload['query']
             pytz_timezone = self._make_request(self.geocoder.timezone, **payload)
-            self.assertEqual(pytz_timezone, expected)
+            if expected is None:
+                self.assertIsNone(pytz_timezone)
+            else:
+                self.assertEqual(pytz_timezone, expected)
             self.assertLess(0, len(w))
 
         return timezone
@@ -250,6 +256,13 @@ class GoogleV3TestCase(GeocoderTestBase):
     def test_timezone_invalid_at_time(self):
         with self.assertRaises(exc.GeocoderQueryError):
             self.geocoder.reverse_timezone(self.new_york_point, "eek")
+
+    def test_reverse_timezone_unknown(self):
+        self.reverse_timezone_run(
+            # Google doesn't return a timezone for Antarctica.
+            {"query": "89.0, 1.0"},
+            None,
+        )
 
     def test_geocode_bounds(self):
         """
