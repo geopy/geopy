@@ -3,8 +3,10 @@ import warnings
 from geopy.compat import urlencode
 from geopy.exc import (
     ConfigurationError,
+    GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
     GeocoderQueryError,
+    GeocoderQuotaExceeded,
     GeocoderServiceError,
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -238,6 +240,7 @@ class GeoNames(Geocoder):
                 '`%s` find_nearby_type is not supported by geopy' % find_nearby_type
             )
 
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
             exactly_one
@@ -295,12 +298,27 @@ class GeoNames(Geocoder):
 
         url = "?".join((self.api_timezone, urlencode(params)))
 
-        logger.debug("%s.timezone: %s", self.__class__.__name__, url)
-        response = self._call_geocoder(url, timeout=timeout)
+        logger.debug("%s.reverse_timezone: %s", self.__class__.__name__, url)
+        return self._parse_json_timezone(
+            self._call_geocoder(url, timeout=timeout)
+        )
 
-        return self._parse_json_timezone(response)
+    def _raise_for_error(self, body):
+        err = body.get('status')
+        if err:
+            code = err['value']
+            message = err['message']
+            # http://www.geonames.org/export/webservice-exception.html
+            if message.startswith("user account not enabled to use"):
+                raise GeocoderInsufficientPrivileges(message)
+            if code == 10:
+                raise GeocoderAuthenticationFailure(message)
+            if code in (18, 19, 20):
+                raise GeocoderQuotaExceeded(message)
+            raise GeocoderServiceError(message)
 
     def _parse_json_timezone(self, response):
+        self._raise_for_error(response)
         return from_timezone_name(response["timezoneId"], raw=response)
 
     def _parse_json(self, doc, exactly_one):
@@ -308,12 +326,7 @@ class GeoNames(Geocoder):
         Parse JSON response body.
         """
         places = doc.get('geonames', [])
-        err = doc.get('status', None)
-        if err and 'message' in err:
-            if err['message'].startswith("user account not enabled to use"):
-                raise GeocoderInsufficientPrivileges(err['message'])
-            else:
-                raise GeocoderServiceError(err['message'])
+        self._raise_for_error(doc)
         if not len(places):
             return None
 
