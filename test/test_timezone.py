@@ -1,3 +1,4 @@
+import datetime
 import pickle
 import unittest
 
@@ -5,12 +6,13 @@ import pytz
 import pytz.tzinfo
 
 from geopy.compat import u
-from geopy.timezone import Timezone, from_timezone_name
+from geopy.timezone import Timezone, from_fixed_gmt_offset, from_timezone_name
 
 
 class TimezoneTestCase(unittest.TestCase):
 
-    timezone_name = u("Europe/Moscow")
+    timezone_gmt_offset_hours = 3.0
+    timezone_name = u("Europe/Moscow")  # a DST-less timezone
 
     def test_create_from_timezone_name(self):
         raw = dict(foo="bar")
@@ -18,6 +20,19 @@ class TimezoneTestCase(unittest.TestCase):
 
         self.assertEqual(tz.raw['foo'], 'bar')
         self.assertIsInstance(tz.pytz_timezone, pytz.tzinfo.BaseTzInfo)
+        self.assertIsInstance(tz.pytz_timezone, datetime.tzinfo)
+
+    def test_create_from_fixed_gmt_offset(self):
+        raw = dict(foo="bar")
+        tz = from_fixed_gmt_offset(self.timezone_gmt_offset_hours, raw)
+
+        self.assertEqual(tz.raw['foo'], 'bar')
+        # pytz.FixedOffset is not an instanse of pytz.tzinfo.BaseTzInfo.
+        self.assertIsInstance(tz.pytz_timezone, datetime.tzinfo)
+
+        olson_tz = pytz.timezone(self.timezone_name)
+        dt = datetime.datetime.utcnow()
+        self.assertEqual(tz.pytz_timezone.utcoffset(dt), olson_tz.utcoffset(dt))
 
     def test_create_from_pytz_timezone(self):
         pytz_timezone = pytz.timezone(self.timezone_name)

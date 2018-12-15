@@ -8,6 +8,11 @@ except ImportError:
     pytz_available = False
 
 
+__all__ = (
+    "Timezone",
+)
+
+
 def ensure_pytz_is_installed():
     if not pytz_available:
         raise ImportError(
@@ -30,6 +35,12 @@ def from_timezone_name(timezone_name, raw=None):
             "geopy could not find a timezone in this response: %s" %
             raw
         )
+    return Timezone(pytz_timezone, raw)
+
+
+def from_fixed_gmt_offset(gmt_offset_hours, raw=None):
+    ensure_pytz_is_installed()
+    pytz_timezone = pytz.FixedOffset(gmt_offset_hours * 60)
     return Timezone(pytz_timezone, raw)
 
 
