@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import unittest
 
+import pytest
+
 from geopy.exc import GeocoderInsufficientPrivileges
 from geopy.geocoders import Yandex
 from test.geocoders.util import GeocoderTestBase, env
@@ -46,6 +48,9 @@ class YandexTestCase(GeocoderTestBase):
             {"latitude": 48.002104, "longitude": 37.805186},
         )
 
+    @pytest.mark.xfail(
+        reason="Lately Yandex started to return a valid response here sometimes"
+    )
     def test_failure_with_invalid_api_key(self):
         """
         Yandex.geocode with incorrect api_key
