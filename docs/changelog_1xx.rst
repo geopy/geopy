@@ -2,6 +2,24 @@
 
 Changelog
 =========
+1.18.1
+------
+2018-12-16
+
+*   FIXED: `GeoNames.reverse_timezone` didn't process errors returned by API
+    and instead was always raising obscure `KeyError` exceptions.
+
+*   FIXED: `GeoNames.reverse_timezone` raised `KeyError` for points which
+    don't have an assigned Olson timezone ID (e.g. Antarctica).
+    Now a valid `geopy.Timezone` is returned for such, where pytz timezone
+    is created as `pytz.FixedOffset`.
+
+*   FIXED: `GoogleV3.reverse_timezone` raised `KeyError` for points which
+    don't have an assigned Olson timezone ID (e.g. Antarctica).
+    Now `None` is returned for such requests, as Google doesn't provide
+    any meaningful data there.
+
+
 1.18.0
 ------
 2018-12-02
