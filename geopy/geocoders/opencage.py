@@ -116,8 +116,8 @@ class OpenCage(Geocoder):
         :param str country: Provides the geocoder with a hint to the
             country that the query resides in. This value will help the
             geocoder but will not restrict the possible results to the
-            supplied country. The country code is a 3 character code as
-            defined by the ISO 3166-1 Alpha 3 standard.
+            supplied country. The country code is a 2 character code as
+            defined by the ISO 3166-1 Alpha 2 standard.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -153,7 +153,7 @@ class OpenCage(Geocoder):
         if language:
             params['language'] = language
         if country:
-            params['country'] = country
+            params['countrycode'] = country
 
         url = "?".join((self.api, urlencode(params)))
 

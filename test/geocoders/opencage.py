@@ -71,3 +71,10 @@ class OpenCageTestCase(GeocoderTestBase):
                 {"latitude": 46.7323875, "longitude": -117.0001651},
             )
             self.assertEqual(1, len(w))
+
+    def test_country(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "country": 'us'},
+            {"latitude": 46.7323875, "longitude": -117.0001651}
+        )
