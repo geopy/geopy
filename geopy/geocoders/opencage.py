@@ -113,7 +113,7 @@ class OpenCage(Geocoder):
                 This format is now deprecated in favor of a list/tuple
                 of a pair of geopy Points and will be removed in geopy 2.0.
 
-        :param str country:  Restricts the results to the specified country or countries. 
+        :param str country: Restricts the results to the specified country or countries.
             The country code is a 2 character code as defined by the ISO 3166-1 Alpha 2
             standard.
 
