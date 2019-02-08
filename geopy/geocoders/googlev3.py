@@ -103,7 +103,11 @@ class GoogleV3(Geocoder):
         if secret_key and not client_id:
             raise ConfigurationError('Must provide client_id with secret_key.')
 
-        if not api_key:
+        self.premier = bool(client_id and secret_key)
+        self.client_id = client_id
+        self.secret_key = secret_key
+
+        if not self.premier and not api_key:
             warnings.warn(
                 'Since July 2018 Google requires each request to have an API key. '
                 'Pass a valid `api_key` to GoogleV3 geocoder to hide this warning. '
@@ -115,9 +119,6 @@ class GoogleV3(Geocoder):
         self.api_key = api_key
         self.domain = domain.strip('/')
 
-        self.premier = bool(client_id and secret_key)
-        self.client_id = client_id
-        self.secret_key = secret_key
         self.channel = channel
 
         self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
