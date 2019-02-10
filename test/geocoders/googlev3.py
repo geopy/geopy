@@ -62,6 +62,22 @@ class GoogleV3TestCase(GeocoderTestBase):
         with self.assertRaises(exc.ConfigurationError):
             GoogleV3(api_key='mock', secret_key='a')
 
+    def test_warning_with_no_api_key(self):
+        """
+        GoogleV3 warns if no API key is present
+        """
+        with warnings.catch_warnings(record=True) as w:
+            GoogleV3()
+        self.assertEqual(len(w), 1)
+
+    def test_no_warning_with_no_api_key_but_using_premier(self):
+        """
+        GoogleV3 does not warn about the API key if using premier
+        """
+        with warnings.catch_warnings(record=True) as w:
+            GoogleV3(client_id='client_id', secret_key='secret_key')
+        self.assertEqual(len(w), 0)
+
     def test_check_status(self):
         """
         GoogleV3 raises correctly on Google-specific API status flags
