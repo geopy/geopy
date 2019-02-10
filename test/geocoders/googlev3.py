@@ -1,4 +1,5 @@
 import base64
+import unittest
 import warnings
 from datetime import datetime
 
@@ -11,6 +12,10 @@ from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 
+@unittest.skipUnless(
+    bool(env['GOOGLE_KEY']),
+    "No GOOGLE_KEY env variable set"
+)
 class GoogleV3TestCase(GeocoderTestBase):
     new_york_point = Point(40.75376406311989, -73.98489005863667)
     america_new_york = timezone("America/New_York")
