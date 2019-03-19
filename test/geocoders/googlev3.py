@@ -312,3 +312,50 @@ class GoogleV3TestCase(GeocoderTestBase):
                 {"query": "221b Baker St", "bounds": [50, -2, 55]},
                 {"latitude": 51.52, "longitude": -0.15},
             )
+
+    def test_geocode_place_id_invalid(self):
+        self.geocode_run(
+            {"place_id": "ChIJOcfP0Iq2j4ARDrXUa7ZWs34"},
+            {"latitude": 37.22, "longitude": -122.05}
+        )
+
+    def test_geocode_place_id_not_invalid(self):
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocode_run(
+                {"place_id": "xxxxx"},
+                {},
+                expect_failure=True,
+            )
+
+    def test_place_id_zero_result(self):
+        with self.assertRaises(exc.GeocoderQueryError):
+            self.geocode_run(
+                {"place_id": ""},
+                {},
+                expect_failure=True,
+            )
+
+    def test_geocode_place_id_with_query(self):
+        with self.assertRaises(ValueError):
+            self.geocode_run(
+                {"place_id": "ChIJOcfP0Iq2j4ARDrXUa7ZWs34",
+                 "query": "silicon valley"},
+                {}
+            )
+
+    def test_geocode_place_id_with_bounds(self):
+        with self.assertRaises(ValueError):
+            self.geocode_run(
+                {"place_id": "ChIJOcfP0Iq2j4ARDrXUa7ZWs34",
+                 "bounds": [50, -2, 55, 2]},
+                {}
+            )
+
+    def test_geocode_place_id_with_query_and_bounds(self):
+        with self.assertRaises(ValueError):
+            self.geocode_run(
+                {"place_id": "ChIJOcfP0Iq2j4ARDrXUa7ZWs34",
+                 "query": "silicon valley",
+                 "bounds": [50, -2, 55, 2]},
+                {}
+            )
