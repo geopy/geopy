@@ -36,6 +36,7 @@ class Bing(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -78,6 +79,7 @@ class Bing(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             user_location=None,
             timeout=DEFAULT_SENTINEL,
@@ -155,6 +157,7 @@ class Bing(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             culture=None,

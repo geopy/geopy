@@ -20,6 +20,7 @@ class OpenCage(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             domain='api.opencagedata.com',
             scheme=None,
             timeout=DEFAULT_SENTINEL,
@@ -67,6 +68,7 @@ class OpenCage(Geocoder):
     def geocode(
             self,
             query,
+            *,
             bounds=None,
             country=None,
             language=None,
@@ -137,6 +139,7 @@ class OpenCage(Geocoder):
     def reverse(
             self,
             query,
+            *,
             language=None,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,

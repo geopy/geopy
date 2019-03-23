@@ -40,6 +40,7 @@ class Here(Geocoder):
 
     def __init__(
             self,
+            *,
             app_id=None,
             app_code=None,
             apikey=None,
@@ -130,6 +131,7 @@ class Here(Geocoder):
     def geocode(
             self,
             query,
+            *,
             bbox=None,
             mapview=None,
             exactly_one=True,
@@ -237,6 +239,7 @@ class Here(Geocoder):
     def reverse(
             self,
             query,
+            *,
             radius=None,
             exactly_one=True,
             maxresults=None,

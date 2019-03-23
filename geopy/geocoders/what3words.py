@@ -26,6 +26,7 @@ class What3Words(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -71,11 +72,14 @@ class What3Words(Geocoder):
         else:
             return True
 
-    def geocode(self,
-                query,
-                lang='en',
-                exactly_one=True,
-                timeout=DEFAULT_SENTINEL):
+    def geocode(
+            self,
+            query,
+            *,
+            lang='en',
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
+    ):
 
         """
         Return a location point for a `3 words` query. If the `3 words` address
@@ -158,8 +162,14 @@ class What3Words(Geocoder):
         else:
             return [location]
 
-    def reverse(self, query, lang='en', exactly_one=True,
-                timeout=DEFAULT_SENTINEL):
+    def reverse(
+            self,
+            query,
+            *,
+            lang='en',
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
+    ):
         """
         Return a `3 words` address by location point. Each point on surface has
         a `3 words` address, so there's always a non-empty response.

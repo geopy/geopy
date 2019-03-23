@@ -25,6 +25,7 @@ class Yandex(Geocoder):
     def __init__(
             self,
             api_key=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -74,6 +75,7 @@ class Yandex(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             lang=None,
@@ -124,6 +126,7 @@ class Yandex(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             kind=None,

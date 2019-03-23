@@ -22,6 +22,7 @@ class AlgoliaPlaces(Geocoder):
 
     def __init__(
             self,
+            *,
             app_id=None,
             api_key=None,
             domain='places-dsn.algolia.net',
@@ -80,6 +81,7 @@ class AlgoliaPlaces(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             type=None,
@@ -203,6 +205,7 @@ class AlgoliaPlaces(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,

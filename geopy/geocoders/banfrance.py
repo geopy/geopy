@@ -19,6 +19,7 @@ class BANFrance(Geocoder):
 
     def __init__(
             self,
+            *,
             domain='api-adresse.data.gouv.fr',
             scheme=None,
             timeout=DEFAULT_SENTINEL,
@@ -67,6 +68,7 @@ class BANFrance(Geocoder):
     def geocode(
             self,
             query,
+            *,
             limit=None,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
@@ -111,6 +113,7 @@ class BANFrance(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
