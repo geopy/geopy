@@ -368,14 +368,8 @@ class Geocoder:
                          exc_info=True)
             return None
 
-    def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
-        """
-        Implemented in subclasses.
-        """
-        raise NotImplementedError()
+    # def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    #     raise NotImplementedError()
 
-    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
-        """
-        Implemented in subclasses.
-        """
-        raise NotImplementedError()
+    # def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    #     raise NotImplementedError()
