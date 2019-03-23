@@ -1,6 +1,6 @@
 import warnings
 
-from geopy.compat import urlencode
+from geopy.compat import string_compare, urlencode
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -115,7 +115,14 @@ class GeoNames(Geocoder):
             "%s://%s%s" % (self.scheme, domain, self.timezone_path)
         )
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
+            country=None,
+            country_bias=None,
+    ):
         """
         Return a location point by address.
 
@@ -129,17 +136,37 @@ class GeoNames(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param country: Limit records to the specified countries.
+            Two letter country code ISO-3166 (e.g. ``FR``). Might be
+            a single string or a list of strings.
+
+        :type country: str or list
+
+        :param str country_bias: Records from the country_bias are listed first.
+            Two letter country code ISO-3166.
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {
-            'q': self.format_string % query,
-            'username': self.username
-        }
-        if self.country_bias:
-            params['countryBias'] = self.country_bias
+        params = [
+            ('q', self.format_string % query),
+            ('username', self.username),
+        ]
+
+        if country_bias is None:
+            country_bias = self.country_bias
+        if country_bias:
+            params.append(('countryBias', country_bias))
+
+        if not country:
+            country = []
+        if isinstance(country, string_compare):
+            country = [country]
+        for country_item in country:
+            params.append(('country', country_item))
+
         if exactly_one:
-            params['maxRows'] = 1
+            params.append(('maxRows', 1))
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(

@@ -50,7 +50,9 @@ class PickPoint(Nominatim):
                 This format is now deprecated in favor of a list/tuple
                 of a pair of geopy Points and will be removed in geopy 2.0.
 
-        :param string country_bias: Bias results to this country.
+        :param country_bias: Limit search results to a specific country.
+            This param sets a default value for the `geocode`'s ``country_codes``.
+        :type country_bias: str or list
 
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box.

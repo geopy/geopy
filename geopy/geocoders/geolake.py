@@ -1,4 +1,4 @@
-from geopy.compat import urlencode
+from geopy.compat import string_compare, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -100,11 +100,14 @@ class Geolake(Geocoder):
             are one of: `country`, `state`, `city`, `zipcode`, `street`, `address`,
             `houseNumber` or `subNumber`.
 
-         :param str country_codes: Provides the geocoder with a list of country codes
-            that the query may reside in. This value will limit the geocoder to the
-            supplied countries. Te country code is a 2 character code as defined by
-            the ISO-3166-1 alpha-2 standard.
+        :param country_codes: Provides the geocoder with a list
+            of country codes that the query may reside in. This value will
+            limit the geocoder to the supplied countries. The country code
+            is a 2 character code as defined by the ISO-3166-1 alpha-2
+            standard (e.g. ``FR``). Multiple countries can be specified with
+            a Python list.
 
+        :type country_codes: str or list
 
         :param bool exactly_one: Return one result or a list of one result.
 
@@ -132,10 +135,11 @@ class Geolake(Geocoder):
                 'q': self.format_string % query,
             }
 
-        if country_codes is None:
+        if not country_codes:
             country_codes = []
-
-        if len(country_codes):
+        if isinstance(country_codes, string_compare):
+            country_codes = [country_codes]
+        if country_codes:
             params['countryCodes'] = ",".join(country_codes)
 
         url = "?".join((self.api, urlencode(params)))

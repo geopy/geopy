@@ -69,8 +69,14 @@ class MapBoxTestCase(GeocoderTestBase):
             {"latitude": 45.270208, "longitude": -66.050289, "delta": 0.1},
         )
 
-    def test_geocode_country(self):
+    def test_geocode_country_str(self):
         self.geocode_run(
             {"query": "kazan", "country": "TR"},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_geocode_country_list(self):
+        self.geocode_run(
+            {"query": "kazan", "country": ["CN", "TR"]},
             {"latitude": 40.2317, "longitude": 32.6839},
         )

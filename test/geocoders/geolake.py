@@ -29,27 +29,24 @@ class GeolakeTestCase(GeocoderTestBase):
         cls.delta_exact = 0.2
 
     def test_geocode(self):
-        """
-        Geolake.geocode
-        """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890344, "longitude": -87.623234, "address": "Chicago, US"},
         )
 
-    def test_geocode_country_codes(self):
-        """
-        Geolake.geocode
-        """
+    def test_geocode_country_codes_str(self):
         self.geocode_run(
-            {"query": "Toronto", "country_codes": ["US"]},
+            {"query": "Toronto", "country_codes": "US"},
+            {"latitude": 40.46, "longitude": -80.6, "address": "Toronto, US"},
+        )
+
+    def test_geocode_country_codes_list(self):
+        self.geocode_run(
+            {"query": "Toronto", "country_codes": ["CN", "US"]},
             {"latitude": 40.46, "longitude": -80.6, "address": "Toronto, US"},
         )
 
     def test_geocode_structured(self):
-        """
-        Geolake.geocode
-        """
         query = {
             "street": "north michigan ave",
             "houseNumber": "435",

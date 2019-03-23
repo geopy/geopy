@@ -1,6 +1,6 @@
 import warnings
 
-from geopy.compat import urlencode
+from geopy.compat import string_compare, urlencode
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import _DEFAULT_USER_AGENT, DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -84,7 +84,9 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.15.0
 
-        :param str country_bias: Bias results to this country.
+        :param country_bias: Limit search results to a specific country.
+            This param sets a default value for the `geocode`'s ``country_codes``.
+        :type country_bias: str or list
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -172,6 +174,7 @@ class Nominatim(Geocoder):
             language=False,
             geometry=None,
             extratags=False,
+            country_codes=None,
     ):
         """
         Return a location point by address.
@@ -226,6 +229,13 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.17.0
 
+        :param country_codes: Limit search results
+            to a specific country (or a list of countries).
+            A country_code should be the ISO 3166-1alpha2 code,
+            e.g. ``gb`` for the United Kingdom, ``de`` for Germany, etc.
+
+        :type country_codes: str or list
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
 
@@ -274,8 +284,14 @@ class Nominatim(Geocoder):
         if self.bounded:
             params['bounded'] = 1
 
-        if self.country_bias:
-            params['countrycodes'] = self.country_bias
+        if country_codes is None:
+            country_codes = self.country_bias
+        if not country_codes:
+            country_codes = []
+        if isinstance(country_codes, string_compare):
+            country_codes = [country_codes]
+        if country_codes:
+            params['countrycodes'] = ",".join(country_codes)
 
         if addressdetails:
             params['addressdetails'] = 1

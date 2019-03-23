@@ -183,6 +183,24 @@ class GeoNamesTestCase(GeocoderTestBase):
             pytz.FixedOffset(5 * 60),
         )
 
+    def test_country_str(self):
+        self.geocode_run(
+            {"query": "kazan", "country": "TR"},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_country_list(self):
+        self.geocode_run(
+            {"query": "kazan", "country": ["CN", "TR", "JP"]},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_country_bias(self):
+        self.geocode_run(
+            {"query": "kazan", "country_bias": "TR"},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
 
 class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
 
