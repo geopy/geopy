@@ -22,7 +22,7 @@ class PickPoint(Nominatim):
             api_key,
             format_string=None,
             view_box=None,
-            bounded=False,
+            bounded=None,
             country_bias=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -50,12 +50,24 @@ class PickPoint(Nominatim):
                 This format is now deprecated in favor of a list/tuple
                 of a pair of geopy Points and will be removed in geopy 2.0.
 
-        :param country_bias: Limit search results to a specific country.
-            This param sets a default value for the `geocode`'s ``country_codes``.
-        :type country_bias: str or list
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `viewbox` instead.
 
         :param bool bounded: Restrict the results to only items contained
             within the bounding view_box.
+
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `bounded` instead.
+
+        :type country_bias: str or list
+        :param country_bias: Limit search results to a specific country.
+            This param sets a default value for the `geocode`'s ``country_codes``.
+
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `country_codes` instead.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
