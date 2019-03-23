@@ -115,6 +115,7 @@ An attempt to calculate distances between points with different altitudes
 would result in a ``ValueError`` exception.
 
 """
+import abc
 from math import asin, atan2, cos, sin, sqrt
 
 from geographiclib.geodesic import Geodesic
@@ -186,7 +187,7 @@ def _ensure_same_altitude(a, b):
     # it won't give much error.
 
 
-class Distance:
+class Distance(abc.ABC):
 
     def __init__(self, *args, **kwargs):
         kilometers = kwargs.pop('kilometers', 0)
@@ -235,10 +236,8 @@ class Distance:
 
     __bool__ = __nonzero__
 
+    @abc.abstractmethod
     def measure(self, a, b):
-        """
-        Abstract method for measure
-        """
         raise NotImplementedError()
 
     def __repr__(self):  # pragma: no cover
