@@ -91,18 +91,15 @@ class CommonDistanceComputationCases:
         self.assertAlmostEqual(dist_total.kilometers,
                                dist1.km + dist2.km + dist3.km)
 
-    def test_should_warn_when_using_single_numbers_as_points(self):
+    def test_should_raise_when_using_single_numbers_as_points(self):
         # Each argument is expected to be a Point. If it's not a point,
         # it will be wrapped in Point.
         # Point(10) equals to Point(10, 0).
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            dist1 = self.cls(10, 20)
-            self.assertEqual(2, len(w))  # 1 per each point
-            dist2 = self.cls((10, 0), (20, 0))
-            # no warnings: explicit tuples are not that suspicious
-            self.assertEqual(2, len(w))
-        self.assertAlmostEqual(dist1.kilometers, dist2.kilometers)
+        with self.assertRaises(ValueError):
+            self.cls(10, 20)
+
+        # no error: explicit tuples are not that suspicious
+        self.cls((10, 0), (20, 0))
 
     def test_should_tolerate_tuples_with_textual_numbers(self):
         dist1 = self.cls(("1", "30"), ("20", "60"))
