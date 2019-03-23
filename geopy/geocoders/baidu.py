@@ -31,6 +31,7 @@ class Baidu(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -88,6 +89,7 @@ class Baidu(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
@@ -121,7 +123,7 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return an address by location point.
 

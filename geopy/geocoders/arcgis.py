@@ -35,6 +35,7 @@ class ArcGIS(Geocoder):
             self,
             username=None,
             password=None,
+            *,
             referer=None,
             token_lifetime=60,
             scheme=None,
@@ -139,7 +140,7 @@ class ArcGIS(Geocoder):
         )
         return self._base_call_geocoder(request, timeout=timeout)
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
+    def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 out_fields=None):
         """
         Return a location point by address.
@@ -202,7 +203,7 @@ class ArcGIS(Geocoder):
             return geocoded[0]
         return geocoded
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 distance=None):
         """
         Return an address by location point.

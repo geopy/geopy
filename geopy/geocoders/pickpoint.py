@@ -17,6 +17,7 @@ class PickPoint(Nominatim):
     def __init__(
             self,
             api_key,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='api.pickpoint.io',

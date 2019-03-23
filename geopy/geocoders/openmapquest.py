@@ -25,6 +25,7 @@ class OpenMapQuest(Nominatim):
     def __init__(
             self,
             api_key=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='open.mapquestapi.com',

@@ -24,6 +24,7 @@ class Pelias(Geocoder):
             self,
             domain,
             api_key=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -75,6 +76,7 @@ class Pelias(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
@@ -141,6 +143,7 @@ class Pelias(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=None

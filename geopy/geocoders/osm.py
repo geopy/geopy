@@ -51,6 +51,7 @@ class Nominatim(Geocoder):
 
     def __init__(
             self,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain=_DEFAULT_NOMINATIM_DOMAIN,
@@ -126,6 +127,7 @@ class Nominatim(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
@@ -288,6 +290,7 @@ class Nominatim(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=False,

@@ -12,6 +12,7 @@ class GeocodeEarth(Pelias):
     def __init__(
             self,
             api_key,
+            *,
             domain='api.geocode.earth',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
