@@ -47,20 +47,18 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_boundary_rect(self):
-        self.geocoder = self.make_geocoder(
-            boundary_rect=[[50.1, -130.1], [44.1, -100.9]])
         self.geocode_run(
-            {"query": "moscow"},  # Idaho USA
+            {"query": "moscow",  # Idaho USA
+             "boundary_rect": [[50.1, -130.1], [44.1, -100.9]]},
             {"latitude": 46.7323875, "longitude": -117.0001651},
         )
 
     def test_boundary_rect_deprecated(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
-            self.geocoder = self.make_geocoder(
-                boundary_rect=[-130.1, 44.1, -100.9, 50.1])
             self.geocode_run(
-                {"query": "moscow"},  # Idaho USA
+                {"query": "moscow",  # Idaho USA
+                 "boundary_rect": [-130.1, 44.1, -100.9, 50.1]},
                 {"latitude": 46.7323875, "longitude": -117.0001651},
             )
             self.assertEqual(1, len(w))

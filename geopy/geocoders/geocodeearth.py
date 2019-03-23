@@ -41,7 +41,15 @@ class GeocodeEarth(Pelias):
                 This format is now deprecated in favor of a list/tuple
                 of a pair of geopy Points and will be removed in geopy 2.0.
 
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `boundary_rect` instead.
+
         :param str country_bias: Bias results to this country (ISO alpha-3).
+
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `country_bias` instead.
 
         :param str domain: Specify a custom domain for Pelias API.
 

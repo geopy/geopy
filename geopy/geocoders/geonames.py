@@ -48,7 +48,12 @@ class GeoNames(Geocoder):
             scheme='http',
     ):
         """
-        :param str country_bias:
+        :param str country_bias: Records from the country_bias are listed first.
+            Two letter country code ISO-3166.
+
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `country_bias` instead.
 
         :param str username: GeoNames username, required. Sign up here:
             http://www.geonames.org/login
@@ -100,6 +105,15 @@ class GeoNames(Geocoder):
                 'http://www.geonames.org/login'
             )
         self.username = username
+        if country_bias is not None:
+            warnings.warn(
+                '`country_bias` argument of the %(cls)s.__init__ '
+                'is deprecated and will be removed in geopy 2.0. Use '
+                '%(cls)s.geocode(country_bias=%(value)r) instead.'
+                % dict(cls=type(self).__name__, value=country_bias),
+                DeprecationWarning,
+                stacklevel=2
+            )
         self.country_bias = country_bias
         domain = 'api.geonames.org'
         self.api = (
