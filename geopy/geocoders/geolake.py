@@ -107,6 +107,10 @@ class Geolake(Geocoder):
             standard (e.g. ``FR``). Multiple countries can be specified with
             a Python list.
 
+            .. versionchanged:: 1.19.0
+                Previously only a Python list of countries could be specified.
+                Now a single country as a string can be specified as well.
+
         :type country_codes: str or list
 
         :param bool exactly_one: Return one result or a list of one result.

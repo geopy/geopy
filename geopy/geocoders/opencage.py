@@ -118,6 +118,11 @@ class OpenCage(Geocoder):
             defined by the ISO 3166-1 Alpha 2 standard (e.g. ``fr``).
             Might be a Python list of strings.
 
+            .. versionchanged:: 1.19.0
+                This parameter didn't seem to be respected previously.
+                Also, previously only a single string could be specified.
+                Now a Python list of individual countries is supported.
+
         :type country: str or list
 
         :param bool exactly_one: Return one result or a list of results, if

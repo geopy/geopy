@@ -140,10 +140,14 @@ class GeoNames(Geocoder):
             Two letter country code ISO-3166 (e.g. ``FR``). Might be
             a single string or a list of strings.
 
+            .. versionadded:: 1.19.0
+
         :type country: str or list
 
         :param str country_bias: Records from the country_bias are listed first.
             Two letter country code ISO-3166.
+
+            .. versionadded:: 1.19.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

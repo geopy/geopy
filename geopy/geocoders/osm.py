@@ -234,6 +234,8 @@ class Nominatim(Geocoder):
             A country_code should be the ISO 3166-1alpha2 code,
             e.g. ``gb`` for the United Kingdom, ``de`` for Germany, etc.
 
+            .. versionadded:: 1.19.0
+
         :type country_codes: str or list
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
