@@ -141,7 +141,7 @@ class OpenCage(Geocoder):
                 warnings.warn(
                     'OpenCage `bounds` format of '
                     '`"longitude,latitude,longitude,latitude"` is now '
-                    'deprecated and will be not supported in geopy 2.0. '
+                    'deprecated and will not be supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.',
                     DeprecationWarning,

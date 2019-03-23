@@ -227,7 +227,7 @@ class GoogleV3(Geocoder):
                 warnings.warn(
                     'GoogleV3 `bounds` format of '
                     '`[latitude, longitude, latitude, longitude]` is now '
-                    'deprecated and will be not supported in geopy 2.0. '
+                    'deprecated and will not be supported in geopy 2.0. '
                     'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
                     'instead.',
                     DeprecationWarning,
