@@ -55,7 +55,9 @@ class OpenMapQuest(Nominatim):
 
             .. versionadded:: 1.17.0
 
-        :param str country_bias: Bias results to this country.
+        :param country_bias: Limit search results to a specific country.
+            This param sets a default value for the `geocode`'s ``country_codes``.
+        :type country_bias: str or list
 
             .. versionadded:: 1.17.0
 

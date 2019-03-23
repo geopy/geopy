@@ -1,4 +1,4 @@
-from geopy.compat import quote, urlencode
+from geopy.compat import quote, string_compare, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point
@@ -111,8 +111,11 @@ class MapBox(Geocoder):
         :type proximity: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
-        :param string country: Country to filter result in form of
-            ISO 3166-1 alpha-2 country code.
+        :param country: Country to filter result in form of
+            ISO 3166-1 alpha-2 country code (e.g. ``FR``).
+            Might be a Python list of strings.
+
+        :type country: str or list
 
         :param bbox: The bounding box of the viewport within which
             to bias geocode results more prominently.
@@ -131,8 +134,12 @@ class MapBox(Geocoder):
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
 
+        if not country:
+            country = []
+        if isinstance(country, string_compare):
+            country = [country]
         if country:
-            params['country'] = country
+            params['country'] = ",".join(country)
 
         if proximity:
             p = Point(proximity)

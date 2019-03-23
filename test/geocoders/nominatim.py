@@ -291,6 +291,20 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         # in response a success.
         self.assertTrue(location.raw['extratags']['wikidata'])
 
+    def test_country_codes_str(self):
+        self.geocode_run(
+            {"query": "kazan",
+             "country_codes": 'tr'},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_country_codes_list(self):
+        self.geocode_run(
+            {"query": "kazan",
+             "country_codes": ['cn', 'tr']},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
