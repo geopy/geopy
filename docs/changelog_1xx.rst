@@ -2,6 +2,27 @@
 
 Changelog
 =========
+1.19.0
+------
+2019-03-TBD
+
+*   ADDED: `Geolake`, `GeoNames`, `MapBox`, `OpenCage`, `OpenMapQuest`,
+    `Nominatim` and `PickPoint` geocoders now accept Python lists
+    of countries instead of a single string. (#349)
+
+*   CHANGED: `geocode`-specific args has been moved to `geocode` methods
+    from `__init__`, and the corresponding `__init__` args has been
+    deprecated. The affected geocoders are: `GeocodeEarth`, `GeoNames`,
+    `OpenMapQuest`, `Nominatim`, `Pelias`, `PickPoint`, `LiveAddress`. (#350)
+
+*   FIXED: `OpenCage`'s `country` arg was not respected.
+    Contributed by Sebastian Illing. (#342)
+
+*   FIXED: `GoogleV3` has erroneously been issuing a warning about
+    a missing api key when using premier.
+    Contributed by Mike Hansen. (#345)
+
+
 1.18.1
 ------
 2018-12-16
