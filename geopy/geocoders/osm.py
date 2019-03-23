@@ -155,7 +155,7 @@ class Nominatim(Geocoder):
         The method can be overriden in Nominatim-based geocoders in order
         to extend URL parameters.
 
-        :param string base_api: Geocoding function base address - self.api
+        :param str base_api: Geocoding function base address - self.api
             or self.reverse_api.
 
         :param dict params: Geocoding params.

@@ -33,7 +33,7 @@ class PickPoint(Nominatim):
     ):
         """
 
-        :param string api_key: PickPoint API key obtained at
+        :param str api_key: PickPoint API key obtained at
             https://pickpoint.io.
 
         :param str format_string:
@@ -97,7 +97,7 @@ class PickPoint(Nominatim):
         """
         Construct geocoding request url. Overridden.
 
-        :param string base_api: Geocoding function base address - self.api
+        :param str base_api: Geocoding function base address - self.api
             or self.reverse_api.
 
         :param dict params: Geocoding params.
