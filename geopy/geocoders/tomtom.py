@@ -27,7 +27,7 @@ class TomTom(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='api.tomtom.com',
+            domain='api.tomtom.com'
     ):
         """
         :param str api_key: TomTom API key.
@@ -70,7 +70,7 @@ class TomTom(Geocoder):
             timeout=DEFAULT_SENTINEL,
             limit=None,
             typeahead=False,
-            language=None,
+            language=None
     ):
         """
         Return a location point by address.
@@ -127,7 +127,7 @@ class TomTom(Geocoder):
             *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.

@@ -43,7 +43,7 @@ class GeoNames(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            scheme='http',
+            scheme='http'
     ):
         """
 
@@ -107,7 +107,7 @@ class GeoNames(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             country=None,
-            country_bias=None,
+            country_bias=None
     ):
         """
         Return a location point by address.
@@ -165,7 +165,7 @@ class GeoNames(Geocoder):
             timeout=DEFAULT_SENTINEL,
             feature_code=None,
             lang=None,
-            find_nearby_type='findNearbyPlaceName',
+            find_nearby_type='findNearbyPlaceName'
     ):
         """
         Return an address by location point.

@@ -29,7 +29,7 @@ class Pelias(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. GeocodeEarth).
     ):

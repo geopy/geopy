@@ -30,7 +30,7 @@ class GeocodeFarm(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            scheme=None,
+            scheme=None
     ):
         """
 

@@ -37,7 +37,7 @@ class Baidu(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            security_key=None,
+            security_key=None
     ):
         """
 
@@ -91,7 +91,7 @@ class Baidu(Geocoder):
             query,
             *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.

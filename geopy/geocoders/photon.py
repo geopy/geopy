@@ -30,7 +30,7 @@ class Photon(Geocoder):
             proxies=DEFAULT_SENTINEL,
             domain='photon.komoot.de',
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -146,7 +146,7 @@ class Photon(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=False,
-            limit=None,
+            limit=None
     ):
         """
         Return an address by location point.

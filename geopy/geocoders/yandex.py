@@ -30,7 +30,7 @@ class Yandex(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -78,7 +78,7 @@ class Yandex(Geocoder):
             *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            lang=None,
+            lang=None
     ):
         """
         Return a location point by address.
@@ -130,7 +130,7 @@ class Yandex(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             kind=None,
-            lang=None,
+            lang=None
     ):
         """
         Return an address by location point.
