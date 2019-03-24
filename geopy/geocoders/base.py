@@ -265,11 +265,11 @@ class Geocoder:
     def _call_geocoder(
             self,
             url,
+            *,
             timeout=DEFAULT_SENTINEL,
             raw=False,
             deserializer=json.loads,
-            headers=None,
-            **kwargs
+            headers=None
     ):
         """
         For a generated query URL, get the results.
@@ -284,7 +284,7 @@ class Geocoder:
                    else self.timeout)
 
         try:
-            page = self.urlopen(req, timeout=timeout, **kwargs)
+            page = self.urlopen(req, timeout=timeout)
         except Exception as error:
             message = (
                 str(error.args[0])
