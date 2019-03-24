@@ -461,7 +461,7 @@ class IGNFrance(Geocoder):
             url,
             headers=headers,
             timeout=timeout,
-            deserializer=None
+            is_json=False,
         )
 
         return raw_xml

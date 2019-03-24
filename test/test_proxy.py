@@ -21,7 +21,7 @@ WITH_SYSTEM_PROXIES = bool(getproxies())
 class DummyGeocoder(Geocoder):
     def geocode(self, location):
         with patch.object(geopy.geocoders.base, 'decode_page', lambda page: page):
-            geo_request = self._call_geocoder(location, deserializer=None)
+            geo_request = self._call_geocoder(location, is_json=False)
         geo_html = geo_request.read()
         return geo_html if geo_html else None
 

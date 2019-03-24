@@ -267,7 +267,7 @@ class Geocoder:
             url,
             *,
             timeout=DEFAULT_SENTINEL,
-            deserializer=json.loads,
+            is_json=True,
             headers=None
     ):
         """
@@ -328,9 +328,9 @@ class Geocoder:
 
         page = decode_page(page)
 
-        if deserializer is not None:
+        if is_json:
             try:
-                return deserializer(page)
+                return json.loads(page)
             except ValueError:
                 raise GeocoderParseError(
                     "Could not deserialize using deserializer:\n%s" % page
