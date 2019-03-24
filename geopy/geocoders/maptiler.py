@@ -26,7 +26,7 @@ class MapTiler(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='api.maptiler.com',
+            domain='api.maptiler.com'
     ):
         """
         :param str api_key: The API key required by Maptiler to perform
@@ -87,7 +87,7 @@ class MapTiler(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proximity=None,
             language=None,
-            bbox=None,
+            bbox=None
     ):
         """
         Return a location point by address.
@@ -150,7 +150,7 @@ class MapTiler(Geocoder):
             *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.

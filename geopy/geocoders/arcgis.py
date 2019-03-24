@@ -44,7 +44,7 @@ class ArcGIS(Geocoder):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             auth_domain='www.arcgis.com',
-            domain='geocode.arcgis.com',
+            domain='geocode.arcgis.com'
     ):
         """
 

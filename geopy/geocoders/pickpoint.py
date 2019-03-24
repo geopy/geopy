@@ -23,7 +23,7 @@ class PickPoint(Nominatim):
             domain='api.pickpoint.io',
             scheme=None,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 

@@ -31,7 +31,7 @@ class OpenMapQuest(Nominatim):
             domain='open.mapquestapi.com',
             scheme=None,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 

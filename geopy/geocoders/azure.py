@@ -23,7 +23,7 @@ class AzureMaps(TomTom):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='atlas.microsoft.com',
+            domain='atlas.microsoft.com'
     ):
         """
         :param str subscription_key: Azure Maps subscription key.

@@ -30,7 +30,7 @@ class AlgoliaPlaces(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
         :param str app_id: Unique application identifier. It's used to
@@ -92,7 +92,7 @@ class AlgoliaPlaces(Geocoder):
             around=None,
             around_via_ip=None,
             around_radius=None,
-            x_forwarded_for=None,
+            x_forwarded_for=None
     ):
         """
         Return a location point by address.
@@ -209,7 +209,7 @@ class AlgoliaPlaces(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.

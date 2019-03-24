@@ -42,7 +42,7 @@ class GoogleV3(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            channel='',
+            channel=''
     ):
         """
 
@@ -168,7 +168,7 @@ class GoogleV3(Geocoder):
             components=None,
             place_id=None,
             language=None,
-            sensor=False,
+            sensor=False
     ):
         """
         Return a location point by address.
@@ -266,7 +266,7 @@ class GoogleV3(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=None,
-            sensor=False,
+            sensor=False
     ):
         """
         Return an address by location point.

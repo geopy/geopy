@@ -33,7 +33,7 @@ class MapQuest(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='www.mapquestapi.com',
+            domain='www.mapquestapi.com'
     ):
         """
         :param str api_key: The API key required by Mapquest to perform

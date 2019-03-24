@@ -181,7 +181,7 @@ class Geocoder:
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
