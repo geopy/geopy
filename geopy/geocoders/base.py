@@ -268,19 +268,17 @@ class Geocoder:
             timeout=DEFAULT_SENTINEL,
             raw=False,
             deserializer=json.loads,
+            headers=None,
             **kwargs
     ):
         """
         For a generated query URL, get the results.
         """
 
-        if isinstance(url, Request):
-            # copy Request
-            headers = self.headers.copy()
-            headers.update(url.header_items())
-            req = Request(url=url.get_full_url(), headers=headers)
-        else:
-            req = Request(url=url, headers=self.headers)
+        req_headers = self.headers.copy()
+        if headers:
+            req_headers.update(headers)
+        req = Request(url=url, headers=req_headers)
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)

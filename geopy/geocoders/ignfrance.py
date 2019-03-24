@@ -1,7 +1,6 @@
 import base64
 import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
-from urllib.request import Request
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -449,21 +448,18 @@ class IGNFrance(Geocoder):
         """
         Send the request to get raw content.
         """
-
-        request = Request(url)
-
+        headers = {}
         if self.referer is not None:
-            request.add_header('Referer', self.referer)
+            headers['Referer'] = self.referer
 
         if self.username and self.password and self.referer is None:
             credentials = '{0}:{1}'.format(self.username, self.password).encode()
             auth_str = base64.standard_b64encode(credentials).decode()
-            request.add_unredirected_header(
-                'Authorization',
-                'Basic {}'.format(auth_str.strip()))
+            headers['Authorization'] = 'Basic {}'.format(auth_str.strip())
 
         raw_xml = self._call_geocoder(
-            request,
+            url,
+            headers=headers,
             timeout=timeout,
             deserializer=None
         )
