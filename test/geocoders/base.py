@@ -96,16 +96,21 @@ class GeocoderTestCase(unittest.TestCase):
         g = Geocoder()
         assert g.timeout == 12
 
-        with patch.object(g, 'urlopen') as mock_urlopen:
-            g._call_geocoder(url, raw=True)
+        with ExitStack() as stack:
+            mock_urlopen = stack.enter_context(patch.object(g, 'urlopen'))
+            stack.enter_context(
+                patch.object(geopy.geocoders.base, 'decode_page', return_value='{}')
+            )
+
+            g._call_geocoder(url)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] == 12
 
-            g._call_geocoder(url, timeout=7, raw=True)
+            g._call_geocoder(url, timeout=7)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] == 7
 
-            g._call_geocoder(url, timeout=None, raw=True)
+            g._call_geocoder(url, timeout=None)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] is None
 
