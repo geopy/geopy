@@ -386,6 +386,31 @@ Exceptions
 .. autoclass:: geopy.exc.GeocoderNotFound
     :show-inheritance:
 
+Adapters
+~~~~~~~~
+
+.. automodule:: geopy.adapters
+    :members: __doc__
+
+Supported Adapters
+------------------
+
+.. autoclass:: geopy.adapters.URLLibAdapter
+    :show-inheritance:
+
+
+Base Classes
+------------
+
+.. autoclass:: geopy.adapters.AdapterHTTPError
+    :show-inheritance:
+
+    .. automethod:: __init__
+
+.. autoclass:: geopy.adapters.BaseAdapter
+    :members:
+
+    .. automethod:: __init__
 
 Logging
 ~~~~~~~

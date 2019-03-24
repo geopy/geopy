@@ -183,7 +183,9 @@ def patch_urllib(monkeypatch, requests_monitor, is_internet_access_allowed):
                         if record_request:
                             requests_monitor.record_response(req, resp, end - start)
                         return resp
-                except:  # noqa
+                except Exception as e:
+                    if "SSL" in str(e):  # Don't retry TLS verification errors
+                        raise
                     if i == retries:
                         raise
                 if record_request:
