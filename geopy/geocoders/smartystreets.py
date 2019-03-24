@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+from geopy.adapters import AdapterHTTPError
 from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -103,14 +104,13 @@ class LiveAddress(Geocoder):
         return self._parse_json(self._call_geocoder(url, timeout=timeout),
                                 exactly_one)
 
-    def _geocoder_exception_handler(
-            self, error, message, http_code=None, http_body=None
-    ):
-        """
-        LiveStreets-specific exceptions.
-        """
-        if "no active subscriptions found" in message.lower():
-            raise GeocoderQuotaExceeded(message)
+    def _geocoder_exception_handler(self, error):
+        search = "no active subscriptions found"
+        if isinstance(error, AdapterHTTPError):
+            if search in str(error).lower():
+                raise GeocoderQuotaExceeded(str(error)) from error
+            if search in (error.text or "").lower():
+                raise GeocoderQuotaExceeded(error.text) from error
 
     def _parse_json(self, response, exactly_one=True):
         """

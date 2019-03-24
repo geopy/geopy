@@ -1,11 +1,14 @@
 import os
 import ssl
 import unittest
+from contextlib import ExitStack
 from unittest.mock import patch
+from urllib.parse import urljoin
 from urllib.request import getproxies, urlopen
 
-import geopy.geocoders.base
-from geopy.exc import GeocoderServiceError
+import geopy.geocoders
+from geopy.adapters import AdapterHTTPError, URLLibAdapter
+from geopy.exc import GeocoderParseError, GeocoderServiceError
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
 
@@ -19,29 +22,37 @@ WITH_SYSTEM_PROXIES = bool(getproxies())
 
 
 class DummyGeocoder(Geocoder):
-    def geocode(self, location):
-        with patch.object(geopy.geocoders.base, 'decode_page', lambda page: page):
-            geo_request = self._call_geocoder(location, is_json=False)
-        geo_html = geo_request.read()
+    def geocode(self, location, *, is_json=False):
+        geo_html = self._call_geocoder(location, is_json=is_json)
         return geo_html if geo_html else None
 
 
-class SystemCACertificatesProxyTestCase(unittest.TestCase):
-    remote_website_https = "https://example.org/"
+class BaseSystemCATestCase:
+    """Test TLS certificates validation using the system-trusted CAs.
+    """
+    adapter_factory = NotImplementedError  # overridden in subclasses
+
+    remote_website_https = "https://httpbin.org/html"  # must be trusted by the system CAs
     timeout = 5
 
     def setUp(self):
-        self.proxy_server = ProxyServerThread(timeout=self.timeout)
-        self.proxy_server.start()
+        self.stack = ExitStack()
+        self.proxy_server = self.stack.enter_context(
+            ProxyServerThread(timeout=self.timeout)
+        )
+        self.stack.enter_context(
+            patch.object(
+                geopy.geocoders.options, 'default_adapter_factory', self.adapter_factory
+            )
+        )
         self.proxy_url = self.proxy_server.get_proxy_url()
 
     def tearDown(self):
-        self.proxy_server.stop()
-        self.proxy_server.join()
+        self.stack.close()
 
     def test_geocoder_constructor_uses_https_proxy(self):
         base_http = urlopen(self.remote_website_https, timeout=self.timeout)
-        base_html = base_http.read()
+        base_html = base_http.read().decode()
 
         geocoder_dummy = DummyGeocoder(proxies={"https": self.proxy_url},
                                        timeout=self.timeout)
@@ -65,27 +76,49 @@ class SystemCACertificatesProxyTestCase(unittest.TestCase):
         self.assertIn('SSL', str(cm.exception))
         self.assertEqual(1, len(self.proxy_server.requests))
 
+    @unittest.skipUnless(not WITH_SYSTEM_PROXIES,
+                         "There're active system proxies")
+    def test_ssl_context_without_proxy_is_respected(self):
+        # Create an ssl context which should not allow the negotiation with
+        # the `self.remote_website_https`.
+        bad_ctx = ssl.create_default_context(cafile=CERT_SELFSIGNED_CA)
+        geocoder_dummy = DummyGeocoder(ssl_context=bad_ctx,
+                                       timeout=self.timeout)
+        with self.assertRaises(GeocoderServiceError) as cm:
+            geocoder_dummy.geocode(self.remote_website_https)
+        self.assertIn('SSL', str(cm.exception))
 
-class LocalProxyTestCase(unittest.TestCase):
+
+class BaseLocalProxyTestCase:
+    """Proxy integration tests using a local (plaintext) HTTP server."""
+    adapter_factory = NotImplementedError  # overridden in subclasses
+
     timeout = 5
 
     def setUp(self):
-        self.proxy_server = ProxyServerThread(timeout=self.timeout)
-        self.proxy_server.start()
-        self.http_server = HttpServerThread(timeout=self.timeout)
-        self.http_server.start()
+        self.stack = ExitStack()
+        self.proxy_server = self.stack.enter_context(
+            ProxyServerThread(timeout=self.timeout)
+        )
+        self.http_server = self.stack.enter_context(
+            HttpServerThread(timeout=self.timeout)
+        )
+        self.stack.enter_context(
+            patch.object(
+                geopy.geocoders.options, 'default_adapter_factory', self.adapter_factory
+            )
+        )
         self.proxy_url = self.proxy_server.get_proxy_url()
         self.remote_website_http = self.http_server.get_server_url()
+        self.remote_website_http_json = urljoin(self.remote_website_http, "/json")
+        self.remote_website_http_404 = urljoin(self.remote_website_http, "/404")
 
     def tearDown(self):
-        self.proxy_server.stop()
-        self.http_server.stop()
-        self.proxy_server.join()
-        self.http_server.join()
+        self.stack.close()
 
     def test_geocoder_constructor_uses_http_proxy(self):
         base_http = urlopen(self.remote_website_http, timeout=self.timeout)
-        base_html = base_http.read()
+        base_html = base_http.read().decode()
 
         geocoder_dummy = DummyGeocoder(proxies={"http": self.proxy_url},
                                        timeout=self.timeout)
@@ -98,7 +131,7 @@ class LocalProxyTestCase(unittest.TestCase):
 
     def test_geocoder_constructor_uses_str_proxy(self):
         base_http = urlopen(self.remote_website_http, timeout=self.timeout)
-        base_html = base_http.read()
+        base_html = base_http.read().decode()
         geocoder_dummy = DummyGeocoder(proxies=self.proxy_url,
                                        timeout=self.timeout)
         self.assertEqual(0, len(self.proxy_server.requests))
@@ -113,17 +146,47 @@ class LocalProxyTestCase(unittest.TestCase):
         self.assertDictEqual(g.proxies, {'http': self.proxy_url,
                                          'https': self.proxy_url})
 
+    def test_get_json(self):
+        geocoder_dummy = DummyGeocoder(timeout=self.timeout)
+        result = geocoder_dummy.geocode(self.remote_website_http_json, is_json=True)
+        assert isinstance(result, dict)
+
+    def test_get_json_failure_on_non_json(self):
+        geocoder_dummy = DummyGeocoder(timeout=self.timeout)
+        with self.assertRaises(GeocoderParseError):
+            geocoder_dummy.geocode(self.remote_website_http, is_json=True)
+
+    def test_adapter_exception_for_non_200_response(self):
+        geocoder_dummy = DummyGeocoder(timeout=self.timeout)
+        with self.assertRaises(GeocoderServiceError) as cm:
+            geocoder_dummy.geocode(self.remote_website_http_404)
+        self.assertIsInstance(cm.exception, GeocoderServiceError)
+        self.assertIsInstance(cm.exception.__cause__, AdapterHTTPError)
+        self.assertIsInstance(cm.exception.__cause__, IOError)
+
 
 @unittest.skipUnless(not WITH_SYSTEM_PROXIES,
                      "There're active system proxies")
-class SystemProxiesTestCase(unittest.TestCase):
+class BaseSystemProxiesTestCase:
+    """Tests checking that system proxies are respected."""
+    adapter_factory = None  # overridden in subclasses
+
     timeout = 5
 
     def setUp(self):
-        self.proxy_server = ProxyServerThread(timeout=self.timeout)
-        self.proxy_server.start()
-        self.http_server = HttpServerThread(timeout=self.timeout)
-        self.http_server.start()
+        self.stack = ExitStack()
+        self.proxy_server = self.stack.enter_context(
+            ProxyServerThread(timeout=self.timeout)
+        )
+        self.http_server = self.stack.enter_context(
+            HttpServerThread(timeout=self.timeout)
+        )
+        self.stack.enter_context(
+            patch.object(
+                geopy.geocoders.options, 'default_adapter_factory', self.adapter_factory
+            )
+        )
+
         self.proxy_url = self.proxy_server.get_proxy_url()
         self.remote_website_http = self.http_server.get_server_url()
 
@@ -133,13 +196,9 @@ class SystemProxiesTestCase(unittest.TestCase):
         os.environ['https_proxy'] = self.proxy_url
 
     def tearDown(self):
-        self.proxy_server.stop()
-        self.http_server.stop()
-        self.proxy_server.join()
-        self.http_server.join()
-
         os.environ.pop('http_proxy', None)
         os.environ.pop('https_proxy', None)
+        self.stack.close()
 
     def test_system_proxies_are_respected_by_default(self):
         geocoder_dummy = DummyGeocoder(timeout=self.timeout)
@@ -169,3 +228,15 @@ class SystemProxiesTestCase(unittest.TestCase):
         self.assertEqual(0, len(self.proxy_server.requests))
         geocoder_dummy.geocode(self.remote_website_http)
         self.assertEqual(1, len(self.proxy_server.requests))
+
+
+class URLLibAdapterSystemCATestCase(BaseSystemCATestCase, unittest.TestCase):
+    adapter_factory = URLLibAdapter
+
+
+class URLLibAdapterLocalProxyTestCase(BaseLocalProxyTestCase, unittest.TestCase):
+    adapter_factory = URLLibAdapter
+
+
+class URLLibAdapterSystemProxiesTestCase(BaseSystemProxiesTestCase, unittest.TestCase):
+    adapter_factory = URLLibAdapter
