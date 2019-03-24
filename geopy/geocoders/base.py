@@ -1,4 +1,3 @@
-import functools
 import json
 from socket import timeout as SocketTimeout
 from ssl import SSLError
@@ -268,7 +267,6 @@ class Geocoder:
             url,
             timeout=DEFAULT_SENTINEL,
             raw=False,
-            requester=None,
             deserializer=json.loads,
             **kwargs
     ):
@@ -276,33 +274,19 @@ class Geocoder:
         For a generated query URL, get the results.
         """
 
-        if requester:
-            req = url  # Don't construct an urllib's Request for a custom requester.
-
-            # `requester` might be anything which can issue an HTTP request.
-            # Assume that `requester` is a method of the `requests` library.
-            # Requests, however, doesn't accept SSL context in its HTTP
-            # request methods. A custom HTTP adapter has to be created for that.
-            # So the current usage is not directly compatible with `requests`.
-            requester = functools.partial(requester, context=self.ssl_context,
-                                          proxies=self.proxies,
-                                          headers=self.headers)
+        if isinstance(url, Request):
+            # copy Request
+            headers = self.headers.copy()
+            headers.update(url.header_items())
+            req = Request(url=url.get_full_url(), headers=headers)
         else:
-            if isinstance(url, Request):
-                # copy Request
-                headers = self.headers.copy()
-                headers.update(url.header_items())
-                req = Request(url=url.get_full_url(), headers=headers)
-            else:
-                req = Request(url=url, headers=self.headers)
-
-        requester = requester or self.urlopen
+            req = Request(url=url, headers=self.headers)
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)
 
         try:
-            page = requester(req, timeout=timeout, **kwargs)
+            page = self.urlopen(req, timeout=timeout, **kwargs)
         except Exception as error:
             message = (
                 str(error.args[0])
