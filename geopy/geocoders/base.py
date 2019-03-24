@@ -267,7 +267,6 @@ class Geocoder:
             url,
             *,
             timeout=DEFAULT_SENTINEL,
-            raw=False,
             deserializer=json.loads,
             headers=None
     ):
@@ -326,9 +325,6 @@ class Geocoder:
             status_code = None
         if status_code in ERROR_CODE_MAP:
             raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
-
-        if raw:
-            return page
 
         page = decode_page(page)
 
