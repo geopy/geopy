@@ -1,6 +1,5 @@
 import collections.abc
 from urllib.parse import urlencode
-from urllib.request import Request
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -186,18 +185,18 @@ class AlgoliaPlaces(Geocoder):
             params['aroundRadius'] = around_radius
 
         url = '?'.join((self.geocode_api, urlencode(params)))
-        request = Request(url)
+        headers = {}
 
         if x_forwarded_for is not None:
-            request.add_header('X-Forwarded-For', x_forwarded_for)
+            headers['X-Forwarded-For'] = x_forwarded_for
 
         if self.app_id is not None and self.api_key is not None:
-            request.add_header('X-Algolia-Application-Id', self.app_id)
-            request.add_header('X-Algolia-API-Key', self.api_key)
+            headers['X-Algolia-Application-Id'] = self.app_id
+            headers['X-Algolia-API-Key'] = self.api_key
 
         logger.debug('%s.geocode: %s', self.__class__.__name__, url)
         return self._parse_json(
-            self._call_geocoder(request, timeout=timeout),
+            self._call_geocoder(url, headers=headers, timeout=timeout),
             exactly_one,
             language=language,
         )
@@ -252,15 +251,15 @@ class AlgoliaPlaces(Geocoder):
             params['language'] = language
 
         url = '?'.join((self.reverse_api, urlencode(params)))
-        request = Request(url)
+        headers = {}
 
         if self.app_id is not None and self.api_key is not None:
-            request.add_header('X-Algolia-Application-Id', self.app_id)
-            request.add_header('X-Algolia-API-Key', self.api_key)
+            headers['X-Algolia-Application-Id'] = self.app_id
+            headers['X-Algolia-API-Key'] = self.api_key
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
-            self._call_geocoder(request, timeout=timeout),
+            self._call_geocoder(url, headers=headers, timeout=timeout),
             exactly_one,
             language=language,
         )
