@@ -395,6 +395,9 @@ Adapters
 Supported Adapters
 ------------------
 
+.. autoclass:: geopy.adapters.RequestsAdapter
+    :show-inheritance:
+
 .. autoclass:: geopy.adapters.URLLibAdapter
     :show-inheritance:
 

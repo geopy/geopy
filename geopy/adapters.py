@@ -28,6 +28,15 @@ from geopy.exc import (
 )
 from geopy.util import logger
 
+try:
+    import requests
+    from requests.adapters import HTTPAdapter as RequestsHTTPAdapter
+
+    requests_available = True
+except ImportError:
+    RequestsHTTPAdapter = object
+    requests_available = False
+
 
 class AdapterHTTPError(IOError):
     """An exception which must be raised by adapters when an HTTP response
@@ -212,3 +221,149 @@ class URLLibAdapter(BaseAdapter):
             return str(body_bytes, encoding=encoding)
         except ValueError:
             raise GeocoderParseError("Unable to decode the response bytes")
+
+
+class RequestsAdapter(BaseAdapter):
+    """The adapter which uses `requests`_ library.
+
+    .. _requests: https://requests.readthedocs.io
+
+    `requests` supports keep-alives, retries, persists Cookies,
+    allows response compression and uses HTTP/1.1 [currently].
+
+    ``requests`` package must be installed in order to use this adapter.
+    """
+
+    is_available = requests_available
+
+    def __init__(
+        self,
+        *,
+        proxies,
+        ssl_context,
+        pool_connections=10,
+        pool_maxsize=10,
+        max_retries=2,
+        pool_block=False
+    ):
+        if not requests_available:
+            raise ImportError(
+                "`requests` must be installed in order to use RequestsAdapter. "
+                "If you have installed geopy via pip, you may use "
+                "this command to install requests: "
+                '`pip install "geopy[requests]"`.'
+            )
+
+        self.session = requests.Session()
+        if proxies is None:
+            # Use system proxies:
+            self.session.trust_env = True
+        else:
+            self.session.trust_env = False
+            self.session.proxies = proxies
+
+        self.session.mount(
+            "http://",
+            RequestsHTTPAdapter(
+                pool_connections=pool_connections,
+                pool_maxsize=pool_maxsize,
+                max_retries=max_retries,
+                pool_block=pool_block,
+            ),
+        )
+        self.session.mount(
+            "https://",
+            RequestsHTTPWithSSLContextAdapter(
+                ssl_context=ssl_context,
+                pool_connections=pool_connections,
+                pool_maxsize=pool_maxsize,
+                max_retries=max_retries,
+                pool_block=pool_block,
+            ),
+        )
+
+    def __del__(self):
+        # Cleanup keepalive connections when Geocoder (and, thus, Adapter)
+        # instances are getting garbage-collected.
+        self.session.close()
+
+    def get_text(self, url, *, timeout, headers):
+        resp = self._request(url, timeout=timeout, headers=headers)
+        return resp.text
+
+    def get_json(self, url, *, timeout, headers):
+        resp = self._request(url, timeout=timeout, headers=headers)
+        try:
+            return resp.json()
+        except ValueError:
+            raise GeocoderParseError(
+                "Could not deserialize using deserializer:\n%s" % resp.text
+            )
+
+    def _request(self, url, *, timeout, headers):
+        try:
+            resp = self.session.get(url, timeout=timeout, headers=headers)
+        except Exception as error:
+            message = str(error)
+            if isinstance(error, SocketTimeout):
+                raise GeocoderTimedOut("Service timed out")
+            elif isinstance(error, SSLError):
+                if "timed out" in message:
+                    raise GeocoderTimedOut("Service timed out")
+            elif isinstance(error, requests.ConnectionError):
+                if "unauthorized" in message.lower():
+                    raise GeocoderServiceError(message)
+                else:
+                    raise GeocoderUnavailable(message)
+            elif isinstance(error, requests.Timeout):
+                raise GeocoderTimedOut("Service timed out")
+            raise GeocoderServiceError(message)
+        else:
+            if resp.status_code >= 400:
+                raise AdapterHTTPError(
+                    "Non-successful status code %s" % resp.status_code,
+                    status_code=resp.status_code,
+                    text=resp.text,
+                )
+
+        return resp
+
+
+# https://github.com/kennethreitz/requests/issues/3774#issuecomment-267871876
+class RequestsHTTPWithSSLContextAdapter(RequestsHTTPAdapter):
+    def __init__(self, *, ssl_context=None, **kwargs):
+        self.__ssl_context = ssl_context
+        super().__init__(**kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        if self.__ssl_context is not None:
+            # This ssl context would get passed through the urllib3's
+            # `PoolManager` up to the `HTTPSConnection` class.
+            kwargs["ssl_context"] = self.__ssl_context
+
+            # If neither `ca_certs` nor `ca_cert_dir` args are specified
+            # (which is always true because we pass an already initialized
+            # ssl context), urllib3 tries to call the ssl context's
+            # `load_default_certs` method, which would reset the ssl context.
+            # Thus we have to modify the ssl context in the way that urllib3
+            # doesn't try to do that.
+            # See https://github.com/urllib3/urllib3/blob/cdfc9a539cc27f5704f8bcd46d34301b3d218aff/src/urllib3/util/ssl_.py#L342-L344  # noqa
+            #
+            # TODO maybe copy the ssl_context instead of mutating?
+            self.__ssl_context.load_default_certs = None
+        return super().init_poolmanager(*args, **kwargs)
+
+    def proxy_manager_for(self, proxy, **proxy_kwargs):
+        if self.__ssl_context is not None:
+            proxy_kwargs["ssl_context"] = self.__ssl_context
+            self.__ssl_context.load_default_certs = None
+        return super().proxy_manager_for(proxy, **proxy_kwargs)
+
+    def cert_verify(self, conn, url, verify, cert):
+        super().cert_verify(conn, url, verify, cert)
+        if self.__ssl_context is not None:
+            # Stop requests from adding any certificates to the ssl context.
+            conn.ca_certs = None
+            conn.ca_cert_dir = None
+            conn.cert_file = None
+            conn.key_file = None

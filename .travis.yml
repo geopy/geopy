@@ -13,7 +13,7 @@ before_install:
   - travis_retry pip install -U pip wheel setuptools
 
 install:
-  - travis_retry pip install -e ".[timezone]"
+  - travis_retry pip install -e ".[requests,timezone]"
 
 stages:
   - lint

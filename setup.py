@@ -64,6 +64,7 @@ setup(
         "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_TEST),
         "dev-docs": EXTRAS_DEV_DOCS,
+        "requests": ["requests"],
         "timezone": ["pytz"],
     },
     license='MIT',

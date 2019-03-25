@@ -9,7 +9,7 @@ from urllib.request import getproxies, urlopen
 import pytest
 
 import geopy.geocoders
-from geopy.adapters import AdapterHTTPError, URLLibAdapter
+from geopy.adapters import AdapterHTTPError, RequestsAdapter, URLLibAdapter
 from geopy.exc import GeocoderParseError, GeocoderServiceError
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
@@ -77,7 +77,7 @@ class BaseSystemCATestCase:
         with self.assertRaises(GeocoderServiceError) as cm:
             geocoder_dummy.geocode(self.remote_website_https)
         self.assertIn('SSL', str(cm.exception))
-        self.assertEqual(1, len(self.proxy_server.requests))
+        self.assertLessEqual(1, len(self.proxy_server.requests))  # requests retries
 
     @unittest.skipUnless(not WITH_SYSTEM_PROXIES,
                          "There're active system proxies")
@@ -243,3 +243,15 @@ class URLLibAdapterLocalProxyTestCase(BaseLocalProxyTestCase, unittest.TestCase)
 
 class URLLibAdapterSystemProxiesTestCase(BaseSystemProxiesTestCase, unittest.TestCase):
     adapter_factory = URLLibAdapter
+
+
+class RequestsAdapterSystemCATestCase(BaseSystemCATestCase, unittest.TestCase):
+    adapter_factory = RequestsAdapter
+
+
+class RequestsAdapterLocalProxyTestCase(BaseLocalProxyTestCase, unittest.TestCase):
+    adapter_factory = RequestsAdapter
+
+
+class RequestsAdapterSystemProxiesTestCase(BaseSystemProxiesTestCase, unittest.TestCase):
+    adapter_factory = RequestsAdapter
