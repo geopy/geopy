@@ -1,4 +1,4 @@
-from geopy.adapters import AdapterHTTPError, URLLibAdapter
+from geopy.adapters import AdapterHTTPError, RequestsAdapter, URLLibAdapter
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -20,7 +20,7 @@ _DEFAULT_USER_AGENT = "geopy/%s" % __version__
 
 _DEFAULT_ADAPTER_CLASS = next(
     adapter_cls
-    for adapter_cls in (URLLibAdapter,)
+    for adapter_cls in (RequestsAdapter, URLLibAdapter,)
     if adapter_cls.is_available
 )
 
@@ -69,7 +69,10 @@ class options:
                     )
                 )
 
-            Default adapter is :class:`geopy.adapters.URLLibAdapter`.
+            If `requests <https://requests.readthedocs.io>`_ package is
+            installed, the default adapter is
+            :class:`geopy.adapters.RequestsAdapter`. Otherwise it is
+            :class:`geopy.adapters.URLLibAdapter`.
 
             .. versionadded:: 2.0
 
