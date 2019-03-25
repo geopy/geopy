@@ -166,6 +166,7 @@ class GoogleV3(Geocoder):
             components=None,
             language=None,
             sensor=False,
+            place_id=None
     ):
         """
         Return a location point by address.
@@ -212,14 +213,30 @@ class GoogleV3(Geocoder):
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
+
+        :param str place_id: Address information is obtained using google
+            place_id. It is not used with ``query`` or ``bounds`` parameters.
+
+                >>> g.geocode(place_id='ChIJOcfP0Iq2j4ARDrXUa7ZWs34')
         """
         params = {
             'sensor': str(sensor).lower()
         }
-        if query is None and not components:
-            raise ValueError('Either `query` or `components` must be set.`')
+        if place_id and (bounds or query):
+            raise ValueError(
+                'Only one of the `query` or `place id` or `bounds` '
+                ' parameters must be entered.')
+
+        if place_id is not None:
+            params['place_id'] = place_id
+
         if query is not None:
             params['address'] = self.format_string % query
+
+        if query is None and place_id is None and not components:
+            raise ValueError('Either `query` or `components` or `place_id` '
+                             'must be set.')
+
         if self.api_key:
             params['key'] = self.api_key
         if bounds:
