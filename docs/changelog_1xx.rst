@@ -4,7 +4,7 @@ Changelog
 =========
 1.19.0
 ------
-2019-03-TBD
+2019-03-26
 
 *   ADDED: `GoogleV3`: `place_id` arg has been added to
     the `geocode` method. Contributed by Mesut Öncel. (#348)
