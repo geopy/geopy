@@ -164,9 +164,9 @@ class GoogleV3(Geocoder):
             bounds=None,
             region=None,
             components=None,
+            place_id=None,
             language=None,
             sensor=False,
-            place_id=None
     ):
         """
         Return a location point by address.
@@ -206,6 +206,13 @@ class GoogleV3(Geocoder):
         :param dict components: Restricts to an area. Can use any combination
             of: route, locality, administrative_area, postal_code, country.
 
+        :param str place_id: Retrieve a Location using a Place ID.
+            Cannot be not used with ``query`` or ``bounds`` parameters.
+
+                >>> g.geocode(place_id='ChIJOcfP0Iq2j4ARDrXUa7ZWs34')
+
+            .. versionadded:: 1.19.0
+
         :param str language: The language in which to return results.
 
         :param bool sensor: Whether the geocoding request comes from a
@@ -213,11 +220,6 @@ class GoogleV3(Geocoder):
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
-
-        :param str place_id: Address information is obtained using google
-            place_id. It is not used with ``query`` or ``bounds`` parameters.
-
-                >>> g.geocode(place_id='ChIJOcfP0Iq2j4ARDrXUa7ZWs34')
         """
         params = {
             'sensor': str(sensor).lower()
