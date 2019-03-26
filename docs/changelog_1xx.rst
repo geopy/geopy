@@ -6,14 +6,18 @@ Changelog
 ------
 2019-03-TBD
 
-*   ADDED: `Geolake`, `GeoNames`, `MapBox`, `OpenCage`, `OpenMapQuest`,
-    `Nominatim` and `PickPoint` geocoders now accept Python lists
-    of countries instead of a single string. (#349)
+*   ADDED: `GoogleV3`: `place_id` arg has been added to
+    the `geocode` method. Contributed by Mesut Öncel. (#348)
 
-*   CHANGED: `geocode`-specific args has been moved to `geocode` methods
+*   ADDED: `Geolake`, `GeoNames`, `MapBox`, `OpenCage`, `OpenMapQuest`,
+    `Nominatim` and `PickPoint` geocoders now also accept Python lists
+    of countries instead of just a single string. (#349)
+
+*   CHANGED: `geocode`-specific args have been moved to `geocode` methods
     from `__init__`, and the corresponding `__init__` args has been
     deprecated. The affected geocoders are: `GeocodeEarth`, `GeoNames`,
-    `OpenMapQuest`, `Nominatim`, `Pelias`, `PickPoint`, `LiveAddress`. (#350)
+    `OpenMapQuest`, `Nominatim`, `Pelias`, `PickPoint`,
+    `LiveAddress`. (#350)
 
 *   FIXED: `OpenCage`'s `country` arg was not respected.
     Contributed by Sebastian Illing. (#342)
