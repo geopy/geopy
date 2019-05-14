@@ -80,3 +80,7 @@ class MapBoxTestCase(GeocoderTestBase):
             {"query": "kazan", "country": ["CN", "TR"]},
             {"latitude": 40.2317, "longitude": 32.6839},
         )
+
+    def test_geocode_exactly_one_true(self):
+        list_result = self.geocode_run({"query": "New York", "exactly_one": False}, {})
+        self.assertTrue(isinstance(list_result, list))
