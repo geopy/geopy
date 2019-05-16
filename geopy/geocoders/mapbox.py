@@ -154,7 +154,7 @@ class MapBox(Geocoder):
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
         return self._parse_json(
-            self._call_geocoder(url, timeout=timeout)
+            self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
     def reverse(
