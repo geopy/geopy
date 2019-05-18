@@ -81,6 +81,11 @@ class MapBoxTestCase(GeocoderTestBase):
             {"latitude": 40.2317, "longitude": 32.6839},
         )
 
+    def test_geocode_raw(self):
+        result = self.geocode_run({"query": "New York"}, {})
+        self.assertTrue(isinstance(result.raw, dict))
+        self.assertEqual(result.raw['center'], [-73.9808, 40.7648])
+
     def test_geocode_exactly_one_true(self):
         list_result = self.geocode_run({"query": "New York", "exactly_one": False}, {})
         self.assertTrue(isinstance(list_result, list))

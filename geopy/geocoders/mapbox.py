@@ -75,10 +75,9 @@ class MapBox(Geocoder):
 
         def parse_feature(feature):
             location = feature['place_name']
-            place = feature['text']
             longitude = feature['geometry']['coordinates'][0]
             latitude = feature['geometry']['coordinates'][1]
-            return Location(location, (latitude, longitude), place)
+            return Location(location, (latitude, longitude), feature)
         if exactly_one:
             return parse_feature(features[0])
         else:
