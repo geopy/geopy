@@ -95,10 +95,18 @@ class MapBox(Geocoder):
         """
         Return a location point by address
 
+        .. versionchanged:: 1.20.0
+            Previously due to a bug the resulting :class:`geopy.location.Location`'s
+            ``raw`` attribute contained a single string instead of a full
+            service response.
+
         :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
+
+            .. versionchanged:: 1.20.0
+                Previously due to a bug this parameter wasn't respected.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -165,6 +173,11 @@ class MapBox(Geocoder):
     ):
         """
         Return an address by location point.
+
+        .. versionchanged:: 1.20.0
+            Previously due to a bug the resulting :class:`geopy.location.Location`'s
+            ``raw`` attribute contained a single string instead of a full
+            service response.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
