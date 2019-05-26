@@ -2,6 +2,20 @@
 
 Changelog
 =========
+1.20.0
+------
+2019-05-26
+
+*   FIXED: `MapBox`'s `geocode` method was ignoring the `exactly_one`
+    parameter. Contributed by TheRealZeljko. (#358)
+
+*   FIXED: The resulting `Location`'s `raw` attribute in `MapBox`
+    erroneously contained a single string instead of a full service
+    response. This might be considered a breaking change (although
+    it's unlikely that the previous `raw` value was usable at all).
+    Contributed by Sergey Lyapustin and TheRealZeljko. (#354)
+
+
 1.19.0
 ------
 2019-03-26
