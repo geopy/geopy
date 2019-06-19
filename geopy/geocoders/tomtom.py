@@ -10,7 +10,7 @@ class TomTom(Geocoder):
     """TomTom geocoder.
 
     Documentation at:
-        https://developer.tomtom.com/online-search/online-search-documentation
+        https://developer.tomtom.com/search-api/search-api-documentation
 
     .. versionadded:: 1.15.0
     """
