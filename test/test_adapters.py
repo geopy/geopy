@@ -6,6 +6,8 @@ from unittest.mock import patch
 from urllib.parse import urljoin
 from urllib.request import getproxies, urlopen
 
+import pytest
+
 import geopy.geocoders
 from geopy.adapters import AdapterHTTPError, URLLibAdapter
 from geopy.exc import GeocoderParseError, GeocoderServiceError
@@ -27,6 +29,7 @@ class DummyGeocoder(Geocoder):
         return geo_html if geo_html else None
 
 
+@pytest.mark.usefixtures("skip_if_internet_access_is_not_allowed")
 class BaseSystemCATestCase:
     """Test TLS certificates validation using the system-trusted CAs.
     """
