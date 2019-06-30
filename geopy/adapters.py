@@ -15,6 +15,7 @@ HTTP client settings.
 """
 import abc
 import json
+import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
 from urllib.error import HTTPError
@@ -333,6 +334,7 @@ class RequestsAdapter(BaseAdapter):
 class RequestsHTTPWithSSLContextAdapter(RequestsHTTPAdapter):
     def __init__(self, *, ssl_context=None, **kwargs):
         self.__ssl_context = ssl_context
+        self.__urllib3_warned = False
         super().__init__(**kwargs)
 
     def init_poolmanager(self, *args, **kwargs):
@@ -340,24 +342,42 @@ class RequestsHTTPWithSSLContextAdapter(RequestsHTTPAdapter):
             # This ssl context would get passed through the urllib3's
             # `PoolManager` up to the `HTTPSConnection` class.
             kwargs["ssl_context"] = self.__ssl_context
-
-            # If neither `ca_certs` nor `ca_cert_dir` args are specified
-            # (which is always true because we pass an already initialized
-            # ssl context), urllib3 tries to call the ssl context's
-            # `load_default_certs` method, which would reset the ssl context.
-            # Thus we have to modify the ssl context in the way that urllib3
-            # doesn't try to do that.
-            # See https://github.com/urllib3/urllib3/blob/cdfc9a539cc27f5704f8bcd46d34301b3d218aff/src/urllib3/util/ssl_.py#L342-L344  # noqa
-            #
-            # TODO maybe copy the ssl_context instead of mutating?
-            self.__ssl_context.load_default_certs = None
+            self.__warn_if_old_urllib3()
         return super().init_poolmanager(*args, **kwargs)
 
     def proxy_manager_for(self, proxy, **proxy_kwargs):
         if self.__ssl_context is not None:
             proxy_kwargs["ssl_context"] = self.__ssl_context
-            self.__ssl_context.load_default_certs = None
+            self.__warn_if_old_urllib3()
         return super().proxy_manager_for(proxy, **proxy_kwargs)
+
+    def __warn_if_old_urllib3(self):
+        if self.__urllib3_warned:
+            return
+
+        self.__urllib3_warned = True
+
+        try:
+            import requests.packages.urllib3 as urllib3
+        except ImportError:
+            import urllib3
+
+        def silent_int(s):
+            try:
+                return int(s)
+            except ValueError:
+                return 0
+
+        version = tuple(silent_int(v) for v in urllib3.__version__.split("."))
+
+        if version < (1, 24, 2):
+            warnings.warn(
+                "urllib3 prior to 1.24.2 is known to have a bug with "
+                "custom ssl contexts: it attempts to load system certificates "
+                "to them. Please consider upgrading `requests` and `urllib3` "
+                "packages. See https://github.com/urllib3/urllib3/pull/1566",
+                UserWarning,
+            )
 
     def cert_verify(self, conn, url, verify, cert):
         super().cert_verify(conn, url, verify, cert)
