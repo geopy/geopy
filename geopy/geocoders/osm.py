@@ -220,6 +220,7 @@ class Nominatim(Geocoder):
             country_codes=None,
             viewbox=None,
             bounded=None,  # TODO: change default value to `False` in geopy 2.0
+            featuretype=None,
     ):
         """
         Return a location point by address.
@@ -295,6 +296,9 @@ class Nominatim(Geocoder):
             within the bounding view_box. Defaults to `False`.
 
             .. versionadded:: 1.19.0
+
+        :param str featuretype: If present, restrict results to certain type of features.
+            Allowed values: `country`, `state`, `city`, `settlement`.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -379,6 +383,9 @@ class Nominatim(Geocoder):
                     "Invalid geometry format. Must be one of: "
                     "wkt, svg, kml, geojson."
                 )
+
+        if featuretype:
+            params['featuretype'] = featuretype
 
         url = self._construct_url(self.api, params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
