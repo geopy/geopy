@@ -302,6 +302,31 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"latitude": 40.2317, "longitude": 32.6839},
         )
 
+    def test_featuretype_param(self):
+        self.geocode_run(
+            {"query": "mexico",
+             "featuretype": 'country'},
+            {"latitude": 22.5000485, "longitude": -100.0000375},
+        )
+
+        self.geocode_run(
+            {"query": "mexico",
+             "featuretype": 'state'},
+            {"latitude": 19.4839446, "longitude": -99.6899716},
+        )
+
+        self.geocode_run(
+            {"query": "mexico",
+             "featuretype": 'city'},
+            {"latitude": 19.4326009, "longitude": -99.1333416},
+        )
+
+        self.geocode_run(
+            {"query": "georgia",
+             "featuretype": 'settlement'},
+            {"latitude": 32.3293809, "longitude": -83.1137366},
+        )
+
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
