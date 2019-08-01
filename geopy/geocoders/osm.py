@@ -221,6 +221,7 @@ class Nominatim(Geocoder):
             viewbox=None,
             bounded=None,  # TODO: change default value to `False` in geopy 2.0
             featuretype=None,
+            namedetails=False,
     ):
         """
         Return a location point by address.
@@ -300,6 +301,10 @@ class Nominatim(Geocoder):
         :param str featuretype: If present, restrict results to certain type of features.
             Allowed values: `country`, `state`, `city`, `settlement`.
 
+        :param bool namedetails: If you want in *Location.raw* to include
+            namedetails, set it to True. This will be a list of alternative names,
+            including language variants, etc.
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
 
@@ -351,9 +356,7 @@ class Nominatim(Geocoder):
             params['bounded'] = 1
 
         if country_codes is None:
-            country_codes = self.country_bias
-        if not country_codes:
-            country_codes = []
+            country_codes = self.country_bias or []
         if isinstance(country_codes, string_compare):
             country_codes = [country_codes]
         if country_codes:
@@ -361,6 +364,9 @@ class Nominatim(Geocoder):
 
         if addressdetails:
             params['addressdetails'] = 1
+
+        if namedetails:
+            params['namedetails'] = 1
 
         if language:
             params['accept-language'] = language
