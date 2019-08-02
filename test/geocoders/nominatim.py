@@ -342,7 +342,6 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         self.assertNotIn('namedetails', result.raw)
 
 
-
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
     @classmethod
