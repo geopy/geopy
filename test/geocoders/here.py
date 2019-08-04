@@ -130,7 +130,7 @@ class HereTestCase(GeocoderTestBase):
 
     def test_geocode_with_paging(self):
         """
-        Here.geocode using simple paging "ouside" geopy
+        Here.geocode using simple paging "outside" geopy
         """
         address_string = "Hauptstr., Berlin, Germany"
         input = {"query": address_string, "maxresults": 12, "exactly_one": False}
@@ -139,7 +139,8 @@ class HereTestCase(GeocoderTestBase):
 
         input["pageinformation"] = 2
         res = self.geocode_run(input, {})
-        self.assertEqual(len(res), 3)
+        self.assertGreaterEqual(len(res), 3)
+        self.assertLessEqual(len(res), 6)
 
         input["pageinformation"] = 3
         res = self.geocode_run(input, {}, expect_failure=True)
