@@ -327,6 +327,20 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"latitude": 32.3293809, "longitude": -83.1137366},
         )
 
+    def test_namedetails(self):
+        query = "Kyoto, Japan"
+        result = self.geocode_run(
+            {"query": query, "namedetails": True},
+            {},
+        )
+        self.assertIn('namedetails', result.raw)
+
+        result = self.geocode_run(
+            {"query": query, "namedetails": False},
+            {},
+        )
+        self.assertNotIn('namedetails', result.raw)
+
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
