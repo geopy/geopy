@@ -356,7 +356,9 @@ class Nominatim(Geocoder):
             params['bounded'] = 1
 
         if country_codes is None:
-            country_codes = self.country_bias or []
+            country_codes = self.country_bias
+        if not country_codes:
+            country_codes = []
         if isinstance(country_codes, string_compare):
             country_codes = [country_codes]
         if country_codes:
