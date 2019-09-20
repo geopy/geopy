@@ -54,7 +54,7 @@ Geocoding
 
 To geolocate a query to an address and coordinates:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
@@ -68,7 +68,7 @@ To geolocate a query to an address and coordinates:
 
 To find the address corresponding to a set of coordinates:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.geocoders import Nominatim
     >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
@@ -93,7 +93,7 @@ with a default of the geodesic distance available as the function
 
 Here's an example usage of the geodesic distance:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.distance import geodesic
     >>> newport_ri = (41.49008, -71.312796)
@@ -103,7 +103,7 @@ Here's an example usage of the geodesic distance:
 
 Using great-circle distance:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.distance import great_circle
     >>> newport_ri = (41.49008, -71.312796)
