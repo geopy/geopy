@@ -162,10 +162,28 @@ class Geolake(Geocoder):
         latitude = page['latitude']
         longitude = page['longitude']
 
-        place = page.get('place')
-        address = ", ".join([place['city'], place['countryCode']])
+        address = self._get_address(page)
         result = Location(address, (latitude, longitude), page)
         if exactly_one:
             return result
         else:
             return [result]
+
+    def _get_address(self, page):
+        """
+        Returns address string from page dictionary
+        :param page: dict
+        :return: str
+        """
+        place = page.get('place')
+        address_city = place.get('city')
+        address_country_code = place.get('countryCode')
+        if address_city and not address_country_code:
+            address = address_city
+        elif not address_city and address_country_code:
+            address = address_country_code
+        elif address_city and address_country_code:
+            address = ', '.join([address_city, address_country_code])
+        else:
+            address = ''
+        return address
