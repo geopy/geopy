@@ -1,7 +1,7 @@
 from geopy.compat import string_compare, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.util import logger, join_filter
+from geopy.util import join_filter, logger
 
 __all__ = ("Geolake", )
 
