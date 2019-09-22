@@ -66,3 +66,9 @@ class GeolakeTestCase(GeocoderTestBase):
             {},
             expect_failure=True
         )
+
+    def test_geocode_missing_city_in_result(self):
+        self.geocode_run(
+            {"query": "H1W 0B4"},
+            {"latitude": 45.544952, "longitude": -73.546694, "address": "CA"}
+        )
