@@ -1,7 +1,7 @@
 from geopy.compat import string_compare, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.util import logger
+from geopy.util import logger, join_filter
 
 __all__ = ("Geolake", )
 
@@ -178,12 +178,5 @@ class Geolake(Geocoder):
         place = page.get('place')
         address_city = place.get('city')
         address_country_code = place.get('countryCode')
-        if address_city and not address_country_code:
-            address = address_city
-        elif not address_city and address_country_code:
-            address = address_country_code
-        elif address_city and address_country_code:
-            address = ', '.join([address_city, address_country_code])
-        else:
-            address = ''
+        address = join_filter(', ', [address_city, address_country_code])
         return address
