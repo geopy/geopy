@@ -109,6 +109,5 @@ class PeliasTestCase(BasePeliasTestCase, GeocoderTestBase):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        print(env)
         return Pelias(env.get('PELIAS_DOMAIN'), api_key=env.get('PELIAS_KEY'),
                       **kwargs)
