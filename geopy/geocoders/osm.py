@@ -528,7 +528,7 @@ class Nominatim(Geocoder):
             # Output format of the request
             'format': 'json',
             # Comma separated `osm_ids`, eg: 'N6101403370,W148332300'
-            'osm_ids': ','.join(self.parse_osm(osm_id) for osm_id in osm_ids),
+            'osm_ids': ','.join(set(self.parse_osm(osm_id) for osm_id in osm_ids)),
             # Extra parameters
             'addressdetails': 1 if addressdetails else 0,
             'extratags': 1 if extratags else 0,
