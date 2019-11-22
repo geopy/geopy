@@ -341,6 +341,67 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
         self.assertNotIn('namedetails', result.raw)
 
+    def test_parse_geocode(self):
+        queries = [
+            {
+                'osm_id': 6101403370,
+                'osm_type': 'node'
+            },
+            {
+                'osm_id': 148332300,
+                'osm_type': 'way'
+            }
+        ]
+        result = [
+            'N6101403370',
+            'W148332300'
+        ]
+        geocoder = self.make_geocoder(user_agent=None)
+        for index, query in enumerate(queries):
+            self.assertEqual(result[index], geocoder.parse_osm(query))
+
+    def test_lookup_api(self):
+        queries = [
+            {
+                'osm_id': 6101403370,
+                'osm_type': 'node'
+            },
+            {
+                'osm_id': 148332300,
+                'osm_type': 'way'
+            }
+        ]
+        result = [
+            {
+                'osm_id': 6101403370,
+                'osm_type': 'node'
+            },
+            {
+                'osm_id': 148332300,
+                'osm_type': 'way'
+            }
+        ]
+
+        geocoder = self.make_geocoder(user_agent=None)
+        response = geocoder.lookup(queries)
+        exact_key_value = ['osm_id', 'osm_type']
+        contain_keys = ['place_id', 'licence', 'osm_type', 'osm_id', 'boundingbox', 'lat',
+                        'lon', 'display_name', 'class', 'type', 'importance']
+        for location in response:
+            location_result = list(filter(lambda place:
+                                          place.get('osm_id') == location.raw.get('osm_id')
+                                          and
+                                          place.get('osm_type') == location.raw.get('osm_type'),
+                                          result))
+            self.assertTrue(len(location_result) > 0)
+            location_result = location_result[0]
+            # Match the exacte value for 'exact_key_value' list of keys
+            for key in exact_key_value:
+                self.assertEquals(location.raw.get(key), location_result.get(key))
+            # The location have all of that keys
+            for key in contain_keys:
+                self.assertTrue(key in location.raw)
+
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 

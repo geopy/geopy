@@ -45,6 +45,7 @@ class Nominatim(Geocoder):
 
     geocode_path = '/search'
     reverse_path = '/reverse'
+    lookup_path = '/lookup'
 
     def __init__(
             self,
@@ -191,6 +192,7 @@ class Nominatim(Geocoder):
 
         self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
         self.reverse_api = "%s://%s%s" % (self.scheme, self.domain, self.reverse_path)
+        self.lookup_api = "%s://%s%s" % (self.scheme, self.domain, self.lookup_path)
 
     def _construct_url(self, base_api, params):
         """
@@ -462,6 +464,80 @@ class Nominatim(Geocoder):
 
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
+        )
+
+    def parse_osm(self, osm):
+        """Parse osm dictionary to string to be able to query it
+
+        - Input:
+            {
+                'osm_id': '6101403370',
+                'osm_type': 'node'  # node, way or relation
+            }
+        - Output:
+            'N6101403370'
+        :param osm: dictionary with the keys osm_id and osm_type
+        :return: string
+        """
+        osm_id = osm.get('osm_id', 0)
+        """Get the first letter of osm_type and capitalize it, eg:
+            - osm_type='relation' -> R
+            - osm_type='node' -> N
+            - osm_type='way' -> W
+        """
+        osm_type = osm.get('osm_type', 'N')[0].capitalize()
+        return '{osm_type}{osm_id}'.format(osm_type=osm_type, osm_id=osm_id)
+
+    def lookup(self, osm_ids, timeout=DEFAULT_SENTINEL, exactly_one=False,
+               addressdetails=False, extratags=False, namedetails=False, language=None):
+        """Return a location point by a list of osm_id and osm_type
+
+        :param osm_ids: list of dictionaries that have osm_id and osm_type keys
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param bool addressdetails: Whether or not to include address details,
+            such as city, county, state, etc. in *Location.raw*
+
+        :param bool extratags: Include additional information in the result if available,
+            e.g. wikipedia link, opening hours.
+
+            .. versionadded:: 1.17.0
+
+        :param bool namedetails: If you want in *Location.raw* to include
+            namedetails, set it to True. This will be a list of alternative names,
+            including language variants, etc.
+
+        :param str language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
+
+            .. versionadded:: 1.0.0
+
+        :return: List of dictionaries
+        """
+        params = {
+            # Output format of the request
+            'format': 'json',
+            # Comma separated `osm_ids`, eg: 'N6101403370,W148332300'
+            'osm_ids': ','.join(set(self.parse_osm(osm_id) for osm_id in osm_ids)),
+            # Extra parameters
+            'addressdetails': 1 if addressdetails else 0,
+            'extratags': 1 if extratags else 0,
+            'namedetails': 1 if namedetails else 0,
+            'accept-language': language if language else ''
+        }
+        url = self._construct_url(self.lookup_api, params)
+        return self._parse_json(
+            self._call_geocoder(url, timeout=timeout), exactly_one=False
         )
 
     @staticmethod
