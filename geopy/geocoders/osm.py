@@ -479,13 +479,16 @@ class Nominatim(Geocoder):
         :param osm: dictionary with the keys osm_id and osm_type
         :return: string
         """
-        osm_id = osm.get('osm_id', 0)
+        osm_id = osm.get('osm_id')
         """Get the first letter of osm_type and capitalize it, eg:
             - osm_type='relation' -> R
             - osm_type='node' -> N
             - osm_type='way' -> W
         """
-        osm_type = osm.get('osm_type', 'N')[0].capitalize()
+        osm_type = osm.get('osm_type')
+        if not osm_type or osm_id:
+            return ''
+        osm_type = osm_type[0].capitalize()
         return '{osm_type}{osm_id}'.format(osm_type=osm_type, osm_id=osm_id)
 
     def lookup(self, osm_ids, timeout=DEFAULT_SENTINEL, exactly_one=False,
