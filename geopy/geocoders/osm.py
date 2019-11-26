@@ -486,7 +486,7 @@ class Nominatim(Geocoder):
             - osm_type='way' -> W
         """
         osm_type = osm.get('osm_type')
-        if not osm_type or osm_id:
+        if not osm_type or not osm_id:
             return ''
         osm_type = osm_type[0].capitalize()
         return '{osm_type}{osm_id}'.format(osm_type=osm_type, osm_id=osm_id)
