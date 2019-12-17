@@ -131,6 +131,7 @@ class Pelias(Geocoder):
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
             country_bias=None,
+            language=False
     ):
         """
         Return a location point by address.
@@ -156,6 +157,12 @@ class Pelias(Geocoder):
         :param str country_bias: Bias results to this country (ISO alpha-3).
 
             .. versionadded:: 1.19.0
+
+        :param str language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -194,6 +201,9 @@ class Pelias(Geocoder):
         if country_bias:
             params['boundary.country'] = country_bias
 
+        if language:
+            params["lang"] = language
+
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode_api: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -205,6 +215,7 @@ class Pelias(Geocoder):
             query,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
+            language=False
     ):
         """
         Return an address by location point.
@@ -222,6 +233,12 @@ class Pelias(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param str language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -233,6 +250,9 @@ class Pelias(Geocoder):
             'point.lat': lat,
             'point.lon': lon,
         }
+
+        if language:
+            params['lang'] = language
 
         if self.api_key:
             params.update({
