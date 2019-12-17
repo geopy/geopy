@@ -203,7 +203,7 @@ class Pelias(Geocoder):
 
         if language:
             params["lang"] = language
-            
+
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode_api: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -253,7 +253,7 @@ class Pelias(Geocoder):
 
         if language:
             params['lang'] = language
-            
+
         if self.api_key:
             params.update({
                 'api_key': self.api_key
