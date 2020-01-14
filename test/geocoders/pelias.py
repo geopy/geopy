@@ -63,6 +63,43 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
             )
             self.assertEqual(1, len(w))
 
+    def test_geocode_language_parameter(self):
+        query = "Graben 7, Wien"
+        result_geocode = self.geocode_run(
+            {"query": query, "language": "de"}, {}
+        )
+        self.assertEqual(
+            result_geocode.raw['properties']['country'],
+            "Österreich"
+        )
+        result_geocode = self.geocode_run(
+            {"query": query, "language": "en"}, {}
+        )
+        self.assertEqual(
+            result_geocode.raw['properties']['country'],
+            "Austria"
+        )
+
+    def test_reverse_language_parameter(self):
+        query = "48.198674, 16.348388"
+        result_reverse_de = self.reverse_run(
+            {"query": query, "exactly_one": True, "language": "de"},
+            {},
+        )
+        self.assertEqual(
+            result_reverse_de.raw['properties']['country'],
+            "Österreich"
+        )
+
+        result_reverse_en = self.reverse_run(
+            {"query": query, "exactly_one": True, "language": "en"},
+            {},
+        )
+        self.assertTrue(
+            result_reverse_en.raw['properties']['country'],
+            "Austria"
+        )
+
 
 @unittest.skipUnless(
     bool(env.get('PELIAS_DOMAIN')),
@@ -70,6 +107,7 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
 )
 class PeliasTestCase(BasePeliasTestCase, GeocoderTestBase):
 
+    @classmethod
     def make_geocoder(cls, **kwargs):
         return Pelias(env.get('PELIAS_DOMAIN'), api_key=env.get('PELIAS_KEY'),
                       **kwargs)
