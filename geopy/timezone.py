@@ -17,7 +17,8 @@ def ensure_pytz_is_installed():
     if not pytz_available:
         raise ImportError(
             'pytz must be installed in order to locate timezones. '
-            ' Install with `pip install geopy -e ".[timezone]"`.'
+            'If geopy has been installed with `pip`, then pytz can be '
+            'installed with `pip install "geopy[timezone]"`.'
         )
 
 
