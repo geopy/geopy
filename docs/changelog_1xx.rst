@@ -2,6 +2,35 @@
 
 Changelog
 =========
+1.21.0
+------
+2020-01-XX
+
+*   ADDED: `Nominatim`-based geocoders: `featuretype` parameter
+    has been added to the `geocode` method.
+    Contributed by Sergio Martín Morillas. (#365)
+
+*   ADDED: `Nominatim`-based geocoders: `namedetails` parameter
+    has been added to the `geocode` method.
+    Contributed by enrique a. (#368)
+
+*   ADDED: `Pelias`: `language` parameter has been added
+    to the `geocode` and `reverse` methods.
+    Contributed by Armin Leuprecht. (#378)
+
+*   CHANGED: `Yandex` geocoder started to require API key for all requests
+    since September 2019, so a warning asking to specify a key has been
+    added which is issued when API key is missing.
+
+*   CHANGED (packaging): sdist now contains tests.
+
+*   FIXED: Updated link to `TomTom` Search API documentation.
+    Contributed by Przemek Malolepszy. (#362)
+
+*   FIXED: Occasional ``KeyError('city')`` in `Geolake`.
+    Contributed by Dmitrii K. (#373)
+
+
 1.20.0
 ------
 2019-05-26
