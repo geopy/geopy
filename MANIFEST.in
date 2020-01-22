@@ -1,4 +1,4 @@
-recursive-include test/* *
+recursive-include test *
 global-exclude *.py[co]
 global-exclude .DS_Store
 global-exclude __pycache__
