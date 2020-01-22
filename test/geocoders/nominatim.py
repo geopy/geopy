@@ -292,14 +292,14 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         self.geocode_run(
             {"query": "kazan",
              "country_codes": 'tr'},
-            {"latitude": 40.2317, "longitude": 32.6839},
+            {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
         )
 
     def test_country_codes_list(self):
         self.geocode_run(
             {"query": "kazan",
              "country_codes": ['cn', 'tr']},
-            {"latitude": 40.2317, "longitude": 32.6839},
+            {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
         )
 
     def test_featuretype_param(self):
