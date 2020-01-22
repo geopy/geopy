@@ -16,6 +16,10 @@ class Yandex(Geocoder):
         https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
 
     .. versionadded:: 1.5.0
+
+    .. attention::
+        Since September 2019 Yandex requires each request to have an API key.
+        API keys can be created at https://developer.tech.yandex.ru/
     """
 
     api_path = '/1.x/'
@@ -36,8 +40,11 @@ class Yandex(Geocoder):
         .. versionchanged:: 1.14.0
            Default scheme has been changed from ``http`` to ``https``.
 
-        :param str api_key: Yandex API key (not obligatory)
-            https://tech.yandex.ru/maps/keys/get/
+        :param str api_key: Yandex API key, mandatory.
+            The key can be created at https://developer.tech.yandex.ru/
+
+            .. versionchanged:: 1.21.0
+                API key is mandatory since September 2019.
 
         :param str lang: response locale, the following locales are
             supported: ``"ru_RU"`` (default), ``"uk_UA"``, ``"be_BY"``,
@@ -78,6 +85,14 @@ class Yandex(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        if not api_key:
+            warnings.warn(
+                'Since September 2019 Yandex requires each request to have an API key. '
+                'Pass a valid `api_key` to Yandex geocoder to hide this warning. '
+                'API keys can be created at https://developer.tech.yandex.ru/',
+                UserWarning,
+                stacklevel=2
+            )
         self.api_key = api_key
         self.lang = lang
         domain = 'geocode-maps.yandex.ru'
