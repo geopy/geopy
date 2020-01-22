@@ -131,7 +131,7 @@ class Pelias(Geocoder):
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
             country_bias=None,
-            language=False
+            language=None
     ):
         """
         Return a location point by address.
@@ -163,6 +163,8 @@ class Pelias(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
+
+            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -215,7 +217,7 @@ class Pelias(Geocoder):
             query,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=False
+            language=None
     ):
         """
         Return an address by location point.
@@ -238,6 +240,8 @@ class Pelias(Geocoder):
             `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
             accept-language string or a simple comma-separated
             list of language codes.
+
+            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

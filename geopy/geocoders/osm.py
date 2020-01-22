@@ -301,9 +301,13 @@ class Nominatim(Geocoder):
         :param str featuretype: If present, restrict results to certain type of features.
             Allowed values: `country`, `state`, `city`, `settlement`.
 
+            .. versionadded:: 1.21.0
+
         :param bool namedetails: If you want in *Location.raw* to include
             namedetails, set it to True. This will be a list of alternative names,
             including language variants, etc.
+
+            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
