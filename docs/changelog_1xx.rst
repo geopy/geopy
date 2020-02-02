@@ -4,7 +4,11 @@ Changelog
 =========
 1.21.0
 ------
-2020-01-XX
+2020-02-03
+
+*   ADDED: `HERE` geocoder now supports the new API KEY authentication
+    method. The old one is marked as deprecated and now issues a warning.
+    Contributed by deeplook. (#388)
 
 *   ADDED: `Nominatim`-based geocoders: `featuretype` parameter
     has been added to the `geocode` method.
