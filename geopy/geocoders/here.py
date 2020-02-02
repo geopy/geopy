@@ -42,9 +42,9 @@ class Here(Geocoder):
 
     def __init__(
             self,
-            apikey,
             app_id=None,
             app_code=None,
+            apikey=None,
             format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
@@ -54,22 +54,30 @@ class Here(Geocoder):
     ):
         """
 
-        :param str apikey: Should be a valid HERE Maps APIKEY. These keys were
-            introduced in December 2019 and will eventually replace the legacy
-            APP CODE/APP ID pairs which are already no longer available for new
-            accounts (but still work for old accounts). If you want to use the
-            legacy APP CODE and APP ID, set this one to None or an empty string.
-            More authentication details are available at
-            https://developer.here.com/blog/announcing-two-new-authentication-types.
-            See https://developer.here.com/authenticationpage.
-
         :param str app_id: Should be a valid HERE Maps APP ID. Will eventually
             be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
+            .. deprecated:: 1.21.0
+                App ID and App Code are being replaced by API Keys and OAuth 2.0
+                by HERE. Consider getting an ``apikey`` instead of using
+                ``app_id`` and ``app_code``.
+
         :param str app_code: Should be a valid HERE Maps APP CODE. Will
             eventually be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
+
+            .. deprecated:: 1.21.0
+
+        :param str apikey: Should be a valid HERE Maps APIKEY. These keys were
+            introduced in December 2019 and will eventually replace the legacy
+            APP CODE/APP ID pairs which are already no longer available for new
+            accounts (but still work for old accounts).
+            More authentication details are available at
+            https://developer.here.com/blog/announcing-two-new-authentication-types.
+            See https://developer.here.com/authenticationpage.
+
+            .. versionadded:: 1.21.0
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -98,13 +106,13 @@ class Here(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        self.apikey = apikey
         self.app_id = app_id
         self.app_code = app_code
-        _apibase = "ls.hereapi.com" if self.apikey else "api.here.com"
-        self.api = "%s://geocoder.%s%s" % (self.scheme, _apibase, self.geocode_path)
+        self.apikey = apikey
+        domain = "ls.hereapi.com" if self.apikey else "api.here.com"
+        self.api = "%s://geocoder.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
-            "%s://reverse.geocoder.%s%s" % (self.scheme, _apibase, self.reverse_path)
+            "%s://reverse.geocoder.%s%s" % (self.scheme, domain, self.reverse_path)
         )
 
     def geocode(

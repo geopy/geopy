@@ -1,4 +1,7 @@
 import unittest
+from abc import ABCMeta, abstractmethod
+
+from six import with_metaclass
 
 from geopy.compat import u
 from geopy.geocoders import Here
@@ -10,24 +13,23 @@ class HereTestCaseUnitTest(GeocoderTestBase):
 
     def test_user_agent_custom(self):
         geocoder = Here(
-            apikey='DUMMYKEY1234',
+            app_id='DUMMYID1234',
+            app_code='DUMMYCODE1234',
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
-@unittest.skipUnless(
-    bool(env.get('HERE_APIKEY')),
-    "No HERE_APIKEY env variable set"
-)
-class HereTestCase(GeocoderTestBase):
+class BaseHereTestCase(with_metaclass(ABCMeta, object)):
+
+    @classmethod
+    @abstractmethod
+    def make_geocoder(cls, **kwargs):
+        pass
 
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = Here(
-            apikey=env['HERE_APIKEY'],
-            timeout=10,
-        )
+        cls.geocoder = cls.make_geocoder()
 
     def test_geocode_empty_result(self):
         """
@@ -211,3 +213,36 @@ class HereTestCase(GeocoderTestBase):
             {}
         )
         self.assertEqual(len(res), 5)
+
+
+@unittest.skipUnless(
+    bool(env.get('HERE_APIKEY')),
+    "No HERE_APIKEY env variable set"
+)
+class HereApiKeyTestCase(BaseHereTestCase, GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return Here(
+            apikey=env['HERE_APIKEY'],
+            timeout=10,
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('HERE_APP_ID')),
+    "No HERE_APP_ID env variable set"
+)
+@unittest.skipUnless(
+    bool(env.get('HERE_APP_CODE')),
+    "No HERE_APP_CODE env variable set"
+)
+class HereLegacyAuthTestCase(BaseHereTestCase, GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return Here(
+            app_id=env['HERE_APP_ID'],
+            app_code=env['HERE_APP_CODE'],
+            timeout=10,
+        )
