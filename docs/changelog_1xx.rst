@@ -4,7 +4,7 @@ Changelog
 =========
 1.21.0
 ------
-2020-02-03
+2020-02-02
 
 *   ADDED: `HERE` geocoder now supports the new API KEY authentication
     method. The old one is marked as deprecated and now issues a warning.
