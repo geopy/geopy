@@ -1,9 +1,8 @@
-"""
-:class:`.Here` geocoder.
-"""
+import warnings
 
 from geopy.compat import urlencode
 from geopy.exc import (
+    ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
     GeocoderQuotaExceeded,
@@ -106,10 +105,28 @@ class Here(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        is_apikey = bool(apikey)
+        is_app_code = app_id and app_code
+        if not is_apikey and not is_app_code:
+            raise ConfigurationError(
+                "HERE geocoder requires authentication, either `apikey` "
+                "or `app_id`+`app_code` must be set"
+            )
+        if is_app_code:
+            warnings.warn(
+                'Since December 2019 HERE provides two new authentication '
+                'methods `API Key` and `OAuth 2.0`. `app_id`+`app_code` '
+                'is deprecated and might eventually be phased out. '
+                'Consider switching to `apikey`, which geopy supports. '
+                'See https://developer.here.com/blog/announcing-two-new-authentication-types',  # noqa
+                UserWarning,
+                stacklevel=2
+            )
+
         self.app_id = app_id
         self.app_code = app_code
         self.apikey = apikey
-        domain = "ls.hereapi.com" if self.apikey else "api.here.com"
+        domain = "ls.hereapi.com" if is_apikey else "api.here.com"
         self.api = "%s://geocoder.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
             "%s://reverse.geocoder.%s%s" % (self.scheme, domain, self.reverse_path)

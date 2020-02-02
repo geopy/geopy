@@ -1,8 +1,10 @@
 import unittest
+import warnings
 from abc import ABCMeta, abstractmethod
 
 from six import with_metaclass
 
+from geopy import exc
 from geopy.compat import u
 from geopy.geocoders import Here
 from geopy.point import Point
@@ -13,11 +15,29 @@ class HereTestCaseUnitTest(GeocoderTestBase):
 
     def test_user_agent_custom(self):
         geocoder = Here(
-            app_id='DUMMYID1234',
-            app_code='DUMMYCODE1234',
+            apikey='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_error_with_no_keys(self):
+        with self.assertRaises(exc.ConfigurationError):
+            Here()
+
+    def test_warning_with_legacy_auth(self):
+        with warnings.catch_warnings(record=True) as w:
+            Here(
+                app_id='DUMMYID1234',
+                app_code='DUMMYCODE1234',
+            )
+        self.assertEqual(len(w), 1)
+
+    def test_no_warning_with_apikey(self):
+        with warnings.catch_warnings(record=True) as w:
+            Here(
+                apikey='DUMMYKEY1234',
+            )
+        self.assertEqual(len(w), 0)
 
 
 class BaseHereTestCase(with_metaclass(ABCMeta, object)):
