@@ -32,7 +32,7 @@ Installation
 geopy 2.0
 ~~~~~~~~~
 
-geopy 2.0 will be released in 2019, presumably in Q2.
+geopy 2.0 will be released in 2020, presumably in Q1.
 Only Python `>=3.5` and `>=pypy3.5` will be supported.
 The 1.x branch will not receive any features after that, although
 critical bugfixes might be backported on request.
