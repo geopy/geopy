@@ -42,8 +42,9 @@ class Here(Geocoder):
 
     def __init__(
             self,
-            app_id,
-            app_code,
+            apikey,
+            app_id=None,
+            app_code=None,
             format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
@@ -53,10 +54,21 @@ class Here(Geocoder):
     ):
         """
 
-        :param str app_id: Should be a valid HERE Maps APP ID
+        :param str apikey: Should be a valid HERE Maps APIKEY. These keys were
+            introduced in December 2019 and will eventually replace the legacy
+            APP CODE/APP ID pairs which are already no longer available for new
+            accounts (but still work for old accounts). If you want to use the
+            legacy APP CODE and APP ID, set this one to None or an empty string.
+            More authentication details are available at
+            https://developer.here.com/blog/announcing-two-new-authentication-types.
             See https://developer.here.com/authenticationpage.
 
-        :param str app_code: Should be a valid HERE Maps APP CODE
+        :param str app_id: Should be a valid HERE Maps APP ID. Will eventually
+            be replaced with APIKEY.
+            See https://developer.here.com/authenticationpage.
+
+        :param str app_code: Should be a valid HERE Maps APP CODE. Will
+            eventually be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
         :param str format_string:
@@ -86,11 +98,13 @@ class Here(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        self.apikey = apikey
         self.app_id = app_id
         self.app_code = app_code
-        self.api = "%s://geocoder.api.here.com%s" % (self.scheme, self.geocode_path)
+        _apibase = "ls.hereapi.com" if self.apikey else "api.here.com"
+        self.api = "%s://geocoder.%s%s" % (self.scheme, _apibase, self.geocode_path)
         self.reverse_api = (
-            "%s://reverse.geocoder.api.here.com%s" % (self.scheme, self.reverse_path)
+            "%s://reverse.geocoder.%s%s" % (self.scheme, _apibase, self.reverse_path)
         )
 
     def geocode(
@@ -169,14 +183,8 @@ class Here(Geocoder):
                 in query.items()
                 if key in self.structured_query_params
             }
-            params['app_id'] = self.app_id
-            params['app_code'] = self.app_code
         else:
-            params = {
-                'searchtext': self.format_string % query,
-                'app_id': self.app_id,
-                'app_code': self.app_code
-            }
+            params = {'searchtext': self.format_string % query}
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lat2)s,%(lon1)s;%(lat1)s,%(lon2)s")
@@ -193,6 +201,11 @@ class Here(Geocoder):
             params['language'] = language
         if additional_data:
             params['additionaldata'] = additional_data
+        if self.apikey:
+            params['apiKey'] = self.apikey
+        else:
+            params['app_id'] = self.app_id
+            params['app_code'] = self.app_code
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -256,8 +269,6 @@ class Here(Geocoder):
         """
         point = self._coerce_point_to_string(query)
         params = {
-            'app_id': self.app_id,
-            'app_code': self.app_code,
             'mode': mode,
             'prox': point,
         }
@@ -271,6 +282,11 @@ class Here(Geocoder):
             params['maxresults'] = 1
         if language:
             params['language'] = language
+        if self.apikey:
+            params['apiKey'] = self.apikey
+        else:
+            params['app_id'] = self.app_id
+            params['app_code'] = self.app_code
         url = "%s?%s" % (self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(

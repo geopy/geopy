@@ -10,28 +10,22 @@ class HereTestCaseUnitTest(GeocoderTestBase):
 
     def test_user_agent_custom(self):
         geocoder = Here(
-            app_id='DUMMYID1234',
-            app_code='DUMMYCODE1234',
+            apikey='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
 
 @unittest.skipUnless(
-    bool(env.get('HERE_APP_ID')),
-    "No HERE_APP_ID env variable set"
-)
-@unittest.skipUnless(
-    bool(env.get('HERE_APP_CODE')),
-    "No HERE_APP_CODE env variable set"
+    bool(env.get('HERE_APIKEY')),
+    "No HERE_APIKEY env variable set"
 )
 class HereTestCase(GeocoderTestBase):
 
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Here(
-            app_id=env['HERE_APP_ID'],
-            app_code=env['HERE_APP_CODE'],
+            apikey=env['HERE_APIKEY'],
             timeout=10,
         )
 
