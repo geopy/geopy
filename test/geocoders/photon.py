@@ -1,8 +1,8 @@
 # coding: utf8
 from __future__ import unicode_literals
 
-from geopy.point import Point
 from geopy.geocoders import Photon
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase
 
 
@@ -11,7 +11,7 @@ class PhotonTestCase(GeocoderTestBase):
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Photon()
-        cls.known_country_it = "Francia"
+        cls.known_country_de = "Frankreich"
         cls.known_country_fr = "France"
 
     def test_user_agent_custom(self):
@@ -53,19 +53,7 @@ class PhotonTestCase(GeocoderTestBase):
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-    def test_reverse_string(self):
-        """
-        Photon.reverse string
-        """
-        self.reverse_run(
-            {"query": "45.7733105, 4.8869339"},
-            {"latitude": 45.7733105, "longitude": 4.8869339}
-        )
-
-    def test_reverse_point(self):
-        """
-        Photon.reverse Point
-        """
+    def test_reverse(self):
         result = self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
             {"latitude": 45.7733105, "longitude": 4.8869339}
@@ -77,12 +65,12 @@ class PhotonTestCase(GeocoderTestBase):
         Photon.geocode using `language`
         """
         result_geocode = self.geocode_run(
-            {"query": self.known_country_fr, "language": "it"},
+            {"query": self.known_country_fr, "language": "de"},
             {},
         )
         self.assertEqual(
             result_geocode.raw['properties']['country'],
-            self.known_country_it
+            self.known_country_de
         )
 
     def test_reverse_language_parameter(self):
@@ -93,12 +81,12 @@ class PhotonTestCase(GeocoderTestBase):
         result_reverse_it = self.reverse_run(
             {"query": "45.7733105, 4.8869339",
              "exactly_one": True,
-             "language": "it"},
+             "language": "de"},
             {},
         )
         self.assertEqual(
             result_reverse_it.raw['properties']['country'],
-            self.known_country_it
+            self.known_country_de
         )
 
         result_reverse_fr = self.reverse_run(

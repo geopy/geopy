@@ -17,6 +17,9 @@ class Photon(Geocoder):
     OpenStreetMap`. No API Key is needed by this platform.
     """
 
+    geocode_path = '/api'
+    reverse_path = '/reverse'
+
     def __init__(
             self,
             format_string=None,
@@ -65,8 +68,8 @@ class Photon(Geocoder):
             ssl_context=ssl_context,
         )
         self.domain = domain.strip('/')
-        self.api = "%s://%s/api" % (self.scheme, self.domain)
-        self.reverse_api = "%s://%s/reverse" % (self.scheme, self.domain)
+        self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
+        self.reverse_api = "%s://%s%s" % (self.scheme, self.domain, self.reverse_path)
 
     def geocode(
             self,
@@ -120,9 +123,7 @@ class Photon(Geocoder):
             params['lang'] = language
         if location_bias:
             try:
-                lat, lon = [x.strip() for x
-                            in self._coerce_point_to_string(location_bias)
-                            .split(',')]
+                lat, lon = self._coerce_point_to_string(location_bias).split(',')
                 params['lon'] = lon
                 params['lat'] = lat
             except ValueError:
@@ -181,8 +182,7 @@ class Photon(Geocoder):
 
         """
         try:
-            lat, lon = [x.strip() for x in
-                        self._coerce_point_to_string(query).split(',')]
+            lat, lon = self._coerce_point_to_string(query).split(',')
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
         params = {

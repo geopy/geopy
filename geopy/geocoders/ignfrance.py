@@ -1,8 +1,15 @@
 import warnings
 import xml.etree.ElementTree as ET
 
-from geopy.compat import (HTTPBasicAuthHandler, HTTPPasswordMgrWithDefaultRealm, Request,
-                          build_opener, iteritems, u, urlencode)
+from geopy.compat import (
+    HTTPBasicAuthHandler,
+    HTTPPasswordMgrWithDefaultRealm,
+    Request,
+    build_opener,
+    iteritems,
+    u,
+    urlencode,
+)
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -33,6 +40,8 @@ class IGNFrance(Geocoder):
             {sub_request}
         </Request>
     </XLS>"""
+
+    api_path = '/%(api_key)s/geoportail/ols'
 
     def __init__(
             self,
@@ -125,11 +134,8 @@ class IGNFrance(Geocoder):
         self.password = password
         self.referer = referer
         self.domain = domain.strip('/')
-        self.api = "{scheme}://{domain}/{api_key}/geoportail/ols".format(
-            scheme=self.scheme,
-            api_key=self.api_key,
-            domain=self.domain
-        )
+        api_path = self.api_path % dict(api_key=self.api_key)
+        self.api = '%s://%s%s' % (self.scheme, self.domain, api_path)
         if username and password and referer is None:
             self.addSimpleHTTPAuthHeader()
 
@@ -291,7 +297,7 @@ class IGNFrance(Geocoder):
                           'argument will become True in geopy 2.0. '
                           'Specify `exactly_one=False` as the argument '
                           'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             exactly_one = False
 
         sub_request = """
@@ -319,7 +325,7 @@ class IGNFrance(Geocoder):
                     'one or more of: StreetAddress, PositionOfInterest'
                 )
 
-        point = self._coerce_point_to_string(query).replace(',', ' ')
+        point = self._coerce_point_to_string(query, "%(lat)s %(lon)s")
         reverse_geocode_preference = '\n'.join((
             '<ReverseGeocodePreference>%s</ReverseGeocodePreference>' % pref
             for pref

@@ -16,7 +16,13 @@ class Yandex(Geocoder):
         https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
 
     .. versionadded:: 1.5.0
+
+    .. attention::
+        Since September 2019 Yandex requires each request to have an API key.
+        API keys can be created at https://developer.tech.yandex.ru/
     """
+
+    api_path = '/1.x/'
 
     def __init__(
             self,
@@ -34,8 +40,11 @@ class Yandex(Geocoder):
         .. versionchanged:: 1.14.0
            Default scheme has been changed from ``http`` to ``https``.
 
-        :param str api_key: Yandex API key (not obligatory)
-            http://api.yandex.ru/maps/form.xml
+        :param str api_key: Yandex API key, mandatory.
+            The key can be created at https://developer.tech.yandex.ru/
+
+            .. versionchanged:: 1.21.0
+                API key is mandatory since September 2019.
 
         :param str lang: response locale, the following locales are
             supported: ``"ru_RU"`` (default), ``"uk_UA"``, ``"be_BY"``,
@@ -76,9 +85,18 @@ class Yandex(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        if not api_key:
+            warnings.warn(
+                'Since September 2019 Yandex requires each request to have an API key. '
+                'Pass a valid `api_key` to Yandex geocoder to hide this warning. '
+                'API keys can be created at https://developer.tech.yandex.ru/',
+                UserWarning,
+                stacklevel=2
+            )
         self.api_key = api_key
         self.lang = lang
-        self.api = '%s://geocode-maps.yandex.ru/1.x/' % self.scheme
+        domain = 'geocode-maps.yandex.ru'
+        self.api = '%s://%s%s' % (self.scheme, domain, self.api_path)
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
@@ -156,18 +174,15 @@ class Yandex(Geocoder):
                           'argument will become True in geopy 2.0. '
                           'Specify `exactly_one=False` as the argument '
                           'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             exactly_one = False
 
         try:
-            lat, lng = [
-                x.strip() for x in
-                self._coerce_point_to_string(query).split(',')
-            ]
+            point = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         except ValueError:
             raise ValueError("Must be a coordinate pair or Point")
         params = {
-            'geocode': '{0},{1}'.format(lng, lat),
+            'geocode': point,
             'format': 'json'
         }
         if self.api_key:

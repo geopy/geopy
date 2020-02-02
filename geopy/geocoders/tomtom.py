@@ -1,4 +1,4 @@
-from geopy.compat import urlencode, quote
+from geopy.compat import quote, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -10,7 +10,9 @@ class TomTom(Geocoder):
     """TomTom geocoder.
 
     Documentation at:
-        https://developer.tomtom.com/online-search/online-search-documentation
+        https://developer.tomtom.com/search-api/search-api-documentation
+
+    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/2/geocode/%(query)s.json'
@@ -49,6 +51,8 @@ class TomTom(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param str domain: Domain where the target TomTom service
+            is hosted.
         """
         super(TomTom, self).__init__(
             format_string=format_string,
@@ -102,7 +106,7 @@ class TomTom(Geocoder):
         """
         query = self.format_string % query
         params = self._geocode_params(query)
-        params['typeahead'] = '1' if typeahead else '0'
+        params['typeahead'] = self._boolean_value(typeahead)
 
         if limit:
             params['limit'] = str(int(limit))
@@ -126,6 +130,7 @@ class TomTom(Geocoder):
             query,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
+            language=None,
     ):
         """
         Return an address by location point.
@@ -143,11 +148,22 @@ class TomTom(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param str language: Language in which search results should be
+            returned. When data in specified language is not
+            available for a specific field, default language is used.
+            List of supported languages (case-insensitive):
+            https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
+
+            .. versionadded:: 1.18.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
         position = self._coerce_point_to_string(query)
         params = self._reverse_params(position)
+
+        if language:
+            params['language'] = language
 
         quoted_position = quote(position.encode('utf-8'))
         url = "?".join((self.api_reverse % dict(position=quoted_position),
@@ -157,6 +173,10 @@ class TomTom(Geocoder):
         return self._parse_reverse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
+
+    @staticmethod
+    def _boolean_value(bool_value):
+        return 'true' if bool_value else 'false'
 
     def _geocode_params(self, formatted_query):
         return {

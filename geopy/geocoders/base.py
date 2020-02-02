@@ -1,36 +1,38 @@
-from ssl import SSLError
-from socket import timeout as SocketTimeout
 import functools
 import json
 import warnings
+from socket import timeout as SocketTimeout
+from ssl import SSLError
 
 from geopy.compat import (
-    string_compare,
     HTTPError,
-    py3k,
-    build_opener_with_context,
     ProxyHandler,
-    URLError,
     Request,
+    URLError,
+    build_opener_with_context,
+    py3k,
+    string_compare,
+)
+from geopy.exc import (
+    ConfigurationError,
+    GeocoderAuthenticationFailure,
+    GeocoderInsufficientPrivileges,
+    GeocoderParseError,
+    GeocoderQueryError,
+    GeocoderQuotaExceeded,
+    GeocoderServiceError,
+    GeocoderTimedOut,
+    GeocoderUnavailable,
 )
 from geopy.point import Point
-from geopy.exc import (
-    GeocoderServiceError,
-    ConfigurationError,
-    GeocoderTimedOut,
-    GeocoderAuthenticationFailure,
-    GeocoderQuotaExceeded,
-    GeocoderQueryError,
-    GeocoderInsufficientPrivileges,
-    GeocoderUnavailable,
-    GeocoderParseError,
-)
-from geopy.util import decode_page, __version__
+from geopy.util import __version__, decode_page, logger
 
 __all__ = (
     "Geocoder",
     "options",
 )
+
+_DEFAULT_USER_AGENT = "geopy/%s" % __version__
 
 
 class options(object):
@@ -104,6 +106,9 @@ class options(object):
             For more information, see
             documentation on :class:`urllib.request.ProxyHandler`.
 
+            .. versionchanged:: 1.15.0
+               Added support for the string value.
+
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
 
@@ -142,6 +147,17 @@ class options(object):
             before raising a :class:`geopy.exc.GeocoderTimedOut` exception.
             Pass `None` to disable timeout.
 
+            .. note::
+               Currently ``None`` as a value is processed correctly only
+               for the ``geopy.geocoders.options.default_timeout`` option
+               value. ``timeout=None`` as a method argument (i.e.
+               ``geocoder.geocode(..., timeout=None)``) would be treated
+               as "use timeout, as set in
+               ``geopy.geocoders.options.default_timeout``", and
+               a deprecation warning would be raised.
+               In geopy 2.0 this will change, so that ``timeout=None``
+               would actually disable timeout.
+
         default_user_agent
             User-Agent header to send with the requests to geocoder API.
     """
@@ -162,7 +178,7 @@ class options(object):
     default_scheme = 'https'
     default_ssl_context = None
     default_timeout = 1
-    default_user_agent = "geopy/%s" % __version__
+    default_user_agent = _DEFAULT_USER_AGENT
 
 
 # Create an object which `repr` returns 'DEFAULT_SENTINEL'. Sphinx (docs) uses
@@ -235,19 +251,48 @@ class Geocoder(object):
         self.urlopen = opener.open
 
     @staticmethod
-    def _coerce_point_to_string(point):
+    def _coerce_point_to_string(point, output_format="%(lat)s,%(lon)s"):
         """
         Do the right thing on "point" input. For geocoders with reverse
         methods.
         """
-        if isinstance(point, Point):
-            return ",".join((str(point.latitude), str(point.longitude)))
-        elif isinstance(point, (list, tuple)):
-            return ",".join((str(point[0]), str(point[1])))  # -altitude
-        elif isinstance(point, string_compare):
-            return point
+        try:
+            if not isinstance(point, Point):
+                point = Point(point)
+        except ValueError as e:
+            if isinstance(point, string_compare):
+                warnings.warn(
+                    'Unable to parse the string as Point: "%s". Using the value '
+                    'as-is for the query. In geopy 2.0 this will become an '
+                    'exception.' % str(e), DeprecationWarning, stacklevel=3
+                )
+                return point
+            raise
         else:
-            raise ValueError("Invalid point")
+            # Altitude is silently dropped.
+            return output_format % dict(lat=point.latitude,
+                                        lon=point.longitude)
+
+    @staticmethod
+    def _format_bounding_box(bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"):
+        """
+        Transform bounding box boundaries to a string matching
+        `output_format` from the following formats:
+
+            - [Point(lat1, lon1), Point(lat2, lon2)]
+            - [[lat1, lon1], [lat2, lon2]]
+            - ["lat1,lon1", "lat2,lon2"]
+
+        It is guaranteed that lat1 <= lat2 and lon1 <= lon2.
+        """
+        if len(bbox) != 2:
+            raise GeocoderQueryError("Unsupported format for a bounding box")
+        p1, p2 = bbox
+        p1, p2 = Point(p1), Point(p2)
+        return output_format % dict(lat1=min(p1.latitude, p2.latitude),
+                                    lon1=min(p1.longitude, p2.longitude),
+                                    lat2=max(p1.latitude, p2.latitude),
+                                    lon2=max(p1.longitude, p2.longitude))
 
     def _geocoder_exception_handler(self, error, message):
         """
@@ -300,7 +345,7 @@ class Geocoder(object):
                  'behavior will be different: None will mean "no timeout" '
                  'instead of "default geocoder timeout". Pass '
                  'geopy.geocoders.base.DEFAULT_SENTINEL instead of None '
-                 'to get rid of this warning.'), DeprecationWarning)
+                 'to get rid of this warning.'), DeprecationWarning, stacklevel=3)
             timeout = DEFAULT_SENTINEL
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
@@ -320,6 +365,10 @@ class Geocoder(object):
             self._geocoder_exception_handler(error, message)
             if isinstance(error, HTTPError):
                 code = error.getcode()
+                body = self._read_http_error_body(error)
+                if body:
+                    logger.info('Received an HTTP error (%s): %s', code, body,
+                                exc_info=False)
                 try:
                     raise ERROR_CODE_MAP[code](message)
                 except KeyError:
@@ -359,6 +408,14 @@ class Geocoder(object):
                 )
         else:
             return page
+
+    def _read_http_error_body(self, error):
+        try:
+            return decode_page(error)
+        except Exception:
+            logger.debug('Unable to fetch body for a non-successful HTTP response',
+                         exc_info=True)
+            return None
 
     def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """

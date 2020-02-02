@@ -22,34 +22,17 @@ addresses, cities, countries, and landmarks across the globe using
 third-party geocoders and other data sources.
 
 geopy includes geocoder classes for the `OpenStreetMap Nominatim`_,
-`ESRI ArcGIS`_, `Google Geocoding API (V3)`_, `Baidu Maps`_,
-`Bing Maps API`_, `Yandex`_, `IGN France`_, `GeoNames`_,
-`Pelias`_, `geocode.earth`_,
-`OpenMapQuest`_, `PickPoint`_, `What3Words`_, `OpenCage`_,
-`SmartyStreets`_, `GeocodeFarm`_, and `Here`_ geocoder services.
-The various geocoder classes are located in `geopy.geocoders`_.
+`Google Geocoding API (V3)`_, and many other geocoding services.
+The full list is available on the `Geocoders doc section`_.
+Geocoder classes are located in `geopy.geocoders`_.
 
 .. _OpenStreetMap Nominatim: https://wiki.openstreetmap.org/wiki/Nominatim
-.. _ESRI ArcGIS: http://resources.arcgis.com/en/help/arcgis-rest-api/
 .. _Google Geocoding API (V3): https://developers.google.com/maps/documentation/geocoding/
-.. _Baidu Maps: http://developer.baidu.com/map/webservice-geocoding.htm
-.. _Bing Maps API: http://www.microsoft.com/maps/developers/web.aspx
-.. _Yandex: http://api.yandex.com/maps/doc/intro/concepts/intro.xml
-.. _IGN France: http://api.ign.fr/tech-docs-js/fr/developpeur/search.html
-.. _GeoNames: http://www.geonames.org/
-.. _Pelias: https://pelias.io/
-.. _geocode.earth: https://geocode.earth/
-.. _OpenMapQuest: http://developer.mapquest.com/web/products/open/geocoding-service
-.. _PickPoint: https://pickpoint.io
-.. _What3Words: http://what3words.com/api/reference
-.. _OpenCage: https://geocoder.opencagedata.com/
-.. _SmartyStreets: https://smartystreets.com/products/liveaddress-api
-.. _GeocodeFarm: https://www.geocodefarm.com/
-.. _Here: https://developer.here.com/documentation/geocoder/
+.. _Geocoders doc section: https://geopy.readthedocs.io/en/latest/#geocoders
 .. _geopy.geocoders: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
-geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6, 3.7), PyPy, and
-PyPy3. geopy does not and will not support CPython 2.6.
+geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6, 3.7, 3.8),
+PyPy, and PyPy3. geopy does not and will not support CPython 2.6.
 
 © geopy contributors 2006-2018 (see AUTHORS) under the `MIT
 License <https://github.com/geopy/geopy/blob/master/LICENSE>`__.
@@ -71,10 +54,10 @@ Geocoding
 
 To geolocate a query to an address and coordinates:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim()
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.geocode("175 5th Avenue NYC")
     >>> print(location.address)
     Flatiron Building, 175, 5th Avenue, Flatiron, New York, NYC, New York, ...
@@ -85,10 +68,10 @@ To geolocate a query to an address and coordinates:
 
 To find the address corresponding to a set of coordinates:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim()
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.reverse("52.509669, 13.376294")
     >>> print(location.address)
     Potsdamer Platz, Mitte, Berlin, 10117, Deutschland, European Union
@@ -110,7 +93,7 @@ with a default of the geodesic distance available as the function
 
 Here's an example usage of the geodesic distance:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.distance import geodesic
     >>> newport_ri = (41.49008, -71.312796)
@@ -120,7 +103,7 @@ Here's an example usage of the geodesic distance:
 
 Using great-circle distance:
 
-.. code:: python
+.. code:: pycon
 
     >>> from geopy.distance import great_circle
     >>> newport_ri = (41.49008, -71.312796)

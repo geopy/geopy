@@ -1,5 +1,5 @@
-
 import unittest
+import warnings
 
 from geopy.compat import u
 from geopy.geocoders import OpenCage
@@ -49,13 +49,39 @@ class OpenCageTestCase(GeocoderTestBase):
         )
 
     def test_geocode_empty_result(self):
-        """
-        Empty OpenCage.geocode results should be graciously handled.
-        """
         self.geocode_run(
-            {
-                "query": "xqj37",
-            },
+            {"query": "xqj37"},
             {},
             expect_failure=True
+        )
+
+    def test_bounds(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "bounds": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
+    def test_bounds_deprecated(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.geocode_run(
+                {"query": "moscow",  # Idaho USA
+                 "bounds": "-130.1,50.1,-100.9,44.1"},
+                {"latitude": 46.7323875, "longitude": -117.0001651},
+            )
+            self.assertEqual(1, len(w))
+
+    def test_country_str(self):
+        self.geocode_run(
+            {"query": "kazan",
+             "country": 'tr'},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_country_list(self):
+        self.geocode_run(
+            {"query": "kazan",
+             "country": ['cn', 'tr']},
+            {"latitude": 40.2317, "longitude": 32.6839},
         )

@@ -9,15 +9,9 @@ import warnings
 from itertools import islice
 from math import fmod
 
-from geopy import util, units
-from geopy.format import (
-    DEGREE,
-    PRIME,
-    DOUBLE_PRIME,
-    format_degrees,
-    format_distance,
-)
-from geopy.compat import string_compare, isfinite
+from geopy import units, util
+from geopy.compat import isfinite, string_compare
+from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
 
 POINT_PATTERN = re.compile(r"""
     .*?
@@ -38,7 +32,7 @@ POINT_PATTERN = re.compile(r"""
       (?P<altitude>
         (?P<altitude_distance>-?%(FLOAT)s)[ ]*
         (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
-    .*?$
+    \s*$
 """ % {
     "FLOAT": r'\d+(?:\.\d+)?',
     "DEGREE": DEGREE,
@@ -78,7 +72,7 @@ def _normalize_coordinates(latitude, longitude, altitude):
                       'meant. If you pass coordinates as positional args, '
                       'please make sure that the order is '
                       '(latitude, longitude) or (y, x) in Cartesian terms.',
-                      UserWarning)
+                      UserWarning, stacklevel=3)
         raise ValueError('Latitude must be in the [-90; 90] range.')
 
     if abs(longitude) > 180:
@@ -176,8 +170,9 @@ class Point(object):
                           'constructing a Point with just a latitude '
                           'seems senseless. If this is exactly what was '
                           'meant, then pass the zero longitude explicitly '
-                          'to get rid of this warning.',
-                          UserWarning)
+                          'to get rid of this warning. '
+                          'In geopy 2.0 this will become an exception.',
+                          DeprecationWarning, stacklevel=2)
 
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)

@@ -1,47 +1,17 @@
 
-import os
 import json
+import os
 import unittest
 from collections import defaultdict
 
 from geopy import exc
 
+env = defaultdict(lambda: None)
 try:
-    env = defaultdict(lambda: None)
     with open(".test_keys") as fp:
         env.update(json.loads(fp.read()))
 except IOError:
-    keys = (
-        'ARCGIS_USERNAME',
-        'ARCGIS_PASSWORD',
-        'ARCGIS_REFERER',
-        'AZURE_SUBSCRIPTION_KEY',
-        'BING_KEY',
-        'GEONAMES_USERNAME',
-        'LIVESTREETS_AUTH_ID',
-        'LIVESTREETS_AUTH_TOKEN',
-        'GEOCODEEARTH_KEY',
-        'GEOCODEFARM_KEY',
-        'HERE_APP_ID',
-        'HERE_APP_CODE',
-        'GEOCODEFARM_SKIP',
-        'BAIDU_KEY',
-        'BAIDU_KEY_REQUIRES_SK',
-        'BAIDU_SEC_KEY',
-        'OPENCAGE_KEY',
-        'OPENMAPQUEST_APIKEY',
-        'PELIAS_DOMAIN',
-        'PELIAS_KEY',
-        'PICKPOINT_KEY',
-        'TOMTOM_KEY',
-        'WHAT3WORDS_KEY',
-        'IGNFRANCE_KEY',
-        'IGNFRANCE_USERNAME',
-        'IGNFRANCE_PASSWORD',
-        'IGNFRANCE_REFERER',
-        'YANDEX_KEY',
-    )
-    env = {key: os.environ.get(key, None) for key in keys}
+    env.update(os.environ)
 
 
 EMPTY = object()
@@ -125,26 +95,40 @@ class GeocoderTestBase(unittest.TestCase):
     def _verify_request(
             self,
             result,
-            raw=EMPTY,
             latitude=EMPTY,
             longitude=EMPTY,
             address=EMPTY,
             exactly_one=True,
+            delta=None,
     ):
         """
-        Verifies that a a result matches the kwargs given.
+        Verifies that result matches the kwargs given.
         """
         item = result if exactly_one else result[0]
+        delta = delta or self.delta
+        exceptions = []
 
-        if raw is not EMPTY:
-            self.assertEqual(item.raw, raw)
         if latitude is not EMPTY:
-            self.assertAlmostEqual(
-                item.latitude, latitude, delta=self.delta
-            )
+            try:
+                self.assertAlmostEqual(
+                    item.latitude, latitude, delta=delta,
+                    msg="latitude differs",
+                )
+            except AssertionError as e:
+                exceptions.append(e)
         if longitude is not EMPTY:
-            self.assertAlmostEqual(
-                item.longitude, longitude, delta=self.delta
-            )
+            try:
+                self.assertAlmostEqual(
+                    item.longitude, longitude, delta=delta,
+                    msg="longitude differs",
+                )
+            except AssertionError as e:
+                exceptions.append(e)
         if address is not EMPTY:
-            self.assertEqual(item.address, address)
+            try:
+                self.assertEqual(item.address, address,
+                                 msg="address differs")
+            except AssertionError as e:
+                exceptions.append(e)
+
+        self.assertFalse(exceptions)

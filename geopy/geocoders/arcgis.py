@@ -26,7 +26,10 @@ class ArcGIS(Geocoder):
 
     _TOKEN_EXPIRED = 498
     _MAX_RETRIES = 3
-    auth_api = 'https://www.arcgis.com/sharing/generateToken'
+
+    auth_path = '/sharing/generateToken'
+    geocode_path = '/arcgis/rest/services/World/GeocodeServer/findAddressCandidates'
+    reverse_path = '/arcgis/rest/services/World/GeocodeServer/reverseGeocode'
 
     def __init__(
             self,
@@ -40,6 +43,8 @@ class ArcGIS(Geocoder):
             user_agent=None,
             format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            auth_domain='www.arcgis.com',
+            domain='geocode.arcgis.com',
     ):
         """
 
@@ -83,6 +88,17 @@ class ArcGIS(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
             .. versionadded:: 1.14.0
+
+        :param str auth_domain: Domain where the target ArcGIS auth service
+            is hosted. Used only in authenticated mode (i.e. username,
+            password and referer are set).
+
+            .. versionadded:: 1.17.0
+
+        :param str domain: Domain where the target ArcGIS service
+            is hosted.
+
+            .. versionadded:: 1.17.0
         """
         super(ArcGIS, self).__init__(
             format_string=format_string,
@@ -108,19 +124,22 @@ class ArcGIS(Geocoder):
         self.username = username
         self.password = password
         self.referer = referer
+        self.auth_domain = auth_domain.strip('/')
+        self.auth_api = (
+            '%s://%s%s' % (self.scheme, self.auth_domain, self.auth_path)
+        )
 
         self.token = None
         self.token_lifetime = token_lifetime * 60  # store in seconds
         self.token_expiry = None
         self.retry = 1
 
+        self.domain = domain.strip('/')
         self.api = (
-            '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/findAddressCandidates' % self.scheme
+            '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
         )
         self.reverse_api = (
-            '%s://geocode.arcgis.com/arcgis/rest/services/'
-            'World/GeocodeServer/reverseGeocode' % self.scheme
+            '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
         )
 
     def _authenticated_call_geocoder(self, url, timeout=DEFAULT_SENTINEL):
@@ -231,12 +250,12 @@ class ArcGIS(Geocoder):
                coordinates according to WKID 4326. Please open an issue in
                the geopy issue tracker if you believe that custom wkid values
                should be supported.
+               This parameter is scheduled for removal in geopy 2.0.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        # ArcGIS is lon,lat; maintain lat,lon convention of geopy
-        point = self._coerce_point_to_string(query).split(",")
+        location = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         if wkid != DEFAULT_WKID:
             warnings.warn("%s.reverse: custom wkid value has been ignored.  "
                           "It wasn't working before because it was specified "
@@ -246,9 +265,8 @@ class ArcGIS(Geocoder):
                           "Please open an issue in the geopy issue tracker "
                           "if you believe that custom wkid values should be "
                           "supported." % (type(self).__name__, DEFAULT_WKID),
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             wkid = DEFAULT_WKID
-        location = ",".join((point[1], point[0]))
         params = {'location': location, 'f': 'json', 'outSR': wkid}
         if distance is not None:
             params['distance'] = distance

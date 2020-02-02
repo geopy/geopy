@@ -1,7 +1,12 @@
 # -*- coding: UTF-8 -*-
 import unittest
+import uuid
 
+import pytz
+
+from geopy import Point
 from geopy.compat import u
+from geopy.exc import GeocoderAuthenticationFailure, GeocoderQueryError
 from geopy.geocoders import GeoNames
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -28,10 +33,15 @@ class GeoNamesTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = GeoNames(username=env['GEONAMES_USERNAME'])
 
+    def reverse_timezone_run(self, payload, expected):
+        timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
+        if expected is None:
+            self.assertIsNone(timezone)
+        else:
+            self.assertEqual(timezone.pytz_timezone, expected)
+        return timezone
+
     def test_unicode_name(self):
-        """
-        GeoNames.geocode unicode
-        """
         self.geocode_run(
             {"query": "Mount Everest, Nepal"},
             {"latitude": 27.987, "longitude": 86.925},
@@ -47,10 +57,176 @@ class GeoNamesTestCase(GeocoderTestBase):
         self.assertIn(u("Ry\u016b\u014d"), location.address)
 
     def test_reverse(self):
-        """
-        GeoNames.reverse
-        """
-        self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667", "exactly_one": True},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+        location = self.reverse_run(
+            {
+                "query": "40.75376406311989, -73.98489005863667",
+                "exactly_one": True,
+            },
+            {
+                "latitude": 40.75376406311989,
+                "longitude": -73.98489005863667,
+            },
         )
+        self.assertIn("Times Square", location.address)
+
+    def test_geocode_empty_response(self):
+        self.geocode_run(
+            {"query": "sdlahaslkhdkasldhkjsahdlkash"},
+            {},
+            expect_failure=True,
+        )
+
+    def test_reverse_nearby_place_name_raises_for_feature_code(self):
+        with self.assertRaises(ValueError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "feature_code": "ADM1",
+                },
+                {},
+            )
+
+        with self.assertRaises(ValueError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "feature_code": "ADM1",
+                    "find_nearby_type": "findNearbyPlaceName",
+                },
+                {},
+            )
+
+    def test_reverse_nearby_place_name_lang(self):
+        location = self.reverse_run(
+            {
+                "query": "52.50, 13.41",
+                "exactly_one": True,
+                "lang": 'ru',
+            },
+            {},
+        )
+        self.assertIn(u'Берлин, Германия', location.address)
+
+    def test_reverse_find_nearby_raises_for_lang(self):
+        with self.assertRaises(ValueError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "find_nearby_type": 'findNearby',
+                    "lang": 'en',
+                },
+                {},
+            )
+
+    def test_reverse_find_nearby(self):
+        location = self.reverse_run(
+            {
+                "query": "40.75376406311989, -73.98489005863667",
+                "exactly_one": True,
+                "find_nearby_type": 'findNearby',
+            },
+            {
+                "latitude": 40.75376406311989,
+                "longitude": -73.98489005863667,
+            },
+        )
+        self.assertIn("New York, United States", location.address)
+
+    def test_reverse_find_nearby_feature_code(self):
+        self.reverse_run(
+            {
+                "query": "40.75376406311989, -73.98489005863667",
+                "exactly_one": True,
+                "find_nearby_type": 'findNearby',
+                "feature_code": "ADM1",
+            },
+            {
+                "latitude": 40.16706,
+                "longitude": -74.49987,
+            },
+        )
+
+    def test_reverse_raises_for_unknown_find_nearby_type(self):
+        with self.assertRaises(GeocoderQueryError):
+            self.reverse_run(
+                {
+                    "query": "40.75376406311989, -73.98489005863667",
+                    "exactly_one": True,
+                    "find_nearby_type": "findSomethingNonExisting",
+                },
+                {},
+            )
+
+    def test_reverse_timezone(self):
+        new_york_point = Point(40.75376406311989, -73.98489005863667)
+        america_new_york = pytz.timezone("America/New_York")
+
+        timezone = self.reverse_timezone_run(
+            {"query": new_york_point},
+            america_new_york,
+        )
+        self.assertEqual(timezone.raw['countryCode'], 'US')
+
+    def test_reverse_timezone_unknown(self):
+        self.reverse_timezone_run(
+            # Geonames doesn't return `timezoneId` for Antarctica,
+            # but it provides GMT offset which can be used
+            # to create a FixedOffset pytz timezone.
+            {"query": "89.0, 1.0"},
+            pytz.UTC,
+        )
+        self.reverse_timezone_run(
+            {"query": "89.0, 80.0"},
+            pytz.FixedOffset(5 * 60),
+        )
+
+    def test_country_str(self):
+        self.geocode_run(
+            {"query": "kazan", "country": "TR"},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_country_list(self):
+        self.geocode_run(
+            {"query": "kazan", "country": ["CN", "TR", "JP"]},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+    def test_country_bias(self):
+        self.geocode_run(
+            {"query": "kazan", "country_bias": "TR"},
+            {"latitude": 40.2317, "longitude": 32.6839},
+        )
+
+
+class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = GeoNames(username="geopy-not-existing-%s" % uuid.uuid4())
+
+    def reverse_timezone_run(self, payload, expected):
+        timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
+        if expected is None:
+            self.assertIsNone(timezone)
+        else:
+            self.assertEqual(timezone.pytz_timezone, expected)
+        return timezone
+
+    def test_geocode(self):
+        with self.assertRaises(GeocoderAuthenticationFailure):
+            self.geocode_run(
+                {"query": "moscow"},
+                {},
+                expect_failure=True,
+            )
+
+    def test_reverse_timezone(self):
+        with self.assertRaises(GeocoderAuthenticationFailure):
+            self.reverse_timezone_run(
+                {"query": "40.6997716, -73.9753359"},
+                None,
+            )

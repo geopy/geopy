@@ -25,6 +25,9 @@ class What3Words(Geocoder):
         r"[^\W\d\_]+\.{1,1}[^\W\d\_]+\.{1,1}[^\W\d\_]+$", re.U
         )
 
+    geocode_path = '/v2/forward'
+    reverse_path = '/v2/reverse'
+
     def __init__(
             self,
             api_key,
@@ -47,8 +50,8 @@ class What3Words(Geocoder):
 
             .. deprecated:: 1.15.0
                API v2 requires https. Don't use this parameter,
-               it's going to be removed in the future versions of
-               geopy. Scheme other than ``https`` would result in a
+               it's going to be removed in geopy 2.0.
+               Scheme other than ``https`` would result in a
                :class:`geopy.exc.ConfigurationError` being thrown.
 
         :param int timeout:
@@ -83,9 +86,9 @@ class What3Words(Geocoder):
             raise exc.ConfigurationError("What3Words now requires `https`.")
 
         self.api_key = api_key
-        self.api = (
-            "%s://api.what3words.com/v2/" % self.scheme
-        )
+        domain = 'api.what3words.com'
+        self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
+        self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
 
     def _check_query(self, query):
         """
@@ -141,7 +144,7 @@ class What3Words(Geocoder):
             'key': self.api_key,
         }
 
-        url = "?".join(((self.api + "forward"), urlencode(params)))
+        url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -227,7 +230,7 @@ class What3Words(Geocoder):
             'key': self.api_key,
         }
 
-        url = "?".join(((self.api + "reverse"), urlencode(params)))
+        url = "?".join((self.reverse_api, urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(

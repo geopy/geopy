@@ -1,3 +1,5 @@
+import warnings
+
 from geopy.compat import urlencode
 from geopy.exc import ConfigurationError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -14,11 +16,13 @@ class LiveAddress(Geocoder):
         https://smartystreets.com/docs/cloud/us-street-api
     """
 
+    geocode_path = '/street-address'
+
     def __init__(
             self,
             auth_id,
             auth_token,
-            candidates=1,
+            candidates=None,
             scheme='https',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -36,13 +40,17 @@ class LiveAddress(Geocoder):
 
         :param int candidates: An integer between 1 and 10 indicating the max
             number of candidate addresses to return if a valid address
-            could be found.
+            could be found. Defaults to `1`.
+
+            .. deprecated:: 1.19.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s `candidates` instead.
 
         :param str scheme: Must be ``https``.
 
             .. deprecated:: 1.14.0
-               Don't use this parameter, it's going to be removed in the
-               future versions of geopy.
+               Don't use this parameter, it's going to be removed in
+               geopy 2.0.
 
             .. versionchanged:: 1.8.0
                LiveAddress now requires `https`. Specifying `scheme=http` will
@@ -85,13 +93,30 @@ class LiveAddress(Geocoder):
             raise ConfigurationError("LiveAddress now requires `https`.")
         self.auth_id = auth_id
         self.auth_token = auth_token
+
         if candidates:
             if not (1 <= candidates <= 10):
                 raise ValueError('candidates must be between 1 and 10')
+        if candidates is not None:
+            warnings.warn(
+                '`candidates` argument of the %(cls)s.__init__ '
+                'is deprecated and will be removed in geopy 2.0. Use '
+                '%(cls)s.geocode(candidates=%(value)r) instead.'
+                % dict(cls=type(self).__name__, value=candidates),
+                DeprecationWarning,
+                stacklevel=2
+            )
         self.candidates = candidates
-        self.api = '%s://api.smartystreets.com/street-address' % self.scheme
+        domain = 'api.smartystreets.com'
+        self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
+            candidates=None,  # TODO: change default value to `1` in geopy 2.0
+    ):
         """
         Return a location point by address.
 
@@ -105,10 +130,34 @@ class LiveAddress(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param int candidates: An integer between 1 and 10 indicating the max
+            number of candidate addresses to return if a valid address
+            could be found. Defaults to `1`.
+
+            .. versionadded:: 1.19.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        url = self._compose_url(self.format_string % query)
+
+        if candidates is None:
+            candidates = self.candidates
+
+        if candidates is None:
+            candidates = 1  # TODO: move to default args in geopy 2.0.
+
+        if candidates:
+            if not (1 <= candidates <= 10):
+                raise ValueError('candidates must be between 1 and 10')
+
+        query = {
+            'auth-id': self.auth_id,
+            'auth-token': self.auth_token,
+            'street': self.format_string % query,
+            'candidates': candidates,
+        }
+        url = '{url}?{query}'.format(url=self.api, query=urlencode(query))
+
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(self._call_geocoder(url, timeout=timeout),
                                 exactly_one)
@@ -119,18 +168,6 @@ class LiveAddress(Geocoder):
         """
         if "no active subscriptions found" in message.lower():
             raise GeocoderQuotaExceeded(message)
-
-    def _compose_url(self, location):
-        """
-        Generate API URL.
-        """
-        query = {
-            'auth-id': self.auth_id,
-            'auth-token': self.auth_token,
-            'street': location,
-            'candidates': self.candidates
-        }
-        return '{url}?{query}'.format(url=self.api, query=urlencode(query))
 
     def _parse_json(self, response, exactly_one=True):
         """

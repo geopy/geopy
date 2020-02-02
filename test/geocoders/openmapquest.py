@@ -1,8 +1,9 @@
-
-from geopy.compat import u
-from geopy.geocoders import OpenMapQuest
-from test.geocoders.util import GeocoderTestBase, env
 import unittest
+
+from geopy.exc import ConfigurationError
+from geopy.geocoders import OpenMapQuest
+from test.geocoders.nominatim import BaseNominatimTestCase
+from test.geocoders.util import GeocoderTestBase, env
 
 
 class OpenMapQuestNoNetTestCase(GeocoderTestBase):
@@ -14,37 +15,18 @@ class OpenMapQuestNoNetTestCase(GeocoderTestBase):
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
+    def test_raises_without_apikey(self):
+        with self.assertRaises(ConfigurationError):
+            OpenMapQuest()
+
 
 @unittest.skipUnless(
     bool(env.get('OPENMAPQUEST_APIKEY')),
     "No OPENMAPQUEST_APIKEY env variable set"
 )
-class OpenMapQuestTestCase(GeocoderTestBase):
+class OpenMapQuestTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
     @classmethod
-    def setUpClass(cls):
-        # setUpClass is still called even if test is skipped.
-        # OpenMapQuest raises ConfigurationError when api_key is empty,
-        # so don't try to create the instance when api_key is empty.
-        if env.get('OPENMAPQUEST_APIKEY'):
-            cls.geocoder = OpenMapQuest(scheme='http', timeout=3,
-                                        api_key=env['OPENMAPQUEST_APIKEY'])
-        cls.delta = 0.04
-
-    def test_geocode(self):
-        """
-        OpenMapQuest.geocode
-        """
-        self.geocode_run(
-            {"query": "435 north michigan ave, chicago il 60611 usa"},
-            {"latitude": 41.890, "longitude": -87.624},
-        )
-
-    def test_unicode_name(self):
-        """
-        OpenMapQuest.geocode unicode
-        """
-        self.geocode_run(
-            {"query": u("\u6545\u5bab")},
-            {"latitude": 39.916, "longitude": 116.390},
-        )
+    def make_geocoder(cls, **kwargs):
+        return OpenMapQuest(api_key=env['OPENMAPQUEST_APIKEY'],
+                            timeout=3, **kwargs)

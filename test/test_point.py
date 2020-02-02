@@ -72,6 +72,10 @@ class PointTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             Point("gibberish")
 
+        with self.assertRaises(ValueError):
+            # It could be interpreted as `Point(75, 5)`.
+            Point("75 5th Avenue, NYC, USA")
+
     def test_point_from_string(self):
         # Examples are from the docstring of `Point.from_string`.
         self.assertEqual(Point("41.5;-81.0"), (41.5, -81.0, 0.0))

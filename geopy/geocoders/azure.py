@@ -10,6 +10,8 @@ class AzureMaps(TomTom):
 
     Documentation at:
         https://docs.microsoft.com/en-us/azure/azure-maps/index
+
+    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/address/json'
@@ -48,6 +50,8 @@ class AzureMaps(TomTom):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param str domain: Domain where the target Azure Maps service
+            is hosted.
         """
         super(AzureMaps, self).__init__(
             api_key=subscription_key,

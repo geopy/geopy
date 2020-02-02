@@ -4,18 +4,20 @@ Test distance formulas
 import math
 import unittest
 import warnings
+
 from mock import patch
 
+from geopy.distance import (
+    EARTH_RADIUS,
+    ELLIPSOIDS,
+    Distance,
+    GeodesicDistance,
+    GreatCircleDistance,
+    VincentyDistance,
+    distance,
+    lonlat,
+)
 from geopy.point import Point
-from geopy.distance import (Distance,
-                            GreatCircleDistance,
-                            VincentyDistance,
-                            GeodesicDistance,
-                            distance,
-                            lonlat,
-                            EARTH_RADIUS,
-                            ELLIPSOIDS)
-
 
 EARTH_CIRCUMFERENCE = 2 * math.pi * EARTH_RADIUS
 NORTH_POLE = Point(90, 0)

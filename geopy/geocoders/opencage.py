@@ -1,6 +1,6 @@
 import warnings
 
-from geopy.compat import urlencode
+from geopy.compat import string_compare, urlencode
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -13,10 +13,12 @@ class OpenCage(Geocoder):
     """Geocoder using the OpenCageData API.
 
     Documentation at:
-        https://geocoder.opencagedata.com/api
+        https://opencagedata.com/api
 
     .. versionadded:: 1.1.0
     """
+
+    api_path = '/geocode/v1/json'
 
     def __init__(
             self,
@@ -33,7 +35,7 @@ class OpenCage(Geocoder):
 
         :param str api_key: The API key required by OpenCageData
             to perform geocoding requests. You can get your key here:
-            https://geocoder.opencagedata.com/
+            https://opencagedata.com/
 
         :param str domain: Currently it is ``'api.opencagedata.com'``, can
             be changed for testing purposes.
@@ -75,7 +77,7 @@ class OpenCage(Geocoder):
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.api = '%s://%s/geocode/v1/json' % (self.scheme, self.domain)
+        self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
 
     def geocode(
             self,
@@ -96,20 +98,32 @@ class OpenCage(Geocoder):
             omitted a code of `en` (English) will be assumed by the remote
             service.
 
-        :param str bounds: Provides the geocoder with a hint to the region
+        :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
+        :param bounds: Provides the geocoder with a hint to the region
             that the query resides in. This value will help the geocoder
             but will not restrict the possible results to the supplied
-            region. The bounds parameter should be specified as 4
-            coordinate points forming the south-west and north-east
-            corners of a bounding box. The order of the coordinates is
-            `longitude,latitude,longitude,latitude`. For example,
-            ``bounds=-0.563160,51.280430,0.278970,51.683979``.
+            region. The bounds parameter should be specified as 2
+            coordinate points -- corners of a bounding box.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-        :param str country: Provides the geocoder with a hint to the
-            country that the query resides in. This value will help the
-            geocoder but will not restrict the possible results to the
-            supplied country. The country code is a 3 character code as
-            defined by the ISO 3166-1 Alpha 3 standard.
+            .. versionchanged:: 1.17.0
+                Previously the only supported format for bounds was a
+                string of ``"longitude,latitude,longitude,latitude"``.
+                This format is now deprecated in favor of a list/tuple
+                of a pair of geopy Points and will be removed in geopy 2.0.
+
+        :param country: Restricts the results to the specified
+            country or countries. The country code is a 2 character code as
+            defined by the ISO 3166-1 Alpha 2 standard (e.g. ``fr``).
+            Might be a Python list of strings.
+
+            .. versionchanged:: 1.19.0
+                This parameter didn't seem to be respected previously.
+                Also, previously only a single string could be specified.
+                Now a Python list of individual countries is supported.
+
+        :type country: str or list
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -128,11 +142,29 @@ class OpenCage(Geocoder):
             'q': self.format_string % query,
         }
         if bounds:
-            params['bounds'] = bounds
+            if isinstance(bounds, string_compare):
+                warnings.warn(
+                    'OpenCage `bounds` format of '
+                    '`"longitude,latitude,longitude,latitude"` is now '
+                    'deprecated and will not be supported in geopy 2.0. '
+                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
+                    'instead.',
+                    DeprecationWarning,
+                    stacklevel=2
+                )
+                lon1, lat1, lon2, lat2 = bounds.split(',')
+                bounds = [[lat1, lon1], [lat2, lon2]]
+            params['bounds'] = self._format_bounding_box(
+                bounds, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
         if language:
             params['language'] = language
+
+        if not country:
+            country = []
+        if isinstance(country, string_compare):
+            country = [country]
         if country:
-            params['country'] = country
+            params['countrycode'] = ",".join(country)
 
         url = "?".join((self.api, urlencode(params)))
 
@@ -181,7 +213,7 @@ class OpenCage(Geocoder):
                           'argument will become True in geopy 2.0. '
                           'Specify `exactly_one=False` as the argument '
                           'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning)
+                          DeprecationWarning, stacklevel=2)
             exactly_one = False
 
         params = {

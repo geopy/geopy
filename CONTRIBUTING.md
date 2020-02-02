@@ -41,14 +41,18 @@ If your PR remains unreviewed for a while, feel free to bug the maintainer.
 
         pip install -e ".[dev]"
 
-3.  Ensure that the tests pass
+3.  Ensure that tests pass
 
-        pytest
+        make test
 
 
 ### Running tests
 
 To run the full test suite:
+
+    make test
+
+Or simply:
 
     pytest
 
@@ -60,7 +64,7 @@ For example:
 Before pushing your code, make sure that linting passes, otherwise Travis
 build would fail:
 
-    flake8
+    make lint
 
 
 ### Geocoder credentials
@@ -95,13 +99,12 @@ Example contents of `.test_keys`:
 
 ### Building docs
 
-    cd docs
-    make html
+    make docs
 
-Open `_build/html/index.html` with a browser to see the docs. On macOS you 
+Open `docs/_build/html/index.html` with a browser to see the docs. On macOS you 
 can use the following command for that:
 
-    open _build/html/index.html
+    open docs/_build/html/index.html
 
 
 ### Adding a new geocoder
@@ -122,11 +125,11 @@ A checklist for adding a new geocoder:
     adding the required imports.
 
 3.  Create a test module in the `test/geocoders` directory. If your geocoder
-    class requires credentials, then make sure to list them in the
-    `test/geocoders/util.py` module and add a unittest decorator (see
-    `test/geocoders/what3words.py` for example). Refer to the
-    [Geocoder credentials](#geocoder-credentials) section above for info
-    on how to work with credentials locally.
+    class requires credentials, make sure to add the `@unittest.skipUnless`
+    decorator to skip running tests when the required credentials
+    are not provided (see `test/geocoders/what3words.py` for example).
+    Refer to the [Geocoder credentials](#geocoder-credentials) section
+    above for info on how to work with credentials locally.
 
 4.  Complete your implementation and tests! Give TDD a try if you aren't used
     to it yet! 🎉 Please note that it's possible to run a single test module
@@ -141,9 +144,7 @@ A checklist for adding a new geocoder:
     ([Building docs](#building-docs) section above) to make sure that you've
     done them right!
 
-7.  Almost done! The last step: add the service name and a homepage link to
-    the `README.rst` file.
-
+That's all!
 
 ### Improving a geocoder
 

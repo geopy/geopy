@@ -1,8 +1,8 @@
 import unittest
 
 from geopy.geocoders import AzureMaps
-from test.geocoders.util import GeocoderTestBase, env
 from test.geocoders.tomtom import BaseTomTomTestCase
+from test.geocoders.util import GeocoderTestBase, env
 
 
 @unittest.skipUnless(

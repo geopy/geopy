@@ -1,4 +1,4 @@
-from geopy.compat import urlencode
+from geopy.compat import quote, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
@@ -27,6 +27,9 @@ class Bing(Geocoder):
         'countryRegion',
         'postalCode',
     }
+
+    geocode_path = '/REST/v1/Locations'
+    reverse_path = '/REST/v1/Locations/%(point)s'
 
     def __init__(
             self,
@@ -75,7 +78,9 @@ class Bing(Geocoder):
             ssl_context=ssl_context,
         )
         self.api_key = api_key
-        self.api = "%s://dev.virtualearth.net/REST/v1/Locations" % self.scheme
+        domain = 'dev.virtualearth.net'
+        self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
+        self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
 
     def geocode(
             self,
@@ -153,7 +158,7 @@ class Bing(Geocoder):
         if include_country_code:
             params['include'] = 'ciso2'  # the only acceptable value
 
-        url = "?".join((self.api, urlencode(params)))
+        url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout),
@@ -201,8 +206,9 @@ class Bing(Geocoder):
         if include_country_code:
             params['include'] = 'ciso2'  # the only acceptable value
 
-        url = "%s/%s?%s" % (
-            self.api, point, urlencode(params))
+        quoted_point = quote(point.encode('utf-8'))
+        url = "?".join((self.reverse_api % dict(point=quoted_point),
+                        urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(

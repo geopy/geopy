@@ -30,11 +30,9 @@ class HereTestCase(GeocoderTestBase):
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Here(
-            format_string='%s',
-            scheme='http',
             app_id=env['HERE_APP_ID'],
             app_code=env['HERE_APP_CODE'],
-            timeout=10
+            timeout=10,
         )
 
     def test_geocode_empty_result(self):
@@ -82,6 +80,20 @@ class HereTestCase(GeocoderTestBase):
             {"latitude": 48.85718, "longitude": 2.34141}
         )
 
+    def test_bbox(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "bbox": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
+    def test_mapview(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "mapview": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
     def test_geocode_shapes(self):
         """
         Here.geocode using additional data parameter (postal code shapes)
@@ -118,7 +130,7 @@ class HereTestCase(GeocoderTestBase):
 
     def test_geocode_with_paging(self):
         """
-        Here.geocode using simple paging "ouside" geopy
+        Here.geocode using simple paging "outside" geopy
         """
         address_string = "Hauptstr., Berlin, Germany"
         input = {"query": address_string, "maxresults": 12, "exactly_one": False}
@@ -127,39 +139,29 @@ class HereTestCase(GeocoderTestBase):
 
         input["pageinformation"] = 2
         res = self.geocode_run(input, {})
-        self.assertEqual(len(res), 3)
+        self.assertGreaterEqual(len(res), 3)
+        self.assertLessEqual(len(res), 6)
 
         input["pageinformation"] = 3
         res = self.geocode_run(input, {}, expect_failure=True)
 
-    def test_reverse_string(self):
-        """
-        Here.reverse string
-        """
-        self.reverse_run(
-            {"query": "40.753898, -73.985071"},
-            {"latitude": 40.753898, "longitude": -73.985071}
-        )
-
-    def test_reverse_point(self):
-        """
-        Here.reverse Point
-        """
+    def test_reverse(self):
         self.reverse_run(
             {"query": Point(40.753898, -73.985071)},
             {"latitude": 40.753898, "longitude": -73.985071}
         )
 
-    def test_reverse_point_radius_1000(self):
+    def test_reverse_point_radius_1000_float(self):
         """
         Here.reverse Point with radius
         """
         # needs more testing
         res = self.reverse_run(
-            {"query": Point(40.753898, -73.985071), "radius": 1000, "exactly_one": False},
+            {"query": Point(40.753898, -73.985071), "radius": 1000.12,
+             "exactly_one": False},
             {"latitude": 40.753898, "longitude": -73.985071}
         )
-        self.assertEqual(len(res), 10)
+        self.assertGreater(len(res), 5)
 
     def test_reverse_point_radius_10(self):
         """
@@ -170,7 +172,7 @@ class HereTestCase(GeocoderTestBase):
             {"query": Point(40.753898, -73.985071), "radius": 10, "exactly_one": False},
             {"latitude": 40.753898, "longitude": -73.985071}
         )
-        self.assertEqual(len(res), 10)
+        self.assertGreater(len(res), 5)
 
     def test_reverse_with_language_de(self):
         """

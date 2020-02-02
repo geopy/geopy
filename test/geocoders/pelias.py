@@ -1,11 +1,14 @@
 # coding: utf8
 from __future__ import unicode_literals
-from abc import ABCMeta, abstractmethod
-from six import with_metaclass
-import unittest
 
-from geopy.point import Point
+import unittest
+import warnings
+from abc import ABCMeta, abstractmethod
+
+from six import with_metaclass
+
 from geopy.geocoders import Pelias
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 
@@ -37,16 +40,64 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
             {"latitude": 37.33939, "longitude": -121.89496},
         )
 
-    def test_reverse_string(self):
-        self.reverse_run(
-            {"query": "40.75376406311989, -73.98489005863667"},
-            {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
-        )
-
-    def test_reverse_point(self):
+    def test_reverse(self):
         self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667}
+        )
+
+    def test_boundary_rect(self):
+        self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "boundary_rect": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
+    def test_boundary_rect_deprecated(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.geocode_run(
+                {"query": "moscow",  # Idaho USA
+                 "boundary_rect": [-130.1, 44.1, -100.9, 50.1]},
+                {"latitude": 46.7323875, "longitude": -117.0001651},
+            )
+            self.assertEqual(1, len(w))
+
+    def test_geocode_language_parameter(self):
+        query = "Graben 7, Wien"
+        result_geocode = self.geocode_run(
+            {"query": query, "language": "de"}, {}
+        )
+        self.assertEqual(
+            result_geocode.raw['properties']['country'],
+            "Österreich"
+        )
+        result_geocode = self.geocode_run(
+            {"query": query, "language": "en"}, {}
+        )
+        self.assertEqual(
+            result_geocode.raw['properties']['country'],
+            "Austria"
+        )
+
+    def test_reverse_language_parameter(self):
+        query = "48.198674, 16.348388"
+        result_reverse_de = self.reverse_run(
+            {"query": query, "exactly_one": True, "language": "de"},
+            {},
+        )
+        self.assertEqual(
+            result_reverse_de.raw['properties']['country'],
+            "Österreich"
+        )
+
+        result_reverse_en = self.reverse_run(
+            {"query": query, "exactly_one": True, "language": "en"},
+            {},
+        )
+        self.assertTrue(
+            result_reverse_en.raw['properties']['country'],
+            "Austria"
         )
 
 
@@ -56,6 +107,7 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
 )
 class PeliasTestCase(BasePeliasTestCase, GeocoderTestBase):
 
+    @classmethod
     def make_geocoder(cls, **kwargs):
         return Pelias(env.get('PELIAS_DOMAIN'), api_key=env.get('PELIAS_KEY'),
                       **kwargs)

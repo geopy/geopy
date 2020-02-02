@@ -10,7 +10,7 @@ locale, during its initialization.
 To geolocate a query to an address and coordinates:
 
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim()
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.geocode("175 5th Avenue NYC")
     >>> print(location.address)
     Flatiron Building, 175, 5th Avenue, Flatiron, New York, NYC, New York, ...
@@ -23,7 +23,7 @@ To geolocate a query to an address and coordinates:
 To find the address corresponding to a set of coordinates:
 
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim()
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
     >>> location = geolocator.reverse("52.509669, 13.376294")
     >>> print(location.address)
     Potsdamer Platz, Mitte, Berlin, 10117, Deutschland, European Union
@@ -64,12 +64,14 @@ Every geocoder accepts an argument ``format_string`` that defaults to ``'%s'``
 where the input string to geocode is interpolated. For example, if you only
 need to geocode locations in `Cleveland, Ohio`, you could do::
 
-    >>> from geopy.geocoders import GoogleV3
-    >>> geolocator = GoogleV3(format_string="%s, Cleveland OH")
+    >>> from geopy.geocoders import Nominatim
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here",
+    ...                        format_string="%s, Cleveland OH")
     >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
     >>> print(address, latitude, longitude)
-    Thwing Center, 11111 Euclid Ave, Cleveland, OH 44106, USA \
-41.5074066 -81.60832649999999
+    Thwing Center, 11111, Euclid Avenue, Magnolia-Wade Park Historic District, \
+University Circle, Cleveland, Cuyahoga County, Ohio, 44106, USA \
+41.5074076 -81.6083649792596
 
 """
 
@@ -90,14 +92,17 @@ __all__ = (
     "ArcGIS",
     "AzureMaps",
     "Baidu",
+    "BANFrance",
     "Bing",
     "DataBC",
     "GeocodeEarth",
     "GeocodeFarm",
     "GeoNames",
     "GoogleV3",
+    "Geolake",
     "Here",
     "IGNFrance",
+    "MapBox",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
@@ -111,17 +116,22 @@ __all__ = (
 )
 
 
+from geopy.exc import GeocoderNotFound
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu
+from geopy.geocoders.banfrance import BANFrance
+from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
 from geopy.geocoders.geocodeearth import GeocodeEarth
 from geopy.geocoders.geocodefarm import GeocodeFarm
+from geopy.geocoders.geolake import Geolake
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
+from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
@@ -133,14 +143,11 @@ from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 
-from geopy.geocoders.base import options
-from geopy.exc import GeocoderNotFound
-
-
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
     "azure": AzureMaps,
     "baidu": Baidu,
+    "banfrance": BANFrance,
     "bing": Bing,
     "databc": DataBC,
     "geocodeearth": GeocodeEarth,
@@ -148,8 +155,10 @@ SERVICE_TO_GEOCODER = {
     "geonames": GeoNames,
     "google": GoogleV3,
     "googlev3": GoogleV3,
+    "geolake": Geolake,
     "here": Here,
     "ignfrance": IGNFrance,
+    "mapbox": MapBox,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,

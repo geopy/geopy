@@ -1,6 +1,11 @@
 Welcome to GeoPy's documentation!
 =================================
 
+.. image:: _static/logo-wide.png
+   :width: 80%
+   :align: center
+   :alt: GeoPy logo
+
 :Documentation: https://geopy.readthedocs.io/
 :Source Code: https://github.com/geopy/geopy
 :Issue Tracker: https://github.com/geopy/geopy/issues
@@ -24,17 +29,68 @@ Installation
 
     pip install geopy
 
+geopy 2.0
+~~~~~~~~~
+
+geopy 2.0 will be released in 2019, presumably in Q2.
+Only Python `>=3.5` and `>=pypy3.5` will be supported.
+The 1.x branch will not receive any features after that, although
+critical bugfixes might be backported on request.
+
+Python 2.7 support in new releases is already being removed
+in many other scientific Python packages, such as `numpy` and `pandas`
+(see https://python3statement.org/),
+so this is a good time to get rid of the 2.7 burden for geopy as well.
+
+The last minor release of 1.x series will contain deprecation warnings
+for all of the breaking changes introduced in 2.0, thus make sure to
+check your code with warnings enabled (i.e. run python with the ``-Wd``
+switch) to ensure a smoother transition from 1.x to 2.0.
+
 Geocoders
 ~~~~~~~~~
 
 .. automodule:: geopy.geocoders
    :members: __doc__
 
+.. autofunction:: geopy.geocoders.get_geocoder_for_service
+
+Default Options Object
+----------------------
+
 .. autoclass:: geopy.geocoders.options
    :members:
    :undoc-members:
 
-.. autofunction:: geopy.geocoders.get_geocoder_for_service
+Usage with Pandas
+-----------------
+
+It's possible to geocode a pandas DataFrame with geopy, however,
+rate-limiting must be taken into account.
+
+A large number of DataFrame rows might produce a significant amount of
+geocoding requests to a Geocoding service, which might be throttled
+by the service (e.g. by returning `Too Many Requests` 429 HTTP error
+or timing out).
+
+:class:`geopy.extra.rate_limiter.RateLimiter` class provides a convenient
+wrapper, which can be used to automatically add delays between geocoding
+calls to reduce the load on the Geocoding service. Also it can retry
+failed requests and swallow errors for individual rows.
+
+If you're having the `Too Many Requests` error, you may try the following:
+
+- Use :class:`geopy.extra.rate_limiter.RateLimiter` with non-zero
+  ``min_delay_seconds``.
+- Try a different Geocoding service (please consult with their ToS first,
+  as some services prohibit bulk geocoding).
+- Take a paid plan on the chosen Geocoding service, which provides
+  higher quota.
+- Provision your own local copy of the Geocoding service (such as Nominatim).
+
+.. autoclass:: geopy.extra.rate_limiter.RateLimiter
+
+   .. automethod:: __init__
 
 ArcGIS
 ------
@@ -58,6 +114,14 @@ Baidu
 -----
 
 .. autoclass:: geopy.geocoders.Baidu
+   :members:
+
+   .. automethod:: __init__
+
+BANFrance
+---------
+
+.. autoclass:: geopy.geocoders.BANFrance
    :members:
 
    .. automethod:: __init__
@@ -96,6 +160,14 @@ GeocodeFarm
 
    .. automethod:: __init__
 
+Geolake
+--------
+
+.. autoclass:: geopy.geocoders.Geolake
+   :members:
+
+   .. automethod:: __init__
+
 GeoNames
 --------
 
@@ -128,6 +200,14 @@ IGNFrance
 
    .. automethod:: __init__
 
+MapBox
+--------
+
+.. autoclass:: geopy.geocoders.MapBox
+   :members:
+
+   .. automethod:: __init__
+
 OpenCage
 --------
 
@@ -141,6 +221,8 @@ OpenMapQuest
 
 .. autoclass:: geopy.geocoders.OpenMapQuest
    :members:
+   :inherited-members:
+   :show-inheritance:
 
    .. automethod:: __init__
 
@@ -231,10 +313,13 @@ Data
 ~~~~
 
 .. autoclass:: geopy.location.Location
-    :members: __init__, address, latitude, longitude, altitude, raw
+    :members: address, latitude, longitude, altitude, point, raw
 
 .. autoclass:: geopy.point.Point
     :members: __new__, from_string, from_sequence, from_point
+
+.. autoclass:: geopy.timezone.Timezone
+    :members: pytz_timezone, raw
 
 Exceptions
 ~~~~~~~~~~
@@ -278,10 +363,13 @@ Logging
 
 geopy will log geocoding URLs with a logger name ``geopy`` at level `DEBUG`,
 and for some geocoders, these URLs will include authentication information.
+
+HTTP bodies of responses with unsuccessful status codes are logged
+with `INFO` level.
+
 Default logging level is `NOTSET`, which delegates the messages processing to
 the root logger. See docs for :meth:`logging.Logger.setLevel` for more
 information.
-geopy does no logging above `DEBUG`.
 
 
 Semver
