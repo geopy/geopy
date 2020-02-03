@@ -3,7 +3,6 @@
 :class:`.Point` data structure.
 """
 
-import collections
 import re
 import warnings
 from itertools import islice
@@ -12,6 +11,14 @@ from math import fmod
 from geopy import units, util
 from geopy.compat import isfinite, string_compare
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
+
+try:
+    # Python 3.3+
+    from collections.abc import Iterable
+except ImportError:
+    # Python 2.7
+    from collections import Iterable
+
 
 POINT_PATTERN = re.compile(r"""
     .*?
@@ -261,7 +268,7 @@ class Point(object):
         )
 
     def __eq__(self, other):
-        if not isinstance(other, collections.Iterable):
+        if not isinstance(other, Iterable):
             return NotImplemented
         return tuple(self) == tuple(other)
 
