@@ -216,6 +216,14 @@ MapQuest
 
    .. automethod:: __init__
 
+MapTiler
+--------
+
+.. autoclass:: geopy.geocoders.MapTiler
+   :members:
+
+   .. automethod:: __init__
+
 OpenCage
 --------
 
