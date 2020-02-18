@@ -6,9 +6,10 @@ from statistics import mean
 from time import sleep
 from timeit import default_timer
 
-import pytest
 import six
 from six.moves.urllib.parse import urlparse
+
+import pytest
 
 max_retries = int(os.getenv('GEOPY_TEST_RETRIES', 2))
 error_wait_seconds = float(os.getenv('GEOPY_TEST_ERROR_WAIT_SECONDS', 3))

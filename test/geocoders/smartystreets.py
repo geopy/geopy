@@ -1,10 +1,9 @@
 import unittest
 
-from mock import patch
-
 import geopy.geocoders
 from geopy.exc import ConfigurationError
 from geopy.geocoders import LiveAddress
+from mock import patch
 from test.geocoders.util import GeocoderTestBase, env
 
 

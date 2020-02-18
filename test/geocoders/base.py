@@ -2,14 +2,13 @@
 import unittest
 import warnings
 
-from mock import patch, sentinel
-
 import geopy.compat
 import geopy.geocoders
 from geopy.exc import GeocoderNotFound, GeocoderQueryError
 from geopy.geocoders import GoogleV3, get_geocoder_for_service
 from geopy.geocoders.base import Geocoder
 from geopy.point import Point
+from mock import patch, sentinel
 
 
 class GetGeocoderTestCase(unittest.TestCase):

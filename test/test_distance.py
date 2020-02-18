@@ -5,8 +5,6 @@ import math
 import unittest
 import warnings
 
-from mock import patch
-
 from geopy.distance import (
     EARTH_RADIUS,
     ELLIPSOIDS,
@@ -18,6 +16,7 @@ from geopy.distance import (
     lonlat,
 )
 from geopy.point import Point
+from mock import patch
 
 EARTH_CIRCUMFERENCE = 2 * math.pi * EARTH_RADIUS
 NORTH_POLE = Point(90, 0)

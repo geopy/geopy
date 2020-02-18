@@ -1,13 +1,13 @@
 import warnings
 from abc import ABCMeta, abstractmethod
 
-from mock import patch
 from six import with_metaclass
 
 import geopy.geocoders
 from geopy.compat import u
 from geopy.geocoders import Nominatim
 from geopy.point import Point
+from mock import patch
 from test.geocoders.util import GeocoderTestBase
 
 

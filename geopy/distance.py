@@ -92,7 +92,6 @@ import warnings
 from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
 
 from geographiclib.geodesic import Geodesic
-
 from geopy import units, util
 from geopy.compat import cmp, py3k, string_compare
 from geopy.point import Point

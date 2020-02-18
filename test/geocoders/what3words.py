@@ -1,11 +1,10 @@
 import unittest
 
-from mock import patch
-
 import geopy.exc
 import geopy.geocoders
 from geopy.compat import u
 from geopy.geocoders import What3Words
+from mock import patch
 from test.geocoders.util import GeocoderTestBase, env
 
 

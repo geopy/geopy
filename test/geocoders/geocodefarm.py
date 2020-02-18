@@ -1,9 +1,8 @@
 import pytest
-from mock import patch
-
 from geopy import exc
 from geopy.geocoders import GeocodeFarm
 from geopy.point import Point
+from mock import patch
 from test.geocoders.util import GeocoderTestBase, env
 
 

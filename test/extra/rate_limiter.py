@@ -1,9 +1,8 @@
 import unittest
 
-from mock import MagicMock, patch, sentinel
-
 from geopy.exc import GeocoderQuotaExceeded, GeocoderServiceError
 from geopy.extra.rate_limiter import RateLimiter
+from mock import MagicMock, patch, sentinel
 
 try:
     from contextlib import ExitStack
