@@ -439,7 +439,7 @@ class GoogleV3(Geocoder):
     def _parse_json_timezone(self, response):
         status = response.get('status')
         if status != 'OK':
-            self._check_status(status)
+            self._check_status(status, response.get('error_message'))
 
         timezone_id = response.get("timeZoneId")
         if timezone_id is None:
@@ -477,7 +477,7 @@ class GoogleV3(Geocoder):
 
         places = page.get('results', [])
         if not len(places):
-            self._check_status(page.get('status'))
+            self._check_status(page.get('status'), page.get('error_message'))
             return None
 
         def parse_place(place):
@@ -493,10 +493,13 @@ class GoogleV3(Geocoder):
             return [parse_place(place) for place in places]
 
     @staticmethod
-    def _check_status(status):
+    def _check_status(status, error_message=None):
         """
         Validates error statuses.
         """
+
+        error_message = ' API error message: %' % error_message if error_message else ''
+
         if status == 'ZERO_RESULTS':
             # When there are no results, just return.
             return
@@ -504,13 +507,15 @@ class GoogleV3(Geocoder):
             raise GeocoderQuotaExceeded(
                 'The given key has gone over the requests limit in the 24'
                 ' hour period or has submitted too many requests in too'
-                ' short a period of time.'
+                ' short a period of time.' + error_message
             )
         elif status == 'REQUEST_DENIED':
             raise GeocoderQueryError(
-                'Your request was denied.'
+                'Your request was denied. ' + error_message
             )
         elif status == 'INVALID_REQUEST':
-            raise GeocoderQueryError('Probably missing address or latlng.')
+            raise GeocoderQueryError(
+                'Probably missing address or latlng.' + error_message
+            )
         else:
-            raise GeocoderQueryError('Unknown error.')
+            raise GeocoderQueryError('Unknown error.' + error_message)
