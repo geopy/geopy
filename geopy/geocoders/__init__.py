@@ -142,6 +142,7 @@ from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
+from geopy.geocoders.mapquest import MapQuest
 
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
@@ -169,6 +170,7 @@ SERVICE_TO_GEOCODER = {
     "tomtom": TomTom,
     "what3words": What3Words,
     "yandex": Yandex,
+    "mapquest": MapQuest
 }
 
 
