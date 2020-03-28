@@ -467,7 +467,7 @@ class Nominatim(Geocoder):
         )
 
     def parse_osm(self, osm):
-        """Parse osm dictionary to string to be able to query it
+        """Convert osm dictionary to string
 
         - Input:
             {

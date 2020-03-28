@@ -371,6 +371,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
                 'osm_type': 'way'
             }
         ]
+        # Make sure the content is returned from the API
         result = [
             {
                 'osm_id': 6101403370,
@@ -388,11 +389,12 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         contain_keys = ['place_id', 'licence', 'osm_type', 'osm_id', 'boundingbox', 'lat',
                         'lon', 'display_name', 'class', 'type', 'importance']
         for location in response:
-            location_result = list(filter(lambda place:
-                                          place.get('osm_id') == location.raw.get('osm_id')
-                                          and
-                                          place.get('osm_type') == location.raw.get('osm_type'),
-                                          result))
+            location_result = list(
+                filter(lambda place:
+                       place.get('osm_id') == location.raw.get('osm_id')
+                       and place.get('osm_type') == location.raw.get('osm_type'),
+                       result)
+            )
             self.assertTrue(len(location_result) > 0)
             location_result = location_result[0]
             # Match the exacte value for 'exact_key_value' list of keys
