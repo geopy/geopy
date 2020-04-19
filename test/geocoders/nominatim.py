@@ -341,6 +341,18 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
         self.assertNotIn('namedetails', result.raw)
 
+    def test_reverse_zoom_parameter(self):
+        query = "33.8120962, -117.9211682"
+        result_reverse = self.reverse_run(
+            {"query": query, "exactly_one": True, "zoom": "10"},
+            {},
+        )
+
+        self.assertEqual(
+            result_reverse.raw["display_name"],
+            "Anaheim, Orange County, California, United States of America"
+        )
+
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
 
