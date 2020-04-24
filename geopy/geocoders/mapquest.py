@@ -137,7 +137,7 @@ class MapQuest(Geocoder):
         
         if bbox:
             params['boundingBox'] = self._format_bounding_box(
-                bbox, "%(lon1)s,%(lat1)s,%(lon2),%(lat2)s"
+                bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s"
             )
         
         url = self.api + self.geocode_path + "?" + urlencode(params)
