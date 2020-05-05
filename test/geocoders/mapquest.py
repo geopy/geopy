@@ -1,7 +1,7 @@
 import unittest
 
 from geopy.compat import u
-from geopy.geocoders import MapBox
+from geopy.geocoders import MapQuest
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -10,10 +10,10 @@ from test.geocoders.util import GeocoderTestBase, env
     bool(env.get('MAPQUEST_KEY')),
     "No MAPQUEST_KEY env variable set"
 )
-class MapBoxTestCase(GeocoderTestBase):
+class MapQuestTestCase(GeocoderTestBase):
     @classmethod
     def setUpClass(cls):
-        cls.geocoder = MapBox(api_key=env['MAPQUEST_KEY'], timeout=3)
+        cls.geocoder = MapQuest(api_key=env['MAPQUEST_KEY'], timeout=3)
 
     def test_geocode(self):
         self.geocode_run(
@@ -46,7 +46,7 @@ class MapBoxTestCase(GeocoderTestBase):
         self.geocode_run(
             {
                 "query": "435 north michigan ave, chicago il 60611 usa",
-                "bbox": [Point(35.227672, -103.271484),
+                "bounds": [Point(35.227672, -103.271484),
                          Point(48.603858, -74.399414)]
             },
             {"latitude": 41.890, "longitude": -87.624},
