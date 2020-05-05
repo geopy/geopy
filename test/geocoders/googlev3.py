@@ -142,6 +142,8 @@ class GoogleV3TestCase(GeocoderTestBase):
         """
         f = GoogleV3._format_components_param
         self.assertEqual(f({}), '')
+        self.assertEqual(f([]), '')
+
         self.assertEqual(f({'country': 'FR'}), 'country:FR')
         output = f({'administrative_area': 'CA', 'country': 'FR'})
         # the order the dict is iterated over is not important
@@ -152,13 +154,18 @@ class GoogleV3TestCase(GeocoderTestBase):
             ), output
         )
 
-        with self.assertRaises(AttributeError):
+        self.assertEqual(f([('country', 'FR')]), 'country:FR')
+        output = f([
+            ('administrative_area','CA'),
+            ('administrative_area', 'Los Angeles'),
+            ('country', 'US')
+        ])
+        self.assertEqual(output,'administrative_area:CA|administrative_area:Los Angeles|country:US')
+
+        with self.assertRaises(ValueError):
             f(None)
 
-        with self.assertRaises(AttributeError):
-            f([])
-
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(ValueError):
             f('administrative_area:CA|country:FR')
 
     def test_geocode(self):
@@ -195,6 +202,18 @@ class GoogleV3TestCase(GeocoderTestBase):
             expect_failure=True
         )
 
+        self.geocode_run(
+            {
+                "query": "santa cruz",
+                "components": [
+                    ('administrative_area', 'CA'),
+                    ('country', 'FR')
+                ]
+            },
+            {},
+            expect_failure=True
+        )
+
     def test_components(self):
         """
         GoogleV3.geocode with components
@@ -209,10 +228,27 @@ class GoogleV3TestCase(GeocoderTestBase):
             {"latitude": 28.4636296, "longitude": -16.2518467},
         )
 
+        self.geocode_run(
+            {
+                "query": "santa cruz",
+                "components": [
+                    ('country', 'ES')
+                ]
+            },
+            {"latitude": 28.4636296, "longitude": -16.2518467},
+        )
+
     def test_components_without_query(self):
         self.geocode_run(
             {
                 "components": {"city": "Paris", "country": "FR"},
+            },
+            {"latitude": 46.227638, "longitude": 2.213749},
+        )
+
+        self.geocode_run(
+            {
+                "components": [("city", "Paris"), ("country", "FR")],
             },
             {"latitude": 46.227638, "longitude": 2.213749},
         )
