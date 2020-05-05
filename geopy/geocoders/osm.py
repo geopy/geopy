@@ -15,7 +15,7 @@ class Nominatim(Geocoder):
     """Nominatim geocoder for OpenStreetMap data.
 
     Documentation at:
-        https://wiki.openstreetmap.org/wiki/Nominatim
+        https://nominatim.org/release-docs/develop/api/Overview/
 
     .. attention::
        Using Nominatim with the default `user_agent` is strongly discouraged,
@@ -235,7 +235,7 @@ class Nominatim(Geocoder):
                 `postalcode`. For more information, see Nominatim's
                 documentation for `structured requests`:
 
-                    https://wiki.openstreetmap.org/wiki/Nominatim
+                    https://nominatim.org/release-docs/develop/api/Search
 
         :type query: dict or str
 

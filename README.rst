@@ -26,7 +26,7 @@ geopy includes geocoder classes for the `OpenStreetMap Nominatim`_,
 The full list is available on the `Geocoders doc section`_.
 Geocoder classes are located in `geopy.geocoders`_.
 
-.. _OpenStreetMap Nominatim: https://wiki.openstreetmap.org/wiki/Nominatim
+.. _OpenStreetMap Nominatim: https://nominatim.org
 .. _Google Geocoding API (V3): https://developers.google.com/maps/documentation/geocoding/
 .. _Geocoders doc section: https://geopy.readthedocs.io/en/latest/#geocoders
 .. _geopy.geocoders: https://github.com/geopy/geopy/tree/master/geopy/geocoders
