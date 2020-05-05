@@ -103,6 +103,7 @@ __all__ = (
     "Here",
     "IGNFrance",
     "MapBox",
+    "MapQuest",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
@@ -132,6 +133,7 @@ from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
+from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
@@ -142,7 +144,6 @@ from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
-from geopy.geocoders.mapquest import MapQuest
 
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
@@ -160,6 +161,7 @@ SERVICE_TO_GEOCODER = {
     "here": Here,
     "ignfrance": IGNFrance,
     "mapbox": MapBox,
+    "mapquest": MapQuest,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
@@ -169,8 +171,7 @@ SERVICE_TO_GEOCODER = {
     "liveaddress": LiveAddress,
     "tomtom": TomTom,
     "what3words": What3Words,
-    "yandex": Yandex,
-    "mapquest": MapQuest
+    "yandex": Yandex
 }
 
 
