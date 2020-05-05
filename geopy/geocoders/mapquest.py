@@ -8,9 +8,15 @@ __all__ = ("MapQuest", )
 
 
 class MapQuest(Geocoder):
-    """Geocoder using the MapQuest API
+    """Geocoder using the non-free MapQuest API.
     Documentation at:
         https://developer.mapquest.com/documentation/geocoding-api/
+
+    MapQuest provides two Geocoding APIs:
+     - :class:`geopy.geocoders.OpenMapQuest` API which is free and is based on open data.
+     - :class:`geopy.geocoders.MapQuest` API which is paid and is based on non-free licensed data.
+
+    This class provides support for using the "non-free" version of MapQuest. To use the open-source version use the :class:`geopy.geocoders.OpenMapQuest` api instead.
     """
     geocode_path = '/geocoding/v1/address'
     reverse_path = '/geocoding/v1/reverse'
@@ -27,9 +33,9 @@ class MapQuest(Geocoder):
         domain='www.mapquestapi.com',
     ):
         """
-        :param str api_key: The API key required by Mapbox to perform
-            geocoding requests. API keys are managed through Mapox's account
-            page (https://www.mapbox.com/account/access-tokens).
+        :param str api_key: The API key required by Mapquest to perform
+            geocoding requests. API keys are managed through MapQuest's "Manage Keys"
+            page (https://developer.mapquest.com/user/me/apps).
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -50,7 +56,7 @@ class MapQuest(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-        :param str domain: base api domain for mapbox
+        :param str domain: base api domain for mapquest
         """
         super(MapQuest, self).__init__(
             format_string=format_string,
@@ -108,7 +114,7 @@ class MapQuest(Geocoder):
         exactly_one=True,
         timeout=DEFAULT_SENTINEL,
         country=None,
-        bbox=None
+        bounds=None
     ):
         """
         Return a location point by address
@@ -122,10 +128,10 @@ class MapQuest(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param bbox: The bounding box of the viewport within which
+        :param bounds: The bounding box of the viewport within which
             to bias geocode results more prominently.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
-        :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
+        :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
@@ -135,9 +141,9 @@ class MapQuest(Geocoder):
         params['key'] = self.api_key
         params['location'] = query
         
-        if bbox:
+        if bounds:
             params['boundingBox'] = self._format_bounding_box(
-                bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s"
+                bounds, "%(lat2)s,%(lon1)s,%(lat1)s,%(lon2)s"
             )
         
         url = self.api + self.geocode_path + "?" + urlencode(params)
