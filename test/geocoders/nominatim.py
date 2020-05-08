@@ -347,10 +347,19 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query, "exactly_one": True, "zoom": "10"},
             {},
         )
-
         self.assertEqual(
             result_reverse.raw["display_name"],
             "Anaheim, Orange County, California, United States of America"
+        )
+
+        result_reverse = self.reverse_run(
+            {"query": query, "exactly_one": True},
+            {},
+        )
+        self.assertEqual(
+            result_reverse.raw["display_name"],
+            "Disneyland, 1313, South Harbor Boulevard, Anaheim Resort District, Anaheim, "
+            "Orange County, California, 92805, United States of America"
         )
 
 

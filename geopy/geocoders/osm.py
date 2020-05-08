@@ -445,6 +445,7 @@ class Nominatim(Geocoder):
             .. versionadded:: 1.14.0
 
         :param str zoom: Level of detail required for the address.
+        :type zoom: str, int, or float.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
