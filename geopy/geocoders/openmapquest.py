@@ -11,6 +11,12 @@ class OpenMapQuest(Nominatim):
     Documentation at:
         https://developer.mapquest.com/documentation/open/
 
+    MapQuest provides two Geocoding APIs:
+        - "OpenMapQuest" API which is free and is based on open data.
+        - "MapQuest" API which is paid and is based on non-free licensed data.
+
+    This class provides support for using the free version of MapQuest. To use the non-free version use the :class:`geopy.geocoders.MapQuest` api instead.
+    
     .. versionchanged:: 1.17.0
        OpenMapQuest now extends the Nominatim class.
     """
