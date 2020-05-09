@@ -73,6 +73,38 @@ need to geocode locations in `Cleveland, Ohio`, you could do::
 University Circle, Cleveland, Cuyahoga County, Ohio, 44106, USA \
 41.5074076 -81.6083649792596
 
+Geopy Is Not a Service
+~~~~~~~~~~~~~~~~~~~~~~
+
+Geocoding is provided by a number of different services, which are not
+affiliated with geopy in any way. These services provide APIs, which anyone
+could implement, and geopy is just a library which provides these
+implementations for many different services in a single package.
+
+.. image:: ./_static/geopy_and_geocoding_services.svg
+   :target: ./_static/geopy_and_geocoding_services.svg
+
+Therefore:
+
+1. Different services have different Terms of Use, quotas, pricing,
+   geodatabases and so on. For example, :class:`geopy.geocoders.Nominatim`
+   is free, but provides low request limits. If you need to make more queries,
+   consider using another (probably paid) service, such as
+   :class:`geopy.geocoders.OpenMapQuest` or :class:`geopy.geocoders.PickPoint`
+   (these two are commercial providers of Nominatim, so they should
+   have the same data and APIs). Or, if you are ready to wait, you can try
+   :class:`geopy.extra.rate_limiter.RateLimiter`.
+
+2. geopy cannot be responsible for the geocoding services' databases.
+   If you have issues with some queries which the service cannot fulfill,
+   it should be directed to that service's support team.
+
+3. geopy cannot be responsible for any networking issues between your computer
+   and the geocoding service.
+
+If you face any problem with your current geocoding service provider, you can
+always try a different one.
+
 """
 
 __all__ = (
