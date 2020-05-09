@@ -208,6 +208,14 @@ MapBox
 
    .. automethod:: __init__
 
+MapQuest
+--------
+
+.. autoclass:: geopy.geocoders.MapQuest
+   :members:
+
+   .. automethod:: __init__
+
 OpenCage
 --------
 
