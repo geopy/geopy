@@ -213,14 +213,16 @@ class GoogleV3(Geocoder):
         :param str region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.
 
-        :param Union[dict,list] components: Restricts to an area. Can use any combination
-            of: route, locality, administrative_area, postal_code, country.
-            
-            Pass a list of tuples if you want to specify multiple components of the same type
-            e.g.:
-             
-                >>> [('administrative_area','VA'), ('administrative_area':'Arlington')]
-            
+        :type components: dict or list
+        :param components: Restricts to an area. Can use any combination of:
+            `route`, `locality`, `administrative_area`, `postal_code`,
+            `country`.
+
+            Pass a list of tuples if you want to specify multiple components of
+            the same type, e.g.:
+
+                >>> [('administrative_area', 'VA'), ('administrative_area', 'Arlington')]
+
 
         :param str place_id: Retrieve a Location using a Place ID.
             Cannot be not used with ``query`` or ``bounds`` parameters.

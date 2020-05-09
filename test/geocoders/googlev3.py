@@ -156,11 +156,14 @@ class GoogleV3TestCase(GeocoderTestBase):
 
         self.assertEqual(f([('country', 'FR')]), 'country:FR')
         output = f([
-            ('administrative_area','CA'),
+            ('administrative_area', 'CA'),
             ('administrative_area', 'Los Angeles'),
             ('country', 'US')
         ])
-        self.assertEqual(output,'administrative_area:CA|administrative_area:Los Angeles|country:US')
+        self.assertEqual(
+            output,
+            'administrative_area:CA|administrative_area:Los Angeles|country:US'
+        )
 
         with self.assertRaises(ValueError):
             f(None)
