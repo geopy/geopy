@@ -342,20 +342,20 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         self.assertNotIn('namedetails', result.raw)
 
     def test_reverse_zoom_parameter(self):
-        query = "48.8582602, 2.2944990"
+        query = "40.689253199999996, -74.04454817144321"
         result_reverse = self.reverse_run(
             {"query": query, "exactly_one": True, "zoom": "10"},
             {},
         )
-        self.assertIn("Paris", result_reverse.address)
-        self.assertNotIn("Tour Eiffel", result_reverse.address)
+        self.assertIn("New York", result_reverse.address)
+        self.assertNotIn("Statue of Liberty", result_reverse.address)
 
         result_reverse = self.reverse_run(
             {"query": query, "exactly_one": True},
             {},
         )
-        self.assertIn("Paris", result_reverse.address)
-        self.assertIn("Tour Eiffel", result_reverse.address)
+        self.assertIn("New York", result_reverse.address)
+        self.assertIn("Statue of Liberty", result_reverse.address)
 
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
