@@ -47,7 +47,7 @@ class MapQuestTestCase(GeocoderTestBase):
             {
                 "query": "435 north michigan ave, chicago il 60611 usa",
                 "bounds": [Point(35.227672, -103.271484),
-                         Point(48.603858, -74.399414)]
+                           Point(48.603858, -74.399414)]
             },
             {"latitude": 41.890, "longitude": -87.624},
         )

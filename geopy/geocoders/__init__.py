@@ -203,7 +203,7 @@ SERVICE_TO_GEOCODER = {
     "liveaddress": LiveAddress,
     "tomtom": TomTom,
     "what3words": What3Words,
-    "yandex": Yandex
+    "yandex": Yandex,
 }
 
 

@@ -1,7 +1,6 @@
-from geopy.compat import quote, string_compare, urlencode
+from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.point import Point
 from geopy.util import logger
 
 __all__ = ("MapQuest", )
@@ -9,15 +8,22 @@ __all__ = ("MapQuest", )
 
 class MapQuest(Geocoder):
     """Geocoder using the non-free MapQuest API.
+
     Documentation at:
         https://developer.mapquest.com/documentation/geocoding-api/
 
     MapQuest provides two Geocoding APIs:
-     - :class:`geopy.geocoders.OpenMapQuest` API which is free and is based on open data.
-     - :class:`geopy.geocoders.MapQuest` API which is paid and is based on non-free licensed data.
 
-    This class provides support for using the "non-free" version of MapQuest. To use the open-source version use the :class:`geopy.geocoders.OpenMapQuest` api instead.
+    - :class:`geopy.geocoders.OpenMapQuest` API which is free and is based on
+      open data.
+    - :class:`geopy.geocoders.MapQuest` API which is paid and is based on
+      non-free licensed data.
+
+    This class provides support for using the "non-free" version of MapQuest.
+    To use the open-source version use the
+    :class:`geopy.geocoders.OpenMapQuest` api instead.
     """
+
     geocode_path = '/geocoding/v1/address'
     reverse_path = '/geocoding/v1/reverse'
 
@@ -77,7 +83,7 @@ class MapQuest(Geocoder):
 
         if features == []:
             return None
-        
+
         def parse_location(feature):
             addr_keys = [
                 'street',
@@ -102,12 +108,12 @@ class MapQuest(Geocoder):
             longitude = feature['latLng']['lng']
             latitude = feature['latLng']['lat']
             return Location(location, (latitude, longitude), feature)
-        
+
         if exactly_one:
             return parse_feature(features[0])
         else:
             return [parse_feature(feature) for feature in features]
-    
+
     def geocode(
         self,
         query,
@@ -140,12 +146,12 @@ class MapQuest(Geocoder):
         params = {}
         params['key'] = self.api_key
         params['location'] = query
-        
+
         if bounds:
             params['boundingBox'] = self._format_bounding_box(
                 bounds, "%(lat2)s,%(lon1)s,%(lat1)s,%(lon2)s"
             )
-        
+
         url = self.api + self.geocode_path + "?" + urlencode(params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -153,7 +159,7 @@ class MapQuest(Geocoder):
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
-    
+
     def reverse(
         self,
         query,
@@ -184,7 +190,7 @@ class MapQuest(Geocoder):
 
         point = self._coerce_point_to_string(query, "%(lat)s,%(lon)s")
         params['location'] = point
-        
+
         url = self.api + self.reverse_path + "?" + urlencode(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
