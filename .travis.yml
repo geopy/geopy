@@ -12,10 +12,6 @@ python:
   - "pypy"
   - "pypy3"
 
-matrix:
-  allow_failures:
-    - python: "3.9-dev"
-
 before_install:
   - travis_retry pip install -U pip wheel setuptools
 
@@ -34,6 +30,9 @@ script:
   - make test
 
 jobs:
+  allow_failures:
+    - python: "3.9-dev"
+
   include:
     - stage: lint
       name: "Linting"
