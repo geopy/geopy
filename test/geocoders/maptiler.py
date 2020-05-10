@@ -77,15 +77,15 @@ class MapTilerTestCase(GeocoderTestBase):
             {"query": zurich_point, "exactly_one": True, "language": "ja"},
             {"latitude": 47.3723, "longitude": 8.5422, "delta": 1},
         )
-        self.assertIn("チューリッヒ", location.address)
+        self.assertIn(u("\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2"), location.address)
 
     def test_geocode_language(self):
         location = self.geocode_run(
-            {"query": "Zürich", "exactly_one": True, "language": "ja",
+            {"query": u("Z\u00fcrich"), "exactly_one": True, "language": "ja",
              "proximity": Point(47.3723, 8.5422)},
             {"latitude": 47.3723, "longitude": 8.5422, "delta": 1},
         )
-        self.assertIn("チューリッヒ", location.address)
+        self.assertIn(u("\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2"), location.address)
 
     def test_geocode_raw(self):
         result = self.geocode_run({"query": "New York"}, {})
