@@ -156,8 +156,6 @@ class AlgoliaPlaces(Geocoder):
             'query': self.format_string % query,
         }
 
-        _parse_json_kwargs = {}
-
         if type is not None:
             params['type'] = type
 
@@ -173,7 +171,6 @@ class AlgoliaPlaces(Geocoder):
 
         if language is not None:
             params['language'] = language.lower()
-            _parse_json_kwargs['language'] = language
 
         if countries is not None:
             params['countries'] = ','.join([c.lower() for c in countries])
@@ -202,7 +199,7 @@ class AlgoliaPlaces(Geocoder):
         return self._parse_json(
             self._call_geocoder(request, timeout=timeout),
             exactly_one,
-            **_parse_json_kwargs,
+            language=language,
         )
 
     def reverse(
@@ -250,14 +247,11 @@ class AlgoliaPlaces(Geocoder):
             'aroundLatLng': '%s,%s' % (lat, lng),
         }
 
-        _parse_json_kwargs = {}
-
         if limit is not None:
             params['hitsPerPage'] = limit
 
         if language is not None:
             params['language'] = language
-            _parse_json_kwargs['language'] = language
 
         url = '?'.join((self.reverse_api, urlencode(params)))
         request = Request(url)
@@ -270,21 +264,27 @@ class AlgoliaPlaces(Geocoder):
         return self._parse_json(
             self._call_geocoder(request, timeout=timeout),
             exactly_one,
-            **_parse_json_kwargs,
+            language=language,
         )
 
     @staticmethod
-    def _parse_feature(feature, language="default"):
+    def _parse_feature(feature, language):
         # Parse each resource.
         latitude = feature.get('_geoloc', {}).get('lat')
         longitude = feature.get('_geoloc', {}).get('lng')
-        placename = feature['locale_names'].get(language)[0] \
-            if isinstance(feature['locale_names'], dict) \
-            else feature['locale_names'][0]
+
+        if isinstance(feature['locale_names'], dict):
+            if language in feature['locale_names']:
+                placename = feature['locale_names'][language][0]
+            else:
+                placename = feature['locale_names']["default"][0]
+        else:
+            placename = feature['locale_names'][0]
+
         return Location(placename, (latitude, longitude), feature)
 
     @classmethod
-    def _parse_json(self, response, exactly_one, language='default'):
+    def _parse_json(self, response, exactly_one, language):
         if response is None or 'hits' not in response:
             return None
         features = response['hits']
