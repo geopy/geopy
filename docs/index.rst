@@ -92,6 +92,14 @@ If you're having the `Too Many Requests` error, you may try the following:
 
    .. automethod:: __init__
 
+AlgoliaPlaces
+------
+
+.. autoclass:: geopy.geocoders.AlgoliaPlaces
+   :members:
+
+   .. automethod:: __init__
+
 ArcGIS
 ------
 
