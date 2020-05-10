@@ -1,7 +1,6 @@
 import unittest
 
 from geopy.geocoders import AlgoliaPlaces
-from test.geocoders.tomtom import BaseTomTomTestCase
 from test.geocoders.util import GeocoderTestBase, env
 
 
@@ -9,7 +8,11 @@ from test.geocoders.util import GeocoderTestBase, env
     bool(env.get('ALGOLIA_PLACES_APP_ID')) and bool(env.get('ALGOLIA_PLACES_API_KEY')),
     'No ALGOLIA_PLACES_APP_ID and/or no ALGOLIA_PLACES_API_KEY env variables setted'
 )
-class AlgoliaPlacesTestCase(BaseTomTomTestCase, GeocoderTestBase):
+class AlgoliaPlacesTestCase(GeocoderTestBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = cls.make_geocoder()
 
     @classmethod
     def make_geocoder(cls, **kwargs):
@@ -18,6 +21,19 @@ class AlgoliaPlacesTestCase(BaseTomTomTestCase, GeocoderTestBase):
             env['ALGOLIA_PLACES_API_KEY'],
             timeout=3,
             **kwargs)
+
+    def test_user_agent_custom(self):
+        geocoder = self.make_geocoder(
+            user_agent='my_user_agent/1.0'
+        )
+        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+
+    def test_geocode(self):
+        location = self.geocode_run(
+            {'query': 'москва'},
+            {'latitude': 55.75587, 'longitude': 37.61768},
+        )
+        self.assertIn('Москва', location.address)
 
     def test_reverse(self):
         location = self.reverse_run(
@@ -53,7 +69,7 @@ class AlgoliaPlacesTestCase(BaseTomTomTestCase, GeocoderTestBase):
 
     def test_countries(self):
         countries = ["ES"]
-        locations = self.geocode_run(
+        self.geocode_run(
             {'query': 'Madrid', 'language': 'en',
              'exactly_one': False, 'countries': countries},
             {},
@@ -61,7 +77,7 @@ class AlgoliaPlacesTestCase(BaseTomTomTestCase, GeocoderTestBase):
 
     def test_countries_no_result(self):
         countries = ["NO", "IT"]
-        locations = self.geocode_run(
+        self.geocode_run(
             {'query': 'Madrid', 'language': 'en',
              'exactly_one': False, 'countries': countries},
             {},
