@@ -7,21 +7,19 @@ __all__ = ("MapQuest", )
 
 
 class MapQuest(Geocoder):
-    """Geocoder using the non-free MapQuest API.
+    """Geocoder using the MapQuest API based on Licensed data.
 
     Documentation at:
         https://developer.mapquest.com/documentation/geocoding-api/
 
     MapQuest provides two Geocoding APIs:
 
-    - :class:`geopy.geocoders.OpenMapQuest` API which is free and is based on
-      open data.
-    - :class:`geopy.geocoders.MapQuest` API which is paid and is based on
-      non-free licensed data.
+    - :class:`geopy.geocoders.OpenMapQuest` Nominatim-alike API
+      which is based on Open data from OpenStreetMap.
+    - :class:`geopy.geocoders.MapQuest` (this class) MapQuest's own API
+      which is based on Licensed data.
 
-    This class provides support for using the "non-free" version of MapQuest.
-    To use the open-source version use the
-    :class:`geopy.geocoders.OpenMapQuest` api instead.
+    .. versionadded:: 1.22.0
     """
 
     geocode_path = '/geocoding/v1/address'
