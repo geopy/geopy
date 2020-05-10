@@ -163,8 +163,8 @@ class GoogleV3(Geocoder):
                 '`components` parameter must be of type `dict` or `list`')
 
         return "|".join(
-                (":".join(item) for item in component_items)
-            )
+            (":".join(item) for item in component_items)
+        )
 
     def geocode(
             self,
@@ -223,6 +223,8 @@ class GoogleV3(Geocoder):
 
                 >>> [('administrative_area', 'VA'), ('administrative_area', 'Arlington')]
 
+            .. versionchanged:: 1.22.0
+                Added support for a list of tuples.
 
         :param str place_id: Retrieve a Location using a Place ID.
             Cannot be not used with ``query`` or ``bounds`` parameters.
