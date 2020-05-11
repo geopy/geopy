@@ -1,17 +1,11 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-import unittest
-
 from geopy.geocoders import AlgoliaPlaces
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 
-@unittest.skipUnless(
-    bool(env.get('ALGOLIA_PLACES_APP_ID')) and bool(env.get('ALGOLIA_PLACES_API_KEY')),
-    'No ALGOLIA_PLACES_APP_ID and/or no ALGOLIA_PLACES_API_KEY env variables setted'
-)
 class AlgoliaPlacesTestCase(GeocoderTestBase):
 
     @classmethod
@@ -21,8 +15,8 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
     @classmethod
     def make_geocoder(cls, **kwargs):
         return AlgoliaPlaces(
-            env['ALGOLIA_PLACES_APP_ID'],
-            env['ALGOLIA_PLACES_API_KEY'],
+            app_id=env.get('ALGOLIA_PLACES_APP_ID'),
+            api_key=env.get('ALGOLIA_PLACES_API_KEY'),
             timeout=3,
             **kwargs)
 
