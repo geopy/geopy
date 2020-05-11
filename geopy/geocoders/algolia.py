@@ -1,6 +1,7 @@
 from geopy.compat import Request, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
+from geopy.point import Point
 from geopy.util import logger
 
 __all__ = ('AlgoliaPlaces',)
@@ -33,6 +34,7 @@ class AlgoliaPlaces(Geocoder):
         """
         :param str app_id: Unique application identifier. It's used to
             identify you when using Algolia's API.
+            See https://www.algolia.com/dashboard.
 
         :param str api_key: Algolia's user API key.
 
@@ -82,22 +84,30 @@ class AlgoliaPlaces(Geocoder):
     def geocode(
             self,
             query,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
             type=None,
             restrict_searchable_attributes=None,
             limit=None,
-            exactly_one=True,
             language=None,
             countries=None,
             around=None,
             around_via_ip=None,
             around_radius=None,
             x_forwarded_for=None,
-            timeout=DEFAULT_SENTINEL,
     ):
         """
         Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
         :param str type: Restrict the search results to a specific type.
             Available types are defined in documentation:
@@ -110,8 +120,6 @@ class AlgoliaPlaces(Geocoder):
             response. If not provided and there are multiple results
             Algolia API will return 20 results by default. This will be
             reset to one if ``exactly_one`` is True.
-
-        :param bool exactly_one: Restrict the response to one resource.
 
         :param str language: If specified, restrict the search results
             to a single language. You can pass two letters country
@@ -135,19 +143,11 @@ class AlgoliaPlaces(Geocoder):
             latitude/longitude. Otherwise a default radius is
             automatically computed given the area density.
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call
-            only, the value set during the geocoder's initialization.
-
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
-
         :param str x_forwarded_for: Override the HTTP header X-Forwarded-For.
             With this you can control the source IP address used to resolve
             the geo-location of the user. This is particularly useful when
             you want to use the API from your backend as if it was from your
-            end-users locations.
+            end-users' locations.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -162,8 +162,7 @@ class AlgoliaPlaces(Geocoder):
             params['type'] = type
 
         if restrict_searchable_attributes is not None:
-            params['restrictSearchableAttributes'] = \
-                restrict_searchable_attributes
+            params['restrictSearchableAttributes'] = restrict_searchable_attributes
 
         if limit is not None:
             params['hitsPerPage'] = limit
@@ -209,9 +208,9 @@ class AlgoliaPlaces(Geocoder):
             self,
             query,
             exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
             limit=None,
             language=None,
-            timeout=DEFAULT_SENTINEL,
     ):
         """
         Return an address by location point.
@@ -224,6 +223,11 @@ class AlgoliaPlaces(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+
         :param int limit: Limit the maximum number of items in the
             response. If not provided and there are multiple results
             Algolia API will return 20 results by default. This will be
@@ -233,21 +237,13 @@ class AlgoliaPlaces(Geocoder):
             to a single language. You can pass two letters country
             codes (ISO 639-1).
 
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call
-            only, the value set during the geocoder's initialization.
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        try:
-            lat, lng = self._coerce_point_to_string(query).split(',')
-        except ValueError:
-            raise ValueError('Must be a coordinate pair or Point')
+        location = self._coerce_point_to_string(query)
 
         params = {
-            'aroundLatLng': '%s,%s' % (lat, lng),
+            'aroundLatLng': location,
         }
 
         if limit is not None:

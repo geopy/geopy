@@ -67,17 +67,18 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
 
     def test_countries(self):
         countries = ["ES"]
-        self.geocode_run(
+        location = self.geocode_run(
             {'query': 'Madrid', 'language': 'en',
-             'exactly_one': False, 'countries': countries},
+             'countries': countries},
             {},
         )
+        self.assertIn("Madrid", location.address)
 
     def test_countries_no_result(self):
         countries = ["NO", "IT"]
         self.geocode_run(
             {'query': 'Madrid', 'language': 'en',
-             'exactly_one': False, 'countries': countries},
+             'countries': countries},
             {},
             expect_failure=True
         )
