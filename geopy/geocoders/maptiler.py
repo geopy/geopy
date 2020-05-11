@@ -1,4 +1,4 @@
-from geopy.compat import quote, urlencode
+from geopy.compat import quote, string_compare, urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point
@@ -11,7 +11,7 @@ class MapTiler(Geocoder):
     """Geocoder using the MapTiler API.
 
     Documentation at:
-        https://cloud.maptiler.com/geocoding/
+        https://cloud.maptiler.com/geocoding/ (requires sign-up)
 
     .. versionadded:: 1.22.0
     """
@@ -111,8 +111,9 @@ class MapTiler(Geocoder):
         :type proximity: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
-        :param str language: Prefer results in specific languages. It's possible
-            to specify multiple values. e.g. "de,en"
+        :param language: Prefer results in specific languages. Accepts
+            a single string like ``"en"`` or a list like ``["de", "en"]``.
+        :type language: str or list
 
         :param bbox: The bounding box of the viewport within which
             to bias geocode results more prominently.
@@ -130,8 +131,10 @@ class MapTiler(Geocoder):
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
 
+        if isinstance(language, string_compare):
+            language = [language]
         if language:
-            params['language'] = language
+            params['language'] = ','.join(language)
 
         if proximity:
             p = Point(proximity)
@@ -149,14 +152,11 @@ class MapTiler(Geocoder):
             self,
             query,
             exactly_one=True,
-            language=None,
             timeout=DEFAULT_SENTINEL,
+            language=None,
     ):
         """
         Return an address by location point.
-
-        :param str language: Prefer results in specific languages. It's possible
-            to specify multiple values. e.g. "de,en"
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -171,13 +171,19 @@ class MapTiler(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param language: Prefer results in specific languages. Accepts
+            a single string like ``"en"`` or a list like ``["de", "en"]``.
+        :type language: str or list
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
         params = {'key': self.api_key}
 
+        if isinstance(language, string_compare):
+            language = [language]
         if language:
-            params['language'] = language
+            params['language'] = ','.join(language)
 
         point = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         quoted_query = quote(point.encode('utf-8'))
