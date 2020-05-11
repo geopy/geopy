@@ -4,7 +4,7 @@ Changelog
 =========
 1.22.0
 ------
-2020-05-XX
+2020-05-11
 
 *   ADDED: `AlgoliaPlaces` geocoder.
     Contributed by Álvaro Mondéjar. (#405)
