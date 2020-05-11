@@ -1,4 +1,5 @@
 from geopy.compat import quote, urlencode
+from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -220,3 +221,10 @@ class TomTom(Geocoder):
         latitude, longitude = result['position'].split(',')
         return Location(result['address']['freeformAddress'],
                         (latitude, longitude), result)
+
+    def _geocoder_exception_handler(
+            self, error, message, http_code=None, http_body=None
+    ):
+        if http_code is not None and http_body is not None:
+            if http_code >= 400 and "Developer Over Qps" in http_body:
+                raise GeocoderQuotaExceeded("Developer Over Qps")

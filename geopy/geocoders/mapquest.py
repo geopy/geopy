@@ -26,15 +26,15 @@ class MapQuest(Geocoder):
     reverse_path = '/geocoding/v1/reverse'
 
     def __init__(
-        self,
-        api_key,
-        format_string=None,
-        scheme=None,
-        timeout=DEFAULT_SENTINEL,
-        proxies=DEFAULT_SENTINEL,
-        user_agent=None,
-        ssl_context=DEFAULT_SENTINEL,
-        domain='www.mapquestapi.com',
+            self,
+            api_key,
+            format_string=None,
+            scheme=None,
+            timeout=DEFAULT_SENTINEL,
+            proxies=DEFAULT_SENTINEL,
+            user_agent=None,
+            ssl_context=DEFAULT_SENTINEL,
+            domain='www.mapquestapi.com',
     ):
         """
         :param str api_key: The API key required by Mapquest to perform
@@ -117,12 +117,12 @@ class MapQuest(Geocoder):
             return [parse_feature(feature) for feature in features]
 
     def geocode(
-        self,
-        query,
-        exactly_one=True,
-        timeout=DEFAULT_SENTINEL,
-        limit=None,
-        bounds=None
+            self,
+            query,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
+            limit=None,
+            bounds=None
     ):
         """
         Return a location point by address.
@@ -173,10 +173,10 @@ class MapQuest(Geocoder):
         )
 
     def reverse(
-        self,
-        query,
-        exactly_one=True,
-        timeout=DEFAULT_SENTINEL
+            self,
+            query,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.

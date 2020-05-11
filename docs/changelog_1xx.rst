@@ -40,6 +40,9 @@ Changelog
     has been raising an `IndexError`, `reverse` was returning an empty
     list. Now they both return `None`. (#244)
 
+*   FIXED: `TomTom` geocoder has been raising `GeocoderInsufficientPrivileges`
+    exception for rate limiting errors instead of `GeocoderQuotaExceeded`.
+
 
 1.21.0
 ------
