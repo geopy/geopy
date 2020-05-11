@@ -56,6 +56,8 @@ class GeocoderTestBase(unittest.TestCase):
                 self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
             else:
                 self.fail('%s: No result found' % cls.__name__)
+        if result == []:
+            self.fail('%s returned an empty list instead of None' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
@@ -74,6 +76,8 @@ class GeocoderTestBase(unittest.TestCase):
                 self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
             else:
                 self.fail('%s: No result found' % cls.__name__)
+        if result == []:
+            self.fail('%s returned an empty list instead of None' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
