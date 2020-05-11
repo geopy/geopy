@@ -46,6 +46,8 @@ class DataBC(Geocoder):
 
             .. versionadded:: 1.14.0
 
+            .. deprecated:: 1.22.0
+
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.

@@ -35,6 +35,8 @@ class TomTom(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
+            .. deprecated:: 1.22.0
+
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
 

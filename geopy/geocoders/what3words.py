@@ -46,6 +46,8 @@ class What3Words(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
+            .. deprecated:: 1.22.0
+
         :param str scheme: Must be ``https``.
 
             .. deprecated:: 1.15.0

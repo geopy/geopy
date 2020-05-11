@@ -26,7 +26,6 @@ class BingTestCase(GeocoderTestBase):
     @classmethod
     def setUpClass(cls):
         cls.geocoder = Bing(
-            format_string='%s',
             api_key=env['BING_KEY']
         )
 

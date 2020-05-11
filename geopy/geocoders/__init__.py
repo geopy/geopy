@@ -60,18 +60,55 @@ If a service is unavailable or otherwise returns a non-OK response, or doesn't
 receive a response in the allotted timeout, you will receive one of the
 `Exceptions`_ detailed below.
 
-Every geocoder accepts an argument ``format_string`` that defaults to ``'%s'``
-where the input string to geocode is interpolated. For example, if you only
-need to geocode locations in `Cleveland, Ohio`, you could do::
+.. _specifying_parameters_once:
 
+Specifying Parameters Once
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Geocoding methods accept a lot of different parameters, and you would
+probably want to specify some of them just once and not care about them
+later.
+
+This is easy to achieve with Python's :func:`functools.partial`::
+
+    >>> from functools import partial
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here",
-    ...                        format_string="%s, Cleveland OH")
-    >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
-    >>> print(address, latitude, longitude)
-    Thwing Center, 11111, Euclid Avenue, Magnolia-Wade Park Historic District, \
-University Circle, Cleveland, Cuyahoga County, Ohio, 44106, USA \
-41.5074076 -81.6083649792596
+
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
+
+    >>> geocode = partial(geolocator.geocode, language="es")
+    >>> print(geocode("london"))
+    Londres, Greater London, Inglaterra, SW1A 2DX, Gran Bretaña
+    >>> print(geocode("paris"))
+    París, Isla de Francia, Francia metropolitana, Francia
+    >>> print(geocode("paris", language="en"))
+    Paris, Ile-de-France, Metropolitan France, France
+
+    >>> reverse = partial(geolocator.reverse, language="es")
+    >>> print(reverse("52.509669, 13.376294"))
+    Steinecke, Potsdamer Platz, Tiergarten, Mitte, 10785, Alemania
+
+If you need to modify the query, you can also use a one-liner with lambda.
+For example, if you only need to geocode locations in `Cleveland, Ohio`,
+you could do::
+
+    >>> geocode = lambda query: geolocator.geocode("%s, Cleveland OH" % query)
+    >>> print(geocode("11111 Euclid Ave"))
+    Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
+    University Circle, Cleveland, Cuyahoga County, Ohio, 44106, United States
+    of America
+
+That lambda doesn't accept kwargs. If you need them, you could do::
+
+    >>> _geocode = partial(geolocator.geocode, language="es")
+    >>> geocode = lambda query, **kw: _geocode("%s, Cleveland OH" % query, **kw)
+    >>> print(geocode("11111 Euclid Ave"))
+    Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
+    University Circle, Cleveland, Cuyahoga County, Ohio, 44106, Estados Unidos
+    >>> print(geocode("11111 Euclid Ave", language="en"))
+    Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
+    University Circle, Cleveland, Cuyahoga County, Ohio, 44106, United States
+    of America
 
 Geopy Is Not a Service
 ~~~~~~~~~~~~~~~~~~~~~~

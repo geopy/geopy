@@ -30,7 +30,11 @@ Changelog
 
 *   CHANGED: `Yandex` now issues a deprecation warning when `lang`
     parameter is specified in `__init__`. `lang` should be passed
-    to `geocode` and `reverse` instead.
+    to `geocode` and `reverse` instead. (#350)
+
+*   CHANGED: `format_string` param has been marked as deprecated
+    in all geocoders and will be removed in geopy 2.0.
+    See the new `Specifying Parameters Once` doc section for alternatives.
 
 *   FIXED: `IGNFrance` incorrectly processed empty results: `geocode`
     has been raising an `IndexError`, `reverse` was returning an empty

@@ -48,6 +48,8 @@ class Pelias(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
+            .. deprecated:: 1.22.0
+
         :type boundary_rect: list or tuple of 2 items of :class:`geopy.point.Point`
             or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
         :param boundary_rect: Coordinates to restrict search within.

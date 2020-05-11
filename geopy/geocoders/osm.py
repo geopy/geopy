@@ -65,6 +65,8 @@ class Nominatim(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
+            .. deprecated:: 1.22.0
+
         :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
         :param view_box: Coordinates to restrict search within.
