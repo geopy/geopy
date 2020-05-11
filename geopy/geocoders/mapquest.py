@@ -73,7 +73,13 @@ class MapQuest(Geocoder):
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.api = "%s://%s" % (self.scheme, self.domain)
+
+        self.geocode_api = (
+            '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
+        )
+        self.reverse_api = (
+            '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
+        )
 
     def _parse_json(self, json, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
@@ -94,11 +100,7 @@ class MapQuest(Geocoder):
                 'postalCode'
             ]
 
-            location = []
-
-            for k in addr_keys:
-                if k in feature and feature[k]:
-                    location.append(feature[k])
+            location = [feature[k] for k in addr_keys if feature.get(k)]
             return ", ".join(location)
 
         def parse_feature(feature):
@@ -117,7 +119,7 @@ class MapQuest(Geocoder):
         query,
         exactly_one=True,
         timeout=DEFAULT_SENTINEL,
-        country=None,
+        limit=None,
         bounds=None
     ):
         """
@@ -133,6 +135,9 @@ class MapQuest(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param int limit: Limit the maximum number of items in the
+            response. This will be reset to one if ``exactly_one`` is True.
+
         :param bounds: The bounding box of the viewport within which
             to bias geocode results more prominently.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
@@ -144,14 +149,20 @@ class MapQuest(Geocoder):
         """
         params = {}
         params['key'] = self.api_key
-        params['location'] = query
+        params['location'] = self.format_string % query
+
+        if limit is not None:
+            params['maxResults'] = limit
+
+        if exactly_one:
+            params["maxResults"] = 1
 
         if bounds:
             params['boundingBox'] = self._format_bounding_box(
                 bounds, "%(lat2)s,%(lon1)s,%(lat1)s,%(lon2)s"
             )
 
-        url = self.api + self.geocode_path + "?" + urlencode(params)
+        url = '?'.join((self.geocode_api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
 
@@ -190,7 +201,7 @@ class MapQuest(Geocoder):
         point = self._coerce_point_to_string(query, "%(lat)s,%(lon)s")
         params['location'] = point
 
-        url = self.api + self.reverse_path + "?" + urlencode(params)
+        url = '?'.join((self.reverse_api, urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
 

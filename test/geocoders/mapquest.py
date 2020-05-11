@@ -30,7 +30,7 @@ class MapQuestTestCase(GeocoderTestBase):
     def test_reverse(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         location = self.reverse_run(
-            {"query": new_york_point, "exactly_one": True},
+            {"query": new_york_point},
             {"latitude": 40.7537640, "longitude": -73.98489, "delta": 1},
         )
         self.assertIn("New York", location.address)
@@ -38,6 +38,13 @@ class MapQuestTestCase(GeocoderTestBase):
     def test_zero_results(self):
         self.geocode_run(
             {"query": ''},
+            {},
+            expect_failure=True,
+        )
+
+    def test_geocode_empty(self):
+        self.geocode_run(
+            {'query': 'sldkfhdskjfhsdkhgflaskjgf'},
             {},
             expect_failure=True,
         )
@@ -58,9 +65,15 @@ class MapQuestTestCase(GeocoderTestBase):
         self.assertAlmostEqual(-74.007228, result.raw['latLng']['lng'], delta=delta)
         self.assertAlmostEqual(40.713054, result.raw['latLng']['lat'], delta=delta)
 
-    def test_geocode_exactly_one_false(self):
+    def test_geocode_limit(self):
         list_result = self.geocode_run(
-            {"query": "maple street", "exactly_one": False},
+            {"query": "maple street", "exactly_one": False, "limit": 2},
             {},
         )
-        self.assertGreaterEqual(len(list_result), 3)
+        self.assertEqual(len(list_result), 2)
+
+        list_result = self.geocode_run(
+            {"query": "maple street", "exactly_one": False, "limit": 4},
+            {},
+        )
+        self.assertEqual(len(list_result), 4)
