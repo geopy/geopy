@@ -28,6 +28,10 @@ Changelog
 *   CHANGED: Updated links to Nominatim documentation.
     Contributed by Sarah Hoffmann. (#403)
 
+*   CHANGED: `Yandex` now issues a deprecation warning when `lang`
+    parameter is specified in `__init__`. `lang` should be passed
+    to `geocode` and `reverse` instead.
+
 
 1.21.0
 ------

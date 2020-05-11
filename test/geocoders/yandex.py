@@ -70,12 +70,8 @@ class YandexTestCase(GeocoderTestBase):
         """
         Yandex.geocode with lang
         """
-        self.geocoder = Yandex(
-            api_key=env.get('YANDEX_KEY'),
-            lang='uk_UA'
-        )
         self.geocode_run(
-            {"query": "площа Леніна Донецьк"},
+            {"query": "площа Леніна Донецьк", "lang": "uk_UA"},
             {"address": "площа Леніна, Донецьк, Україна",
              "latitude": 48.002104, "longitude": 37.805186},
         )
@@ -84,4 +80,11 @@ class YandexTestCase(GeocoderTestBase):
         self.reverse_run(
             {"query": (55.743659, 37.408055), "kind": "locality", "exactly_one": True},
             {"address": "Москва, Россия"}
+        )
+
+    def test_reverse_lang_param(self):
+        self.reverse_run(
+            {"query": (55.743659, 37.408055), "kind": "locality",
+             "lang": "uk_UA", "exactly_one": True},
+            {"address": "Москва, Росія"}
         )
