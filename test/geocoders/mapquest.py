@@ -54,9 +54,13 @@ class MapQuestTestCase(GeocoderTestBase):
 
     def test_geocode_raw(self):
         result = self.geocode_run({"query": "New York"}, {})
-        self.assertTrue(isinstance(result.raw, dict))
-        self.assertEqual(result.raw['latLng'], {'lat': 40.713054, 'lng': -74.007228})
+        delta = 1.0
+        self.assertAlmostEqual(-74.007228, result.raw['latLng']['lng'], delta=delta)
+        self.assertAlmostEqual(40.713054, result.raw['latLng']['lat'], delta=delta)
 
-    def test_geocode_exactly_one_true(self):
-        list_result = self.geocode_run({"query": "New York", "exactly_one": False}, {})
-        self.assertTrue(isinstance(list_result, list))
+    def test_geocode_exactly_one_false(self):
+        list_result = self.geocode_run(
+            {"query": "maple street", "exactly_one": False},
+            {},
+        )
+        self.assertGreaterEqual(len(list_result), 3)

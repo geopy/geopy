@@ -93,7 +93,7 @@ class MapBox(Geocoder):
             bbox=None,
     ):
         """
-        Return a location point by address
+        Return a location point by address.
 
         .. versionchanged:: 1.20.0
             Previously due to a bug the resulting :class:`geopy.location.Location`'s

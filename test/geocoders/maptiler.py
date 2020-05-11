@@ -3,7 +3,6 @@ import unittest
 
 from geopy.compat import u
 from geopy.geocoders import MapTiler
-from geopy.location import Location
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -32,7 +31,7 @@ class MapTilerTestCase(GeocoderTestBase):
     def test_reverse(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         location = self.reverse_run(
-            {"query": new_york_point, "exactly_one": True},
+            {"query": new_york_point},
             {"latitude": 40.7537640, "longitude": -73.98489, "delta": 1},
         )
         self.assertIn("New York", location.address)
@@ -74,14 +73,14 @@ class MapTilerTestCase(GeocoderTestBase):
     def test_reverse_language(self):
         zurich_point = Point(47.3723, 8.5422)
         location = self.reverse_run(
-            {"query": zurich_point, "exactly_one": True, "language": "ja"},
+            {"query": zurich_point, "language": "ja"},
             {"latitude": 47.3723, "longitude": 8.5422, "delta": 1},
         )
         self.assertIn(u("\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2"), location.address)
 
     def test_geocode_language(self):
         location = self.geocode_run(
-            {"query": u("Z\u00fcrich"), "exactly_one": True, "language": "ja",
+            {"query": u("Z\u00fcrich"), "language": "ja",
              "proximity": Point(47.3723, 8.5422)},
             {"latitude": 47.3723, "longitude": 8.5422, "delta": 1},
         )
@@ -89,16 +88,14 @@ class MapTilerTestCase(GeocoderTestBase):
 
     def test_geocode_raw(self):
         result = self.geocode_run({"query": "New York"}, {})
-        delta = 0.00001
-        self.assertTrue(isinstance(result.raw, dict))
+        delta = 1.0
         self.assertAlmostEqual(-73.8784155, result.raw['center'][0], delta=delta)
         self.assertAlmostEqual(40.6930727, result.raw['center'][1], delta=delta)
         self.assertEqual("relation175905", result.raw['properties']['osm_id'])
 
     def test_geocode_exactly_one_false(self):
-        list_result = self.geocode_run({"query": "New York", "exactly_one": False}, {})
-        self.assertTrue(isinstance(list_result, list))
-
-    def test_geocode_exactly_one_true(self):
-        list_result = self.geocode_run({"query": "New York", "exactly_one": True}, {})
-        self.assertTrue(isinstance(list_result, Location))
+        list_result = self.geocode_run(
+            {"query": "maple street", "exactly_one": False},
+            {},
+        )
+        self.assertGreaterEqual(len(list_result), 3)

@@ -94,7 +94,7 @@ class MapTiler(Geocoder):
             bbox=None,
     ):
         """
-        Return a location point by address
+        Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 

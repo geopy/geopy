@@ -30,7 +30,7 @@ class MapBoxTestCase(GeocoderTestBase):
     def test_reverse(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         location = self.reverse_run(
-            {"query": new_york_point, "exactly_one": True},
+            {"query": new_york_point},
             {"latitude": 40.7537640, "longitude": -73.98489, "delta": 1},
         )
         self.assertIn("New York", location.address)
@@ -83,9 +83,13 @@ class MapBoxTestCase(GeocoderTestBase):
 
     def test_geocode_raw(self):
         result = self.geocode_run({"query": "New York"}, {})
-        self.assertTrue(isinstance(result.raw, dict))
-        self.assertEqual(result.raw['center'], [-73.9808, 40.7648])
+        delta = 1.0
+        self.assertAlmostEqual(-73.8784155, result.raw['center'][0], delta=delta)
+        self.assertAlmostEqual(40.6930727, result.raw['center'][1], delta=delta)
 
-    def test_geocode_exactly_one_true(self):
-        list_result = self.geocode_run({"query": "New York", "exactly_one": False}, {})
-        self.assertTrue(isinstance(list_result, list))
+    def test_geocode_exactly_one_false(self):
+        list_result = self.geocode_run(
+            {"query": "maple street", "exactly_one": False},
+            {},
+        )
+        self.assertGreaterEqual(len(list_result), 3)

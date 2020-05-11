@@ -5,6 +5,7 @@ import unittest
 from collections import defaultdict
 
 from geopy import exc
+from geopy.location import Location
 
 env = defaultdict(lambda: None)
 try:
@@ -104,6 +105,11 @@ class GeocoderTestBase(unittest.TestCase):
         """
         Verifies that result matches the kwargs given.
         """
+        if exactly_one:
+            self.assertIsInstance(result, Location)
+        else:
+            self.assertIsInstance(result, list)
+
         item = result if exactly_one else result[0]
         delta = delta or self.delta
         exceptions = []
