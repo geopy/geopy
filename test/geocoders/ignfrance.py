@@ -103,7 +103,7 @@ class IGNFranceTestCase(GeocoderTestBase):
     def test_reverse_no_result(self):
         self.reverse_run(
             # North Atlantic Ocean
-            {"query": (35.173809, -37.485351)},
+            {"query": (35.173809, -37.485351), "exactly_one": True},
             {},
             expect_failure=True
         )
