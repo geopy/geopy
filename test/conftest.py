@@ -1,4 +1,3 @@
-# coding: utf-8
 import atexit
 import os
 from collections import defaultdict
@@ -81,9 +80,9 @@ class RequestsMonitor(object):
             return "; ".join(s for s in (count, times, retries) if s)
 
         legend = (
-            "count – number of requests (excluding retries); "
-            "min, max, mean, total – request duration statistics "
-            "(excluding failed requests); retries – number of retries."
+            "count -- number of requests (excluding retries); "
+            "min, max, mean, total -- request duration statistics "
+            "(excluding failed requests); retries -- number of retries."
         )
         return pretty_dict_format('Request statistics per hostname',
                                   self.host_stats,

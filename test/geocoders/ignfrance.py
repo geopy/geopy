@@ -129,14 +129,9 @@ class IGNFranceTestCase(GeocoderTestBase):
             {},
         )
 
-        self.assertEqual(
-            res[0].address,
-            "02000 Chambry"
-        )
-        self.assertEqual(
-            res[1].address,
-            "16420 Saint-Christophe"
-        )
+        addresses = [location.address for location in res]
+        self.assertIn("02000 Chambry", addresses)
+        self.assertIn("16420 Saint-Christophe", addresses)
 
     def test_geocode_filter_by_attribute(self):
         """
@@ -219,7 +214,7 @@ class IGNFranceTestCase(GeocoderTestBase):
         )
         self.assertEqual(
             res.address,
-            '3 av camille guerin, 44000 Nantes'
+            '7 av camille guerin, 44000 Nantes'
         )
 
     def test_reverse_invalid_preference(self):
@@ -243,14 +238,9 @@ class IGNFranceTestCase(GeocoderTestBase):
              "reverse_geocode_preference": ['StreetAddress', 'PositionOfInterest']},
             {},
         )
-        self.assertEqual(
-            res[0].address,
-            '3 av camille guerin, 44000 Nantes'
-        )
-        self.assertEqual(
-            res[1].address,
-            '5 av camille guerin, 44000 Nantes'
-        )
+        addresses = [location.address for location in res]
+        self.assertIn("3 av camille guerin, 44000 Nantes", addresses)
+        self.assertIn("5 av camille guerin, 44000 Nantes", addresses)
 
     def test_reverse_by_radius(self):
         """
