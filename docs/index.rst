@@ -126,6 +126,16 @@ Baidu
 
    .. automethod:: __init__
 
+BaiduV3
+-------
+
+.. autoclass:: geopy.geocoders.BaiduV3
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+   .. automethod:: __init__
+
 BANFrance
 ---------
 

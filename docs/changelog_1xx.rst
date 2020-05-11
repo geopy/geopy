@@ -9,6 +9,8 @@ Changelog
 *   ADDED: `AlgoliaPlaces` geocoder.
     Contributed by Álvaro Mondéjar. (#405)
 
+*   ADDED: `BaiduV3` geocoder. (#394)
+
 *   ADDED: `MapQuest` geocoder.
     Contributed by Pratheek Rebala. (#399)
 
