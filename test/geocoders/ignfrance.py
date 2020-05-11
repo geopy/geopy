@@ -93,6 +93,21 @@ class IGNFranceTestCase(GeocoderTestBase):
             {"latitude": 47.222482, "longitude": -1.556303},
         )
 
+    def test_geocode_no_result(self):
+        self.geocode_run(
+            {"query": 'asdfasdfasdf'},
+            {},
+            expect_failure=True,
+        )
+
+    def test_reverse_no_result(self):
+        self.reverse_run(
+            # North Atlantic Ocean
+            {"query": (35.173809, -37.485351)},
+            {},
+            expect_failure=True
+        )
+
     def test_geocode_with_address(self):
         """
         IGNFrance.geocode Address

@@ -32,6 +32,10 @@ Changelog
     parameter is specified in `__init__`. `lang` should be passed
     to `geocode` and `reverse` instead.
 
+*   FIXED: `IGNFrance` incorrectly processed empty results: `geocode`
+    has been raising an `IndexError`, `reverse` was returning an empty
+    list. Now they both return `None`. (#244)
+
 
 1.21.0
 ------

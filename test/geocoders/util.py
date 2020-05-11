@@ -47,9 +47,9 @@ class GeocoderTestBase(unittest.TestCase):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
         """
+        cls = type(self)
         result = self._make_request(self.geocoder.geocode, **payload)
         if result is None:
-            cls = type(self)
             if expect_failure:
                 return
             elif skiptest_on_failure:
@@ -67,9 +67,9 @@ class GeocoderTestBase(unittest.TestCase):
         """
         Calls geocoder.reverse(**payload), then checks against `expected`.
         """
+        cls = type(self)
         result = self._make_request(self.geocoder.reverse, **payload)
         if result is None:
-            cls = type(self)
             if expect_failure:
                 return
             elif skiptest_on_failure:

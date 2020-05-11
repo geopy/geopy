@@ -430,6 +430,8 @@ class IGNFrance(Geocoder):
         # Return places as json instead of XML
         places = self._xml_to_json_places(tree, is_reverse=is_reverse)
 
+        if not places:
+            return None
         if exactly_one:
             return self._parse_place(places[0], is_freeform=is_freeform)
         else:
