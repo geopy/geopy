@@ -2,6 +2,31 @@
 
 Changelog
 =========
+1.22.0
+------
+2020-05-XX
+
+*   ADDED: `AlgoliaPlaces` geocoder.
+    Contributed by Álvaro Mondéjar. (#405)
+
+*   ADDED: `MapQuest` geocoder.
+    Contributed by Pratheek Rebala. (#399)
+
+*   ADDED: `MapTiler` geocoder.
+    Contributed by chilfing. (#397)
+
+*   ADDED: `Nominatim`-based geocoders: `zoom` parameter
+    has been added to the `reverse` method.
+    Contributed by David Mueller. (#406)
+
+*   ADDED: `GoogleV3` added support for lists in `components` param
+    which allows to specify multiple components with the same name.
+    Contributed by Pratheek Rebala. (#409)
+
+*   CHANGED: Updated links to Nominatim documentation.
+    Contributed by Sarah Hoffmann. (#403)
+
+
 1.21.0
 ------
 2020-02-02
