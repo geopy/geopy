@@ -419,7 +419,7 @@ class IGNFrance(Geocoder):
             ns = '{%s}' % namespace
             ns = u(ns)
             nsl = len(ns)
-            for elem in doc.getiterator():
+            for elem in doc.iter():
                 if elem.tag.startswith(ns):
                     elem.tag = elem.tag[nsl:]
 
