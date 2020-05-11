@@ -88,8 +88,8 @@ class AlgoliaPlaces(Geocoder):
             exactly_one=True,
             language=None,
             countries=None,
-            around_lat_lng=None,
-            around_lat_lng_via_ip=None,
+            around=None,
+            around_via_ip=None,
             around_radius=None,
             x_forwarded_for=None,
             timeout=DEFAULT_SENTINEL,
@@ -121,11 +121,13 @@ class AlgoliaPlaces(Geocoder):
             to a specific list of countries. You can pass two letters
             country codes (ISO 3166-1).
 
-        :param str around_lat_lng: Force to first search around a specific
-            latitude longitude. The option value must be provided as a
-            string: `latitude,longitude` like `12.232,23.1`.
+        :param around: Force to first search around a specific
+            latitude longitude.
+        :type around: :class:`geopy.point.Point`, list or tuple of
+            ``(latitude, longitude)``, or string as ``"%(latitude)s,
+            %(longitude)s"``.
 
-        :param bool around_lat_lng_via_ip: Whether or not to first search
+        :param bool around_via_ip: Whether or not to first search
             around the geolocation of the user found via his IP address.
             This is true by default.
 
@@ -175,12 +177,13 @@ class AlgoliaPlaces(Geocoder):
         if countries is not None:
             params['countries'] = ','.join([c.lower() for c in countries])
 
-        if around_lat_lng is not None:
-            params['aroundLatLng'] = around_lat_lng
+        if around is not None:
+            p = Point(around)
+            params['aroundLatLng'] = "%s,%s" % (p.latitude, p.longitude)
 
-        if isinstance(around_lat_lng_via_ip, bool):
+        if around_via_ip is not None:
             params['aroundLatLngViaIP'] = \
-                'true' if around_lat_lng_via_ip else 'false'
+                'true' if around_via_ip else 'false'
 
         if around_radius is not None:
             params['aroundRadius'] = around_radius

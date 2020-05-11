@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from geopy.geocoders import AlgoliaPlaces
+from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 
@@ -92,4 +93,14 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
             {'query': 'sldkfhdskjfhsdkhgflaskjgf'},
             {},
             expect_failure=True,
+        )
+
+    def test_around(self):
+        self.geocode_run(
+            {'query': 'maple street', 'language': 'en', 'around': Point(51.1, -0.1)},
+            {'latitude': 51.5299, 'longitude': -0.0628044, "delta": 1},
+        )
+        self.geocode_run(
+            {'query': 'maple street', 'language': 'en', 'around': Point(50.1, 10.1)},
+            {'latitude': 50.0517, 'longitude': 10.1966, "delta": 1},
         )
