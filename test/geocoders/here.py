@@ -261,8 +261,11 @@ class HereLegacyAuthTestCase(BaseHereTestCase, GeocoderTestBase):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        return Here(
-            app_id=env['HERE_APP_ID'],
-            app_code=env['HERE_APP_CODE'],
-            timeout=10,
-        )
+        with warnings.catch_warnings(record=True) as w:
+            geocoder = Here(
+                app_id=env['HERE_APP_ID'],
+                app_code=env['HERE_APP_CODE'],
+                timeout=10,
+            )
+        assert len(w) == 1
+        return geocoder
