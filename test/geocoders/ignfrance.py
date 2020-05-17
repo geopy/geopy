@@ -7,6 +7,7 @@ from six import with_metaclass
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
 from test.geocoders.util import GeocoderTestBase, env
+from test.proxy_server import ProxyServerThread
 
 
 class IGNFranceTestCaseUnitTest(GeocoderTestBase):
@@ -317,3 +318,46 @@ class IGNFranceUsernameAuthTestCase(BaseIGNFranceTestCase, GeocoderTestBase):
             password=env['IGNFRANCE_PASSWORD'],
             timeout=10
         )
+
+
+@unittest.skipUnless(
+    bool(env.get('IGNFRANCE_USERNAME_KEY') and env.get('IGNFRANCE_USERNAME')
+         and env.get('IGNFRANCE_PASSWORD')),
+    "No IGNFRANCE_USERNAME_KEY or IGNFRANCE_USERNAME "
+    "or IGNFRANCE_PASSWORD env variable set"
+)
+class IGNFranceUsernameAuthProxyTestCase(GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return IGNFrance(
+            api_key=env['IGNFRANCE_USERNAME_KEY'],
+            username=env['IGNFRANCE_USERNAME'],
+            password=env['IGNFRANCE_PASSWORD'],
+            timeout=10,
+            **kwargs,
+        )
+
+    proxy_timeout = 5
+
+    def setUp(self):
+        self.proxy_server = ProxyServerThread(timeout=self.proxy_timeout)
+        self.proxy_server.start()
+        self.proxy_url = self.proxy_server.get_proxy_url()
+        self.geocoder = self.make_geocoder(proxies=self.proxy_url)
+
+    def tearDown(self):
+        self.proxy_server.stop()
+        self.proxy_server.join()
+
+    def test_proxy_is_respected(self):
+        self.assertEqual(0, len(self.proxy_server.requests))
+        self.geocode_run(
+            {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER",
+             "query_type": "StreetAddress",
+             "exactly_one": True},
+            {"latitude": 47.293048,
+             "longitude": 1.718985,
+             "address": "le camp des landes, 41200 Villefranche-sur-Cher"},
+        )
+        self.assertEqual(1, len(self.proxy_server.requests))
