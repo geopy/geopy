@@ -335,7 +335,7 @@ class IGNFranceUsernameAuthProxyTestCase(GeocoderTestBase):
             username=env['IGNFRANCE_USERNAME'],
             password=env['IGNFRANCE_PASSWORD'],
             timeout=10,
-            **kwargs,
+            **kwargs
         )
 
     proxy_timeout = 5
