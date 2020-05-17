@@ -1,15 +1,12 @@
 # -*- coding: utf8 -*-
 import unittest
+from abc import ABCMeta, abstractmethod
+
+from six import with_metaclass
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
 from test.geocoders.util import GeocoderTestBase, env
-
-credentials = bool(
-    (env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_USERNAME')
-     and env.get('IGNFRANCE_PASSWORD')) or (
-         env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_REFERER'))
-)
 
 
 class IGNFranceTestCaseUnitTest(GeocoderTestBase):
@@ -22,27 +19,6 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
-
-
-@unittest.skipUnless(
-    credentials,
-    "One or more of the env variables IGNFRANCE_KEY, IGNFRANCE_USERNAME "
-    "and IGNFRANCE_PASSWORD is not set"
-)
-class IGNFranceTestCase(GeocoderTestBase):
-
-    @classmethod
-    def setUpClass(cls):
-        if not credentials:
-            return
-        cls.geocoder = IGNFrance(
-            api_key=env.get('IGNFRANCE_KEY'),
-            username=env.get('IGNFRANCE_USERNAME'),
-            password=env.get('IGNFRANCE_PASSWORD'),
-            referer=env.get('IGNFRANCE_REFERER'),
-            timeout=10
-        )
-        cls.delta_exact = 0.2
 
     def test_invalid_auth_1(self):
         """
@@ -64,6 +40,18 @@ class IGNFranceTestCase(GeocoderTestBase):
         """
         with self.assertRaises(ConfigurationError):
             IGNFrance(api_key="a", username="b")
+
+
+class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
+
+    @classmethod
+    @abstractmethod
+    def make_geocoder(cls, **kwargs):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = cls.make_geocoder()
 
     def test_invalid_query_type(self):
         """
@@ -295,4 +283,37 @@ class IGNFranceTestCase(GeocoderTestBase):
         self.assertEqual(
             coordinates_couples_radius.issubset(coordinates_couples),
             True
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_REFERER')),
+    "No IGNFRANCE_KEY or IGNFRANCE_REFERER env variable set"
+)
+class IGNFranceApiKeyAuthTestCase(BaseIGNFranceTestCase, GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return IGNFrance(
+            api_key=env['IGNFRANCE_KEY'],
+            referer=env['IGNFRANCE_REFERER'],
+            timeout=10
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('IGNFRANCE_USERNAME_KEY') and env.get('IGNFRANCE_USERNAME')
+         and env.get('IGNFRANCE_PASSWORD')),
+    "No IGNFRANCE_USERNAME_KEY or IGNFRANCE_USERNAME "
+    "or IGNFRANCE_PASSWORD env variable set"
+)
+class IGNFranceUsernameAuthTestCase(BaseIGNFranceTestCase, GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return IGNFrance(
+            api_key=env['IGNFRANCE_USERNAME_KEY'],
+            username=env['IGNFRANCE_USERNAME'],
+            password=env['IGNFRANCE_PASSWORD'],
+            timeout=10
         )
