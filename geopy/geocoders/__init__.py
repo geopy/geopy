@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Each geolocation service you might use, such as Google Maps, Bing Maps, or
 Nominatim, has its own class in ``geopy.geocoders`` abstracting the service's
@@ -60,18 +61,87 @@ If a service is unavailable or otherwise returns a non-OK response, or doesn't
 receive a response in the allotted timeout, you will receive one of the
 `Exceptions`_ detailed below.
 
-Every geocoder accepts an argument ``format_string`` that defaults to ``'%s'``
-where the input string to geocode is interpolated. For example, if you only
-need to geocode locations in `Cleveland, Ohio`, you could do::
+.. _specifying_parameters_once:
 
+Specifying Parameters Once
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Geocoding methods accept a lot of different parameters, and you would
+probably want to specify some of them just once and not care about them
+later.
+
+This is easy to achieve with Python's :func:`functools.partial`::
+
+    >>> from functools import partial
     >>> from geopy.geocoders import Nominatim
-    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here",
-    ...                        format_string="%s, Cleveland OH")
-    >>> address, (latitude, longitude) = geolocator.geocode("11111 Euclid Ave")
-    >>> print(address, latitude, longitude)
-    Thwing Center, 11111, Euclid Avenue, Magnolia-Wade Park Historic District, \
-University Circle, Cleveland, Cuyahoga County, Ohio, 44106, USA \
-41.5074076 -81.6083649792596
+
+    >>> geolocator = Nominatim(user_agent="specify_your_app_name_here")
+
+    >>> geocode = partial(geolocator.geocode, language="es")
+    >>> print(geocode("london"))
+    Londres, Greater London, Inglaterra, SW1A 2DX, Gran Bretaña
+    >>> print(geocode("paris"))
+    París, Isla de Francia, Francia metropolitana, Francia
+    >>> print(geocode("paris", language="en"))
+    Paris, Ile-de-France, Metropolitan France, France
+
+    >>> reverse = partial(geolocator.reverse, language="es")
+    >>> print(reverse("52.509669, 13.376294"))
+    Steinecke, Potsdamer Platz, Tiergarten, Mitte, 10785, Alemania
+
+If you need to modify the query, you can also use a one-liner with lambda.
+For example, if you only need to geocode locations in `Cleveland, Ohio`,
+you could do::
+
+    >>> geocode = lambda query: geolocator.geocode("%s, Cleveland OH" % query)
+    >>> print(geocode("11111 Euclid Ave"))
+    Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
+    University Circle, Cleveland, Cuyahoga County, Ohio, 44106, United States
+    of America
+
+That lambda doesn't accept kwargs. If you need them, you could do::
+
+    >>> _geocode = partial(geolocator.geocode, language="es")
+    >>> geocode = lambda query, **kw: _geocode("%s, Cleveland OH" % query, **kw)
+    >>> print(geocode("11111 Euclid Ave"))
+    Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
+    University Circle, Cleveland, Cuyahoga County, Ohio, 44106, Estados Unidos
+    >>> print(geocode("11111 Euclid Ave", language="en"))
+    Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
+    University Circle, Cleveland, Cuyahoga County, Ohio, 44106, United States
+    of America
+
+Geopy Is Not a Service
+~~~~~~~~~~~~~~~~~~~~~~
+
+Geocoding is provided by a number of different services, which are not
+affiliated with geopy in any way. These services provide APIs, which anyone
+could implement, and geopy is just a library which provides these
+implementations for many different services in a single package.
+
+.. image:: ./_static/geopy_and_geocoding_services.svg
+   :target: ./_static/geopy_and_geocoding_services.svg
+
+Therefore:
+
+1. Different services have different Terms of Use, quotas, pricing,
+   geodatabases and so on. For example, :class:`geopy.geocoders.Nominatim`
+   is free, but provides low request limits. If you need to make more queries,
+   consider using another (probably paid) service, such as
+   :class:`geopy.geocoders.OpenMapQuest` or :class:`geopy.geocoders.PickPoint`
+   (these two are commercial providers of Nominatim, so they should
+   have the same data and APIs). Or, if you are ready to wait, you can try
+   :class:`geopy.extra.rate_limiter.RateLimiter`.
+
+2. geopy cannot be responsible for the geocoding services' databases.
+   If you have issues with some queries which the service cannot fulfill,
+   it should be directed to that service's support team.
+
+3. geopy cannot be responsible for any networking issues between your computer
+   and the geocoding service.
+
+If you face any problem with your current geocoding service provider, you can
+always try a different one.
 
 """
 
@@ -89,9 +159,11 @@ __all__ = (
     #
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
+    "AlgoliaPlaces",
     "ArcGIS",
     "AzureMaps",
     "Baidu",
+    "BaiduV3",
     "BANFrance",
     "Bing",
     "DataBC",
@@ -103,6 +175,8 @@ __all__ = (
     "Here",
     "IGNFrance",
     "MapBox",
+    "MapQuest",
+    "MapTiler",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
@@ -117,9 +191,10 @@ __all__ = (
 
 
 from geopy.exc import GeocoderNotFound
+from geopy.geocoders.algolia import AlgoliaPlaces
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
-from geopy.geocoders.baidu import Baidu
+from geopy.geocoders.baidu import Baidu, BaiduV3
 from geopy.geocoders.banfrance import BANFrance
 from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
@@ -132,6 +207,8 @@ from geopy.geocoders.googlev3 import GoogleV3
 from geopy.geocoders.here import Here
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
+from geopy.geocoders.mapquest import MapQuest
+from geopy.geocoders.maptiler import MapTiler
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.osm import Nominatim
@@ -144,9 +221,11 @@ from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 
 SERVICE_TO_GEOCODER = {
+    "algolia": AlgoliaPlaces,
     "arcgis": ArcGIS,
     "azure": AzureMaps,
     "baidu": Baidu,
+    "baiduv3": BaiduV3,
     "banfrance": BANFrance,
     "bing": Bing,
     "databc": DataBC,
@@ -159,6 +238,8 @@ SERVICE_TO_GEOCODER = {
     "here": Here,
     "ignfrance": IGNFrance,
     "mapbox": MapBox,
+    "mapquest": MapQuest,
+    "maptiler": MapTiler,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,

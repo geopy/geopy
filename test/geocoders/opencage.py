@@ -28,7 +28,6 @@ class OpenCageTestCase(GeocoderTestBase):
             api_key=env['OPENCAGE_KEY'],
             timeout=10,
         )
-        cls.delta_exact = 0.2
 
     def test_geocode(self):
         """

@@ -1,15 +1,13 @@
 # -*- coding: utf8 -*-
 import unittest
+from abc import ABCMeta, abstractmethod
+
+from six import with_metaclass
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
 from test.geocoders.util import GeocoderTestBase, env
-
-credentials = bool(
-    (env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_USERNAME')
-     and env.get('IGNFRANCE_PASSWORD')) or (
-         env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_REFERER'))
-)
+from test.proxy_server import ProxyServerThread
 
 
 class IGNFranceTestCaseUnitTest(GeocoderTestBase):
@@ -22,27 +20,6 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
             user_agent='my_user_agent/1.0'
         )
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
-
-
-@unittest.skipUnless(
-    credentials,
-    "One or more of the env variables IGNFRANCE_KEY, IGNFRANCE_USERNAME "
-    "and IGNFRANCE_PASSWORD is not set"
-)
-class IGNFranceTestCase(GeocoderTestBase):
-
-    @classmethod
-    def setUpClass(cls):
-        if not credentials:
-            return
-        cls.geocoder = IGNFrance(
-            api_key=env.get('IGNFRANCE_KEY'),
-            username=env.get('IGNFRANCE_USERNAME'),
-            password=env.get('IGNFRANCE_PASSWORD'),
-            referer=env.get('IGNFRANCE_REFERER'),
-            timeout=10
-        )
-        cls.delta_exact = 0.2
 
     def test_invalid_auth_1(self):
         """
@@ -64,6 +41,18 @@ class IGNFranceTestCase(GeocoderTestBase):
         """
         with self.assertRaises(ConfigurationError):
             IGNFrance(api_key="a", username="b")
+
+
+class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
+
+    @classmethod
+    @abstractmethod
+    def make_geocoder(cls, **kwargs):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = cls.make_geocoder()
 
     def test_invalid_query_type(self):
         """
@@ -91,6 +80,21 @@ class IGNFranceTestCase(GeocoderTestBase):
              "query_type": "CadastralParcel",
              "exactly_one": True},
             {"latitude": 47.222482, "longitude": -1.556303},
+        )
+
+    def test_geocode_no_result(self):
+        self.geocode_run(
+            {"query": 'asdfasdfasdf'},
+            {},
+            expect_failure=True,
+        )
+
+    def test_reverse_no_result(self):
+        self.reverse_run(
+            # North Atlantic Ocean
+            {"query": (35.173809, -37.485351), "exactly_one": True},
+            {},
+            expect_failure=True
         )
 
     def test_geocode_with_address(self):
@@ -129,14 +133,9 @@ class IGNFranceTestCase(GeocoderTestBase):
             {},
         )
 
-        self.assertEqual(
-            res[0].address,
-            "02000 Chambry"
-        )
-        self.assertEqual(
-            res[1].address,
-            "16420 Saint-Christophe"
-        )
+        addresses = [location.address for location in res]
+        self.assertIn("02000 Chambry", addresses)
+        self.assertIn("16420 Saint-Christophe", addresses)
 
     def test_geocode_filter_by_attribute(self):
         """
@@ -219,7 +218,7 @@ class IGNFranceTestCase(GeocoderTestBase):
         )
         self.assertEqual(
             res.address,
-            '3 av camille guerin, 44000 Nantes'
+            '7 av camille guerin, 44000 Nantes'
         )
 
     def test_reverse_invalid_preference(self):
@@ -243,14 +242,9 @@ class IGNFranceTestCase(GeocoderTestBase):
              "reverse_geocode_preference": ['StreetAddress', 'PositionOfInterest']},
             {},
         )
-        self.assertEqual(
-            res[0].address,
-            '3 av camille guerin, 44000 Nantes'
-        )
-        self.assertEqual(
-            res[1].address,
-            '5 av camille guerin, 44000 Nantes'
-        )
+        addresses = [location.address for location in res]
+        self.assertIn("3 av camille guerin, 44000 Nantes", addresses)
+        self.assertIn("5 av camille guerin, 44000 Nantes", addresses)
 
     def test_reverse_by_radius(self):
         """
@@ -291,3 +285,79 @@ class IGNFranceTestCase(GeocoderTestBase):
             coordinates_couples_radius.issubset(coordinates_couples),
             True
         )
+
+
+@unittest.skipUnless(
+    bool(env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_REFERER')),
+    "No IGNFRANCE_KEY or IGNFRANCE_REFERER env variable set"
+)
+class IGNFranceApiKeyAuthTestCase(BaseIGNFranceTestCase, GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return IGNFrance(
+            api_key=env['IGNFRANCE_KEY'],
+            referer=env['IGNFRANCE_REFERER'],
+            timeout=10
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('IGNFRANCE_USERNAME_KEY') and env.get('IGNFRANCE_USERNAME')
+         and env.get('IGNFRANCE_PASSWORD')),
+    "No IGNFRANCE_USERNAME_KEY or IGNFRANCE_USERNAME "
+    "or IGNFRANCE_PASSWORD env variable set"
+)
+class IGNFranceUsernameAuthTestCase(BaseIGNFranceTestCase, GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return IGNFrance(
+            api_key=env['IGNFRANCE_USERNAME_KEY'],
+            username=env['IGNFRANCE_USERNAME'],
+            password=env['IGNFRANCE_PASSWORD'],
+            timeout=10
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('IGNFRANCE_USERNAME_KEY') and env.get('IGNFRANCE_USERNAME')
+         and env.get('IGNFRANCE_PASSWORD')),
+    "No IGNFRANCE_USERNAME_KEY or IGNFRANCE_USERNAME "
+    "or IGNFRANCE_PASSWORD env variable set"
+)
+class IGNFranceUsernameAuthProxyTestCase(GeocoderTestBase):
+
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return IGNFrance(
+            api_key=env['IGNFRANCE_USERNAME_KEY'],
+            username=env['IGNFRANCE_USERNAME'],
+            password=env['IGNFRANCE_PASSWORD'],
+            timeout=10,
+            **kwargs
+        )
+
+    proxy_timeout = 5
+
+    def setUp(self):
+        self.proxy_server = ProxyServerThread(timeout=self.proxy_timeout)
+        self.proxy_server.start()
+        self.proxy_url = self.proxy_server.get_proxy_url()
+        self.geocoder = self.make_geocoder(proxies=self.proxy_url)
+
+    def tearDown(self):
+        self.proxy_server.stop()
+        self.proxy_server.join()
+
+    def test_proxy_is_respected(self):
+        self.assertEqual(0, len(self.proxy_server.requests))
+        self.geocode_run(
+            {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER",
+             "query_type": "StreetAddress",
+             "exactly_one": True},
+            {"latitude": 47.293048,
+             "longitude": 1.718985,
+             "address": "le camp des landes, 41200 Villefranche-sur-Cher"},
+        )
+        self.assertEqual(1, len(self.proxy_server.requests))

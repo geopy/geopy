@@ -20,10 +20,15 @@ class Baidu(Geocoder):
     Documentation at:
         http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
 
+    .. attention::
+        Newly registered API keys will not work with v2 API,
+        use :class:`.BaiduV3` instead.
+
     .. versionadded:: 1.0.0
     """
 
     api_path = '/geocoder/v2/'
+    reverse_path = '/geocoder/v2/'
 
     def __init__(
             self,
@@ -64,6 +69,8 @@ class Baidu(Geocoder):
 
             .. versionadded:: 1.14.0
 
+            .. deprecated:: 1.22.0
+
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -86,6 +93,7 @@ class Baidu(Geocoder):
         )
         self.api_key = api_key
         self.api = '%s://api.map.baidu.com%s' % (self.scheme, self.api_path)
+        self.reverse_api = '%s://api.map.baidu.com%s' % (self.scheme, self.reverse_path)
         self.security_key = security_key
 
     @staticmethod
@@ -126,7 +134,7 @@ class Baidu(Geocoder):
             'address': self.format_string % query,
         }
 
-        url = self._construct_url(params)
+        url = self._construct_url(self.api, self.api_path, params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -162,7 +170,7 @@ class Baidu(Geocoder):
             'location': self._coerce_point_to_string(query),
         }
 
-        url = self._construct_url(params)
+        url = self._construct_url(self.reverse_api, self.reverse_path, params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_reverse_json(
@@ -269,12 +277,25 @@ class Baidu(Geocoder):
         else:
             raise GeocoderQueryError('Unknown error. Status: %r' % status)
 
-    def _construct_url(self, params):
+    def _construct_url(self, url, path, params):
         query_string = urlencode(params)
         if self.security_key is None:
-            return "%s?%s" % (self.api, query_string)
+            return "%s?%s" % (url, query_string)
         else:
             # http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix
-            raw = "%s?%s%s" % (self.api_path, query_string, self.security_key)
+            raw = "%s?%s%s" % (path, query_string, self.security_key)
             sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
-            return "%s?%s&sn=%s" % (self.api, query_string, sn)
+            return "%s?%s&sn=%s" % (url, query_string, sn)
+
+
+class BaiduV3(Baidu):
+    """Geocoder using the Baidu Maps v3 API.
+
+    Documentation at:
+        http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
+
+    .. versionadded:: 1.22.0
+    """
+
+    api_path = '/geocoding/v3/'
+    reverse_path = '/reverse_geocoding/v3/'

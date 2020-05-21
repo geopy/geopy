@@ -30,7 +30,6 @@ class GeocoderTestCase(unittest.TestCase):
         cls.geocoder = Geocoder()
 
     def test_init_with_args(self):
-        format_string = '%s Los Angeles, CA USA'
         scheme = 'http'
         timeout = 942
         proxies = {'https': '192.0.2.0'}
@@ -38,17 +37,26 @@ class GeocoderTestCase(unittest.TestCase):
         ssl_context = sentinel.some_ssl_context
 
         geocoder = Geocoder(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        for attr in ('format_string', 'scheme', 'timeout', 'proxies',
-                     'ssl_context'):
+        for attr in ('scheme', 'timeout', 'proxies', 'ssl_context'):
             self.assertEqual(locals()[attr], getattr(geocoder, attr))
         self.assertEqual(user_agent, geocoder.headers['User-Agent'])
+
+    def test_deprecated_format_string(self):
+        format_string = '%s Los Angeles, CA USA'
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            geocoder = Geocoder(
+                format_string=format_string,
+            )
+            self.assertEqual(format_string, geocoder.format_string)
+            self.assertEqual(1, len(w))
 
     def test_init_with_defaults(self):
         attr_to_option = {

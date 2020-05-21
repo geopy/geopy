@@ -3,7 +3,7 @@ import unittest
 
 from geopy.compat import u
 from geopy.exc import GeocoderAuthenticationFailure
-from geopy.geocoders import Baidu
+from geopy.geocoders import Baidu, BaiduV3
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
@@ -91,4 +91,33 @@ class BaiduSKTestCase(BaiduQueriesTestCaseMixin, GeocoderTestBase):
                 " ' & = , ? %"
             )},
             {"latitude": 39.983615544507, "longitude": 116.32295155093},
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('BAIDU_V3_KEY')),
+    "No BAIDU_V3_KEY env variable set"
+)
+class BaiduV3TestCase(BaiduTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = BaiduV3(
+            api_key=env['BAIDU_V3_KEY'],
+            timeout=3,
+        )
+
+
+@unittest.skipUnless(
+    bool(env.get('BAIDU_V3_KEY_REQUIRES_SK')) and bool(env.get('BAIDU_V3_SEC_KEY')),
+    "BAIDU_V3_KEY_REQUIRES_SK and BAIDU_V3_SEC_KEY env variables not set"
+)
+class BaiduV3SKTestCase(BaiduSKTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.geocoder = BaiduV3(
+            api_key=env['BAIDU_V3_KEY_REQUIRES_SK'],
+            security_key=env['BAIDU_V3_SEC_KEY'],
+            timeout=3,
         )

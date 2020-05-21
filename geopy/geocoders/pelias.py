@@ -48,6 +48,8 @@ class Pelias(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
+            .. deprecated:: 1.22.0
+
         :type boundary_rect: list or tuple of 2 items of :class:`geopy.point.Point`
             or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
         :param boundary_rect: Coordinates to restrict search within.
@@ -131,6 +133,7 @@ class Pelias(Geocoder):
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
             country_bias=None,
+            language=None
     ):
         """
         Return a location point by address.
@@ -156,6 +159,14 @@ class Pelias(Geocoder):
         :param str country_bias: Bias results to this country (ISO alpha-3).
 
             .. versionadded:: 1.19.0
+
+        :param str language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
+
+            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -194,6 +205,9 @@ class Pelias(Geocoder):
         if country_bias:
             params['boundary.country'] = country_bias
 
+        if language:
+            params["lang"] = language
+
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode_api: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -205,6 +219,7 @@ class Pelias(Geocoder):
             query,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
+            language=None
     ):
         """
         Return an address by location point.
@@ -222,6 +237,14 @@ class Pelias(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param str language: Preferred language in which to return results.
+            Either uses standard
+            `RFC2616 <http://www.ietf.org/rfc/rfc2616.txt>`_
+            accept-language string or a simple comma-separated
+            list of language codes.
+
+            .. versionadded:: 1.21.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -233,6 +256,9 @@ class Pelias(Geocoder):
             'point.lat': lat,
             'point.lon': lon,
         }
+
+        if language:
+            params['lang'] = language
 
         if self.api_key:
             params.update({

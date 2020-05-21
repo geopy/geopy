@@ -15,7 +15,7 @@ class Nominatim(Geocoder):
     """Nominatim geocoder for OpenStreetMap data.
 
     Documentation at:
-        https://wiki.openstreetmap.org/wiki/Nominatim
+        https://nominatim.org/release-docs/develop/api/Overview/
 
     .. attention::
        Using Nominatim with the default `user_agent` is strongly discouraged,
@@ -65,6 +65,8 @@ class Nominatim(Geocoder):
         """
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
+
+            .. deprecated:: 1.22.0
 
         :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -197,7 +199,7 @@ class Nominatim(Geocoder):
     def _construct_url(self, base_api, params):
         """
         Construct geocoding request url.
-        The method can be overriden in Nominatim-based geocoders in order
+        The method can be overridden in Nominatim-based geocoders in order
         to extend URL parameters.
 
         :param str base_api: Geocoding function base address - self.api
@@ -237,7 +239,7 @@ class Nominatim(Geocoder):
                 `postalcode`. For more information, see Nominatim's
                 documentation for `structured requests`:
 
-                    https://wiki.openstreetmap.org/wiki/Nominatim
+                    https://nominatim.org/release-docs/develop/api/Search
 
         :type query: dict or str
 
@@ -303,9 +305,13 @@ class Nominatim(Geocoder):
         :param str featuretype: If present, restrict results to certain type of features.
             Allowed values: `country`, `state`, `city`, `settlement`.
 
+            .. versionadded:: 1.21.0
+
         :param bool namedetails: If you want in *Location.raw* to include
             namedetails, set it to True. This will be a list of alternative names,
             including language variants, etc.
+
+            .. versionadded:: 1.21.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -410,7 +416,8 @@ class Nominatim(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=False,
-            addressdetails=True
+            addressdetails=True,
+            zoom=None
     ):
         """
         Return an address by location point.
@@ -441,6 +448,12 @@ class Nominatim(Geocoder):
 
             .. versionadded:: 1.14.0
 
+        :param int zoom: Level of detail required for the address,
+            an integer in range from 0 (country level) to 18 (building level),
+            default is 18.
+
+            .. versionadded:: 1.22.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
 
@@ -458,6 +471,9 @@ class Nominatim(Geocoder):
             params['accept-language'] = language
 
         params['addressdetails'] = 1 if addressdetails else 0
+
+        if zoom is not None:
+            params['zoom'] = zoom
 
         url = self._construct_url(self.reverse_api, params)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)

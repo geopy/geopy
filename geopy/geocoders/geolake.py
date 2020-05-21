@@ -47,6 +47,8 @@ class Geolake(Geocoder):
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
 
+            .. deprecated:: 1.22.0
+
         :param str api_key: The API key required by Geolake
             to perform geocoding requests. You can get your key here:
             https://geolake.com/

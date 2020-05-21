@@ -80,6 +80,8 @@ class GoogleV3(Geocoder):
 
             .. versionadded:: 1.14.0
 
+            .. deprecated:: 1.22.0
+
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -152,8 +154,18 @@ class GoogleV3(Geocoder):
         """
         Format the components dict to something Google understands.
         """
+        component_items = []
+
+        if isinstance(components, dict):
+            component_items = components.items()
+        elif isinstance(components, list):
+            component_items = components
+        else:
+            raise ValueError(
+                '`components` parameter must be of type `dict` or `list`')
+
         return "|".join(
-            (":".join(item) for item in components.items())
+            (":".join(item) for item in component_items)
         )
 
     def geocode(
@@ -203,8 +215,18 @@ class GoogleV3(Geocoder):
         :param str region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.
 
-        :param dict components: Restricts to an area. Can use any combination
-            of: route, locality, administrative_area, postal_code, country.
+        :type components: dict or list
+        :param components: Restricts to an area. Can use any combination of:
+            `route`, `locality`, `administrative_area`, `postal_code`,
+            `country`.
+
+            Pass a list of tuples if you want to specify multiple components of
+            the same type, e.g.:
+
+                >>> [('administrative_area', 'VA'), ('administrative_area', 'Arlington')]
+
+            .. versionchanged:: 1.22.0
+                Added support for a list of tuples.
 
         :param str place_id: Retrieve a Location using a Place ID.
             Cannot be not used with ``query`` or ``bounds`` parameters.

@@ -16,6 +16,10 @@ class Yandex(Geocoder):
         https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
 
     .. versionadded:: 1.5.0
+
+    .. attention::
+        Since September 2019 Yandex requires each request to have an API key.
+        API keys can be created at https://developer.tech.yandex.ru/
     """
 
     api_path = '/1.x/'
@@ -36,12 +40,25 @@ class Yandex(Geocoder):
         .. versionchanged:: 1.14.0
            Default scheme has been changed from ``http`` to ``https``.
 
-        :param str api_key: Yandex API key (not obligatory)
-            https://tech.yandex.ru/maps/keys/get/
+        :param str api_key: Yandex API key, mandatory.
+            The key can be created at https://developer.tech.yandex.ru/
 
-        :param str lang: response locale, the following locales are
-            supported: ``"ru_RU"`` (default), ``"uk_UA"``, ``"be_BY"``,
-            ``"en_US"``, ``"tr_TR"``.
+            .. versionchanged:: 1.21.0
+                API key is mandatory since September 2019.
+
+        :param str lang: Language of the response and regional settings
+            of the map. List of supported values:
+
+            - ``tr_TR`` -- Turkish (only for maps of Turkey);
+            - ``en_RU`` -- response in English, Russian map features;
+            - ``en_US`` -- response in English, American map features;
+            - ``ru_RU`` -- Russian (default);
+            - ``uk_UA`` -- Ukrainian;
+            - ``be_BY`` -- Belarusian.
+
+            .. deprecated:: 1.22.0
+                This argument will be removed in geopy 2.0.
+                Use `geocode`'s and `reverse`'s `lang` instead.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -64,6 +81,8 @@ class Yandex(Geocoder):
 
             .. versionadded:: 1.14.0
 
+            .. deprecated:: 1.22.0
+
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -78,12 +97,36 @@ class Yandex(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        if not api_key:
+            warnings.warn(
+                'Since September 2019 Yandex requires each request to have an API key. '
+                'Pass a valid `api_key` to Yandex geocoder to hide this warning. '
+                'API keys can be created at https://developer.tech.yandex.ru/',
+                UserWarning,
+                stacklevel=2
+            )
         self.api_key = api_key
+        if lang is not None:
+            warnings.warn(
+                '`lang` argument of the %(cls)s.__init__ '
+                'is deprecated and will be removed in geopy 2.0. Use '
+                '%(cls)s.geocode(lang=%(value)r) and '
+                '%(cls)s.reverse(lang=%(value)r) instead.'
+                % dict(cls=type(self).__name__, value=lang),
+                DeprecationWarning,
+                stacklevel=2
+            )
         self.lang = lang
         domain = 'geocode-maps.yandex.ru'
         self.api = '%s://%s%s' % (self.scheme, domain, self.api_path)
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def geocode(
+            self,
+            query,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL,
+            lang=None,
+    ):
         """
         Return a location point by address.
 
@@ -97,6 +140,18 @@ class Yandex(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
+        :param str lang: Language of the response and regional settings
+            of the map. List of supported values:
+
+            - ``tr_TR`` -- Turkish (only for maps of Turkey);
+            - ``en_RU`` -- response in English, Russian map features;
+            - ``en_US`` -- response in English, American map features;
+            - ``ru_RU`` -- Russian (default);
+            - ``uk_UA`` -- Ukrainian;
+            - ``be_BY`` -- Belarusian.
+
+            .. versionadded:: 1.22.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -106,8 +161,10 @@ class Yandex(Geocoder):
         }
         if self.api_key:
             params['apikey'] = self.api_key
-        if self.lang:
-            params['lang'] = self.lang
+        if lang is None:
+            lang = self.lang
+        if lang:
+            params['lang'] = lang
         if exactly_one:
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
@@ -123,6 +180,7 @@ class Yandex(Geocoder):
             exactly_one=DEFAULT_SENTINEL,
             timeout=DEFAULT_SENTINEL,
             kind=None,
+            lang=None,
     ):
         """
         Return an address by location point.
@@ -151,6 +209,18 @@ class Yandex(Geocoder):
 
             .. versionadded:: 1.14.0
 
+        :param str lang: Language of the response and regional settings
+            of the map. List of supported values:
+
+            - ``tr_TR`` -- Turkish (only for maps of Turkey);
+            - ``en_RU`` -- response in English, Russian map features;
+            - ``en_US`` -- response in English, American map features;
+            - ``ru_RU`` -- Russian (default);
+            - ``uk_UA`` -- Ukrainian;
+            - ``be_BY`` -- Belarusian.
+
+            .. versionadded:: 1.22.0
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -172,8 +242,10 @@ class Yandex(Geocoder):
         }
         if self.api_key:
             params['apikey'] = self.api_key
-        if self.lang:
-            params['lang'] = self.lang
+        if lang is None:
+            lang = self.lang
+        if lang:
+            params['lang'] = lang
         if kind:
             params['kind'] = kind
         url = "?".join((self.api, urlencode(params)))

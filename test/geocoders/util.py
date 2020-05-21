@@ -5,6 +5,7 @@ import unittest
 from collections import defaultdict
 
 from geopy import exc
+from geopy.location import Location
 
 env = defaultdict(lambda: None)
 try:
@@ -46,15 +47,17 @@ class GeocoderTestBase(unittest.TestCase):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
         """
+        cls = type(self)
         result = self._make_request(self.geocoder.geocode, **payload)
         if result is None:
-            cls = type(self)
             if expect_failure:
                 return
             elif skiptest_on_failure:
                 self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
             else:
                 self.fail('%s: No result found' % cls.__name__)
+        if result == []:
+            self.fail('%s returned an empty list instead of None' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
@@ -64,15 +67,17 @@ class GeocoderTestBase(unittest.TestCase):
         """
         Calls geocoder.reverse(**payload), then checks against `expected`.
         """
+        cls = type(self)
         result = self._make_request(self.geocoder.reverse, **payload)
         if result is None:
-            cls = type(self)
             if expect_failure:
                 return
             elif skiptest_on_failure:
                 self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
             else:
                 self.fail('%s: No result found' % cls.__name__)
+        if result == []:
+            self.fail('%s returned an empty list instead of None' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
@@ -104,6 +109,11 @@ class GeocoderTestBase(unittest.TestCase):
         """
         Verifies that result matches the kwargs given.
         """
+        if exactly_one:
+            self.assertIsInstance(result, Location)
+        else:
+            self.assertIsInstance(result, list)
+
         item = result if exactly_one else result[0]
         delta = delta or self.delta
         exceptions = []

@@ -292,14 +292,14 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         self.geocode_run(
             {"query": "kazan",
              "country_codes": 'tr'},
-            {"latitude": 40.2317, "longitude": 32.6839},
+            {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
         )
 
     def test_country_codes_list(self):
         self.geocode_run(
             {"query": "kazan",
              "country_codes": ['cn', 'tr']},
-            {"latitude": 40.2317, "longitude": 32.6839},
+            {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
         )
 
     def test_featuretype_param(self):
@@ -403,6 +403,22 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             # The location have all of that keys
             for key in contain_keys:
                 self.assertTrue(key in location.raw)
+
+    def test_reverse_zoom_parameter(self):
+        query = "40.689253199999996, -74.04454817144321"
+        result_reverse = self.reverse_run(
+            {"query": query, "exactly_one": True, "zoom": 10},
+            {},
+        )
+        self.assertIn("New York", result_reverse.address)
+        self.assertNotIn("Statue of Liberty", result_reverse.address)
+
+        result_reverse = self.reverse_run(
+            {"query": query, "exactly_one": True},
+            {},
+        )
+        self.assertIn("New York", result_reverse.address)
+        self.assertIn("Statue of Liberty", result_reverse.address)
 
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):

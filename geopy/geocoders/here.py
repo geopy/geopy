@@ -1,9 +1,8 @@
-"""
-:class:`.Here` geocoder.
-"""
+import warnings
 
 from geopy.compat import urlencode
 from geopy.exc import (
+    ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
     GeocoderQuotaExceeded,
@@ -42,8 +41,9 @@ class Here(Geocoder):
 
     def __init__(
             self,
-            app_id,
-            app_code,
+            app_id=None,
+            app_code=None,
+            apikey=None,
             format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
@@ -53,14 +53,35 @@ class Here(Geocoder):
     ):
         """
 
-        :param str app_id: Should be a valid HERE Maps APP ID
+        :param str app_id: Should be a valid HERE Maps APP ID. Will eventually
+            be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
-        :param str app_code: Should be a valid HERE Maps APP CODE
+            .. deprecated:: 1.21.0
+                App ID and App Code are being replaced by API Keys and OAuth 2.0
+                by HERE. Consider getting an ``apikey`` instead of using
+                ``app_id`` and ``app_code``.
+
+        :param str app_code: Should be a valid HERE Maps APP CODE. Will
+            eventually be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
+
+            .. deprecated:: 1.21.0
+
+        :param str apikey: Should be a valid HERE Maps APIKEY. These keys were
+            introduced in December 2019 and will eventually replace the legacy
+            APP CODE/APP ID pairs which are already no longer available for new
+            accounts (but still work for old accounts).
+            More authentication details are available at
+            https://developer.here.com/blog/announcing-two-new-authentication-types.
+            See https://developer.here.com/authenticationpage.
+
+            .. versionadded:: 1.21.0
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
+
+            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -86,11 +107,31 @@ class Here(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+        is_apikey = bool(apikey)
+        is_app_code = app_id and app_code
+        if not is_apikey and not is_app_code:
+            raise ConfigurationError(
+                "HERE geocoder requires authentication, either `apikey` "
+                "or `app_id`+`app_code` must be set"
+            )
+        if is_app_code:
+            warnings.warn(
+                'Since December 2019 HERE provides two new authentication '
+                'methods `API Key` and `OAuth 2.0`. `app_id`+`app_code` '
+                'is deprecated and might eventually be phased out. '
+                'Consider switching to `apikey`, which geopy supports. '
+                'See https://developer.here.com/blog/announcing-two-new-authentication-types',  # noqa
+                UserWarning,
+                stacklevel=2
+            )
+
         self.app_id = app_id
         self.app_code = app_code
-        self.api = "%s://geocoder.api.here.com%s" % (self.scheme, self.geocode_path)
+        self.apikey = apikey
+        domain = "ls.hereapi.com" if is_apikey else "api.here.com"
+        self.api = "%s://geocoder.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
-            "%s://reverse.geocoder.api.here.com%s" % (self.scheme, self.reverse_path)
+            "%s://reverse.geocoder.%s%s" % (self.scheme, domain, self.reverse_path)
         )
 
     def geocode(
@@ -169,14 +210,8 @@ class Here(Geocoder):
                 in query.items()
                 if key in self.structured_query_params
             }
-            params['app_id'] = self.app_id
-            params['app_code'] = self.app_code
         else:
-            params = {
-                'searchtext': self.format_string % query,
-                'app_id': self.app_id,
-                'app_code': self.app_code
-            }
+            params = {'searchtext': self.format_string % query}
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lat2)s,%(lon1)s;%(lat1)s,%(lon2)s")
@@ -193,6 +228,11 @@ class Here(Geocoder):
             params['language'] = language
         if additional_data:
             params['additionaldata'] = additional_data
+        if self.apikey:
+            params['apiKey'] = self.apikey
+        else:
+            params['app_id'] = self.app_id
+            params['app_code'] = self.app_code
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -256,8 +296,6 @@ class Here(Geocoder):
         """
         point = self._coerce_point_to_string(query)
         params = {
-            'app_id': self.app_id,
-            'app_code': self.app_code,
             'mode': mode,
             'prox': point,
         }
@@ -271,6 +309,11 @@ class Here(Geocoder):
             params['maxresults'] = 1
         if language:
             params['language'] = language
+        if self.apikey:
+            params['apiKey'] = self.apikey
+        else:
+            params['app_id'] = self.app_id
+            params['app_code'] = self.app_code
         url = "%s?%s" % (self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(

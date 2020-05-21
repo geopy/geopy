@@ -26,7 +26,6 @@ class GeolakeTestCase(GeocoderTestBase):
             api_key=env['GEOLAKE_KEY'],
             timeout=10,
         )
-        cls.delta_exact = 0.2
 
     def test_geocode(self):
         self.geocode_run(

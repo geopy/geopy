@@ -72,6 +72,8 @@ class LiveAddress(Geocoder):
 
             .. versionadded:: 1.14.0
 
+            .. deprecated:: 1.22.0
+
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -162,7 +164,9 @@ class LiveAddress(Geocoder):
         return self._parse_json(self._call_geocoder(url, timeout=timeout),
                                 exactly_one)
 
-    def _geocoder_exception_handler(self, error, message):
+    def _geocoder_exception_handler(
+            self, error, message, http_code=None, http_body=None
+    ):
         """
         LiveStreets-specific exceptions.
         """

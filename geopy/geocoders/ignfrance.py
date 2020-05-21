@@ -1,15 +1,8 @@
+import base64
 import warnings
 import xml.etree.ElementTree as ET
 
-from geopy.compat import (
-    HTTPBasicAuthHandler,
-    HTTPPasswordMgrWithDefaultRealm,
-    Request,
-    build_opener,
-    iteritems,
-    u,
-    urlencode,
-)
+from geopy.compat import Request, iteritems, u, urlencode
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -97,6 +90,8 @@ class IGNFrance(Geocoder):
 
             .. versionadded:: 1.14.0
 
+            .. deprecated:: 1.22.0
+
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -136,8 +131,6 @@ class IGNFrance(Geocoder):
         self.domain = domain.strip('/')
         api_path = self.api_path % dict(api_key=self.api_key)
         self.api = '%s://%s%s' % (self.scheme, self.domain, api_path)
-        if username and password and referer is None:
-            self.addSimpleHTTPAuthHeader()
 
     def geocode(
             self,
@@ -352,55 +345,6 @@ class IGNFrance(Geocoder):
             is_freeform='false'
         )
 
-    def addSimpleHTTPAuthHeader(self):
-        # TODO make this a private API
-        # Create Urllib request object embedding HTTP simple authentication
-        sub_request = """
-        <GeocodeRequest returnFreeForm="{is_freeform}">
-            <Address countryCode="{query_type}">
-                <freeFormAddress>{query}</freeFormAddress>
-            </Address>
-        </GeocodeRequest>
-        """
-
-        xml_request = self.xml_request.format(
-            method_name='LocationUtilityService',
-            sub_request=sub_request,
-            maximum_responses=1
-        )
-
-        # Create query using parameters
-        request_string = xml_request.format(
-            is_freeform='false',
-            query='rennes',
-            query_type='PositionOfInterest'
-        )
-
-        params = {
-            'xls':  request_string
-        }
-
-        top_level_url = "?".join((self.api, urlencode(params)))
-        password_mgr = HTTPPasswordMgrWithDefaultRealm()
-
-        # Add the username and password.
-        # If we knew the realm, we could use it instead of None.
-        password_mgr.add_password(
-            None,
-            top_level_url,
-            self.username,
-            self.password
-        )
-
-        handler = HTTPBasicAuthHandler(password_mgr)
-
-        # create "opener" (OpenerDirector instance)
-        opener = build_opener(handler)
-
-        # Install the opener.
-        # Now all calls to urllib.request.urlopen use our opener.
-        self.urlopen = opener.open
-
     def _parse_xml(self,
                    page,
                    is_reverse=False,
@@ -419,7 +363,7 @@ class IGNFrance(Geocoder):
             ns = '{%s}' % namespace
             ns = u(ns)
             nsl = len(ns)
-            for elem in doc.getiterator():
+            for elem in doc.iter():
                 if elem.tag.startswith(ns):
                     elem.tag = elem.tag[nsl:]
 
@@ -430,6 +374,8 @@ class IGNFrance(Geocoder):
         # Return places as json instead of XML
         places = self._xml_to_json_places(tree, is_reverse=is_reverse)
 
+        if not places:
+            return None
         if exactly_one:
             return self._parse_place(places[0], is_freeform=is_freeform)
         else:
@@ -535,6 +481,13 @@ class IGNFrance(Geocoder):
 
         if self.referer is not None:
             request.add_header('Referer', self.referer)
+
+        if self.username and self.password and self.referer is None:
+            credentials = '{0}:{1}'.format(self.username, self.password).encode()
+            auth_str = base64.standard_b64encode(credentials).decode()
+            request.add_unredirected_header(
+                'Authorization',
+                'Basic {}'.format(auth_str.strip()))
 
         raw_xml = self._call_geocoder(
             request,

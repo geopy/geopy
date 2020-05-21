@@ -64,6 +64,12 @@ class options(object):
             be interpolated before querying the geocoder. Used by `geocode`
             calls only. For example: ``'%s, Mountain View, CA'``.
 
+            .. deprecated:: 1.22.0
+                ``format_string`` is deprecated in favor of more advanced
+                alternatives (see :ref:`Specifying Parameters Once
+                <specifying_parameters_once>`) and will be removed in
+                geopy 2.0.
+
         default_proxies
             Tunnel requests through HTTP proxy.
 
@@ -216,10 +222,14 @@ class Geocoder(object):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
-        """
-        Mostly-common geocoder validation, proxies, &c. Not all geocoders
-        specify format_string and such.
-        """
+        if format_string is not None or options.default_format_string != "%s":
+            warnings.warn(
+                '`format_string` is deprecated. Please pass the already '
+                'formatted queries to `geocode` instead. See '
+                '`Specifying Parameters Once` section in docs for more '
+                'details. In geopy 2.0 `format_string` will be removed.',
+                DeprecationWarning, stacklevel=3
+            )
         self.format_string = format_string or options.default_format_string
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
@@ -294,7 +304,9 @@ class Geocoder(object):
                                     lat2=max(p1.latitude, p2.latitude),
                                     lon2=max(p1.longitude, p2.longitude))
 
-    def _geocoder_exception_handler(self, error, message):
+    def _geocoder_exception_handler(
+            self, error, message, http_code=None, http_body=None
+    ):
         """
         Geocoder-specific exceptions handler.
         Override if custom exceptions processing is needed.
@@ -362,15 +374,19 @@ class Geocoder(object):
                     else str(error)
                 )
             )
-            self._geocoder_exception_handler(error, message)
             if isinstance(error, HTTPError):
-                code = error.getcode()
-                body = self._read_http_error_body(error)
-                if body:
-                    logger.info('Received an HTTP error (%s): %s', code, body,
+                http_code = error.getcode()
+                http_body = self._read_http_error_body(error)
+                if http_body:
+                    logger.info('Received an HTTP error (%s): %s', http_code, http_body,
                                 exc_info=False)
+            else:
+                http_code = None
+                http_body = None
+            self._geocoder_exception_handler(error, message, http_code, http_body)
+            if isinstance(error, HTTPError):
                 try:
-                    raise ERROR_CODE_MAP[code](message)
+                    raise ERROR_CODE_MAP[http_code](message)
                 except KeyError:
                     raise GeocoderServiceError(message)
             elif isinstance(error, URLError):

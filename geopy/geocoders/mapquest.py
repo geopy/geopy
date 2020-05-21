@@ -3,35 +3,43 @@ from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
-__all__ = ("BANFrance", )
+__all__ = ("MapQuest", )
 
 
-class BANFrance(Geocoder):
-    """Geocoder using the Base Adresse Nationale France API.
+class MapQuest(Geocoder):
+    """Geocoder using the MapQuest API based on Licensed data.
 
     Documentation at:
-        https://adresse.data.gouv.fr/api
+        https://developer.mapquest.com/documentation/geocoding-api/
 
-    .. versionadded:: 1.18.0
+    MapQuest provides two Geocoding APIs:
+
+    - :class:`geopy.geocoders.OpenMapQuest` Nominatim-alike API
+      which is based on Open data from OpenStreetMap.
+    - :class:`geopy.geocoders.MapQuest` (this class) MapQuest's own API
+      which is based on Licensed data.
+
+    .. versionadded:: 1.22.0
     """
 
-    geocode_path = '/search'
-    reverse_path = '/reverse'
+    geocode_path = '/geocoding/v1/address'
+    reverse_path = '/geocoding/v1/reverse'
 
     def __init__(
             self,
-            domain='api-adresse.data.gouv.fr',
+            api_key,
             format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            domain='www.mapquestapi.com',
     ):
         """
-
-        :param str domain: Currently it is ``'api-adresse.data.gouv.fr'``, can
-            be changed for testing purposes.
+        :param str api_key: The API key required by Mapquest to perform
+            geocoding requests. API keys are managed through MapQuest's "Manage Keys"
+            page (https://developer.mapquest.com/user/me/apps).
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
@@ -54,8 +62,9 @@ class BANFrance(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param str domain: base api domain for mapquest
         """
-        super(BANFrance, self).__init__(
+        super(MapQuest, self).__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -63,6 +72,8 @@ class BANFrance(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
+
+        self.api_key = api_key
         self.domain = domain.strip('/')
 
         self.geocode_api = (
@@ -72,46 +83,91 @@ class BANFrance(Geocoder):
             '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
         )
 
+    def _parse_json(self, json, exactly_one=True):
+        '''Returns location, (latitude, longitude) from json feed.'''
+        features = json['results'][0]['locations']
+
+        if features == []:
+            return None
+
+        def parse_location(feature):
+            addr_keys = [
+                'street',
+                'adminArea6',
+                'adminArea5',
+                'adminArea4',
+                'adminArea3',
+                'adminArea2',
+                'adminArea1',
+                'postalCode'
+            ]
+
+            location = [feature[k] for k in addr_keys if feature.get(k)]
+            return ", ".join(location)
+
+        def parse_feature(feature):
+            location = parse_location(feature)
+            longitude = feature['latLng']['lng']
+            latitude = feature['latLng']['lat']
+            return Location(location, (latitude, longitude), feature)
+
+        if exactly_one:
+            return parse_feature(features[0])
+        else:
+            return [parse_feature(feature) for feature in features]
+
     def geocode(
             self,
             query,
-            limit=None,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
+            limit=None,
+            bounds=None
     ):
         """
         Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
 
-        :param int limit: Defines the maximum number of items in the
-            response structure. If not provided and there are multiple
-            results the BAN API will return 5 results by default.
-            This will be reset to one if ``exactly_one`` is True.
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
+        :param int limit: Limit the maximum number of items in the
+            response. This will be reset to one if ``exactly_one`` is True.
+
+        :param bounds: The bounding box of the viewport within which
+            to bias geocode results more prominently.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+        :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
-
         """
-
-        params = {
-            'q': self.format_string % query,
-        }
+        params = {}
+        params['key'] = self.api_key
+        params['location'] = self.format_string % query
 
         if limit is not None:
-            params['limit'] = limit
+            params['maxResults'] = limit
 
-        url = "?".join((self.geocode_api, urlencode(params)))
+        if exactly_one:
+            params["maxResults"] = 1
+
+        if bounds:
+            params['boundingBox'] = self._format_bounding_box(
+                bounds, "%(lat2)s,%(lon1)s,%(lat1)s,%(lon2)s"
+            )
+
+        url = '?'.join((self.geocode_api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
+
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
@@ -120,7 +176,7 @@ class BANFrance(Geocoder):
             self,
             query,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
@@ -140,42 +196,17 @@ class BANFrance(Geocoder):
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
-
         """
+        params = {}
+        params['key'] = self.api_key
 
-        try:
-            lat, lng = self._coerce_point_to_string(query).split(',')
-        except ValueError:
-            raise ValueError("Must be a coordinate pair or Point")
+        point = self._coerce_point_to_string(query, "%(lat)s,%(lon)s")
+        params['location'] = point
 
-        params = {
-            'lat': lat,
-            'lng': lng,
-        }
+        url = '?'.join((self.reverse_api, urlencode(params)))
 
-        url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+
         return self._parse_json(
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
-
-    @staticmethod
-    def _parse_feature(feature):
-        # Parse each resource.
-        latitude = feature.get('geometry', {}).get('coordinates', [])[1]
-        longitude = feature.get('geometry', {}).get('coordinates', [])[0]
-        placename = feature.get('properties', {}).get('label')
-
-        return Location(placename, (latitude, longitude), feature)
-
-    @classmethod
-    def _parse_json(self, response, exactly_one):
-        if response is None or 'features' not in response:
-            return None
-        features = response['features']
-        if not len(features):
-            return None
-        if exactly_one:
-            return self._parse_feature(features[0])
-        else:
-            return [self._parse_feature(feature) for feature in features]

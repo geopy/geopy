@@ -11,6 +11,13 @@ class OpenMapQuest(Nominatim):
     Documentation at:
         https://developer.mapquest.com/documentation/open/
 
+    MapQuest provides two Geocoding APIs:
+
+    - :class:`geopy.geocoders.OpenMapQuest` (this class) Nominatim-alike API
+      which is based on Open data from OpenStreetMap.
+    - :class:`geopy.geocoders.MapQuest` MapQuest's own API which is based on
+      Licensed data.
+
     .. versionchanged:: 1.17.0
        OpenMapQuest now extends the Nominatim class.
     """
@@ -42,6 +49,8 @@ class OpenMapQuest(Nominatim):
 
         :param str format_string:
             See :attr:`geopy.geocoders.options.default_format_string`.
+
+            .. deprecated:: 1.22.0
 
         :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.

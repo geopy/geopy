@@ -32,7 +32,7 @@ Installation
 geopy 2.0
 ~~~~~~~~~
 
-geopy 2.0 will be released in 2019, presumably in Q2.
+geopy 2.0 will be released in 2020, presumably in Q1.
 Only Python `>=3.5` and `>=pypy3.5` will be supported.
 The 1.x branch will not receive any features after that, although
 critical bugfixes might be backported on request.
@@ -92,6 +92,14 @@ If you're having the `Too Many Requests` error, you may try the following:
 
    .. automethod:: __init__
 
+AlgoliaPlaces
+-------------
+
+.. autoclass:: geopy.geocoders.AlgoliaPlaces
+   :members:
+
+   .. automethod:: __init__
+
 ArcGIS
 ------
 
@@ -115,6 +123,16 @@ Baidu
 
 .. autoclass:: geopy.geocoders.Baidu
    :members:
+
+   .. automethod:: __init__
+
+BaiduV3
+-------
+
+.. autoclass:: geopy.geocoders.BaiduV3
+   :members:
+   :inherited-members:
+   :show-inheritance:
 
    .. automethod:: __init__
 
@@ -204,6 +222,22 @@ MapBox
 --------
 
 .. autoclass:: geopy.geocoders.MapBox
+   :members:
+
+   .. automethod:: __init__
+
+MapQuest
+--------
+
+.. autoclass:: geopy.geocoders.MapQuest
+   :members:
+
+   .. automethod:: __init__
+
+MapTiler
+--------
+
+.. autoclass:: geopy.geocoders.MapTiler
    :members:
 
    .. automethod:: __init__
