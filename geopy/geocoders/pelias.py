@@ -29,7 +29,6 @@ class Pelias(Geocoder):
             self,
             domain,
             api_key=None,
-            format_string=None,
             boundary_rect=None,
             country_bias=None,
             timeout=DEFAULT_SENTINEL,
@@ -44,11 +43,6 @@ class Pelias(Geocoder):
         :param str domain: Specify a domain for Pelias API.
 
         :param str api_key: Pelias API key, optional.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :type boundary_rect: list or tuple of 2 items of :class:`geopy.point.Point`
             or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -89,7 +83,6 @@ class Pelias(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -171,7 +164,7 @@ class Pelias(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {'text': self.format_string % query}
+        params = {'text': query}
 
         if self.api_key:
             params.update({

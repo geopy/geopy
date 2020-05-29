@@ -31,7 +31,6 @@ class What3Words(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme='https',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -42,11 +41,6 @@ class What3Words(Geocoder):
 
         :param str api_key: Key provided by What3Words
             (https://accounts.what3words.com/register).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme: Must be ``https``.
 
@@ -74,7 +68,6 @@ class What3Words(Geocoder):
             .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             # The `scheme` argument is present for the legacy reasons only.
             # If a custom value has been passed, it should be validated.
             # Otherwise use `https` instead of the `options.default_scheme`.
@@ -141,7 +134,7 @@ class What3Words(Geocoder):
             )
 
         params = {
-            'addr': self.format_string % query,
+            'addr': query,
             'lang': lang.lower(),
             'key': self.api_key,
         }

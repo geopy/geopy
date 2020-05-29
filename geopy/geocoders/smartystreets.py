@@ -27,7 +27,6 @@ class LiveAddress(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
@@ -67,13 +66,6 @@ class LiveAddress(Geocoder):
 
             .. versionadded:: 1.12.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -81,7 +73,6 @@ class LiveAddress(Geocoder):
             .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             # The `scheme` argument is present for the legacy reasons only.
             # If a custom value has been passed, it should be validated.
             # Otherwise use `https` instead of the `options.default_scheme`.
@@ -155,7 +146,7 @@ class LiveAddress(Geocoder):
         query = {
             'auth-id': self.auth_id,
             'auth-token': self.auth_token,
-            'street': self.format_string % query,
+            'street': query,
             'candidates': candidates,
         }
         url = '{url}?{query}'.format(url=self.api, query=urlencode(query))

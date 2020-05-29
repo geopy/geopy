@@ -25,7 +25,6 @@ class GeocodeFarm(Geocoder):
     def __init__(
             self,
             api_key=None,
-            format_string=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
@@ -36,11 +35,6 @@ class GeocodeFarm(Geocoder):
 
         :param str api_key: (optional) The API key required by GeocodeFarm
             to perform geocoding requests.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -65,7 +59,6 @@ class GeocodeFarm(Geocoder):
             .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -99,7 +92,7 @@ class GeocodeFarm(Geocoder):
             ``exactly_one=False``.
         """
         params = {
-            'addr': self.format_string % query,
+            'addr': query,
         }
         if self.api_key:
             params['key'] = self.api_key

@@ -48,7 +48,6 @@ class IGNFrance(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
@@ -86,13 +85,6 @@ class IGNFrance(Geocoder):
 
             .. versionadded:: 1.12.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -101,7 +93,6 @@ class IGNFrance(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -175,8 +166,6 @@ class IGNFrance(Geocoder):
             ``exactly_one=False``.
 
         """
-
-        query = self.format_string % query
 
         # Check if acceptable query type
         if query_type not in ['PositionOfInterest',

@@ -27,7 +27,6 @@ class AlgoliaPlaces(Geocoder):
             app_id=None,
             api_key=None,
             domain='places-dsn.algolia.net',
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -43,11 +42,6 @@ class AlgoliaPlaces(Geocoder):
 
         :param str domain: Currently it is ``'places-dsn.algolia.net'``,
             can be changed for testing purposes.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -67,7 +61,6 @@ class AlgoliaPlaces(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -160,7 +153,7 @@ class AlgoliaPlaces(Geocoder):
         """
 
         params = {
-            'query': self.format_string % query,
+            'query': query,
         }
 
         if type is not None:

@@ -24,7 +24,6 @@ class Photon(Geocoder):
 
     def __init__(
             self,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -33,11 +32,6 @@ class Photon(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -64,7 +58,6 @@ class Photon(Geocoder):
             .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -117,7 +110,7 @@ class Photon(Geocoder):
 
         """
         params = {
-            'q': self.format_string % query
+            'q': query
         }
         if limit:
             params['limit'] = int(limit)

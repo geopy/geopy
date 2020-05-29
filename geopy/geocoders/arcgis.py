@@ -42,7 +42,6 @@ class ArcGIS(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
             auth_domain='www.arcgis.com',
             domain='geocode.arcgis.com',
@@ -79,13 +78,6 @@ class ArcGIS(Geocoder):
 
             .. versionadded:: 1.12.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -104,7 +96,6 @@ class ArcGIS(Geocoder):
             .. versionadded:: 1.17.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -185,7 +176,7 @@ class ArcGIS(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {'singleLine': self.format_string % query, 'f': 'json'}
+        params = {'singleLine': query, 'f': 'json'}
         if exactly_one:
             params['maxLocations'] = 1
         if out_fields is not None:

@@ -14,7 +14,6 @@ class GeocodeEarth(Pelias):
     def __init__(
             self,
             api_key,
-            format_string=None,
             boundary_rect=None,
             country_bias=None,
             domain='api.geocode.earth',
@@ -26,11 +25,6 @@ class GeocodeEarth(Pelias):
     ):
         """
         :param str api_key: Geocode.earth API key, required.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :type boundary_rect: list or tuple of 2 items of :class:`geopy.point.Point`
             or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -74,7 +68,6 @@ class GeocodeEarth(Pelias):
         """
         super().__init__(
             api_key=api_key,
-            format_string=format_string,
             boundary_rect=boundary_rect,
             country_bias=country_bias,
             domain=domain,

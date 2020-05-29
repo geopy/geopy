@@ -37,7 +37,6 @@ class Baidu(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
             security_key=None,
     ):
@@ -64,13 +63,6 @@ class Baidu(Geocoder):
 
             .. versionadded:: 1.12.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -84,7 +76,6 @@ class Baidu(Geocoder):
             .. versionadded:: 1.15.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -131,7 +122,7 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'address': self.format_string % query,
+            'address': query,
         }
 
         url = self._construct_url(self.api, self.api_path, params)

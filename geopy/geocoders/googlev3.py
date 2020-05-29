@@ -41,7 +41,6 @@ class GoogleV3(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
             channel='',
     ):
@@ -76,13 +75,6 @@ class GoogleV3(Geocoder):
 
             .. versionadded:: 1.12.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -94,7 +86,6 @@ class GoogleV3(Geocoder):
             .. versionadded:: 1.12.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -259,7 +250,7 @@ class GoogleV3(Geocoder):
             params['place_id'] = place_id
 
         if query is not None:
-            params['address'] = self.format_string % query
+            params['address'] = query
 
         if query is None and place_id is None and not components:
             raise ValueError('Either `query` or `components` or `place_id` '
