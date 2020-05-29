@@ -29,24 +29,6 @@ Installation
 
     pip install geopy
 
-geopy 2.0
-~~~~~~~~~
-
-geopy 2.0 will be released in 2020, presumably in Q1.
-Only Python `>=3.5` and `>=pypy3.5` will be supported.
-The 1.x branch will not receive any features after that, although
-critical bugfixes might be backported on request.
-
-Python 2.7 support in new releases is already being removed
-in many other scientific Python packages, such as `numpy` and `pandas`
-(see https://python3statement.org/),
-so this is a good time to get rid of the 2.7 burden for geopy as well.
-
-The last minor release of 1.x series will contain deprecation warnings
-for all of the breaking changes introduced in 2.0, thus make sure to
-check your code with warnings enabled (i.e. run python with the ``-Wd``
-switch) to ensure a smoother transition from 1.x to 2.0.
-
 Geocoders
 ~~~~~~~~~
 
