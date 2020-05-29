@@ -51,6 +51,7 @@ class GeocodeFarmTestCase(GeocoderTestBase):
         location = self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+            skiptest_on_failure=True,  # sometimes the result is empty
         )
         self.assertIn("new york", location.address.lower())
 
