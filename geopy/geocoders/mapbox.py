@@ -22,7 +22,6 @@ class MapBox(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -34,11 +33,6 @@ class MapBox(Geocoder):
         :param str api_key: The API key required by Mapbox to perform
             geocoding requests. API keys are managed through Mapox's account
             page (https://www.mapbox.com/account/access-tokens).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -59,7 +53,6 @@ class MapBox(Geocoder):
         :param str domain: base api domain for mapbox
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -143,7 +136,6 @@ class MapBox(Geocoder):
         params = {}
 
         params['access_token'] = self.api_key
-        query = self.format_string % query
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")

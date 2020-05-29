@@ -20,7 +20,6 @@ class PickPoint(Nominatim):
     def __init__(
             self,
             api_key,
-            format_string=None,
             view_box=None,
             bounded=None,
             country_bias=None,
@@ -35,11 +34,6 @@ class PickPoint(Nominatim):
 
         :param str api_key: PickPoint API key obtained at
             https://pickpoint.io.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -94,7 +88,6 @@ class PickPoint(Nominatim):
         """
 
         super().__init__(
-            format_string=format_string,
             view_box=view_box,
             bounded=bounded,
             country_bias=country_bias,

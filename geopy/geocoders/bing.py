@@ -36,7 +36,6 @@ class Bing(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -47,11 +46,6 @@ class Bing(Geocoder):
 
         :param str api_key: Should be a valid Bing Maps API key
             (https://www.microsoft.com/en-us/maps/create-a-bing-maps-key).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -74,7 +68,6 @@ class Bing(Geocoder):
             .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -146,7 +139,7 @@ class Bing(Geocoder):
             params['key'] = self.api_key
         else:
             params = {
-                'query': self.format_string % query,
+                'query': query,
                 'key': self.api_key
             }
         if user_location:

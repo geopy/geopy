@@ -52,16 +52,6 @@ class options:
         7
 
     Attributes:
-        default_format_string
-            String containing ``'%s'`` where the string to geocode should
-            be interpolated before querying the geocoder. Used by `geocode`
-            calls only. For example: ``'%s, Mountain View, CA'``.
-
-            .. deprecated:: 1.22.0
-                ``format_string`` is deprecated in favor of more advanced
-                alternatives (see :ref:`Specifying Parameters Once
-                <specifying_parameters_once>`) and will be removed in
-                geopy 2.0.
 
         default_proxies
             Tunnel requests through HTTP proxy.
@@ -155,7 +145,6 @@ class options:
     #
     # [1]: http://www.sphinx-doc.org/en/master/ext/autodoc.html#directive-autoattribute
     # [2]: https://github.com/rtfd/readthedocs.org/issues/855#issuecomment-261337038
-    default_format_string = '%s'
     default_proxies = None
     default_scheme = 'https'
     default_ssl_context = None
@@ -191,22 +180,12 @@ class Geocoder:
 
     def __init__(
             self,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
-        if format_string is not None or options.default_format_string != "%s":
-            warnings.warn(
-                '`format_string` is deprecated. Please pass the already '
-                'formatted queries to `geocode` instead. See '
-                '`Specifying Parameters Once` section in docs for more '
-                'details. In geopy 2.0 `format_string` will be removed.',
-                DeprecationWarning, stacklevel=3
-            )
-        self.format_string = format_string or options.default_format_string
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
             raise ConfigurationError(

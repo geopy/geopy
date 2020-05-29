@@ -28,7 +28,6 @@ class OpenMapQuest(Nominatim):
     def __init__(
             self,
             api_key=None,
-            format_string=None,
             view_box=None,
             bounded=None,
             country_bias=None,
@@ -46,11 +45,6 @@ class OpenMapQuest(Nominatim):
             .. versionchanged:: 1.12.0
                OpenMapQuest now requires an API key. Using an empty key will
                result in a :class:`geopy.exc.ConfigurationError`.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :type view_box: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -108,7 +102,6 @@ class OpenMapQuest(Nominatim):
             .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             view_box=view_box,
             bounded=bounded,
             country_bias=country_bias,

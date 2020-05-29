@@ -41,15 +41,9 @@ class Geolake(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str api_key: The API key required by Geolake
             to perform geocoding requests. You can get your key here:
@@ -76,7 +70,6 @@ class Geolake(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -140,7 +133,7 @@ class Geolake(Geocoder):
         else:
             params = {
                 'api_key': self.api_key,
-                'q': self.format_string % query,
+                'q': query,
             }
 
         if not country_codes:

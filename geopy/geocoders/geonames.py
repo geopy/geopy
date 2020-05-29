@@ -43,7 +43,6 @@ class GeoNames(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
             scheme='http',
     ):
@@ -69,13 +68,6 @@ class GeoNames(Geocoder):
 
             .. versionadded:: 1.12.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
@@ -93,7 +85,6 @@ class GeoNames(Geocoder):
             .. versionadded:: 1.18.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -169,7 +160,7 @@ class GeoNames(Geocoder):
             ``exactly_one=False``.
         """
         params = [
-            ('q', self.format_string % query),
+            ('q', query),
             ('username', self.username),
         ]
 

@@ -45,7 +45,6 @@ class Here(Geocoder):
             app_id=None,
             app_code=None,
             apikey=None,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -79,11 +78,6 @@ class Here(Geocoder):
 
             .. versionadded:: 1.21.0
 
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
-
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
 
@@ -101,7 +95,6 @@ class Here(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -212,7 +205,7 @@ class Here(Geocoder):
                 if key in self.structured_query_params
             }
         else:
-            params = {'searchtext': self.format_string % query}
+            params = {'searchtext': query}
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lat2)s,%(lon1)s;%(lat1)s,%(lon2)s")

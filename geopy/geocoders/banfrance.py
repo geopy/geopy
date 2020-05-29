@@ -22,7 +22,6 @@ class BANFrance(Geocoder):
     def __init__(
             self,
             domain='api-adresse.data.gouv.fr',
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -33,11 +32,6 @@ class BANFrance(Geocoder):
 
         :param str domain: Currently it is ``'api-adresse.data.gouv.fr'``, can
             be changed for testing purposes.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -57,7 +51,6 @@ class BANFrance(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -104,7 +97,7 @@ class BANFrance(Geocoder):
         """
 
         params = {
-            'q': self.format_string % query,
+            'q': query,
         }
 
         if limit is not None:

@@ -49,20 +49,8 @@ class GeocoderTestCase(unittest.TestCase):
             assert locals()[attr] == getattr(geocoder, attr)
         assert user_agent == geocoder.headers['User-Agent']
 
-    def test_deprecated_format_string(self):
-        format_string = '%s Los Angeles, CA USA'
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            geocoder = Geocoder(
-                format_string=format_string,
-            )
-            assert format_string == geocoder.format_string
-            assert 1 == len(w)
-
     def test_init_with_defaults(self):
         attr_to_option = {
-            'format_string': 'default_format_string',
             'scheme': 'default_scheme',
             'timeout': 'default_timeout',
             'proxies': 'default_proxies',
