@@ -355,6 +355,12 @@ Data
 .. autoclass:: geopy.timezone.Timezone
     :members: pytz_timezone, raw
 
+Units Conversion
+~~~~~~~~~~~~~~~~
+
+.. automodule:: geopy.units
+    :members:
+
 Exceptions
 ~~~~~~~~~~
 
