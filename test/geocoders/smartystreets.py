@@ -1,12 +1,13 @@
-import unittest
 from unittest.mock import patch
+
+import pytest
 
 import geopy.geocoders
 from geopy.geocoders import LiveAddress
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.util import BaseTestGeocoder, env
 
 
-class LiveAddressTestCaseUnitTest(GeocoderTestBase):
+class TestUnitLiveAddress:
     dummy_id = 'DUMMY12345'
     dummy_token = 'DUMMY67890'
 
@@ -24,22 +25,22 @@ class LiveAddressTestCaseUnitTest(GeocoderTestBase):
         assert geocoder.scheme == 'https'
 
 
-@unittest.skipUnless(
-    env.get('LIVESTREETS_AUTH_ID') and env.get('LIVESTREETS_AUTH_TOKEN'),
-    "No LIVESTREETS_AUTH_ID AND LIVESTREETS_AUTH_TOKEN env variables set"
+@pytest.mark.skipif(
+    not (env.get('LIVESTREETS_AUTH_ID') and env.get('LIVESTREETS_AUTH_TOKEN')),
+    reason="No LIVESTREETS_AUTH_ID AND LIVESTREETS_AUTH_TOKEN env variables set"
 )
-class LiveAddressTestCase(GeocoderTestBase):
+class TestLiveAddress(BaseTestGeocoder):
 
     @classmethod
-    def setUpClass(cls):
-        cls.geocoder = LiveAddress(
+    def make_geocoder(cls, **kwargs):
+        return LiveAddress(
             auth_id=env['LIVESTREETS_AUTH_ID'],
             auth_token=env['LIVESTREETS_AUTH_TOKEN'],
+            **kwargs
         )
-        cls.delta = 0.04
 
-    def test_geocode(self):
-        self.geocode_run(
+    async def test_geocode(self):
+        await self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )

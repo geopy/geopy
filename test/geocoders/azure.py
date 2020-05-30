@@ -1,15 +1,15 @@
-import unittest
+import pytest
 
 from geopy.geocoders import AzureMaps
-from test.geocoders.tomtom import BaseTomTomTestCase
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.tomtom import BaseTestTomTom
+from test.geocoders.util import env
 
 
-@unittest.skipUnless(
-    bool(env.get('AZURE_SUBSCRIPTION_KEY')),
-    "No AZURE_SUBSCRIPTION_KEY env variable set"
+@pytest.mark.skipif(
+    not bool(env.get('AZURE_SUBSCRIPTION_KEY')),
+    reason="No AZURE_SUBSCRIPTION_KEY env variable set"
 )
-class AzureMapsTestCase(BaseTomTomTestCase, GeocoderTestBase):
+class TestAzureMaps(BaseTestTomTom):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
