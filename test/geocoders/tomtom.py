@@ -1,36 +1,26 @@
-import unittest
-from abc import ABC, abstractmethod
+import pytest
 
 from geopy.geocoders import TomTom
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.util import BaseTestGeocoder, env
 
 
-class BaseTomTomTestCase(ABC):
+class BaseTestTomTom(BaseTestGeocoder):
 
-    @classmethod
-    @abstractmethod
-    def make_geocoder(cls, **kwargs):
-        pass
-
-    @classmethod
-    def setUpClass(cls):
-        cls.geocoder = cls.make_geocoder()
-
-    def test_user_agent_custom(self):
+    async def test_user_agent_custom(self):
         geocoder = self.make_geocoder(
             user_agent='my_user_agent/1.0'
         )
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
-    def test_geocode(self):
-        location = self.geocode_run(
+    async def test_geocode(self):
+        location = await self.geocode_run(
             {'query': 'москва'},
             {'latitude': 55.75587, 'longitude': 37.61768},
         )
         assert 'Москва' in location.address
 
-    def test_reverse(self):
-        location = self.reverse_run(
+    async def test_reverse(self):
+        location = await self.reverse_run(
             {'query': '51.5285057, -0.1369635', 'language': 'en-US'},
             {'latitude': 51.5285057, 'longitude': -0.1369635,
              "delta": 0.3},
@@ -46,19 +36,19 @@ class BaseTomTomTestCase(ABC):
         # the cyrillic variant, even when the `en-US` language is
         # requested.
 
-    def test_geocode_empty(self):
-        self.geocode_run(
+    async def test_geocode_empty(self):
+        await self.geocode_run(
             {'query': 'sldkfhdskjfhsdkhgflaskjgf'},
             {},
             expect_failure=True,
         )
 
 
-@unittest.skipUnless(
-    bool(env.get('TOMTOM_KEY')),
-    "No TOMTOM_KEY env variable set"
+@pytest.mark.skipif(
+    not bool(env.get('TOMTOM_KEY')),
+    reason="No TOMTOM_KEY env variable set"
 )
-class TomTomTestCase(BaseTomTomTestCase, GeocoderTestBase):
+class TestTomTom(BaseTestTomTom):
 
     @classmethod
     def make_geocoder(cls, **kwargs):

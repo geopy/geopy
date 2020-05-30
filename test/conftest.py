@@ -1,5 +1,7 @@
+import asyncio
 import atexit
 import contextlib
+import inspect
 import os
 from collections import defaultdict
 from functools import partial
@@ -12,8 +14,38 @@ from urllib.parse import urlparse
 import pytest
 
 import geopy.geocoders
-from geopy.adapters import AdapterHTTPError, BaseAdapter, BaseSyncAdapter
+from geopy.adapters import AdapterHTTPError, BaseSyncAdapter
 from geopy.geocoders.base import _DEFAULT_ADAPTER_CLASS
+
+# pytest-aiohttp calls `inspect.isasyncgenfunction` to detect
+# async generators in fixtures.
+# To support Python 3.5 we use `async_generator` library.
+# However:
+# - Since Python 3.6 there is a native implementation of
+#   `inspect.isasyncgenfunction`, but it returns False
+#   for `async_generator`'s functions.
+# - The stock `async_generator.isasyncgenfunction` doesn't detect
+#   generators wrapped in `@pytest.fixture`.
+#
+# Thus we resort to monkey-patching it (for now).
+if getattr(inspect, "isasyncgenfunction", None) is not None:
+    # >=py36
+    original_isasyncgenfunction = inspect.isasyncgenfunction
+else:
+    # ==py35
+    original_isasyncgenfunction = lambda func: False  # noqa
+
+
+def isasyncgenfunction(obj):
+    if original_isasyncgenfunction(obj):
+        return True
+    # Detect async_generator function, possibly wrapped in `@pytest.fixture`:
+    # See https://github.com/python-trio/async_generator/blob/v1.10/async_generator/_impl.py#L451-L455  # noqa
+    return bool(getattr(obj, "_async_gen_function", None))
+
+
+inspect.isasyncgenfunction = isasyncgenfunction
+
 
 max_retries = int(os.getenv('GEOPY_TEST_RETRIES', 2))
 error_wait_seconds = float(os.getenv('GEOPY_TEST_ERROR_WAIT_SECONDS', 3))
@@ -41,6 +73,15 @@ def skip_if_internet_access_is_not_allowed(is_internet_access_allowed):
     # Used in test_adapters.py, which doesn't use the injected adapter below.
     if not is_internet_access_allowed:
         pytest.skip("Skipping a test requiring Internet access")
+
+
+@pytest.fixture(autouse=True, scope="session")
+def loop():
+    # Geocoder instances have class scope, so the event loop
+    # should have session scope.
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop
 
 
 def netloc_from_url(url):
@@ -143,7 +184,7 @@ def patch_adapter(requests_monitor, is_internet_access_allowed):
         - Skip tests requiring Internet access when Internet access is not allowed.
     """
 
-    class AdapterProxy(BaseAdapter):
+    class AdapterProxy(BaseSyncAdapter):
         def __init__(self, *, proxies, ssl_context, adapter_factory):
             self.adapter = adapter_factory(
                 proxies=proxies,
@@ -208,44 +249,8 @@ def patch_adapter(requests_monitor, is_internet_access_allowed):
     # In order to take advantage of Keep-Alives in tests, the actual Adapter
     # should be persisted between the test runs, so this fixture must be
     # in the "session" scope.
-    InjectableProxy.inject(partial(AdapterProxy, adapter_factory=_DEFAULT_ADAPTER_CLASS))
-    yield
-    InjectableProxy.inject(None)
-
-
-class InjectableProxy:
-    _cls_factory = None
-
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
-        self._target_factory = None
-        self._target = None
-
-    @classmethod
-    def inject(cls, factory):
-        cls._cls_factory = factory
-
-    @property
-    def target(self):
-        cls = type(self)
-        if self._target is None or self._target_factory is not cls._cls_factory:
-            self._target = cls._cls_factory(**self.kwargs)
-            self._target_factory = cls._cls_factory
-        return self._target
-
-    def __getattr__(self, name):
-        return getattr(self.target, name)
-
-
-BaseSyncAdapter.register(InjectableProxy)
-
-
-# InjectableProxy allows to substitute an Adapter instance for already
-# created geocoder classes. Geocoder testcases tend to create Geocoders
-# in the unittest's `setUpClass` method, so the geocoder instances
-# could be reused between test runs.
-#
-# Unfortunately `setUpClass` is executed before the fixtures, so we cannot
-# just patch `geopy.geocoders.options` in a fixture. This hack with
-# `InjectableProxy` allows to inject an Adapter from a pytest fixture.
-patch.object(geopy.geocoders.options, "default_adapter_factory", InjectableProxy).start()
+    adapter_factory = partial(AdapterProxy, adapter_factory=_DEFAULT_ADAPTER_CLASS)
+    with patch.object(
+        geopy.geocoders.options, "default_adapter_factory", adapter_factory
+    ):
+        yield
