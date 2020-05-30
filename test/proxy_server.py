@@ -70,6 +70,10 @@ class ProxyServerThread(threading.Thread):
         super().__init__()
         self.daemon = True
 
+    def reset(self):
+        self.requests.clear()
+        self.auth = None
+
     def __enter__(self):
         self.start()
         return self
