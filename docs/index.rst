@@ -350,7 +350,9 @@ Data
     :members: address, latitude, longitude, altitude, point, raw
 
 .. autoclass:: geopy.point.Point
-    :members: __new__, from_string, from_sequence, from_point
+    :members:
+
+    .. automethod:: __new__
 
 .. autoclass:: geopy.timezone.Timezone
     :members: pytz_timezone, raw

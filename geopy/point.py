@@ -135,6 +135,13 @@ class Point(object):
 
         >>> latitude, longitude, altitude = p
 
+    Textual representations::
+
+        >>> p = Point(41.5, -81.0, 12.3)
+        >>> str(p)  # same as `p.format()`
+        '41 30m 0s N, 81 0m 0s W, 12.3km'
+        >>> repr(p)
+        'Point(41.5, -81.0, 12.3)'
     """
 
     __slots__ = ("latitude", "longitude", "altitude")
@@ -206,7 +213,17 @@ class Point(object):
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         """
-        Format decimal degrees (DD) to degrees minutes seconds (DMS)
+        Format decimal degrees (DD) to degrees minutes seconds (DMS)::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format()
+            '41 30m 0s N, 81 0m 0s W, 12.3km'
+            >>> p = Point(41.5, 0, 0)
+            >>> p.format()
+            '41 30m 0s N, 0 0m 0s E'
+
+        :param bool altitude: Whether to include ``altitude`` value.
+            By default it is automatically included if it is non-zero.
         """
         latitude = "%s %s" % (
             format_degrees(abs(self.latitude), symbols={
@@ -233,7 +250,17 @@ class Point(object):
 
     def format_decimal(self, altitude=None):
         """
-        Format decimal degrees with altitude
+        Format decimal degrees with altitude::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format_decimal()
+            '41.5, -81.0, 12.3km'
+            >>> p = Point(41.5, 0, 0)
+            >>> p.format_decimal()
+            '41.5, 0.0'
+
+        :param bool altitude: Whether to include ``altitude`` value.
+            By default it is automatically included if it is non-zero.
         """
         coordinates = [str(self.latitude), str(self.longitude)]
 
@@ -248,7 +275,17 @@ class Point(object):
 
     def format_altitude(self, unit='km'):
         """
-        Format altitude with unit
+        Format altitude with unit::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format_altitude()
+            '12.3km'
+            >>> p = Point(41.5, -81.0, 0)
+            >>> p.format_altitude()
+            '0.0km'
+
+        :param str unit: Resulting altitude unit. Supported units
+            are listed in :meth:`.from_string` doc.
         """
         return format_distance(self.altitude, unit=unit)
 
@@ -295,7 +332,18 @@ class Point(object):
     @classmethod
     def parse_altitude(cls, distance, unit):
         """
-        Parse altitude managing units conversion
+        Parse altitude managing units conversion::
+
+            >>> Point.parse_altitude(712, 'm')
+            0.712
+            >>> Point.parse_altitude(712, 'km')
+            712.0
+            >>> Point.parse_altitude(712, 'mi')
+            1145.852928
+
+        :param float distance: Numeric value of altitude.
+        :param str unit: ``distance`` unit. Supported units
+            are listed in :meth:`.from_string` doc.
         """
         if distance is not None:
             distance = float(distance)
