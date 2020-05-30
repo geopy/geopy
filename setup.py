@@ -23,6 +23,7 @@ INSTALL_REQUIRES = [
 ]
 
 EXTRAS_DEV_TESTFILES_COMMON = [
+    "async_generator",
 ]
 
 EXTRAS_DEV_LINT = [
@@ -32,6 +33,7 @@ EXTRAS_DEV_LINT = [
 
 EXTRAS_DEV_TEST = [
     "coverage",
+    "pytest-aiohttp",  # for `async def` tests
     "pytest>=3.10",
 ]
 
