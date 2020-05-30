@@ -15,7 +15,11 @@ from geopy.adapters import (
     RequestsAdapter,
     URLLibAdapter,
 )
-from geopy.exc import GeocoderParseError, GeocoderServiceError
+from geopy.exc import (
+    GeocoderAuthenticationFailure,
+    GeocoderParseError,
+    GeocoderServiceError,
+)
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
 
@@ -87,6 +91,11 @@ def remote_website_http_json(remote_website_http):
 
 
 @pytest.fixture
+def remote_website_http_json_plain(remote_website_http):
+    return urljoin(remote_website_http, "/json/plain")
+
+
+@pytest.fixture
 def remote_website_http_404(remote_website_http):
     return urljoin(remote_website_http, "/404")
 
@@ -130,6 +139,69 @@ async def test_geocoder_constructor_uses_https_proxy(
         assert 0 == len(proxy_server.requests)
         assert base_html == await geocoder_dummy.geocode(remote_website_trusted_https)
         assert 1 == len(proxy_server.requests)
+
+
+async def test_geocoder_http_proxy_auth_is_respected(
+    timeout, proxy_server, remote_website_http
+):
+    proxy_server.set_auth("user", "test")
+    base_http = urlopen(remote_website_http, timeout=timeout)
+    base_html = base_http.read().decode()
+
+    proxy_url = proxy_server.get_proxy_url()
+
+    async with make_dummy_async_geocoder(
+        proxies={"http": proxy_url}, timeout=timeout
+    ) as geocoder_dummy:
+        assert 0 == len(proxy_server.requests)
+        assert base_html == await geocoder_dummy.geocode(remote_website_http)
+        assert 1 == len(proxy_server.requests)
+
+
+async def test_geocoder_https_proxy_auth_is_respected(
+    timeout, proxy_server, remote_website_trusted_https
+):
+    proxy_server.set_auth("user", "test")
+    base_http = urlopen(remote_website_trusted_https, timeout=timeout)
+    base_html = base_http.read().decode()
+
+    proxy_url = proxy_server.get_proxy_url()
+
+    async with make_dummy_async_geocoder(
+        proxies={"https": proxy_url}, timeout=timeout
+    ) as geocoder_dummy:
+        assert 0 == len(proxy_server.requests)
+        assert base_html == await geocoder_dummy.geocode(remote_website_trusted_https)
+        assert 1 == len(proxy_server.requests)
+
+
+async def test_geocoder_http_proxy_auth_error(
+    timeout, proxy_server, proxy_url, remote_website_http
+):
+    proxy_server.set_auth("user", "test")
+
+    async with make_dummy_async_geocoder(
+        proxies={"http": proxy_url}, timeout=timeout
+    ) as geocoder_dummy:
+        # For HTTP targets we cannot distinguish between 401 from proxy
+        # and 401 from geocoding service, thus the same error as for
+        # 401 for geocoders is raised: GeocoderAuthenticationFailure
+        with pytest.raises(GeocoderAuthenticationFailure) as exc_info:
+            await geocoder_dummy.geocode(remote_website_http)
+        assert exc_info.type is GeocoderAuthenticationFailure
+
+
+async def test_geocoder_https_proxy_auth_error(
+    timeout, proxy_server, proxy_url, remote_website_trusted_https
+):
+    proxy_server.set_auth("user", "test")
+
+    async with make_dummy_async_geocoder(
+        proxies={"https": proxy_url}, timeout=timeout
+    ) as geocoder_dummy:
+        with pytest.raises(GeocoderServiceError) as exc_info:
+            await geocoder_dummy.geocode(remote_website_trusted_https)
+        assert exc_info.type is GeocoderServiceError
 
 
 async def test_ssl_context_with_proxy_is_respected(
@@ -199,6 +271,14 @@ async def test_geocoder_constructor_has_both_schemes_proxy(proxy_url):
 async def test_get_json(remote_website_http_json, timeout):
     async with make_dummy_async_geocoder(timeout=timeout) as geocoder_dummy:
         result = await geocoder_dummy.geocode(remote_website_http_json, is_json=True)
+        assert isinstance(result, dict)
+
+
+async def test_get_json_plain(remote_website_http_json_plain, timeout):
+    async with make_dummy_async_geocoder(timeout=timeout) as geocoder_dummy:
+        result = await geocoder_dummy.geocode(
+            remote_website_http_json_plain, is_json=True
+        )
         assert isinstance(result, dict)
 
 
