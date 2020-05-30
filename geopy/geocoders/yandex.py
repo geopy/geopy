@@ -1,3 +1,4 @@
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import GeocoderParseError, GeocoderServiceError
@@ -115,10 +116,8 @@ class Yandex(Geocoder):
             params['results'] = 1
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one,
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -177,10 +176,8 @@ class Yandex(Geocoder):
             params['kind'] = kind
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, doc, exactly_one):
         """

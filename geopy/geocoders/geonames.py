@@ -1,3 +1,4 @@
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import (
@@ -152,10 +153,8 @@ class GeoNames(Geocoder):
             params.append(('maxRows', 1))
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one,
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -235,10 +234,8 @@ class GeoNames(Geocoder):
             )
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _reverse_find_nearby_params(self, lat, lng, feature_code):
         params = {
@@ -295,9 +292,7 @@ class GeoNames(Geocoder):
         url = "?".join((self.api_timezone, urlencode(params)))
 
         logger.debug("%s.reverse_timezone: %s", self.__class__.__name__, url)
-        return self._parse_json_timezone(
-            self._call_geocoder(url, timeout=timeout)
-        )
+        return self._call_geocoder(url, self._parse_json_timezone, timeout=timeout)
 
     def _raise_for_error(self, body):
         err = body.get('status')

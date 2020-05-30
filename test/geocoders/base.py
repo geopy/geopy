@@ -103,15 +103,15 @@ class GeocoderTestCase(unittest.TestCase):
         with ExitStack() as stack:
             mock_get_json = stack.enter_context(patch.object(g.adapter, 'get_json'))
 
-            g._call_geocoder(url)
+            g._call_geocoder(url, lambda res: res)
             args, kwargs = mock_get_json.call_args
             assert kwargs['timeout'] == 12
 
-            g._call_geocoder(url, timeout=7)
+            g._call_geocoder(url, lambda res: res, timeout=7)
             args, kwargs = mock_get_json.call_args
             assert kwargs['timeout'] == 7
 
-            g._call_geocoder(url, timeout=None)
+            g._call_geocoder(url, lambda res: res, timeout=None)
             args, kwargs = mock_get_json.call_args
             assert kwargs['timeout'] is None
 
