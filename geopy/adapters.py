@@ -14,11 +14,14 @@ HTTP client settings.
     .. _provisional basis: https://docs.python.org/3/glossary.html#term-provisional-api
 """
 import abc
+import asyncio
+import contextlib
 import json
 import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
 from urllib.error import HTTPError
+from urllib.parse import urlparse
 from urllib.request import HTTPSHandler, ProxyHandler, Request, URLError, build_opener
 
 from geopy.exc import (
@@ -26,6 +29,7 @@ from geopy.exc import (
     GeocoderServiceError,
     GeocoderTimedOut,
     GeocoderUnavailable,
+    GeopyError,
 )
 from geopy.util import logger
 
@@ -37,6 +41,14 @@ try:
 except ImportError:
     RequestsHTTPAdapter = object
     requests_available = False
+
+try:
+    import aiohttp
+    import aiohttp.client_exceptions
+
+    aiohttp_available = True
+except ImportError:
+    aiohttp_available = False
 
 
 class AdapterHTTPError(IOError):
@@ -363,6 +375,107 @@ class RequestsAdapter(BaseSyncAdapter):
                 )
 
         return resp
+
+
+class AioHTTPAdapter(BaseAsyncAdapter):
+    """The adapter which uses `aiohttp`_ library.
+
+    .. _aiohttp: https://docs.aiohttp.org/
+
+    `aiohttp` supports keep-alives, persists Cookies, allows response
+    compression and uses HTTP/1.1 [currently].
+
+    ``aiohttp`` package must be installed in order to use this adapter.
+    """
+
+    is_available = aiohttp_available
+
+    def __init__(self, *, proxies, ssl_context):
+        if not aiohttp_available:
+            raise ImportError(
+                "`aiohttp` must be installed in order to use AioHTTPAdapter. "
+                "If you have installed geopy via pip, you may use "
+                "this command to install aiohttp: "
+                '`pip install "geopy[aiohttp]"`.'
+            )
+        if proxies is not None:
+            # Don't use system proxies:
+            trust_env = False
+        else:
+            trust_env = True
+        self.proxies = proxies
+        self.ssl_context = ssl_context
+        self.session = aiohttp.ClientSession(
+            trust_env=trust_env, raise_for_status=False
+        )
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        # Might issue a warning if loop is immediately closed:
+        #   ResourceWarning: unclosed transport <_SelectorSocketTransport fd=10>
+        # https://github.com/aio-libs/aiohttp/issues/1115#issuecomment-242278593
+        # https://github.com/python/asyncio/issues/466
+        await self.session.close()
+
+    async def get_text(self, url, *, timeout, headers):
+        with self._normalize_exceptions():
+            async with self._request(url, timeout=timeout, headers=headers) as resp:
+                await self._raise_for_status(resp)
+                return await resp.text()
+
+    async def get_json(self, url, *, timeout, headers):
+        with self._normalize_exceptions():
+            async with self._request(url, timeout=timeout, headers=headers) as resp:
+                await self._raise_for_status(resp)
+                try:
+                    try:
+                        return await resp.json()
+                    except aiohttp.client_exceptions.ContentTypeError:
+                        # `Attempt to decode JSON with unexpected mimetype:
+                        # text/plain;charset=utf-8`
+                        return json.loads(await resp.text())
+                except ValueError:
+                    raise GeocoderParseError(
+                        "Could not deserialize using deserializer:\n%s"
+                        % (await resp.text())
+                    )
+
+    async def _raise_for_status(self, resp):
+        if resp.status >= 400:
+            raise AdapterHTTPError(
+                "Non-successful status code %s" % resp.status,
+                status_code=resp.status,
+                text=await resp.text(),
+            )
+
+    def _request(self, url, *, timeout, headers):
+        if self.proxies:
+            scheme = urlparse(url).scheme
+            proxy = self.proxies.get(scheme.lower())
+        else:
+            proxy = None
+        return self.session.get(
+            url, timeout=timeout, headers=headers, proxy=proxy, ssl=self.ssl_context
+        )
+
+    @contextlib.contextmanager
+    def _normalize_exceptions(self):
+        try:
+            yield
+        except (GeopyError, AdapterHTTPError):
+            raise
+        except Exception as error:
+            message = str(error)
+            if isinstance(error, asyncio.TimeoutError):
+                raise GeocoderTimedOut("Service timed out")
+            elif isinstance(error, SSLError):
+                if "timed out" in message:
+                    raise GeocoderTimedOut("Service timed out")
+            elif isinstance(error, aiohttp.ClientConnectionError):
+                raise GeocoderUnavailable(message)
+            raise GeocoderServiceError(message)
 
 
 # https://github.com/kennethreitz/requests/issues/3774#issuecomment-267871876
