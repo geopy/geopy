@@ -1,3 +1,4 @@
+import base64
 import http.server as SimpleHTTPServer
 import select
 import socket
@@ -64,6 +65,7 @@ class ProxyServerThread(threading.Thread):
         self.proxy_server = None
         self.socket_created_future = Future()
         self.requests = []
+        self.auth = None
 
         super().__init__()
         self.daemon = True
@@ -76,20 +78,51 @@ class ProxyServerThread(threading.Thread):
         self.stop()
         self.join()
 
+    def set_auth(self, username, password):
+        self.auth = "%s:%s" % (username, password)
+
     def get_proxy_url(self):
         assert self.socket_created_future.result(self.spinup_timeout)
-        return "http://%s:%s" % (self.proxy_host, self.proxy_port)
+        if self.auth:
+            auth = "%s@" % self.auth
+        else:
+            auth = ""
+        return "http://%s%s:%s" % (auth, self.proxy_host, self.proxy_port)
 
     def run(self):
         assert not self.proxy_server, ("This class is not reentrable. "
                                        "Please create a new instance.")
 
         requests = self.requests
+        proxy_thread = self
 
         class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
             timeout = self.timeout
 
+            def check_auth(self):
+                if proxy_thread.auth is not None:
+                    auth_header = self.headers.get('Proxy-Authorization')
+                    b64_auth = base64.standard_b64encode(
+                        proxy_thread.auth.encode()
+                    ).decode()
+                    expected_auth = "Basic %s" % b64_auth
+                    if auth_header != expected_auth:
+                        self.send_response(401)
+                        self.send_header('Connection', 'close')
+                        self.end_headers()
+                        self.wfile.write(
+                            (
+                                "not authenticated. Expected %r, received %r"
+                                % (expected_auth, auth_header)
+                            ).encode()
+                        )
+                        self.connection.close()
+                        return False
+                return True
+
             def do_GET(self):
+                if not self.check_auth():
+                    return
                 requests.append(self.path)
 
                 req = urlopen(self.path, timeout=self.timeout)
@@ -104,6 +137,8 @@ class ProxyServerThread(threading.Thread):
                 req.close()
 
             def do_CONNECT(self):
+                if not self.check_auth():
+                    return
                 requests.append(self.path)
 
                 # Make a raw TCP connection to the target server
@@ -192,6 +227,12 @@ class HttpServerThread(threading.Thread):
                 elif self.path == "/json":
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    self.wfile.write(b'{"hello":"world"}')
+                elif self.path == "/json/plain":
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/plain;charset=utf-8')
                     self.send_header('Connection', 'close')
                     self.end_headers()
                     self.wfile.write(b'{"hello":"world"}')
