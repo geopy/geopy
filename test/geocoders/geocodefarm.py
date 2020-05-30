@@ -31,9 +31,6 @@ class GeocodeFarmTestCase(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_geocode(self):
-        """
-        GeocodeFarm.geocode
-        """
         location = self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
@@ -56,9 +53,6 @@ class GeocodeFarmTestCase(GeocoderTestBase):
         self.assertIn("new york", location.address.lower())
 
     def test_authentication_failure(self):
-        """
-        GeocodeFarm authentication failure
-        """
         self.geocoder = GeocodeFarm(api_key="invalid")
         with self.assertRaises(exc.GeocoderAuthenticationFailure):
             self.geocode_run(
@@ -68,9 +62,6 @@ class GeocodeFarmTestCase(GeocoderTestBase):
             )
 
     def test_quota_exceeded(self):
-        """
-        GeocodeFarm quota exceeded
-        """
 
         def mock_call_geocoder(*args, **kwargs):
             return {
@@ -94,9 +85,6 @@ class GeocodeFarmTestCase(GeocoderTestBase):
         )
 
     def test_unhandled_api_error(self):
-        """
-        GeocodeFarm unhandled error
-        """
 
         def mock_call_geocoder(*args, **kwargs):
             return {

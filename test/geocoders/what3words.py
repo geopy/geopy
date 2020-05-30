@@ -56,18 +56,12 @@ class What3WordsTestCase(GeocoderTestBase):
         )
 
     def test_reverse(self):
-        """
-        What3Words.reverse - '3 Words'
-        """
         self.reverse_run(
             {"query": "53.037611,11.565012", "lang": 'DE'},
             {"address": 'fortschrittliche.voll.schnitt'},
         )
 
     def test_unicode_query(self):
-        """
-        What3Words.geocode - '3 Words' unicode
-        """
         self.geocode_run(
             {
                 "query": u(
@@ -98,9 +92,6 @@ class What3WordsTestCase(GeocoderTestBase):
         )
 
     def test_result_language(self):
-        """
-        What3Words.geocode result language
-        """
         self.geocode_run(
             {"query": "piped.gains.jangle", "lang": 'DE'},
             {"address": 'fortschrittliche.voll.schnitt'},

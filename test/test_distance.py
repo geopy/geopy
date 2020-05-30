@@ -1,6 +1,3 @@
-"""
-Test distance formulas
-"""
 import math
 import unittest
 import warnings

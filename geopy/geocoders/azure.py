@@ -1,4 +1,3 @@
-
 from geopy.geocoders.base import DEFAULT_SENTINEL
 from geopy.geocoders.tomtom import TomTom
 

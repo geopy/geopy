@@ -1,4 +1,3 @@
-
 import unittest
 
 from geopy.compat import u
@@ -30,36 +29,24 @@ class BingTestCase(GeocoderTestBase):
         )
 
     def test_geocode(self):
-        """
-        Bing.geocode
-        """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
     def test_unicode_name(self):
-        """
-        Bing.geocode unicode
-        """
         self.geocode_run(
             {"query": u("\u043c\u043e\u0441\u043a\u0432\u0430")},
             {"latitude": 55.756, "longitude": 37.615},
         )
 
     def test_reverse_point(self):
-        """
-        Bing.reverse using point
-        """
         self.reverse_run(
             {"query": Point(40.753898, -73.985071)},
             {"latitude": 40.753, "longitude": -73.984},
         )
 
     def test_reverse_with_culture_de(self):
-        """
-        Bing.reverse using point and culture parameter to get a non english response
-        """
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "culture": "DE"},
             {},
@@ -67,9 +54,6 @@ class BingTestCase(GeocoderTestBase):
         self.assertIn("Vereinigte Staaten von Amerika", res.address)
 
     def test_reverse_with_culture_en(self):
-        """
-        Bing.reverse using point and culture parameter to get an english response
-        """
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "culture": "EN"},
             {},
@@ -77,9 +61,6 @@ class BingTestCase(GeocoderTestBase):
         self.assertIn("United States", res.address)
 
     def test_reverse_with_include_country_code(self):
-        """
-        Bing.reverse using point and include country-code in the response
-        """
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071),
              "include_country_code": True},
@@ -88,9 +69,6 @@ class BingTestCase(GeocoderTestBase):
         self.assertEqual(res.raw["address"].get("countryRegionIso2", 'missing'), 'US')
 
     def test_user_location(self):
-        """
-        Bing.geocode using `user_location`
-        """
         pennsylvania = (40.98327, -74.96064)
         colorado = (40.1602849999851, -105.102491162672)
 
@@ -107,9 +85,6 @@ class BingTestCase(GeocoderTestBase):
                 self.skipTest("Bing ignored user_location: %s" % str(e))
 
     def test_optional_params(self):
-        """
-        Bing.geocode using optional params
-        """
         res = self.geocode_run(
             {"query": "Badeniho 1, Prague, Czech Republic",
              "culture": 'cs',
@@ -122,9 +97,6 @@ class BingTestCase(GeocoderTestBase):
         self.assertEqual(address['countryRegionIso2'], "CZ")
 
     def test_structured_query(self):
-        """
-        Bing.geocode using structured query
-        """
         res = self.geocode_run(
             {"query": {'postalCode': '80020', 'countryRegion': 'United States'}},
             {},

@@ -22,23 +22,14 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_invalid_auth_1(self):
-        """
-        IGNFrance api_key without referer is ConfigurationError
-        """
         with self.assertRaises(ConfigurationError):
             IGNFrance(api_key="a")
 
     def test_invalid_auth_2(self):
-        """
-        IGNFrance api_key, username, and referer is ConfigurationError
-        """
         with self.assertRaises(ConfigurationError):
             IGNFrance(api_key="a", username="b", referer="c")
 
     def test_invalid_auth_3(self):
-        """
-        IGNFrance username without password is ConfgurationError
-        """
         with self.assertRaises(ConfigurationError):
             IGNFrance(api_key="a", username="b")
 
@@ -55,16 +46,10 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         cls.geocoder = cls.make_geocoder()
 
     def test_invalid_query_type(self):
-        """
-        IGNFrance.geocode invalid query_type
-        """
         with self.assertRaises(GeocoderQueryError):
             self.geocoder.geocode("44109000EX0114", query_type="invalid")
 
     def test_invalid_query_parcel(self):
-        """
-        IGNFrance.geocode invalid CadastralParcel
-        """
         with self.assertRaises(GeocoderQueryError):
             self.geocoder.geocode(
                 "incorrect length string",
@@ -72,9 +57,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
             )
 
     def test_geocode(self):
-        """
-        IGNFrance.geocode CadastralParcel
-        """
         self.geocode_run(
             {"query": "44109000EX0114",
              "query_type": "CadastralParcel",
@@ -98,9 +80,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode_with_address(self):
-        """
-        IGNFrance.geocode Address
-        """
         self.geocode_run(
             {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER",
              "query_type": "StreetAddress",
@@ -111,9 +90,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode_freeform(self):
-        """
-        IGNFrance.geocode with freeform and StreetAddress
-        """
         self.geocode_run(
             {"query": "8 rue Général Buat, Nantes",
              "query_type": "StreetAddress",
@@ -123,9 +99,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode_position_of_interest(self):
-        """
-        IGNFrance.geocode with PositionOfInterest
-        """
         res = self.geocode_run(
             {"query": "Chambéry",
              "query_type": "PositionOfInterest",
@@ -138,9 +111,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("16420 Saint-Christophe", addresses)
 
     def test_geocode_filter_by_attribute(self):
-        """
-        IGNFrance.geocode with filter by attribute
-        """
         res = self.geocode_run(
             {"query": "Les Molettes",
              "query_type": "PositionOfInterest",
@@ -157,9 +127,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         self.assertEqual(unique[0], "38")
 
     def test_geocode_filter_by_envelope(self):
-        """
-        IGNFrance.geocode using envelope
-        """
         lat_min, lng_min, lat_max, lng_max = 45.00, 5, 46, 6.40
 
         spatial_filtering_envelope = """
@@ -208,9 +175,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_reverse(self):
-        """
-        IGNFrance.reverse simple
-        """
         res = self.reverse_run(
             {"query": '47.229554,-1.541519',
              "exactly_one": True},
@@ -222,20 +186,14 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_reverse_invalid_preference(self):
-        """
-        IGNFrance.reverse with invalid reverse_geocode_preference
-        """
         with self.assertRaises(GeocoderQueryError):
             self.geocoder.reverse(
                 query='47.229554,-1.541519',
                 exactly_one=True,
-                reverse_geocode_preference=['a']
+                reverse_geocode_preference=['a']  # invalid
             )
 
     def test_reverse_preference(self):
-        """
-        IGNFrance.reverse preference
-        """
         res = self.reverse_run(
             {"query": '47.229554,-1.541519',
              "exactly_one": False,
@@ -247,9 +205,6 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("5 av camille guerin, 44000 Nantes", addresses)
 
     def test_reverse_by_radius(self):
-        """
-        IGNFrance.reverse by radius
-        """
         spatial_filtering_radius = """
         <gml:CircleByCenterPoint>
             <gml:pos>{coord}</gml:pos>

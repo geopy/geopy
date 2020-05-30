@@ -1,7 +1,3 @@
-"""
-Formatting...
-"""
-
 from geopy import units
 from geopy.compat import py3k
 

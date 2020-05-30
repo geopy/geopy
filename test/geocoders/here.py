@@ -52,9 +52,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         cls.geocoder = cls.make_geocoder()
 
     def test_geocode_empty_result(self):
-        """
-        Here.geocode empty results should be graciously handled.
-        """
         self.geocode_run(
             {"query": "xqj37"},
             {},
@@ -62,18 +59,12 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode(self):
-        """
-        Here.geocode
-        """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624}
         )
 
     def test_geocode_structured(self):
-        """
-        Here.geocode
-        """
         query = {
             "street": "north michigan ave",
             "housenumber": "435",
@@ -88,9 +79,7 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode_unicode_name(self):
-        """
-        Here.geocode unicode in Japanese for Paris. (POIs not included.)
-        """
+        # unicode in Japanese for Paris. (POIs not included.)
         self.geocode_run(
             {"query": u("\u30d1\u30ea")},
             {"latitude": 48.85718, "longitude": 2.34141}
@@ -111,9 +100,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_geocode_shapes(self):
-        """
-        Here.geocode using additional data parameter (postal code shapes)
-        """
         address_string = "435 north michigan ave, chicago il 60611 usa"
         res = self.geocode_run(
             {"query": address_string, "additional_data": "IncludeShapeLevel,postalCode"},
@@ -123,9 +109,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertTrue(shape_value.startswith('MULTIPOLYGON ((('))
 
     def test_geocode_with_language_de(self):
-        """
-        Here.geocode using language parameter to get a non-English response
-        """
         address_string = "435 north michigan ave, chicago il 60611 usa"
         res = self.geocode_run(
             {"query": address_string, "language": "de-DE"},
@@ -134,9 +117,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("Vereinigte Staaten", res.address)
 
     def test_geocode_with_language_en(self):
-        """
-        Here.geocode using language parameter to get an English response
-        """
         address_string = "435 north michigan ave, chicago il 60611 usa"
         res = self.geocode_run(
             {"query": address_string, "language": "en-US"},
@@ -145,9 +125,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("United States", res.address)
 
     def test_geocode_with_paging(self):
-        """
-        Here.geocode using simple paging "outside" geopy
-        """
         address_string = "Hauptstr., Berlin, Germany"
         input = {"query": address_string, "maxresults": 12, "exactly_one": False}
         res = self.geocode_run(input, {})
@@ -168,9 +145,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_reverse_point_radius_1000_float(self):
-        """
-        Here.reverse Point with radius
-        """
         # needs more testing
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "radius": 1000.12,
@@ -180,9 +154,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertGreater(len(res), 5)
 
     def test_reverse_point_radius_10(self):
-        """
-        Here.reverse Point with radius
-        """
         # needs more testing
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "radius": 10, "exactly_one": False},
@@ -191,9 +162,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertGreater(len(res), 5)
 
     def test_reverse_with_language_de(self):
-        """
-        Here.reverse using point and language parameter to get a non-English response
-        """
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "language": "de-DE"},
             {}
@@ -201,9 +169,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("Vereinigte Staaten", res.address)
 
     def test_reverse_with_language_en(self):
-        """
-        Here.reverse using point and language parameter to get an English response
-        """
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "language": "en-US"},
             {}
@@ -211,9 +176,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("United States", res.address)
 
     def test_reverse_with_mode_areas(self):
-        """
-        Here.reverse using mode parameter 'retrieveAreas'.
-        """
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "mode": "retrieveAreas"},
             {}
@@ -221,9 +183,6 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
         self.assertIn("Theater District-Times Square", res.address)
 
     def test_reverse_with_maxresults_5(self):
-        """
-        Here.reverse using maxresults parameter 5.
-        """
         res = self.reverse_run(
             {
                 "query": Point(40.753898, -73.985071),

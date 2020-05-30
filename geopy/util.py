@@ -1,7 +1,3 @@
-"""
-Utils.
-"""
-
 import logging
 
 from geopy.compat import py3k, text_type

@@ -1,6 +1,3 @@
-"""
-Test ability to proxy requests.
-"""
 import os
 import ssl
 import unittest

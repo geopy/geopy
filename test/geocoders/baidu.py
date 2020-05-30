@@ -1,4 +1,3 @@
-
 import unittest
 
 from geopy.compat import u
@@ -24,9 +23,6 @@ class BaiduTestCaseUnitTest(GeocoderTestBase):
 class BaiduQueriesTestCaseMixin:
 
     def test_basic_address(self):
-        """
-        Baidu.geocode
-        """
         self.geocode_run(
             {"query": u(
                 "\u5317\u4eac\u5e02\u6d77\u6dc0\u533a"
@@ -36,9 +32,6 @@ class BaiduQueriesTestCaseMixin:
         )
 
     def test_reverse_point(self):
-        """
-        Baidu.reverse Point
-        """
         self.reverse_run(
             {"query": Point(39.983615544507, 116.32295155093)},
             {"latitude": 39.983615544507, "longitude": 116.32295155093},

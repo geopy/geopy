@@ -54,34 +54,22 @@ class GoogleV3TestCase(GeocoderTestBase):
         self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
 
     def test_configuration_error(self):
-        """
-        GoogleV3 raises configuration errors on invalid auth params
-        """
         with self.assertRaises(exc.ConfigurationError):
             GoogleV3(api_key='mock', client_id='a')
         with self.assertRaises(exc.ConfigurationError):
             GoogleV3(api_key='mock', secret_key='a')
 
     def test_warning_with_no_api_key(self):
-        """
-        GoogleV3 warns if no API key is present
-        """
         with warnings.catch_warnings(record=True) as w:
             GoogleV3()
         self.assertEqual(len(w), 1)
 
     def test_no_warning_with_no_api_key_but_using_premier(self):
-        """
-        GoogleV3 does not warn about the API key if using premier
-        """
         with warnings.catch_warnings(record=True) as w:
             GoogleV3(client_id='client_id', secret_key='secret_key')
         self.assertEqual(len(w), 0)
 
     def test_check_status(self):
-        """
-        GoogleV3 raises correctly on Google-specific API status flags
-        """
         self.assertEqual(self.geocoder._check_status("ZERO_RESULTS"), None)
         with self.assertRaises(exc.GeocoderQuotaExceeded):
             self.geocoder._check_status("OVER_QUERY_LIMIT")
@@ -93,9 +81,6 @@ class GoogleV3TestCase(GeocoderTestBase):
             self.geocoder._check_status("_")
 
     def test_get_signed_url(self):
-        """
-        GoogleV3._get_signed_url
-        """
         geocoder = GoogleV3(
             api_key='mock',
             client_id='my_client_id',
@@ -119,9 +104,6 @@ class GoogleV3TestCase(GeocoderTestBase):
         )
 
     def test_get_signed_url_with_channel(self):
-        """
-        GoogleV3._get_signed_url
-        """
         geocoder = GoogleV3(
             api_key='mock',
             client_id='my_client_id',
@@ -137,9 +119,6 @@ class GoogleV3TestCase(GeocoderTestBase):
         self.assertTrue('client' in params)
 
     def test_format_components_param(self):
-        """
-        GoogleV3._format_components_param
-        """
         f = GoogleV3._format_components_param
         self.assertEqual(f({}), '')
         self.assertEqual(f([]), '')
@@ -172,27 +151,18 @@ class GoogleV3TestCase(GeocoderTestBase):
             f('administrative_area:CA|country:FR')
 
     def test_geocode(self):
-        """
-        GoogleV3.geocode
-        """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
     def test_unicode_name(self):
-        """
-        GoogleV3.geocode unicode
-        """
         self.geocode_run(
             {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
     def test_geocode_with_conflicting_components(self):
-        """
-        GoogleV3.geocode returns None on conflicting components
-        """
         self.geocode_run(
             {
                 "query": "santa cruz",
@@ -218,9 +188,6 @@ class GoogleV3TestCase(GeocoderTestBase):
         )
 
     def test_components(self):
-        """
-        GoogleV3.geocode with components
-        """
         self.geocode_run(
             {
                 "query": "santa cruz",
@@ -263,9 +230,6 @@ class GoogleV3TestCase(GeocoderTestBase):
         )
 
     def test_zero_results(self):
-        """
-        GoogleV3.geocode returns None for no result
-        """
         with self.assertRaises(exc.GeocoderQueryError):
             self.geocode_run(
                 {"query": ''},
@@ -325,9 +289,6 @@ class GoogleV3TestCase(GeocoderTestBase):
         )
 
     def test_geocode_bounds(self):
-        """
-        GoogleV3.geocode check bounds restriction
-        """
         self.geocode_run(
             {"query": "221b Baker St", "bounds": [[50, -2], [55, 2]]},
             {"latitude": 51.52, "longitude": -0.15},
@@ -343,9 +304,6 @@ class GoogleV3TestCase(GeocoderTestBase):
             self.assertEqual(1, len(w))
 
     def test_geocode_bounds_invalid(self):
-        """
-        GoogleV3.geocode bounds must be 4-length iterable
-        """
         with self.assertRaises(exc.GeocoderQueryError):
             self.geocode_run(
                 {"query": "221b Baker St", "bounds": [50, -2, 55]},

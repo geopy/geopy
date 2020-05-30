@@ -84,9 +84,6 @@ class GeocoderTestBase(unittest.TestCase):
 
     @classmethod
     def _make_request(cls, call, *args, **kwargs):
-        """
-        Handles remote service errors.
-        """
         try:
             result = call(*args, **kwargs)
         except exc.GeocoderQuotaExceeded:
@@ -106,9 +103,6 @@ class GeocoderTestBase(unittest.TestCase):
             exactly_one=True,
             delta=None,
     ):
-        """
-        Verifies that result matches the kwargs given.
-        """
         if exactly_one:
             self.assertIsInstance(result, Location)
         else:

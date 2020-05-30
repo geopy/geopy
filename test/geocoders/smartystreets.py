@@ -52,9 +52,6 @@ class LiveAddressTestCase(GeocoderTestBase):
         cls.delta = 0.04
 
     def test_geocode(self):
-        """
-        LiveAddress.geocode
-        """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},

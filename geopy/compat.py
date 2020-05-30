@@ -1,7 +1,3 @@
-"""
-Compatibility...
-"""
-
 import inspect
 import sys
 import warnings

@@ -23,17 +23,11 @@ class ArcGISTestCase(GeocoderTestBase):
     def setUpClass(cls):
         cls.geocoder = ArcGIS(timeout=3)
 
-    def test_config_error(self):
-        """
-        ArcGIS.__init__ invalid authentication
-        """
+    def test_missing_password_error(self):
         with self.assertRaises(exc.ConfigurationError):
             ArcGIS(username='a')
 
     def test_scheme_config_error(self):
-        """
-        ArcGIS.__init__ invalid scheme
-        """
         with self.assertRaises(exc.ConfigurationError):
             ArcGIS(
                 username='a',
@@ -43,18 +37,12 @@ class ArcGISTestCase(GeocoderTestBase):
             )
 
     def test_geocode(self):
-        """
-        ArcGIS.geocode
-        """
         self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
     def test_unicode_name(self):
-        """
-        ArcGIS.geocode unicode
-        """
         self.geocode_run(
             {"query": u("\u6545\u5bab")},
             {"latitude": 39.916, "longitude": 116.390},
@@ -68,9 +56,6 @@ class ArcGISTestCase(GeocoderTestBase):
         )
 
     def test_geocode_with_out_fields_string(self):
-        """
-        ArcGIS.geocode with outFields string
-        """
         result = self.geocode_run(
             {"query": "Trafalgar Square, London",
              "out_fields": "Country"},
@@ -80,9 +65,6 @@ class ArcGISTestCase(GeocoderTestBase):
                              {'Country': 'GBR'})
 
     def test_geocode_with_out_fields_list(self):
-        """
-        ArcGIS.geocode with outFields list
-        """
         result = self.geocode_run(
             {"query": "Trafalgar Square, London",
              "out_fields": ["City", "Type"]},
@@ -92,9 +74,6 @@ class ArcGISTestCase(GeocoderTestBase):
                              {'City': 'London', 'Type': 'Tourist Attraction'})
 
     def test_reverse_point(self):
-        """
-        ArcGIS.reverse using point
-        """
         location = self.reverse_run(
             {"query": Point(40.753898, -73.985071)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
@@ -146,9 +125,6 @@ class ArcGISAuthenticatedTestCase(GeocoderTestBase):
         )
 
     def test_basic_address(self):
-        """
-        ArcGIS.geocode using authentication
-        """
         self.geocode_run(
             {"query": "Potsdamer Platz, Berlin, Deutschland"},
             {"latitude": 52.5094982, "longitude": 13.3765983},
