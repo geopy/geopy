@@ -222,6 +222,8 @@ class Point(object):
             >>> p.format()
             '41 30m 0s N, 0 0m 0s E'
 
+        See also :meth:`.format_unicode`.
+
         :param bool altitude: Whether to include ``altitude`` value.
             By default it is automatically included if it is non-zero.
         """
@@ -247,6 +249,24 @@ class Point(object):
             coordinates.append(self.format_altitude(altitude))
 
         return ", ".join(coordinates)
+
+    def format_unicode(self, altitude=None):
+        """
+        :meth:`.format` with pretty unicode chars for degrees,
+        minutes and seconds::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format_unicode()
+            '41° 30′ 0″ N, 81° 0′ 0″ W, 12.3km'
+
+        .. versionadded:: 1.23.0
+
+        :param bool altitude: Whether to include ``altitude`` value.
+            By default it is automatically included if it is non-zero.
+        """
+        return self.format(
+            altitude, DEGREE, PRIME, DOUBLE_PRIME
+        )
 
     def format_decimal(self, altitude=None):
         """
@@ -293,9 +313,7 @@ class Point(object):
         return self.format()
 
     def __unicode__(self):
-        return self.format(
-            None, DEGREE, PRIME, DOUBLE_PRIME
-        )
+        return self.format_unicode()
 
     def __eq__(self, other):
         if not isinstance(other, collections.Iterable):
