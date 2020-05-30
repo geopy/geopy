@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 from geopy.exc import (
-    ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
     GeocoderQueryError,
@@ -37,7 +36,7 @@ class GeoNames(Geocoder):
 
     def __init__(
             self,
-            username=None,
+            username,
             *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -78,12 +77,6 @@ class GeoNames(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        if username is None:
-            raise ConfigurationError(
-                'No username given, required for api access.  If you do not '
-                'have a GeoNames username, sign up here: '
-                'http://www.geonames.org/login'
-            )
         self.username = username
 
         domain = 'api.geonames.org'
