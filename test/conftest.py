@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 import pytest
 
 import geopy.geocoders
-from geopy.adapters import AdapterHTTPError, BaseAdapter
+from geopy.adapters import AdapterHTTPError, BaseAdapter, BaseSyncAdapter
 from geopy.geocoders.base import _DEFAULT_ADAPTER_CLASS
 
 max_retries = int(os.getenv('GEOPY_TEST_RETRIES', 2))
@@ -235,6 +235,9 @@ class InjectableProxy:
 
     def __getattr__(self, name):
         return getattr(self.target, name)
+
+
+BaseSyncAdapter.register(InjectableProxy)
 
 
 # InjectableProxy allows to substitute an Adapter instance for already

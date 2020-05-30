@@ -63,9 +63,16 @@ class AdapterHTTPError(IOError):
 class BaseAdapter(abc.ABC):
     """Base class for an Adapter.
 
-    To make geocoders use a custom adapter, add an implementation
-    of this class and specify it in
-    the :attr:`geopy.geocoders.options.default_adapter_factory` value.
+    There are two types of adapters:
+
+    - :class:`.BaseSyncAdapter` -- synchronous adapter,
+    - :class:`.BaseAsyncAdapter` -- asynchronous (asyncio) adapter.
+
+    Concrete adapter implementations must extend one of the two
+    base adapters above.
+
+    See :attr:`geopy.geocoders.options.default_adapter_factory`
+    for details on how to specify an adapter to be used by geocoders.
 
     """
 
@@ -133,7 +140,29 @@ class BaseAdapter(abc.ABC):
         pass
 
 
-class URLLibAdapter(BaseAdapter):
+class BaseSyncAdapter(BaseAdapter):
+    """Base class for synchronous adapters.
+    """
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
+class BaseAsyncAdapter(BaseAdapter):
+    """Base class for asynchronous adapters.
+    """
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
+class URLLibAdapter(BaseSyncAdapter):
     """The fallback adapter which uses urllib from the Python standard
     library, see :func:`urllib.request.urlopen`.
 
@@ -224,7 +253,7 @@ class URLLibAdapter(BaseAdapter):
             raise GeocoderParseError("Unable to decode the response bytes")
 
 
-class RequestsAdapter(BaseAdapter):
+class RequestsAdapter(BaseSyncAdapter):
     """The adapter which uses `requests`_ library.
 
     .. _requests: https://requests.readthedocs.io
@@ -282,6 +311,12 @@ class RequestsAdapter(BaseAdapter):
                 pool_block=pool_block,
             ),
         )
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.session.close()
 
     def __del__(self):
         # Cleanup keepalive connections when Geocoder (and, thus, Adapter)

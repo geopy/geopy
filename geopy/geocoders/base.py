@@ -1,7 +1,16 @@
+import asyncio
 import functools
+import inspect
 import threading
 
-from geopy.adapters import AdapterHTTPError, RequestsAdapter, URLLibAdapter
+from geopy import compat
+from geopy.adapters import (
+    AdapterHTTPError,
+    BaseAsyncAdapter,
+    BaseSyncAdapter,
+    RequestsAdapter,
+    URLLibAdapter,
+)
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -234,6 +243,48 @@ class Geocoder:
             proxies=self.proxies,
             ssl_context=self.ssl_context,
         )
+        if isinstance(self.adapter, BaseSyncAdapter):
+            self.__run_async = False
+        elif isinstance(self.adapter, BaseAsyncAdapter):
+            self.__run_async = True
+        else:
+            raise ConfigurationError(
+                "Adapter %r must extend either BaseSyncAdapter or BaseAsyncAdapter"
+                % (type(self.adapter),)
+            )
+
+    def __enter__(self):
+        """Context manager for synchronous adapters. At exit all
+        open connections will be closed.
+
+        In synchronous mode context manager usage is not required,
+        and connections will be automatically closed by garbage collection.
+        """
+        if self.__run_async:
+            raise TypeError("`async with` must be used with async adapters")
+        res = self.adapter.__enter__()
+        assert res is self.adapter, "adapter's __enter__ must return `self`"
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.adapter.__exit__(exc_type, exc_val, exc_tb)
+
+    async def __aenter__(self):
+        """Context manager for asynchronous adapters. At exit all
+        open connections will be closed.
+
+        In asynchronous mode context manager usage is not required,
+        however, it is strongly advised to avoid warnings about
+        resources leaks.
+        """
+        if not self.__run_async:
+            raise TypeError("`async with` cannot be used with sync adapters")
+        res = await self.adapter.__aenter__()
+        assert res is self.adapter, "adapter's __enter__ must return `self`"
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.adapter.__aexit__(exc_type, exc_val, exc_tb)
 
     def _coerce_point_to_string(self, point, output_format="%(lat)s,%(lon)s"):
         """
@@ -309,8 +360,26 @@ class Geocoder:
                 result = self.adapter.get_json(url, timeout=timeout, headers=req_headers)
             else:
                 result = self.adapter.get_text(url, timeout=timeout, headers=req_headers)
-            return callback(result)
-        except AdapterHTTPError as error:
+            if self.__run_async:
+                async def fut():
+                    try:
+                        res = callback(await result)
+                        if inspect.isawaitable(res):
+                            res = await res
+                        return res
+                    except Exception as error:
+                        self._adapter_error_handler(error)
+                        raise
+
+                return fut()
+            else:
+                return callback(result)
+        except Exception as error:
+            self._adapter_error_handler(error)
+            raise
+
+    def _adapter_error_handler(self, error):
+        if isinstance(error, AdapterHTTPError):
             if error.text:
                 logger.info(
                     'Received an HTTP error (%s): %s',
@@ -321,9 +390,8 @@ class Geocoder:
             self._geocoder_exception_handler(error)
             exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
             raise exc_cls(str(error)) from error
-        except Exception as error:
+        else:
             self._geocoder_exception_handler(error)
-            raise
 
     # def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
     #     raise NotImplementedError()
@@ -338,11 +406,51 @@ def _synchronized(func):
 
     This decorator transparently handles sync and async working modes.
     """
-    lock = threading.RLock()
+
+    sync_lock = threading.RLock()
+
+    def locked_sync(self, *args, **kwargs):
+        with sync_lock:
+            return func(self, *args, **kwargs)
+
+    # At the moment this decorator is evaluated we don't know if we
+    # will work in sync or async mode.
+    # But we shouldn't create the asyncio Lock in sync mode to avoid
+    # unwanted implicit loop initialization.
+    async_lock = None  # asyncio.Lock()
+    async_lock_task = None  # support reentrance
+
+    async def locked_async(self, *args, **kwargs):
+        nonlocal async_lock
+        nonlocal async_lock_task
+
+        if async_lock is None:
+            async_lock = asyncio.Lock()
+
+        if async_lock.locked():
+            assert async_lock_task is not None
+            if compat.current_task() is async_lock_task:
+                res = func(self, *args, **kwargs)
+                if inspect.isawaitable(res):
+                    res = await res
+                return res
+
+        async with async_lock:
+            async_lock_task = compat.current_task()
+            try:
+                res = func(self, *args, **kwargs)
+                if inspect.isawaitable(res):
+                    res = await res
+                return res
+            finally:
+                async_lock_task = None
 
     @functools.wraps(func)
     def f(self, *args, **kwargs):
-        with lock:
-            return func(self, *args, **kwargs)
+        run_async = isinstance(self.adapter, BaseAsyncAdapter)
+        if run_async:
+            return locked_async(self, *args, **kwargs)
+        else:
+            return locked_sync(self, *args, **kwargs)
 
     return f
