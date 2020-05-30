@@ -39,15 +39,21 @@ class DummyGeocoder(Geocoder):
         return self._call_geocoder(location, lambda res: res, is_json=is_json)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def timeout():
     return 5
 
 
-@pytest.fixture
-def proxy_server(timeout):
+@pytest.fixture(scope="session")
+def proxy_server_thread(timeout):
     with ProxyServerThread(timeout=timeout) as proxy_server:
         yield proxy_server
+
+
+@pytest.fixture
+def proxy_server(proxy_server_thread):
+    proxy_server_thread.reset()
+    return proxy_server_thread
 
 
 @pytest.fixture
@@ -69,7 +75,7 @@ def inject_proxy_to_system_env(proxy_url):
     os.environ.pop("https_proxy", None)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def http_server(timeout):
     with HttpServerThread(timeout=timeout) as http_server:
         yield http_server
