@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 import pytest
 
@@ -25,11 +24,6 @@ class YandexTestCase(GeocoderTestBase):
             user_agent='my_user_agent/1.0'
         )
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
-
-    def test_warning_with_no_api_key(self):
-        with warnings.catch_warnings(record=True) as w:
-            Yandex()
-        assert len(w) == 1
 
     def test_unicode_name(self):
         self.geocode_run(
