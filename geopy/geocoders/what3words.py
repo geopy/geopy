@@ -1,4 +1,5 @@
 import re
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy import exc
@@ -125,10 +126,8 @@ class What3Words(Geocoder):
 
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one=exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, resources, exactly_one=True):
         """
@@ -214,10 +213,8 @@ class What3Words(Geocoder):
         url = "?".join((self.reverse_api, urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one=exactly_one
-        )
+        callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_reverse_json(self, resources, exactly_one=True):
         """

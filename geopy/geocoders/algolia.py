@@ -1,4 +1,5 @@
 import collections.abc
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -201,11 +202,8 @@ class AlgoliaPlaces(Geocoder):
             headers['X-Algolia-API-Key'] = self.api_key
 
         logger.debug('%s.geocode: %s', self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, headers=headers, timeout=timeout),
-            exactly_one,
-            language=language,
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one, language=language)
+        return self._call_geocoder(url, callback, headers=headers, timeout=timeout)
 
     def reverse(
             self,
@@ -264,11 +262,8 @@ class AlgoliaPlaces(Geocoder):
             headers['X-Algolia-API-Key'] = self.api_key
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, headers=headers, timeout=timeout),
-            exactly_one,
-            language=language,
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one, language=language)
+        return self._call_geocoder(url, callback, headers=headers, timeout=timeout)
 
     @staticmethod
     def _parse_feature(feature, language):

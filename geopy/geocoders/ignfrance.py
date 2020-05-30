@@ -1,5 +1,6 @@
 import base64
 import xml.etree.ElementTree as ET
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
@@ -222,14 +223,10 @@ class IGNFrance(Geocoder):
         url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        raw_xml = self._request_raw_content(url, timeout)
-
-        return self._parse_xml(
-            raw_xml,
-            is_freeform=is_freeform,
-            exactly_one=exactly_one
+        callback = partial(
+            self._parse_xml, is_freeform=is_freeform, exactly_one=exactly_one
         )
+        return self._request_raw_content(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -315,15 +312,13 @@ class IGNFrance(Geocoder):
         url = "?".join((self.api, urlencode({'xls': request_string})))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-
-        raw_xml = self._request_raw_content(url, timeout)
-
-        return self._parse_xml(
-            raw_xml,
+        callback = partial(
+            self._parse_xml,
             exactly_one=exactly_one,
             is_reverse=True,
             is_freeform='false'
         )
+        return self._request_raw_content(url, callback, timeout=timeout)
 
     def _parse_xml(self,
                    page,
@@ -451,7 +446,7 @@ class IGNFrance(Geocoder):
 
         return places
 
-    def _request_raw_content(self, url, timeout):
+    def _request_raw_content(self, url, callback, *, timeout):
         """
         Send the request to get raw content.
         """
@@ -464,14 +459,13 @@ class IGNFrance(Geocoder):
             auth_str = base64.standard_b64encode(credentials).decode()
             headers['Authorization'] = 'Basic {}'.format(auth_str.strip())
 
-        raw_xml = self._call_geocoder(
+        return self._call_geocoder(
             url,
+            callback,
             headers=headers,
             timeout=timeout,
             is_json=False,
         )
-
-        return raw_xml
 
     @staticmethod
     def _parse_place(place, is_freeform=None):

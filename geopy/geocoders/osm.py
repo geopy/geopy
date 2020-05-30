@@ -1,4 +1,5 @@
 import collections.abc
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
@@ -289,10 +290,8 @@ class Nominatim(Geocoder):
 
         url = self._construct_url(self.api, params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -356,10 +355,8 @@ class Nominatim(Geocoder):
 
         url = self._construct_url(self.reverse_api, params)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     @staticmethod
     def parse_code(place):

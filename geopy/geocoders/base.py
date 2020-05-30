@@ -284,6 +284,7 @@ class Geocoder:
     def _call_geocoder(
             self,
             url,
+            callback,
             *,
             timeout=DEFAULT_SENTINEL,
             is_json=True,
@@ -302,9 +303,10 @@ class Geocoder:
 
         try:
             if is_json:
-                return self.adapter.get_json(url, timeout=timeout, headers=req_headers)
+                result = self.adapter.get_json(url, timeout=timeout, headers=req_headers)
             else:
-                return self.adapter.get_text(url, timeout=timeout, headers=req_headers)
+                result = self.adapter.get_text(url, timeout=timeout, headers=req_headers)
+            return callback(result)
         except AdapterHTTPError as error:
             if error.text:
                 logger.info(

@@ -25,8 +25,9 @@ WITH_SYSTEM_PROXIES = bool(getproxies())
 
 class DummyGeocoder(Geocoder):
     def geocode(self, location, *, is_json=False):
-        geo_html = self._call_geocoder(location, is_json=is_json)
-        return geo_html if geo_html else None
+        return self._call_geocoder(
+            location, lambda res: res if res else None, is_json=is_json
+        )
 
 
 @pytest.mark.usefixtures("skip_if_internet_access_is_not_allowed")

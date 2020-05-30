@@ -1,3 +1,4 @@
+from functools import partial
 from urllib.parse import quote, urlencode
 
 from geopy.adapters import AdapterHTTPError
@@ -124,10 +125,8 @@ class TomTom(Geocoder):
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -172,10 +171,8 @@ class TomTom(Geocoder):
         url = "?".join((self.api_reverse % dict(position=quoted_position),
                         urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-
-        return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     @staticmethod
     def _boolean_value(bool_value):

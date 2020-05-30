@@ -1,3 +1,4 @@
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import GeocoderQueryError
@@ -119,8 +120,10 @@ class DataBC(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        response = self._call_geocoder(url, timeout=timeout)
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
+    def _parse_json(self, response, exactly_one):
         # Success; convert from GeoJSON
         if not len(response['features']):
             return None
