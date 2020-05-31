@@ -18,7 +18,8 @@ class GeocodeEarth(Pelias):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
-            ssl_context=DEFAULT_SENTINEL
+            ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
         :param str api_key: Geocode.earth API key, required.
@@ -41,6 +42,11 @@ class GeocodeEarth(Pelias):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         """
         super().__init__(
             api_key=api_key,
@@ -50,4 +56,5 @@ class GeocodeEarth(Pelias):
             user_agent=user_agent,
             scheme=scheme,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )

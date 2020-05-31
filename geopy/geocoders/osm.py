@@ -57,7 +57,8 @@ class Nominatim(Geocoder):
             domain=_DEFAULT_NOMINATIM_DOMAIN,
             scheme=None,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL
+            ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. PickPoint).
     ):
@@ -81,6 +82,11 @@ class Nominatim(Geocoder):
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
         super().__init__(
             scheme=scheme,
@@ -88,6 +94,7 @@ class Nominatim(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
 
         self.domain = domain.strip('/')
