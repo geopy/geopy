@@ -1,3 +1,6 @@
+import functools
+import threading
+
 from geopy.adapters import AdapterHTTPError, RequestsAdapter, URLLibAdapter
 from geopy.exc import (
     ConfigurationError,
@@ -327,3 +330,19 @@ class Geocoder:
 
     # def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
     #     raise NotImplementedError()
+
+
+def _synchronized(func):
+    """A decorator for geocoder methods which makes the method always run
+    under a lock. The lock is reentrant.
+
+    This decorator transparently handles sync and async working modes.
+    """
+    lock = threading.RLock()
+
+    @functools.wraps(func)
+    def f(self, *args, **kwargs):
+        with lock:
+            return func(self, *args, **kwargs)
+
+    return f

@@ -8,7 +8,7 @@ from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderServiceError,
 )
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder, _synchronized
 from geopy.location import Location
 from geopy.util import logger
 
@@ -263,14 +263,17 @@ class ArcGIS(Geocoder):
             call_url = "&".join((url, urlencode({"token": self.token})))
             headers = {"Referer": self.referer}
             return self._call_geocoder(
-                call_url, maybe_reauthenticate_callback, timeout=timeout, headers=headers
+                call_url,
+                partial(maybe_reauthenticate_callback, from_token=self.token),
+                timeout=timeout,
+                headers=headers,
             )
 
-        def maybe_reauthenticate_callback(response):
+        def maybe_reauthenticate_callback(response, *, from_token):
             if "error" in response:
                 if response["error"]["code"] == self._TOKEN_EXPIRED:
                     return self._refresh_authentication_token(
-                        query_retry_callback, timeout=timeout
+                        query_retry_callback, timeout=timeout, from_token=from_token
                     )
             return parse_callback(response)
 
@@ -282,11 +285,18 @@ class ArcGIS(Geocoder):
             )
 
         if self.token is None or int(time()) > self.token_expiry:
-            return self._refresh_authentication_token(query_callback, timeout=timeout)
+            return self._refresh_authentication_token(
+                query_callback, timeout=timeout, from_token=self.token
+            )
         else:
             return query_callback()
 
-    def _refresh_authentication_token(self, callback_success, *, timeout):
+    @_synchronized
+    def _refresh_authentication_token(self, callback_success, *, timeout, from_token):
+        if from_token != self.token:
+            # Token has already been updated by a concurrent call.
+            return callback_success()
+
         token_request_arguments = {
             'username': self.username,
             'password': self.password,
