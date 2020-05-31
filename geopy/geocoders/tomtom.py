@@ -28,6 +28,7 @@ class TomTom(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None,
             domain='api.tomtom.com'
     ):
         """
@@ -49,6 +50,11 @@ class TomTom(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str domain: Domain where the target TomTom service
             is hosted.
         """
@@ -58,6 +64,7 @@ class TomTom(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         self.api = "%s://%s%s" % (self.scheme, domain, self.geocode_path)

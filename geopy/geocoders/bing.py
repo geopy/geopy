@@ -41,7 +41,8 @@ class Bing(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL
+            ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
@@ -63,6 +64,11 @@ class Bing(Geocoder):
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
         super().__init__(
             scheme=scheme,
@@ -70,6 +76,7 @@ class Bing(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         domain = 'dev.virtualearth.net'

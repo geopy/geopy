@@ -29,7 +29,8 @@ class AlgoliaPlaces(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL
+            ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
         :param str app_id: Unique application identifier. It's used to
@@ -57,6 +58,10 @@ class AlgoliaPlaces(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
         super().__init__(
             scheme=scheme,
@@ -64,6 +69,7 @@ class AlgoliaPlaces(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.domain = domain.strip('/')
 

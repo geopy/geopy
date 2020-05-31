@@ -203,7 +203,8 @@ class Geocoder:
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL
+            ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
@@ -221,7 +222,8 @@ class Geocoder:
         if isinstance(self.proxies, str):
             self.proxies = {'http': self.proxies, 'https': self.proxies}
 
-        adapter_factory = options.default_adapter_factory
+        if adapter_factory is None:
+            adapter_factory = options.default_adapter_factory
         self.adapter = adapter_factory(
             proxies=self.proxies,
             ssl_context=self.ssl_context,

@@ -42,11 +42,15 @@ class GeocoderTestCase(unittest.TestCase):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=lambda **kw: sentinel.local_adapter,
         )
         for attr in ('scheme', 'timeout', 'proxies', 'ssl_context'):
             assert locals()[attr] == getattr(geocoder, attr)
         assert user_agent == geocoder.headers['User-Agent']
+        assert sentinel.local_adapter is geocoder.adapter
 
+    @patch.object(geopy.geocoders.options, 'default_adapter_factory',
+                  lambda **kw: sentinel.default_adapter)
     def test_init_with_defaults(self):
         attr_to_option = {
             'scheme': 'default_scheme',
@@ -65,6 +69,7 @@ class GeocoderTestCase(unittest.TestCase):
             geopy.geocoders.options.default_user_agent ==
             geocoder.headers['User-Agent']
         )
+        assert sentinel.default_adapter is geocoder.adapter
 
     @patch.object(geopy.geocoders.options, 'default_proxies', {'https': '192.0.2.0'})
     @patch.object(geopy.geocoders.options, 'default_timeout', 10)
