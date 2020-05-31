@@ -85,13 +85,17 @@ class ProxyServerThread(threading.Thread):
     def set_auth(self, username, password):
         self.auth = "%s:%s" % (username, password)
 
-    def get_proxy_url(self):
+    def get_proxy_url(self, with_scheme=True):
         assert self.socket_created_future.result(self.spinup_timeout)
         if self.auth:
             auth = "%s@" % self.auth
         else:
             auth = ""
-        return "http://%s%s:%s" % (auth, self.proxy_host, self.proxy_port)
+        if with_scheme:
+            scheme = "http://"
+        else:
+            scheme = ""
+        return "%s%s%s:%s" % (scheme, auth, self.proxy_host, self.proxy_port)
 
     def run(self):
         assert not self.proxy_server, ("This class is not reentrable. "

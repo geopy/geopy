@@ -56,9 +56,13 @@ def proxy_server(proxy_server_thread):
     return proxy_server_thread
 
 
-@pytest.fixture
-def proxy_url(proxy_server):
-    return proxy_server.get_proxy_url()
+@pytest.fixture(params=[True, False])
+def proxy_url(request, proxy_server):
+    # Parametrize with proxy urls with and without scheme, e.g.
+    # - `http://localhost:8080`
+    # - `localhost:8080`
+    with_scheme = request.param
+    return proxy_server.get_proxy_url(with_scheme)
 
 
 @pytest.mark.skipif(WITH_SYSTEM_PROXIES, reason="There're active system proxies")
@@ -154,7 +158,10 @@ async def test_geocoder_http_proxy_auth_is_respected(
     base_http = urlopen(remote_website_http, timeout=timeout)
     base_html = base_http.read().decode()
 
-    proxy_url = proxy_server.get_proxy_url()
+    # with_scheme=False causes errors with auth credentials:
+    #   requests: urllib3.exceptions.ProxySchemeUnknown: Not supported proxy scheme user
+    #   aiohttp: ValueError: Only http proxies are supported
+    proxy_url = proxy_server.get_proxy_url(with_scheme=True)
 
     async with make_dummy_async_geocoder(
         proxies={"http": proxy_url}, timeout=timeout
@@ -171,7 +178,7 @@ async def test_geocoder_https_proxy_auth_is_respected(
     base_http = urlopen(remote_website_trusted_https, timeout=timeout)
     base_html = base_http.read().decode()
 
-    proxy_url = proxy_server.get_proxy_url()
+    proxy_url = proxy_server.get_proxy_url(with_scheme=True)
 
     async with make_dummy_async_geocoder(
         proxies={"https": proxy_url}, timeout=timeout
@@ -184,6 +191,7 @@ async def test_geocoder_https_proxy_auth_is_respected(
 async def test_geocoder_http_proxy_auth_error(
     timeout, proxy_server, proxy_url, remote_website_http
 ):
+    # Set up proxy auth but query it without auth:
     proxy_server.set_auth("user", "test")
 
     async with make_dummy_async_geocoder(
@@ -200,6 +208,7 @@ async def test_geocoder_http_proxy_auth_error(
 async def test_geocoder_https_proxy_auth_error(
     timeout, proxy_server, proxy_url, remote_website_trusted_https
 ):
+    # Set up proxy auth but query it without auth:
     proxy_server.set_auth("user", "test")
 
     async with make_dummy_async_geocoder(
@@ -304,8 +313,17 @@ async def test_adapter_exception_for_non_200_response(remote_website_http_404, t
 
 
 async def test_system_proxies_are_respected_by_default(
-    inject_proxy_to_system_env, timeout, proxy_server, remote_website_http
+    inject_proxy_to_system_env,
+    timeout,
+    proxy_server,
+    remote_website_http,
+    adapter_factory,
+    proxy_url,
 ):
+    if "://" not in proxy_url and adapter_factory is AioHTTPAdapter:
+        # ValueError: Only http proxies are supported
+        pytest.xfail("aiohttp requires schema in proxy urls")
+
     async with make_dummy_async_geocoder(timeout=timeout) as geocoder_dummy:
         assert 0 == len(proxy_server.requests)
         await geocoder_dummy.geocode(remote_website_http)
@@ -313,8 +331,17 @@ async def test_system_proxies_are_respected_by_default(
 
 
 async def test_system_proxies_are_respected_with_none(
-    inject_proxy_to_system_env, timeout, proxy_server, remote_website_http
+    inject_proxy_to_system_env,
+    timeout,
+    proxy_server,
+    remote_website_http,
+    adapter_factory,
+    proxy_url,
 ):
+    if "://" not in proxy_url and adapter_factory is AioHTTPAdapter:
+        # ValueError: Only http proxies are supported
+        pytest.xfail("aiohttp requires schema in proxy urls")
+
     # proxies=None means "use system proxies", e.g. from the ENV.
     async with make_dummy_async_geocoder(
         proxies=None, timeout=timeout
@@ -336,8 +363,8 @@ async def test_system_proxies_are_reset_with_empty_dict(
 async def test_string_value_overrides_system_proxies(
     inject_proxy_to_system_env, timeout, proxy_server, proxy_url, remote_website_http
 ):
-    os.environ["http_proxy"] = "127.0.0.1:1"
-    os.environ["https_proxy"] = "127.0.0.1:1"
+    os.environ["http_proxy"] = "localhost:1"
+    os.environ["https_proxy"] = "localhost:1"
 
     async with make_dummy_async_geocoder(
         proxies=proxy_url, timeout=timeout

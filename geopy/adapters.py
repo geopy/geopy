@@ -454,6 +454,8 @@ class AioHTTPAdapter(BaseAsyncAdapter):
         if self.proxies:
             scheme = urlparse(url).scheme
             proxy = self.proxies.get(scheme.lower())
+            if proxy and "://" not in proxy:
+                proxy = "http://%s" % proxy
         else:
             proxy = None
         return self.session.get(
