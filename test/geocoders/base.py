@@ -6,9 +6,10 @@ import pytest
 
 import geopy.geocoders
 import geopy.geocoders.base
+from geopy.adapters import URLLibAdapter
 from geopy.exc import GeocoderNotFound, GeocoderQueryError
 from geopy.geocoders import GoogleV3, get_geocoder_for_service
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, _synchronized
 from geopy.point import Point
 
 
@@ -207,3 +208,44 @@ class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
         bbox = self.method([Point(50, 160), Point(30, 170)],
                            " %(lon2)s|%(lat2)s -- %(lat1)s|%(lon1)s ")
         assert bbox == " 170.0|50.0 -- 30.0|160.0 "
+
+
+def test_synchronize_decorator_sync_simple():
+    geocoder = Geocoder(adapter_factory=URLLibAdapter)
+    calls = []
+
+    @_synchronized
+    def f(self, one, *, two):
+        calls.append((one, two))
+        return 42
+
+    assert 42 == f(geocoder, 1, two=2)
+    assert calls == [(1, 2)]
+
+
+def test_synchronize_decorator_sync_exception():
+    geocoder = Geocoder(adapter_factory=URLLibAdapter)
+
+    @_synchronized
+    def f(self, one, *, two):
+        raise RuntimeError("test")
+
+    with pytest.raises(RuntimeError):
+        f(geocoder, 1, two=2)
+
+
+def test_synchronize_decorator_sync_reentrance():
+    calls = []
+
+    class DummyGeocoder(Geocoder):
+        @_synchronized
+        def f(self, i=0):
+            calls.append(i)
+            if len(calls) < 5:
+                return self.f(i + 1)
+            return 42
+
+    geocoder = DummyGeocoder(adapter_factory=URLLibAdapter)
+
+    assert 42 == geocoder.f()
+    assert calls == list(range(5))
