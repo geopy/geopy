@@ -1,5 +1,7 @@
 import unittest
 
+import pytest
+
 from geopy.compat import u
 from geopy.geocoders import MapBox
 from geopy.point import Point
@@ -33,7 +35,7 @@ class MapBoxTestCase(GeocoderTestBase):
             {"query": new_york_point},
             {"latitude": 40.7537640, "longitude": -73.98489, "delta": 1},
         )
-        self.assertIn("New York", location.address)
+        assert "New York" in location.address
 
     def test_zero_results(self):
         self.geocode_run(
@@ -84,12 +86,12 @@ class MapBoxTestCase(GeocoderTestBase):
     def test_geocode_raw(self):
         result = self.geocode_run({"query": "New York"}, {})
         delta = 1.0
-        self.assertAlmostEqual(-73.8784155, result.raw['center'][0], delta=delta)
-        self.assertAlmostEqual(40.6930727, result.raw['center'][1], delta=delta)
+        expected = pytest.approx((-73.8784155, 40.6930727), abs=delta)
+        assert expected == result.raw['center']
 
     def test_geocode_exactly_one_false(self):
         list_result = self.geocode_run(
             {"query": "maple street", "exactly_one": False},
             {},
         )
-        self.assertGreaterEqual(len(list_result), 3)
+        assert len(list_result) >= 3

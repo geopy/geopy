@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import unittest
 import warnings
 
+import pytest
+
 from geopy.exc import GeocoderInsufficientPrivileges
 from geopy.geocoders import Yandex
 from test.geocoders.util import GeocoderTestBase, env
@@ -25,12 +27,12 @@ class YandexTestCase(GeocoderTestBase):
             api_key='mock',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_warning_with_no_api_key(self):
         with warnings.catch_warnings(record=True) as w:
             Yandex()
-        self.assertEqual(len(w), 1)
+        assert len(w) == 1
 
     def test_unicode_name(self):
         self.geocode_run(
@@ -42,7 +44,7 @@ class YandexTestCase(GeocoderTestBase):
         self.geocoder = Yandex(
             api_key='bad key'
         )
-        with self.assertRaises(GeocoderInsufficientPrivileges):
+        with pytest.raises(GeocoderInsufficientPrivileges):
             self.geocode_run(
                 {"query": "площадь Ленина Донецк"},
                 {}

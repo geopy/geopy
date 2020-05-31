@@ -4,6 +4,9 @@ import os
 import unittest
 from collections import defaultdict
 
+import pytest
+from mock import ANY
+
 from geopy import exc
 from geopy.location import Location
 
@@ -13,9 +16,6 @@ try:
         env.update(json.loads(fp.read()))
 except IOError:
     env.update(os.environ)
-
-
-EMPTY = object()
 
 
 class GeocoderTestBase(unittest.TestCase):
@@ -97,42 +97,28 @@ class GeocoderTestBase(unittest.TestCase):
     def _verify_request(
             self,
             result,
-            latitude=EMPTY,
-            longitude=EMPTY,
-            address=EMPTY,
+            latitude=ANY,
+            longitude=ANY,
+            address=ANY,
             exactly_one=True,
             delta=None,
     ):
         if exactly_one:
-            self.assertIsInstance(result, Location)
+            assert isinstance(result, Location)
         else:
-            self.assertIsInstance(result, list)
+            assert isinstance(result, list)
 
         item = result if exactly_one else result[0]
         delta = delta or self.delta
-        exceptions = []
 
-        if latitude is not EMPTY:
-            try:
-                self.assertAlmostEqual(
-                    item.latitude, latitude, delta=delta,
-                    msg="latitude differs",
-                )
-            except AssertionError as e:
-                exceptions.append(e)
-        if longitude is not EMPTY:
-            try:
-                self.assertAlmostEqual(
-                    item.longitude, longitude, delta=delta,
-                    msg="longitude differs",
-                )
-            except AssertionError as e:
-                exceptions.append(e)
-        if address is not EMPTY:
-            try:
-                self.assertEqual(item.address, address,
-                                 msg="address differs")
-            except AssertionError as e:
-                exceptions.append(e)
-
-        self.assertFalse(exceptions)
+        expected = (
+            pytest.approx(latitude, abs=delta) if latitude is not ANY else ANY,
+            pytest.approx(longitude, abs=delta) if longitude is not ANY else ANY,
+            address,
+        )
+        received = (
+            item.latitude,
+            item.longitude,
+            item.address,
+        )
+        assert received == expected

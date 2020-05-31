@@ -1,5 +1,6 @@
 import unittest
 
+import pytest
 from mock import patch
 
 import geopy.exc
@@ -17,10 +18,10 @@ class What3WordsTestCaseUnitTest(GeocoderTestBase):
             api_key=self.dummy_api_key,
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_http_scheme_is_disallowed(self):
-        with self.assertRaises(geopy.exc.ConfigurationError):
+        with pytest.raises(geopy.exc.ConfigurationError):
             What3Words(
                 api_key=self.dummy_api_key,
                 scheme='http',
@@ -29,9 +30,9 @@ class What3WordsTestCaseUnitTest(GeocoderTestBase):
     @patch.object(geopy.geocoders.options, 'default_scheme', 'http')
     def test_default_scheme_is_ignored(self):
         geocoder = What3Words(api_key=self.dummy_api_key)
-        self.assertEqual(geocoder.scheme, 'https')
+        assert geocoder.scheme == 'https'
         geocoder = What3Words(api_key=self.dummy_api_key, scheme=None)
-        self.assertEqual(geocoder.scheme, 'https')
+        assert geocoder.scheme == 'https'
 
 
 @unittest.skipUnless(
@@ -74,7 +75,7 @@ class What3WordsTestCase(GeocoderTestBase):
         )
 
     def test_empty_response(self):
-        with self.assertRaises(geopy.exc.GeocoderQueryError):
+        with pytest.raises(geopy.exc.GeocoderQueryError):
             self.geocode_run(
                 {"query": "definitely.not.existingiswearrrr"},
                 {},
@@ -107,4 +108,4 @@ class What3WordsTestCase(GeocoderTestBase):
             )
         )
 
-        self.assertTrue(result_check_threeword_query)
+        assert result_check_threeword_query

@@ -61,24 +61,19 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
                  "boundary_rect": [-130.1, 44.1, -100.9, 50.1]},
                 {"latitude": 46.7323875, "longitude": -117.0001651},
             )
-            self.assertEqual(1, len(w))
+            assert 1 == len(w)
 
     def test_geocode_language_parameter(self):
         query = "Graben 7, Wien"
         result_geocode = self.geocode_run(
             {"query": query, "language": "de"}, {}
         )
-        self.assertEqual(
-            result_geocode.raw['properties']['country'],
-            "Österreich"
-        )
+        assert result_geocode.raw['properties']['country'] == "Österreich"
+
         result_geocode = self.geocode_run(
             {"query": query, "language": "en"}, {}
         )
-        self.assertEqual(
-            result_geocode.raw['properties']['country'],
-            "Austria"
-        )
+        assert result_geocode.raw['properties']['country'] == "Austria"
 
     def test_reverse_language_parameter(self):
         query = "48.198674, 16.348388"
@@ -86,19 +81,13 @@ class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
             {"query": query, "exactly_one": True, "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_reverse_de.raw['properties']['country'],
-            "Österreich"
-        )
+        assert result_reverse_de.raw['properties']['country'] == "Österreich"
 
         result_reverse_en = self.reverse_run(
             {"query": query, "exactly_one": True, "language": "en"},
             {},
         )
-        self.assertTrue(
-            result_reverse_en.raw['properties']['country'],
-            "Austria"
-        )
+        assert result_reverse_en.raw['properties']['country'] == "Austria"
 
 
 @unittest.skipUnless(

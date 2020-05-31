@@ -1,6 +1,7 @@
 import warnings
 from abc import ABCMeta, abstractmethod
 
+import pytest
 from mock import patch
 from six import with_metaclass
 
@@ -46,7 +47,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         )
 
     def test_limit(self):
-        with self.assertRaises(ValueError):  # non-positive limit
+        with pytest.raises(ValueError):  # non-positive limit
             self.geocode_run(
                 {"query": "does not matter", "limit": 0, "exactly_one": False},
                 {}
@@ -56,28 +57,27 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": "second street", "limit": 4, "exactly_one": False},
             {}
         )
-        self.assertGreaterEqual(len(result), 3)  # PickPoint sometimes returns 3
-        self.assertGreaterEqual(4, len(result))
+        assert len(result) >= 3  # PickPoint sometimes returns 3
+        assert 4 >= len(result)
 
     @patch.object(geopy.geocoders.options, 'default_user_agent',
                   'mocked_user_agent/0.0.0')
     def test_user_agent_default(self):
         geocoder = self.make_geocoder(user_agent=None)
-        self.assertEqual(geocoder.headers['User-Agent'],
-                         'mocked_user_agent/0.0.0')
+        assert geocoder.headers['User-Agent'] == 'mocked_user_agent/0.0.0'
 
     def test_user_agent_custom(self):
         geocoder = self.make_geocoder(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_reverse(self):
         location = self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.753, "longitude": -73.984}
         )
-        self.assertIn("New York", location.address)
+        assert "New York" in location.address
 
     def test_structured_query(self):
         self.geocode_run(
@@ -99,7 +99,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         except KeyError:
             # MapQuest
             city_district = result.raw['address']['suburb']
-        self.assertEqual(city_district, 'Mitte')
+        assert city_district == 'Mitte'
 
     def test_geocode_language_parameter(self):
         query = "Mohrenstrasse Berlin"
@@ -108,19 +108,13 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
              "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['address']['country'],
-            "Deutschland"
-        )
+        assert result_geocode.raw['address']['country'] == "Deutschland"
         result_geocode = self.geocode_run(
             {"query": query, "addressdetails": True,
              "language": "en"},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['address']['country'],
-            "Germany"
-        )
+        assert result_geocode.raw['address']['country'] == "Germany"
 
     def test_reverse_language_parameter(self):
         query = "52.51693903613385, 13.3859332733135"
@@ -128,59 +122,42 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query, "exactly_one": True, "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_reverse_de.raw['address']['country'],
-            "Deutschland"
-        )
+        assert result_reverse_de.raw['address']['country'] == "Deutschland"
 
         result_reverse_en = self.reverse_run(
             {"query": query, "exactly_one": True, "language": "en"},
             {},
         )
-        self.assertTrue(
-            # have had a change in the exact authority name
-            "Germany" in result_reverse_en.raw['address']['country']
-        )
+        # have had a change in the exact authority name
+        assert "Germany" in result_reverse_en.raw['address']['country']
 
     def test_geocode_geometry_wkt(self):
         result_geocode = self.geocode_run(
             {"query": "Halensee,Berlin", "geometry": 'WKT'},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['geotext'].startswith('POLYGON(('),
-            True
-        )
+        assert result_geocode.raw['geotext'].startswith('POLYGON((')
 
     def test_geocode_geometry_svg(self):
         result_geocode = self.geocode_run(
             {"query": "Halensee,Berlin", "geometry": 'svg'},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['svg'].startswith('M 13.'),
-            True
-        )
+        assert result_geocode.raw['svg'].startswith('M 13.')
 
     def test_geocode_geometry_kml(self):
         result_geocode = self.geocode_run(
             {"query": "Halensee,Berlin", "geometry": 'kml'},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['geokml'].startswith('<Polygon>'),
-            True
-        )
+        assert result_geocode.raw['geokml'].startswith('<Polygon>')
 
     def test_geocode_geometry_geojson(self):
         result_geocode = self.geocode_run(
             {"query": "Halensee,Berlin", "geometry": 'geojson'},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['geojson'].get('type'),
-            'Polygon'
-        )
+        assert result_geocode.raw['geojson'].get('type') == 'Polygon'
 
     def test_missing_reverse_details(self):
         query = (46.46131, 6.84311)
@@ -188,21 +165,21 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query},
             {}
         )
-        self.assertIn("address", res.raw)
+        assert "address" in res.raw
 
         res = self.reverse_run(
             {"query": query, "addressdetails": False},
             {},
         )
-        self.assertNotIn('address', res.raw)
+        assert 'address' not in res.raw
 
     def test_viewbox(self):
         res = self.geocode_run(
             {"query": "Maple Street"},
             {},
         )
-        self.assertFalse(50 <= res.latitude <= 52)
-        self.assertFalse(-0.15 <= res.longitude <= -0.11)
+        assert not (50 <= res.latitude <= 52)
+        assert not (-0.15 <= res.longitude <= -0.11)
 
         for viewbox in [
             ((52, -0.11), (50, -0.15)),
@@ -219,8 +196,8 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": "Maple Street"},
             {},
         )
-        self.assertFalse(50 <= res.latitude <= 52)
-        self.assertFalse(-0.15 <= res.longitude <= -0.11)
+        assert not (50 <= res.latitude <= 52)
+        assert not (-0.15 <= res.longitude <= -0.11)
 
         for viewbox in [
             (-0.11, 52, -0.15, 50),
@@ -232,7 +209,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
                     {"query": "Maple Street", "viewbox": viewbox},
                     {"latitude": 51.5223513, "longitude": -0.1382104}
                 )
-                self.assertEqual(1, len(w))
+                assert 1 == len(w)
 
     def test_bounded(self):
         bb = (Point('56.588456', '84.719353'), Point('56.437293', '85.296822'))
@@ -255,7 +232,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query},
             {},
         )
-        self.assertIsNone(location.raw.get('extratags'))
+        assert location.raw.get('extratags') is None
         location = self.geocode_run(
             {"query": query, "extratags": True},
             {},
@@ -266,7 +243,7 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         # {'wikidata': 'Q1427377'}
         # So let's simply consider just having the `wikidata` key
         # in response a success.
-        self.assertTrue(location.raw['extratags']['wikidata'])
+        assert location.raw['extratags']['wikidata']
 
     def test_country_codes_moscow(self):
         self.geocode_run(
@@ -285,8 +262,8 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
         # We don't care which Moscow is returned, unless it's
         # the Russian one. We can sort this out by asserting
         # the longitudes. The Russian Moscow has positive longitudes.
-        self.assertLess(-119, location.longitude)
-        self.assertLess(location.longitude, -70)
+        assert -119 < location.longitude
+        assert location.longitude < -70
 
     def test_country_codes_str(self):
         self.geocode_run(
@@ -333,13 +310,13 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query, "namedetails": True},
             {},
         )
-        self.assertIn('namedetails', result.raw)
+        assert 'namedetails' in result.raw
 
         result = self.geocode_run(
             {"query": query, "namedetails": False},
             {},
         )
-        self.assertNotIn('namedetails', result.raw)
+        assert 'namedetails' not in result.raw
 
     def test_reverse_zoom_parameter(self):
         query = "40.689253199999996, -74.04454817144321"
@@ -347,15 +324,15 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
             {"query": query, "exactly_one": True, "zoom": 10},
             {},
         )
-        self.assertIn("New York", result_reverse.address)
-        self.assertNotIn("Statue of Liberty", result_reverse.address)
+        assert "New York" in result_reverse.address
+        assert "Statue of Liberty" not in result_reverse.address
 
         result_reverse = self.reverse_run(
             {"query": query, "exactly_one": True},
             {},
         )
-        self.assertIn("New York", result_reverse.address)
-        self.assertIn("Statue of Liberty", result_reverse.address)
+        assert "New York" in result_reverse.address
+        assert "Statue of Liberty" in result_reverse.address
 
 
 class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
@@ -369,16 +346,16 @@ class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             Nominatim()
-            self.assertEqual(1, len(w))
+            assert 1 == len(w)
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             Nominatim(user_agent='my_application')
-            self.assertEqual(0, len(w))
+            assert 0 == len(w)
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             with patch.object(geopy.geocoders.options, 'default_user_agent',
                               'my_application'):
                 Nominatim()
-            self.assertEqual(0, len(w))
+            assert 0 == len(w)

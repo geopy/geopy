@@ -1,3 +1,5 @@
+import pytest
+
 from geopy.compat import u
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders import DataBC
@@ -14,7 +16,7 @@ class DataBCTestCase(GeocoderTestBase):
         geocoder = DataBC(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_geocode(self):
         self.geocode_run(
@@ -33,7 +35,7 @@ class DataBCTestCase(GeocoderTestBase):
             {"query": "1st St", "exactly_one": False},
             {},
         )
-        self.assertGreater(len(res), 1)
+        assert len(res) > 1
 
     def test_optional_params(self):
         self.geocode_run(
@@ -44,7 +46,7 @@ class DataBCTestCase(GeocoderTestBase):
         )
 
     def test_query_error(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.geocode_run(
                 {"query": "1 Main St, Vancouver",
                  "location_descriptor": "access_Point"},

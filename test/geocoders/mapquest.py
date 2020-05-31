@@ -33,7 +33,7 @@ class MapQuestTestCase(GeocoderTestBase):
             {"query": new_york_point},
             {"latitude": 40.7537640, "longitude": -73.98489, "delta": 1},
         )
-        self.assertIn("New York", location.address)
+        assert "New York" in location.address
 
     def test_zero_results(self):
         self.geocode_run(
@@ -60,20 +60,21 @@ class MapQuestTestCase(GeocoderTestBase):
         )
 
     def test_geocode_raw(self):
-        result = self.geocode_run({"query": "New York"}, {})
-        delta = 1.0
-        self.assertAlmostEqual(-74.007228, result.raw['latLng']['lng'], delta=delta)
-        self.assertAlmostEqual(40.713054, result.raw['latLng']['lat'], delta=delta)
+        result = self.geocode_run(
+            {"query": "New York"},
+            {"latitude": 40.713054, "longitude": -74.007228, "delta": 1},
+        )
+        assert result.raw['adminArea1'] == "US"
 
     def test_geocode_limit(self):
         list_result = self.geocode_run(
             {"query": "maple street", "exactly_one": False, "limit": 2},
             {},
         )
-        self.assertEqual(len(list_result), 2)
+        assert len(list_result) == 2
 
         list_result = self.geocode_run(
             {"query": "maple street", "exactly_one": False, "limit": 4},
             {},
         )
-        self.assertEqual(len(list_result), 4)
+        assert len(list_result) == 4

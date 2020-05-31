@@ -2,6 +2,7 @@
 import unittest
 from abc import ABCMeta, abstractmethod
 
+import pytest
 from six import with_metaclass
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
@@ -19,18 +20,18 @@ class IGNFranceTestCaseUnitTest(GeocoderTestBase):
             password='tops3cr3t',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_invalid_auth_1(self):
-        with self.assertRaises(ConfigurationError):
+        with pytest.raises(ConfigurationError):
             IGNFrance(api_key="a")
 
     def test_invalid_auth_2(self):
-        with self.assertRaises(ConfigurationError):
+        with pytest.raises(ConfigurationError):
             IGNFrance(api_key="a", username="b", referer="c")
 
     def test_invalid_auth_3(self):
-        with self.assertRaises(ConfigurationError):
+        with pytest.raises(ConfigurationError):
             IGNFrance(api_key="a", username="b")
 
 
@@ -46,11 +47,11 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         cls.geocoder = cls.make_geocoder()
 
     def test_invalid_query_type(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.geocoder.geocode("44109000EX0114", query_type="invalid")
 
     def test_invalid_query_parcel(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.geocoder.geocode(
                 "incorrect length string",
                 query_type="CadastralParcel",
@@ -107,8 +108,8 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         )
 
         addresses = [location.address for location in res]
-        self.assertIn("02000 Chambry", addresses)
-        self.assertIn("16420 Saint-Christophe", addresses)
+        assert "02000 Chambry" in addresses
+        assert "16420 Saint-Christophe" in addresses
 
     def test_geocode_filter_by_attribute(self):
         res = self.geocode_run(
@@ -123,8 +124,8 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
         departements = [location.raw['departement'] for location in res]
         unique = list(set(departements))
 
-        self.assertEqual(len(unique), 1)
-        self.assertEqual(unique[0], "38")
+        assert len(unique) == 1
+        assert unique[0] == "38"
 
     def test_geocode_filter_by_envelope(self):
         lat_min, lng_min, lat_max, lng_max = 45.00, 5, 46, 6.40
@@ -169,10 +170,7 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
             ])
         )
 
-        self.assertGreater(
-            len(departements_no_spatial),
-            len(departements_spatial)
-        )
+        assert len(departements_no_spatial) > len(departements_spatial)
 
     def test_reverse(self):
         res = self.reverse_run(
@@ -180,13 +178,10 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
              "exactly_one": True},
             {},
         )
-        self.assertEqual(
-            res.address,
-            '7 av camille guerin, 44000 Nantes'
-        )
+        assert res.address == '7 av camille guerin, 44000 Nantes'
 
     def test_reverse_invalid_preference(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.geocoder.reverse(
                 query='47.229554,-1.541519',
                 exactly_one=True,
@@ -201,8 +196,8 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
             {},
         )
         addresses = [location.address for location in res]
-        self.assertIn("3 av camille guerin, 44000 Nantes", addresses)
-        self.assertIn("5 av camille guerin, 44000 Nantes", addresses)
+        assert "3 av camille guerin, 44000 Nantes" in addresses
+        assert "5 av camille guerin, 44000 Nantes" in addresses
 
     def test_reverse_by_radius(self):
         spatial_filtering_radius = """
@@ -236,10 +231,7 @@ class BaseIGNFranceTestCase(with_metaclass(ABCMeta, object)):
             for location in res_call
         ])
 
-        self.assertEqual(
-            coordinates_couples_radius.issubset(coordinates_couples),
-            True
-        )
+        assert coordinates_couples_radius.issubset(coordinates_couples)
 
 
 @unittest.skipUnless(
@@ -306,7 +298,7 @@ class IGNFranceUsernameAuthProxyTestCase(GeocoderTestBase):
         self.proxy_server.join()
 
     def test_proxy_is_respected(self):
-        self.assertEqual(0, len(self.proxy_server.requests))
+        assert 0 == len(self.proxy_server.requests)
         self.geocode_run(
             {"query": "Camp des Landes, 41200 VILLEFRANCHE-SUR-CHER",
              "query_type": "StreetAddress",
@@ -315,4 +307,4 @@ class IGNFranceUsernameAuthProxyTestCase(GeocoderTestBase):
              "longitude": 1.718985,
              "address": "le camp des landes, 41200 Villefranche-sur-Cher"},
         )
-        self.assertEqual(1, len(self.proxy_server.requests))
+        assert 1 == len(self.proxy_server.requests)

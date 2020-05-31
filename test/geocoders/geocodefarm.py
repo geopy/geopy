@@ -28,14 +28,14 @@ class GeocodeFarmTestCase(GeocoderTestBase):
         geocoder = GeocodeFarm(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_geocode(self):
         location = self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
-        self.assertIn("chicago", location.address.lower())
+        assert "chicago" in location.address.lower()
 
     def test_location_address(self):
         self.geocode_run(
@@ -50,11 +50,11 @@ class GeocodeFarmTestCase(GeocoderTestBase):
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
             skiptest_on_failure=True,  # sometimes the result is empty
         )
-        self.assertIn("new york", location.address.lower())
+        assert "new york" in location.address.lower()
 
     def test_authentication_failure(self):
         self.geocoder = GeocodeFarm(api_key="invalid")
-        with self.assertRaises(exc.GeocoderAuthenticationFailure):
+        with pytest.raises(exc.GeocoderAuthenticationFailure):
             self.geocode_run(
                 {"query": '435 north michigan ave, chicago il 60611'},
                 {},
@@ -74,7 +74,7 @@ class GeocodeFarmTestCase(GeocoderTestBase):
             }
 
         with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
-                self.assertRaises(exc.GeocoderQuotaExceeded):
+                pytest.raises(exc.GeocoderQuotaExceeded):
             self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
     def test_no_results(self):
@@ -97,5 +97,5 @@ class GeocodeFarmTestCase(GeocoderTestBase):
             }
 
         with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
-                self.assertRaises(exc.GeocoderServiceError):
+                pytest.raises(exc.GeocoderServiceError):
             self.geocoder.geocode('435 north michigan ave, chicago il 60611')

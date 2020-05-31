@@ -18,14 +18,14 @@ class PhotonTestCase(GeocoderTestBase):
         geocoder = Photon(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_geocode(self):
         location = self.geocode_run(
             {"query": "14 rue pelisson villeurbanne"},
             {"latitude": 45.7733963, "longitude": 4.88612369},
         )
-        self.assertIn("France", location.address)
+        assert "France" in location.address
 
     def test_osm_tag(self):
         self.geocode_run(
@@ -49,15 +49,15 @@ class PhotonTestCase(GeocoderTestBase):
             {"query": Point(45.7733105, 4.8869339)},
             {"latitude": 45.7733105, "longitude": 4.8869339}
         )
-        self.assertIn("France", result.address)
+        assert "France" in result.address
 
     def test_geocode_language_parameter(self):
         result_geocode = self.geocode_run(
             {"query": self.known_country_fr, "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['properties']['country'],
+        assert (
+            result_geocode.raw['properties']['country'] ==
             self.known_country_de
         )
 
@@ -69,8 +69,8 @@ class PhotonTestCase(GeocoderTestBase):
              "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_reverse_it.raw['properties']['country'],
+        assert (
+            result_reverse_it.raw['properties']['country'] ==
             self.known_country_de
         )
 
@@ -80,7 +80,7 @@ class PhotonTestCase(GeocoderTestBase):
              "language": "fr"},
             {},
         )
-        self.assertEqual(
-            result_reverse_fr.raw['properties']['country'],
+        assert (
+            result_reverse_fr.raw['properties']['country'] ==
             self.known_country_fr
         )

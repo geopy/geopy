@@ -1,5 +1,6 @@
 import unittest
 
+import pytest
 from mock import patch
 
 import geopy.geocoders
@@ -18,10 +19,10 @@ class LiveAddressTestCaseUnitTest(GeocoderTestBase):
             auth_token=self.dummy_token,
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_http_scheme_is_disallowed(self):
-        with self.assertRaises(ConfigurationError):
+        with pytest.raises(ConfigurationError):
             LiveAddress(
                 auth_id=self.dummy_id,
                 auth_token=self.dummy_token,
@@ -31,10 +32,10 @@ class LiveAddressTestCaseUnitTest(GeocoderTestBase):
     @patch.object(geopy.geocoders.options, 'default_scheme', 'http')
     def test_default_scheme_is_ignored(self):
         geocoder = LiveAddress(auth_id=self.dummy_id, auth_token=self.dummy_token)
-        self.assertEqual(geocoder.scheme, 'https')
+        assert geocoder.scheme == 'https'
         geocoder = LiveAddress(auth_id=self.dummy_id, auth_token=self.dummy_token,
                                scheme=None)
-        self.assertEqual(geocoder.scheme, 'https')
+        assert geocoder.scheme == 'https'
 
 
 @unittest.skipUnless(

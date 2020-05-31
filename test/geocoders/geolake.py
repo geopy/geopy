@@ -11,7 +11,7 @@ class GeolakeTestCaseUnitTest(GeocoderTestBase):
             api_key='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
 @unittest.skipUnless(

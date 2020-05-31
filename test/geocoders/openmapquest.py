@@ -1,5 +1,7 @@
 import unittest
 
+import pytest
+
 from geopy.exc import ConfigurationError
 from geopy.geocoders import OpenMapQuest
 from test.geocoders.nominatim import BaseNominatimTestCase
@@ -13,10 +15,10 @@ class OpenMapQuestNoNetTestCase(GeocoderTestBase):
             api_key='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_raises_without_apikey(self):
-        with self.assertRaises(ConfigurationError):
+        with pytest.raises(ConfigurationError):
             OpenMapQuest()
 
 

@@ -1,5 +1,7 @@
 import unittest
 
+import pytest
+
 from geopy.compat import u
 from geopy.exc import GeocoderAuthenticationFailure
 from geopy.geocoders import Baidu, BaiduV3
@@ -17,7 +19,7 @@ class BaiduTestCaseUnitTest(GeocoderTestBase):
         )
 
     def test_user_agent_custom(self):
-        self.assertEqual(self.geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert self.geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
 class BaiduQueriesTestCaseMixin:
@@ -57,9 +59,9 @@ class BaiduTestCase(BaiduQueriesTestCaseMixin, GeocoderTestBase):
 
     def test_invalid_ak(self):
         self.geocoder = Baidu(api_key='DUMMYKEY1234')
-        with self.assertRaises(GeocoderAuthenticationFailure) as cm:
+        with pytest.raises(GeocoderAuthenticationFailure) as exc_info:
             self.geocode_run({"query": u("baidu")}, None)
-        self.assertEqual(str(cm.exception), 'Invalid AK')
+        assert str(exc_info.value) == 'Invalid AK'
 
 
 @unittest.skipUnless(

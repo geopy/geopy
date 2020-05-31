@@ -25,14 +25,14 @@ class BaseTomTomTestCase(with_metaclass(ABCMeta, object)):
         geocoder = self.make_geocoder(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_geocode(self):
         location = self.geocode_run(
             {'query': 'москва'},
             {'latitude': 55.75587, 'longitude': 37.61768},
         )
-        self.assertIn('Москва', location.address)
+        assert 'Москва' in location.address
 
     def test_reverse(self):
         location = self.reverse_run(
@@ -40,7 +40,7 @@ class BaseTomTomTestCase(with_metaclass(ABCMeta, object)):
             {'latitude': 51.5285057, 'longitude': -0.1369635,
              "delta": 0.3},
         )
-        self.assertIn('London', location.address)
+        assert 'London' in location.address
         # Russian Moscow address can be reported differently, so
         # we're querying something more ordinary, like London.
         #

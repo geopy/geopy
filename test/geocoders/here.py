@@ -2,6 +2,7 @@ import unittest
 import warnings
 from abc import ABCMeta, abstractmethod
 
+import pytest
 from six import with_metaclass
 
 from geopy import exc
@@ -18,10 +19,10 @@ class HereTestCaseUnitTest(GeocoderTestBase):
             apikey='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_error_with_no_keys(self):
-        with self.assertRaises(exc.ConfigurationError):
+        with pytest.raises(exc.ConfigurationError):
             Here()
 
     def test_warning_with_legacy_auth(self):
@@ -30,14 +31,14 @@ class HereTestCaseUnitTest(GeocoderTestBase):
                 app_id='DUMMYID1234',
                 app_code='DUMMYCODE1234',
             )
-        self.assertEqual(len(w), 1)
+        assert len(w) == 1
 
     def test_no_warning_with_apikey(self):
         with warnings.catch_warnings(record=True) as w:
             Here(
                 apikey='DUMMYKEY1234',
             )
-        self.assertEqual(len(w), 0)
+        assert len(w) == 0
 
 
 class BaseHereTestCase(with_metaclass(ABCMeta, object)):
@@ -106,7 +107,7 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
             {"latitude": 41.89035, "longitude": -87.62333},
         )
         shape_value = res.raw['Location']['Shape']['Value']
-        self.assertTrue(shape_value.startswith('MULTIPOLYGON ((('))
+        assert shape_value.startswith('MULTIPOLYGON (((')
 
     def test_geocode_with_language_de(self):
         address_string = "435 north michigan ave, chicago il 60611 usa"
@@ -114,7 +115,7 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
             {"query": address_string, "language": "de-DE"},
             {}
         )
-        self.assertIn("Vereinigte Staaten", res.address)
+        assert "Vereinigte Staaten" in res.address
 
     def test_geocode_with_language_en(self):
         address_string = "435 north michigan ave, chicago il 60611 usa"
@@ -122,18 +123,18 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
             {"query": address_string, "language": "en-US"},
             {}
         )
-        self.assertIn("United States", res.address)
+        assert "United States" in res.address
 
     def test_geocode_with_paging(self):
         address_string = "Hauptstr., Berlin, Germany"
         input = {"query": address_string, "maxresults": 12, "exactly_one": False}
         res = self.geocode_run(input, {})
-        self.assertEqual(len(res), 12)
+        assert len(res) == 12
 
         input["pageinformation"] = 2
         res = self.geocode_run(input, {})
-        self.assertGreaterEqual(len(res), 3)
-        self.assertLessEqual(len(res), 6)
+        assert len(res) >= 3
+        assert len(res) <= 6
 
         input["pageinformation"] = 3
         res = self.geocode_run(input, {}, expect_failure=True)
@@ -151,7 +152,7 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
              "exactly_one": False},
             {"latitude": 40.753898, "longitude": -73.985071}
         )
-        self.assertGreater(len(res), 5)
+        assert len(res) > 5
 
     def test_reverse_point_radius_10(self):
         # needs more testing
@@ -159,28 +160,28 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
             {"query": Point(40.753898, -73.985071), "radius": 10, "exactly_one": False},
             {"latitude": 40.753898, "longitude": -73.985071}
         )
-        self.assertGreater(len(res), 5)
+        assert len(res) > 5
 
     def test_reverse_with_language_de(self):
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "language": "de-DE"},
             {}
         )
-        self.assertIn("Vereinigte Staaten", res.address)
+        assert "Vereinigte Staaten" in res.address
 
     def test_reverse_with_language_en(self):
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "language": "en-US"},
             {}
         )
-        self.assertIn("United States", res.address)
+        assert "United States" in res.address
 
     def test_reverse_with_mode_areas(self):
         res = self.reverse_run(
             {"query": Point(40.753898, -73.985071), "mode": "retrieveAreas"},
             {}
         )
-        self.assertIn("Theater District-Times Square", res.address)
+        assert "Theater District-Times Square" in res.address
 
     def test_reverse_with_maxresults_5(self):
         res = self.reverse_run(
@@ -191,7 +192,7 @@ class BaseHereTestCase(with_metaclass(ABCMeta, object)):
             },
             {}
         )
-        self.assertEqual(len(res), 5)
+        assert len(res) == 5
 
 
 @unittest.skipUnless(

@@ -1,6 +1,8 @@
 import unittest
 import warnings
 
+import pytest
+
 from geopy import exc
 from geopy.compat import u
 from geopy.geocoders import ArcGIS
@@ -14,7 +16,7 @@ class ArcGISTestCaseUnitTest(GeocoderTestBase):
         geocoder = ArcGIS(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
 class ArcGISTestCase(GeocoderTestBase):
@@ -24,11 +26,11 @@ class ArcGISTestCase(GeocoderTestBase):
         cls.geocoder = ArcGIS(timeout=3)
 
     def test_missing_password_error(self):
-        with self.assertRaises(exc.ConfigurationError):
+        with pytest.raises(exc.ConfigurationError):
             ArcGIS(username='a')
 
     def test_scheme_config_error(self):
-        with self.assertRaises(exc.ConfigurationError):
+        with pytest.raises(exc.ConfigurationError):
             ArcGIS(
                 username='a',
                 password='b',
@@ -61,8 +63,7 @@ class ArcGISTestCase(GeocoderTestBase):
              "out_fields": "Country"},
             {}
         )
-        self.assertDictEqual(result.raw['attributes'],
-                             {'Country': 'GBR'})
+        assert result.raw['attributes'] == {'Country': 'GBR'}
 
     def test_geocode_with_out_fields_list(self):
         result = self.geocode_run(
@@ -70,15 +71,16 @@ class ArcGISTestCase(GeocoderTestBase):
              "out_fields": ["City", "Type"]},
             {}
         )
-        self.assertDictEqual(result.raw['attributes'],
-                             {'City': 'London', 'Type': 'Tourist Attraction'})
+        assert result.raw['attributes'] == {
+            'City': 'London', 'Type': 'Tourist Attraction'
+        }
 
     def test_reverse_point(self):
         location = self.reverse_run(
             {"query": Point(40.753898, -73.985071)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
-        self.assertIn('New York', location.address)
+        assert 'New York' in location.address
 
     def test_reverse_not_exactly_one(self):
         self.reverse_run(
@@ -103,8 +105,8 @@ class ArcGISTestCase(GeocoderTestBase):
                 {"latitude": 40.75376406311989,
                  "longitude": -73.98489005863667},
             )
-            self.assertIn('New York', location.address)
-            self.assertEqual(1, len(w))
+            assert 'New York' in location.address
+            assert 1 == len(w)
 
 
 @unittest.skipUnless(

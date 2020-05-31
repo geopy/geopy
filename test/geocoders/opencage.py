@@ -13,7 +13,7 @@ class OpenCageTestCaseUnitTest(GeocoderTestBase):
             api_key='DUMMYKEY1234',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
 @unittest.skipUnless(
@@ -63,7 +63,7 @@ class OpenCageTestCase(GeocoderTestBase):
                  "bounds": "-130.1,50.1,-100.9,44.1"},
                 {"latitude": 46.7323875, "longitude": -117.0001651},
             )
-            self.assertEqual(1, len(w))
+            assert 1 == len(w)
 
     def test_country_str(self):
         self.geocode_run(

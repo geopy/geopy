@@ -24,21 +24,21 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
         geocoder = self.make_geocoder(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     def test_geocode(self):
         location = self.geocode_run(
             {'query': 'москва'},
             {'latitude': 55.75587, 'longitude': 37.61768},
         )
-        self.assertIn('Москва', location.address)
+        assert 'Москва' in location.address
 
     def test_reverse(self):
         location = self.reverse_run(
             {'query': '51, -0.13', 'language': 'en'},
             {'latitude': 51, 'longitude': -0.13},
         )
-        self.assertIn('A272', location.address)
+        assert 'A272' in location.address
 
     def test_reverse_no_result(self):
         self.reverse_run(
@@ -53,7 +53,7 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
             {'query': 'Madrid', 'type': 'city', 'language': 'en'},
             {},
         )
-        self.assertIn('Madrid', location.address)
+        assert 'Madrid' in location.address
 
     def test_limit(self):
         limit = 5
@@ -63,7 +63,7 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
              'limit': limit},
             {},
         )
-        self.assertEqual(len(locations), limit)
+        assert len(locations) == limit
 
     def test_countries(self):
         countries = ["ES"]
@@ -72,7 +72,7 @@ class AlgoliaPlacesTestCase(GeocoderTestBase):
              'countries': countries},
             {},
         )
-        self.assertIn("Madrid", location.address)
+        assert "Madrid" in location.address
 
     def test_countries_no_result(self):
         countries = ["NO", "IT"]

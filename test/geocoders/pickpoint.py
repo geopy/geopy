@@ -21,4 +21,4 @@ class PickPointTestCase(BaseNominatimTestCase, GeocoderTestBase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             PickPoint(api_key=env['PICKPOINT_KEY'])
-            self.assertEqual(0, len(w))
+            assert 0 == len(w)

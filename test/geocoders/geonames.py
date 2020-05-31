@@ -2,6 +2,7 @@
 import unittest
 import uuid
 
+import pytest
 import pytz
 
 from geopy import Point
@@ -18,7 +19,7 @@ class GeoNamesTestCaseUnitTest(GeocoderTestBase):
             username='DUMMYUSER_NORBERT',
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
 @unittest.skipUnless(
@@ -36,9 +37,9 @@ class GeoNamesTestCase(GeocoderTestBase):
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
         if expected is None:
-            self.assertIsNone(timezone)
+            assert timezone is None
         else:
-            self.assertEqual(timezone.pytz_timezone, expected)
+            assert timezone.pytz_timezone == expected
         return timezone
 
     def test_unicode_name(self):
@@ -54,7 +55,7 @@ class GeoNamesTestCase(GeocoderTestBase):
             {"latitude": 35.65, "longitude": 138.5},
             skiptest_on_failure=True,  # sometimes the result is empty
         )
-        self.assertIn(u("Ry\u016b\u014d"), location.address)
+        assert u("Ry\u016b\u014d") in location.address
 
     def test_reverse(self):
         location = self.reverse_run(
@@ -67,7 +68,7 @@ class GeoNamesTestCase(GeocoderTestBase):
                 "longitude": -73.98489005863667,
             },
         )
-        self.assertIn("Times Square", location.address)
+        assert "Times Square" in location.address
 
     def test_geocode_empty_response(self):
         self.geocode_run(
@@ -77,7 +78,7 @@ class GeoNamesTestCase(GeocoderTestBase):
         )
 
     def test_reverse_nearby_place_name_raises_for_feature_code(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.reverse_run(
                 {
                     "query": "40.75376406311989, -73.98489005863667",
@@ -87,7 +88,7 @@ class GeoNamesTestCase(GeocoderTestBase):
                 {},
             )
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.reverse_run(
                 {
                     "query": "40.75376406311989, -73.98489005863667",
@@ -107,10 +108,10 @@ class GeoNamesTestCase(GeocoderTestBase):
             },
             {},
         )
-        self.assertIn(u'Берлин, Германия', location.address)
+        assert u'Берлин, Германия' in location.address
 
     def test_reverse_find_nearby_raises_for_lang(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.reverse_run(
                 {
                     "query": "40.75376406311989, -73.98489005863667",
@@ -133,7 +134,7 @@ class GeoNamesTestCase(GeocoderTestBase):
                 "longitude": -73.98489005863667,
             },
         )
-        self.assertIn("New York, United States", location.address)
+        assert "New York, United States" in location.address
 
     def test_reverse_find_nearby_feature_code(self):
         self.reverse_run(
@@ -150,7 +151,7 @@ class GeoNamesTestCase(GeocoderTestBase):
         )
 
     def test_reverse_raises_for_unknown_find_nearby_type(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.reverse_run(
                 {
                     "query": "40.75376406311989, -73.98489005863667",
@@ -168,7 +169,7 @@ class GeoNamesTestCase(GeocoderTestBase):
             {"query": new_york_point},
             america_new_york,
         )
-        self.assertEqual(timezone.raw['countryCode'], 'US')
+        assert timezone.raw['countryCode'] == 'US'
 
     def test_reverse_timezone_unknown(self):
         self.reverse_timezone_run(
@@ -211,13 +212,13 @@ class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
     def reverse_timezone_run(self, payload, expected):
         timezone = self._make_request(self.geocoder.reverse_timezone, **payload)
         if expected is None:
-            self.assertIsNone(timezone)
+            assert timezone is None
         else:
-            self.assertEqual(timezone.pytz_timezone, expected)
+            assert timezone.pytz_timezone == expected
         return timezone
 
     def test_geocode(self):
-        with self.assertRaises(GeocoderAuthenticationFailure):
+        with pytest.raises(GeocoderAuthenticationFailure):
             self.geocode_run(
                 {"query": "moscow"},
                 {},
@@ -225,7 +226,7 @@ class GeoNamesInvalidAccountTestCase(GeocoderTestBase):
             )
 
     def test_reverse_timezone(self):
-        with self.assertRaises(GeocoderAuthenticationFailure):
+        with pytest.raises(GeocoderAuthenticationFailure):
             self.reverse_timezone_run(
                 {"query": "40.6997716, -73.9753359"},
                 None,
