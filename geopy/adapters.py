@@ -22,7 +22,14 @@ from socket import timeout as SocketTimeout
 from ssl import SSLError
 from urllib.error import HTTPError
 from urllib.parse import urlparse
-from urllib.request import HTTPSHandler, ProxyHandler, Request, URLError, build_opener
+from urllib.request import (
+    HTTPSHandler,
+    ProxyHandler,
+    Request,
+    URLError,
+    build_opener,
+    getproxies,
+)
 
 from geopy.exc import (
     GeocoderParseError,
@@ -174,6 +181,32 @@ class BaseAsyncAdapter(BaseAdapter):
         pass
 
 
+def _normalize_proxies(proxies):
+    """Normalize user-supplied `proxies`:
+
+    - For `None` -- retrieve System proxies using
+      :func:`urllib.request.getproxies`
+    - Add `http://` scheme to proxy urls if missing.
+    """
+    if proxies is None:  # Use system proxy settings
+        proxies = getproxies()
+    if not proxies:
+        return {}  # Disable proxies
+
+    normalized = {}
+    for scheme, url in proxies.items():
+        if url and "://" not in url:
+            # Without the scheme there are errors:
+            # from aiohttp:
+            #   ValueError: Only http proxies are supported
+            # from requests (in some envs):
+            #   urllib3.exceptions.ProxySchemeUnknown: Not supported
+            #   proxy scheme localhost
+            url = "http://%s" % url
+        normalized[scheme] = url
+    return normalized
+
+
 class URLLibAdapter(BaseSyncAdapter):
     """The fallback adapter which uses urllib from the Python standard
     library, see :func:`urllib.request.urlopen`.
@@ -187,6 +220,7 @@ class URLLibAdapter(BaseSyncAdapter):
     """
 
     def __init__(self, *, proxies, ssl_context):
+        proxies = _normalize_proxies(proxies)
         super().__init__(proxies=proxies, ssl_context=ssl_context)
 
         # `ProxyHandler` should be present even when actually there're
@@ -295,14 +329,12 @@ class RequestsAdapter(BaseSyncAdapter):
                 "this command to install requests: "
                 '`pip install "geopy[requests]"`.'
             )
+        proxies = _normalize_proxies(proxies)
+        super().__init__(proxies=proxies, ssl_context=ssl_context)
 
         self.session = requests.Session()
-        if proxies is None:
-            # Use system proxies:
-            self.session.trust_env = True
-        else:
-            self.session.trust_env = False
-            self.session.proxies = proxies
+        self.session.trust_env = False  # don't use system proxies
+        self.session.proxies = proxies
 
         self.session.mount(
             "http://",
@@ -398,15 +430,14 @@ class AioHTTPAdapter(BaseAsyncAdapter):
                 "this command to install aiohttp: "
                 '`pip install "geopy[aiohttp]"`.'
             )
-        if proxies is not None:
-            # Don't use system proxies:
-            trust_env = False
-        else:
-            trust_env = True
+        proxies = _normalize_proxies(proxies)
+        super().__init__(proxies=proxies, ssl_context=ssl_context)
+
         self.proxies = proxies
         self.ssl_context = ssl_context
         self.session = aiohttp.ClientSession(
-            trust_env=trust_env, raise_for_status=False
+            trust_env=False,  # don't use system proxies
+            raise_for_status=False
         )
 
     async def __aenter__(self):
@@ -454,8 +485,6 @@ class AioHTTPAdapter(BaseAsyncAdapter):
         if self.proxies:
             scheme = urlparse(url).scheme
             proxy = self.proxies.get(scheme.lower())
-            if proxy and "://" not in proxy:
-                proxy = "http://%s" % proxy
         else:
             proxy = None
         return self.session.get(

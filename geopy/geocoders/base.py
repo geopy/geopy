@@ -94,7 +94,7 @@ class options:
             By default the system proxies are respected (e.g.
             `HTTP_PROXY` and `HTTPS_PROXY` env vars or platform-specific
             proxy settings, such as macOS or Windows native
-            preferences -- see :class:`urllib.request.ProxyHandler` for
+            preferences -- see :func:`urllib.request.getproxies` for
             more details). The `proxies` value for using system proxies
             is ``None``.
 
@@ -128,7 +128,7 @@ class options:
               `proxies` dict.
 
             For more information, see
-            documentation on :class:`urllib.request.ProxyHandler`.
+            documentation on :func:`urllib.request.getproxies`.
 
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
