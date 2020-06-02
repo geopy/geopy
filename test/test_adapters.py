@@ -151,17 +151,15 @@ async def test_geocoder_constructor_uses_https_proxy(
         assert 1 == len(proxy_server.requests)
 
 
+@pytest.mark.parametrize("with_scheme", [False, True])
 async def test_geocoder_http_proxy_auth_is_respected(
-    timeout, proxy_server, remote_website_http
+    timeout, proxy_server, remote_website_http, with_scheme
 ):
     proxy_server.set_auth("user", "test")
     base_http = urlopen(remote_website_http, timeout=timeout)
     base_html = base_http.read().decode()
 
-    # with_scheme=False causes errors with auth credentials:
-    #   requests: urllib3.exceptions.ProxySchemeUnknown: Not supported proxy scheme user
-    #   aiohttp: ValueError: Only http proxies are supported
-    proxy_url = proxy_server.get_proxy_url(with_scheme=True)
+    proxy_url = proxy_server.get_proxy_url(with_scheme=with_scheme)
 
     async with make_dummy_async_geocoder(
         proxies={"http": proxy_url}, timeout=timeout
@@ -171,14 +169,15 @@ async def test_geocoder_http_proxy_auth_is_respected(
         assert 1 == len(proxy_server.requests)
 
 
+@pytest.mark.parametrize("with_scheme", [False, True])
 async def test_geocoder_https_proxy_auth_is_respected(
-    timeout, proxy_server, remote_website_trusted_https
+    timeout, proxy_server, remote_website_trusted_https, with_scheme
 ):
     proxy_server.set_auth("user", "test")
     base_http = urlopen(remote_website_trusted_https, timeout=timeout)
     base_html = base_http.read().decode()
 
-    proxy_url = proxy_server.get_proxy_url(with_scheme=True)
+    proxy_url = proxy_server.get_proxy_url(with_scheme=with_scheme)
 
     async with make_dummy_async_geocoder(
         proxies={"https": proxy_url}, timeout=timeout
@@ -320,10 +319,6 @@ async def test_system_proxies_are_respected_by_default(
     adapter_factory,
     proxy_url,
 ):
-    if "://" not in proxy_url and adapter_factory is AioHTTPAdapter:
-        # ValueError: Only http proxies are supported
-        pytest.xfail("aiohttp requires schema in proxy urls")
-
     async with make_dummy_async_geocoder(timeout=timeout) as geocoder_dummy:
         assert 0 == len(proxy_server.requests)
         await geocoder_dummy.geocode(remote_website_http)
@@ -338,10 +333,6 @@ async def test_system_proxies_are_respected_with_none(
     adapter_factory,
     proxy_url,
 ):
-    if "://" not in proxy_url and adapter_factory is AioHTTPAdapter:
-        # ValueError: Only http proxies are supported
-        pytest.xfail("aiohttp requires schema in proxy urls")
-
     # proxies=None means "use system proxies", e.g. from the ENV.
     async with make_dummy_async_geocoder(
         proxies=None, timeout=timeout
