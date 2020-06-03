@@ -76,13 +76,10 @@ class TestBing(BaseTestGeocoder):
         colorado_bias = (39.914231, -105.070104)
         for expected, bias in ((pennsylvania, pennsylvania_bias),
                                (colorado, colorado_bias)):
-            try:
-                await self.geocode_run(
-                    {"query": "20 Main Street", "user_location": Point(bias)},
-                    {"latitude": expected[0], "longitude": expected[1]},
-                )
-            except AssertionError as e:
-                pytest.xfail("Bing ignored user_location: %s" % str(e))
+            await self.geocode_run(
+                {"query": "20 Main Street", "user_location": Point(bias)},
+                {"latitude": expected[0], "longitude": expected[1]},
+            )
 
     async def test_optional_params(self):
         res = await self.geocode_run(
