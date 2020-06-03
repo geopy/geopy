@@ -49,3 +49,8 @@ jobs:
 
     # The `test` stage using the `python` matrix above is included implicitly.
 
+    # Run a single job with asyncio adapter:
+    # (not the whole matrix, to avoid spending extra quota)
+    - stage: test
+      python: "3.5"
+      env: GEOPY_TEST_ADAPTER=geopy.adapters.AioHTTPAdapter
