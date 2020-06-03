@@ -13,7 +13,7 @@ from geopy.geocoders import *  # noqa
 from geopy.location import Location  # noqa
 from geopy.point import Point  # noqa
 from geopy.timezone import Timezone  # noqa
-from geopy.util import __version__  # noqa
+from geopy.util import __version__, __version_info__, get_version  # noqa
 
 # geopy.geocoders.options must not be importable as `geopy.options`,
 # because that is ambiguous (which options are that).
