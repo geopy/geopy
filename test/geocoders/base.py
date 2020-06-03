@@ -115,7 +115,7 @@ class GeocoderTestCase(unittest.TestCase):
     def test_call_geocoder_timeout(self):
         url = 'spam://ham/eggs'
 
-        g = Geocoder()
+        g = Geocoder(adapter_factory=DummySyncAdapter)
         assert g.timeout == 12
 
         with ExitStack() as stack:

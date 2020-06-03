@@ -52,6 +52,7 @@ except ImportError:
 try:
     import aiohttp
     import aiohttp.client_exceptions
+    import yarl
 
     aiohttp_available = True
 except ImportError:
@@ -435,10 +436,20 @@ class AioHTTPAdapter(BaseAsyncAdapter):
 
         self.proxies = proxies
         self.ssl_context = ssl_context
-        self.session = aiohttp.ClientSession(
-            trust_env=False,  # don't use system proxies
-            raise_for_status=False
-        )
+
+    @property
+    def session(self):
+        # Lazy session creation, which allows to avoid "unclosed socket"
+        # warnings if a Geocoder instance is created without entering
+        # async context and making any requests.
+        session = self.__dict__.get("session")
+        if session is None:
+            session = aiohttp.ClientSession(
+                trust_env=False,  # don't use system proxies
+                raise_for_status=False
+            )
+            self.__dict__["session"] = session
+        return session
 
     async def __aenter__(self):
         return self
@@ -487,6 +498,12 @@ class AioHTTPAdapter(BaseAsyncAdapter):
             proxy = self.proxies.get(scheme.lower())
         else:
             proxy = None
+
+        # aiohttp accepts url as string or as yarl.URL.
+        # A string url might be re-encoded by yarl, which might cause
+        # a hashsum of params to change. Some geocoders use that
+        # to authenticate their requests (such as Baidu SK).
+        url = yarl.URL(url, encoded=True)  # `encoded` param disables url re-encoding
         return self.session.get(
             url, timeout=timeout, headers=headers, proxy=proxy, ssl=self.ssl_context
         )
@@ -495,7 +512,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
     def _normalize_exceptions(self):
         try:
             yield
-        except (GeopyError, AdapterHTTPError):
+        except (GeopyError, AdapterHTTPError, AssertionError):
             raise
         except Exception as error:
             message = str(error)
