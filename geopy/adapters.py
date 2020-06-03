@@ -116,7 +116,6 @@ class BaseAdapter(abc.ABC):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
         """
-        pass
 
     @abc.abstractmethod
     def get_json(self, url, *, timeout, headers):
@@ -133,7 +132,6 @@ class BaseAdapter(abc.ABC):
 
         :param dict headers: A dict with custom HTTP request headers.
         """
-        pass
 
     @abc.abstractmethod
     def get_text(self, url, *, timeout, headers):
@@ -157,7 +155,6 @@ class BaseAdapter(abc.ABC):
 
         :param dict headers: A dict with custom HTTP request headers.
         """
-        pass
 
 
 class BaseSyncAdapter(BaseAdapter):

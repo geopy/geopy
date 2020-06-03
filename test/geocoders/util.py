@@ -69,7 +69,7 @@ class BaseTestGeocoder(ABC):
 
     @classmethod
     @abstractmethod
-    def make_geocoder(cls, **kwargs):
+    def make_geocoder(cls, **kwargs):  # pragma: no cover
         pass
 
     async def geocode_run(

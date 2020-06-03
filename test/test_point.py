@@ -148,7 +148,7 @@ class PointTestCase(unittest.TestCase):
             self.assertEqual(2, len(w))
 
     def test_point_degrees_normalization_does_not_lose_precision(self):
-        if sys.float_info.mant_dig != 53:
+        if sys.float_info.mant_dig != 53:  # pragma: no cover
             raise unittest.SkipTest('This platform does not store floats as '
                                     'IEEE 754 double')
         # IEEE 754 double is stored like this:
