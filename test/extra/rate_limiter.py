@@ -1,95 +1,99 @@
-import unittest
-from contextlib import ExitStack
 from unittest.mock import MagicMock, patch, sentinel
+
+import pytest
 
 from geopy.exc import GeocoderQuotaExceeded, GeocoderServiceError
 from geopy.extra.rate_limiter import RateLimiter
 
 
-class RateLimiterTestCase(unittest.TestCase):
+@pytest.fixture
+def mock_clock():
+    with patch.object(RateLimiter, '_clock') as mock_clock:
+        yield mock_clock
 
-    def setUp(self):
-        self._stack = ExitStack()
-        self.mock_clock = self._stack.enter_context(
-            patch.object(RateLimiter, '_clock'))
-        self.mock_sleep = self._stack.enter_context(
-            patch.object(RateLimiter, '_sleep'))
-        self.mock_func = MagicMock()
 
-    def tearDown(self):
-        self._stack.close()
+@pytest.fixture
+def mock_sleep():
+    with patch.object(RateLimiter, '_sleep') as mock_sleep:
+        yield mock_sleep
 
-    def test_min_delay(self):
-        min_delay = 3.5
 
-        self.mock_clock.side_effect = [1]
-        rl = RateLimiter(self.mock_func, min_delay_seconds=min_delay)
+def test_min_delay(mock_clock, mock_sleep):
+    min_delay = 3.5
+    mock_func = MagicMock()
 
-        # First call -- no delay
-        clock_first = 10
-        self.mock_clock.side_effect = [clock_first, clock_first]  # no delay here
-        rl(sentinel.arg, kwa=sentinel.kwa)
-        self.mock_sleep.assert_not_called()
-        self.mock_func.assert_called_once_with(sentinel.arg, kwa=sentinel.kwa)
+    mock_clock.side_effect = [1]
+    rl = RateLimiter(mock_func, min_delay_seconds=min_delay)
 
-        # Second call after min_delay/3 seconds -- should be delayed
-        clock_second = clock_first + (min_delay / 3)
-        self.mock_clock.side_effect = [clock_second, clock_first + min_delay]
-        rl(sentinel.arg, kwa=sentinel.kwa)
-        self.mock_sleep.assert_called_with(min_delay - (clock_second - clock_first))
-        self.mock_sleep.reset_mock()
+    # First call -- no delay
+    clock_first = 10
+    mock_clock.side_effect = [clock_first, clock_first]  # no delay here
+    rl(sentinel.arg, kwa=sentinel.kwa)
+    mock_sleep.assert_not_called()
+    mock_func.assert_called_once_with(sentinel.arg, kwa=sentinel.kwa)
 
-        # Third call after min_delay*2 seconds -- no delay again
-        clock_third = clock_first + min_delay + min_delay * 2
-        self.mock_clock.side_effect = [clock_third, clock_third]
-        rl(sentinel.arg, kwa=sentinel.kwa)
-        self.mock_sleep.assert_not_called()
+    # Second call after min_delay/3 seconds -- should be delayed
+    clock_second = clock_first + (min_delay / 3)
+    mock_clock.side_effect = [clock_second, clock_first + min_delay]
+    rl(sentinel.arg, kwa=sentinel.kwa)
+    mock_sleep.assert_called_with(min_delay - (clock_second - clock_first))
+    mock_sleep.reset_mock()
 
-    def test_max_retries(self):
-        self.mock_clock.return_value = 1
-        rl = RateLimiter(self.mock_func, max_retries=3,
-                         return_value_on_exception=sentinel.return_value)
+    # Third call after min_delay*2 seconds -- no delay again
+    clock_third = clock_first + min_delay + min_delay * 2
+    mock_clock.side_effect = [clock_third, clock_third]
+    rl(sentinel.arg, kwa=sentinel.kwa)
+    mock_sleep.assert_not_called()
 
-        # Non-geopy errors must not be swallowed
-        self.mock_func.side_effect = ValueError
-        with self.assertRaises(ValueError):
-            rl(sentinel.arg)
-        self.assertEqual(1, self.mock_func.call_count)
-        self.mock_func.reset_mock()
 
-        # geopy errors must be swallowed and retried
-        self.mock_func.side_effect = GeocoderServiceError
-        self.assertEqual(sentinel.return_value, rl(sentinel.arg))
-        self.assertEqual(4, self.mock_func.call_count)
-        self.mock_func.reset_mock()
+def test_max_retries(mock_clock, mock_sleep):
+    mock_func = MagicMock()
+    mock_clock.return_value = 1
+    rl = RateLimiter(mock_func, max_retries=3,
+                     return_value_on_exception=sentinel.return_value)
 
-        # Successful value must be returned
-        self.mock_func.side_effect = [
-            GeocoderServiceError, GeocoderServiceError, sentinel.good
-        ]
-        self.assertEqual(sentinel.good, rl(sentinel.arg))
-        self.assertEqual(3, self.mock_func.call_count)
-        self.mock_func.reset_mock()
+    # Non-geopy errors must not be swallowed
+    mock_func.side_effect = ValueError
+    with pytest.raises(ValueError):
+        rl(sentinel.arg)
+    assert 1 == mock_func.call_count
+    mock_func.reset_mock()
 
-        # When swallowing is disabled, the exception must be raised
-        rl.swallow_exceptions = False
-        self.mock_func.side_effect = GeocoderQuotaExceeded
-        with self.assertRaises(GeocoderQuotaExceeded):
-            rl(sentinel.arg)
-        self.assertEqual(4, self.mock_func.call_count)
-        self.mock_func.reset_mock()
+    # geopy errors must be swallowed and retried
+    mock_func.side_effect = GeocoderServiceError
+    assert sentinel.return_value == rl(sentinel.arg)
+    assert 4 == mock_func.call_count
+    mock_func.reset_mock()
 
-    def test_error_wait_seconds(self):
-        error_wait = 3.3
+    # Successful value must be returned
+    mock_func.side_effect = [
+        GeocoderServiceError, GeocoderServiceError, sentinel.good
+    ]
+    assert sentinel.good == rl(sentinel.arg)
+    assert 3 == mock_func.call_count
+    mock_func.reset_mock()
 
-        self.mock_clock.return_value = 1
-        rl = RateLimiter(self.mock_func, max_retries=3,
-                         error_wait_seconds=error_wait,
-                         return_value_on_exception=sentinel.return_value)
+    # When swallowing is disabled, the exception must be raised
+    rl.swallow_exceptions = False
+    mock_func.side_effect = GeocoderQuotaExceeded
+    with pytest.raises(GeocoderQuotaExceeded):
+        rl(sentinel.arg)
+    assert 4 == mock_func.call_count
+    mock_func.reset_mock()
 
-        self.mock_func.side_effect = GeocoderServiceError
-        self.assertEqual(sentinel.return_value, rl(sentinel.arg))
-        self.assertEqual(4, self.mock_func.call_count)
-        self.assertEqual(3, self.mock_sleep.call_count)
-        self.mock_sleep.assert_called_with(error_wait)
-        self.mock_func.reset_mock()
+
+def test_error_wait_seconds(mock_clock, mock_sleep):
+    mock_func = MagicMock()
+    error_wait = 3.3
+
+    mock_clock.return_value = 1
+    rl = RateLimiter(mock_func, max_retries=3,
+                     error_wait_seconds=error_wait,
+                     return_value_on_exception=sentinel.return_value)
+
+    mock_func.side_effect = GeocoderServiceError
+    assert sentinel.return_value == rl(sentinel.arg)
+    assert 4 == mock_func.call_count
+    assert 3 == mock_sleep.call_count
+    mock_sleep.assert_called_with(error_wait)
+    mock_func.reset_mock()
