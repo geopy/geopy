@@ -124,13 +124,13 @@ implementations for many different services in a single package.
 Therefore:
 
 1. Different services have different Terms of Use, quotas, pricing,
-   geodatabases and so on. For example, :class:`geopy.geocoders.Nominatim`
+   geodatabases and so on. For example, :class:`.Nominatim`
    is free, but provides low request limits. If you need to make more queries,
    consider using another (probably paid) service, such as
-   :class:`geopy.geocoders.OpenMapQuest` or :class:`geopy.geocoders.PickPoint`
+   :class:`.OpenMapQuest` or :class:`.PickPoint`
    (these two are commercial providers of Nominatim, so they should
    have the same data and APIs). Or, if you are ready to wait, you can try
-   :class:`geopy.extra.rate_limiter.RateLimiter`.
+   :mod:`geopy.extra.rate_limiter`.
 
 2. geopy cannot be responsible for the geocoding services' databases.
    If you have issues with some queries which the service cannot fulfill,
