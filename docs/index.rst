@@ -55,7 +55,7 @@ Default Options Object
 Usage with Pandas
 -----------------
 
-It's possible to geocode a pandas DataFrame with geopy, however,
+It is possible to geocode a pandas DataFrame with geopy, however,
 rate-limiting must be taken into account.
 
 A large number of DataFrame rows might produce a significant amount of
@@ -63,14 +63,14 @@ geocoding requests to a Geocoding service, which might be throttled
 by the service (e.g. by returning `Too Many Requests` 429 HTTP error
 or timing out).
 
-:class:`geopy.extra.rate_limiter.RateLimiter` class provides a convenient
+:mod:`geopy.extra.rate_limiter` classes provide a convenient
 wrapper, which can be used to automatically add delays between geocoding
 calls to reduce the load on the Geocoding service. Also it can retry
 failed requests and swallow errors for individual rows.
 
 If you're having the `Too Many Requests` error, you may try the following:
 
-- Use :class:`geopy.extra.rate_limiter.RateLimiter` with non-zero
+- Use :mod:`geopy.extra.rate_limiter` with non-zero
   ``min_delay_seconds``.
 - Try a different Geocoding service (please consult with their ToS first,
   as some services prohibit bulk geocoding).
@@ -78,7 +78,17 @@ If you're having the `Too Many Requests` error, you may try the following:
   higher quota.
 - Provision your own local copy of the Geocoding service (such as Nominatim).
 
+Rate Limiter
+++++++++++++
+
+.. automodule:: geopy.extra.rate_limiter
+   :members: __doc__
+
 .. autoclass:: geopy.extra.rate_limiter.RateLimiter
+
+   .. automethod:: __init__
+
+.. autoclass:: geopy.extra.rate_limiter.AsyncRateLimiter
 
    .. automethod:: __init__
 
