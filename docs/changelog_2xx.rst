@@ -9,4 +9,7 @@ Changelog
 -----
 2020-XXX
 
-XXX
+Packaging changes
+~~~~~~~~~~~~~~~~~
+
+- Dropped support for Python 2.7 and 3.4.
