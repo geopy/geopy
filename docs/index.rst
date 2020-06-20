@@ -53,6 +53,14 @@ Geocoders
 .. automodule:: geopy.geocoders
    :members: __doc__
 
+Accessing Geocoders
+-------------------
+
+The typical way of retrieving a geocoder class is to make an import
+from ``geopy.geocoders`` package::
+
+    from geopy.geocoders import Nominatim
+
 .. autofunction:: geopy.geocoders.get_geocoder_for_service
 
 Default Options Object

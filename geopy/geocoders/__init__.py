@@ -264,6 +264,24 @@ def get_geocoder_for_service(service):
     If the string given is not recognized, a
     :class:`geopy.exc.GeocoderNotFound` exception is raised.
 
+    Given that almost all of the geocoders provide the ``geocode``
+    method it could be used to make basic queries based entirely
+    on user input::
+
+        from geopy.geocoders import get_geocoder_for_service
+
+        def geocode(geocoder, config, query):
+            cls = get_geocoder_for_service(geocoder)
+            geolocator = cls(**config)
+            location = geolocator.geocode(query)
+            return location.address
+
+        >>> geocode("nominatim", dict(user_agent="specify_your_app_name_here"), \
+"london")
+        'London, Greater London, England, SW1A 2DX, United Kingdom'
+        >>> geocode("photon", dict(), "london")
+        'London, SW1A 2DX, London, England, United Kingdom'
+
     """
     try:
         return SERVICE_TO_GEOCODER[service.lower()]
