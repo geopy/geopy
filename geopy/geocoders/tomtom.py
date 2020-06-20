@@ -174,8 +174,7 @@ class TomTom(Geocoder):
         callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def _boolean_value(bool_value):
+    def _boolean_value(self, bool_value):
         return 'true' if bool_value else 'false'
 
     def _geocode_params(self, formatted_query):

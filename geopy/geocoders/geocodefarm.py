@@ -174,8 +174,7 @@ class GeocodeFarm(Geocoder):
         else:
             return places
 
-    @staticmethod
-    def _check_for_api_errors(geocoding_results):
+    def _check_for_api_errors(self, geocoding_results):
         """
         Raise any exceptions if there were problems reported
         in the api response.

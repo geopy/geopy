@@ -131,8 +131,7 @@ class LiveAddress(Geocoder):
         else:
             return [self._format_structured_address(c) for c in response]
 
-    @staticmethod
-    def _format_structured_address(address):
+    def _format_structured_address(self, address):
         """
         Pretty-print address and return lat, lon tuple.
         """

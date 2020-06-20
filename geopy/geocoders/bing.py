@@ -210,8 +210,7 @@ class Bing(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def _parse_json(doc, exactly_one=True):
+    def _parse_json(self, doc, exactly_one=True):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """

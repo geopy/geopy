@@ -286,8 +286,7 @@ class Geocoder:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.adapter.__aexit__(exc_type, exc_val, exc_tb)
 
-    @staticmethod
-    def _coerce_point_to_string(point, output_format="%(lat)s,%(lon)s"):
+    def _coerce_point_to_string(self, point, output_format="%(lat)s,%(lon)s"):
         """
         Do the right thing on "point" input. For geocoders with reverse
         methods.
@@ -305,8 +304,9 @@ class Geocoder:
         return output_format % dict(lat=point.latitude,
                                     lon=point.longitude)
 
-    @staticmethod
-    def _format_bounding_box(bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"):
+    def _format_bounding_box(
+        self, bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"
+    ):
         """
         Transform bounding box boundaries to a string matching
         `output_format` from the following formats:

@@ -134,8 +134,7 @@ class DataBC(Geocoder):
             return geocoded[0]
         return geocoded
 
-    @staticmethod
-    def _parse_feature(feature):
+    def _parse_feature(self, feature):
         properties = feature['properties']
         coordinates = feature['geometry']['coordinates']
         return Location(

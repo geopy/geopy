@@ -265,8 +265,7 @@ class AlgoliaPlaces(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one, language=language)
         return self._call_geocoder(url, callback, headers=headers, timeout=timeout)
 
-    @staticmethod
-    def _parse_feature(feature, language):
+    def _parse_feature(self, feature, language):
         # Parse each resource.
         latitude = feature.get('_geoloc', {}).get('lat')
         longitude = feature.get('_geoloc', {}).get('lng')
@@ -281,7 +280,6 @@ class AlgoliaPlaces(Geocoder):
 
         return Location(placename, (latitude, longitude), feature)
 
-    @classmethod
     def _parse_json(self, response, exactly_one, language):
         if response is None or 'hits' not in response:
             return None
