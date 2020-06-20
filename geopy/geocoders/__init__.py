@@ -142,6 +142,8 @@ Therefore:
 If you face any problem with your current geocoding service provider, you can
 always try a different one.
 
+.. _async_mode:
+
 Async Mode
 ~~~~~~~~~~
 
