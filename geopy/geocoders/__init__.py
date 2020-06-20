@@ -142,6 +142,32 @@ Therefore:
 If you face any problem with your current geocoding service provider, you can
 always try a different one.
 
+Async Mode
+~~~~~~~~~~
+
+By default geopy geocoders are synchronous (i.e. they use an Adapter
+based on :class:`.BaseSyncAdapter`).
+
+All geocoders can be used with asyncio by simply switching to an
+Adapter based on :class:`.BaseAsyncAdapter` (like :class:`.AioHTTPAdapter`).
+
+Example::
+
+    from geopy.adapters import AioHTTPAdapter
+    from geopy.geocoders import Nominatim
+
+    async with Nominatim(
+        user_agent="specify_your_app_name_here",
+        adapter_factory=AioHTTPAdapter,
+    ) as geolocator:
+        location = await geolocator.geocode("175 5th Avenue NYC")
+        print(location.address)
+
+Basically the usage is the same as in synchronous mode, except that
+all geocoder calls should be used with ``await``, and the geocoder
+instance should be created by ``async with``. The context manager is optional,
+however, it is strongly advised to use it to avoid resources leaks.
+
 """
 
 __all__ = (
