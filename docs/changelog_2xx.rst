@@ -17,10 +17,31 @@ If you have checked your code on the latest 1.x release with enabled
 warnings (i.e. with ``-Wd`` key of the ``python`` command) and fixed
 all of them, then it should be safe to upgrade.
 
+New features
+~~~~~~~~~~~~
+
+- :mod:`geopy.adapters` module. Previously all geocoders used :mod:`urllib`
+  for HTTP requests, which doesn't support keepalives. Adapters is
+  a new mechanism which allows to use other HTTP client implementations.
+
+  There are 2 implementations coming out of the box:
+
+  + :class:`geopy.adapters.RequestsAdapter` -- uses ``requests`` library
+    which supports keepalives (thus it is significantly more effective
+    than ``urllib``). It is used by default if ``requests`` package
+    is installed.
+  + :class:`geopy.adapters.URLLibAdapter` -- uses ``urllib``, basically
+    it provides the same behavior as in geopy 1.x. It is used by default if
+    ``requests`` package is not installed.
+
+
 Packaging changes
 ~~~~~~~~~~~~~~~~~
 
 - Dropped support for Python 2.7 and 3.4.
+- New extras:
+
+  + ``geopy[requests]`` for :class:`geopy.adapters.RequestsAdapter`.
 
 Chores
 ~~~~~~
