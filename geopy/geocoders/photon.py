@@ -200,14 +200,12 @@ class Photon(Geocoder):
         if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
-            return cls.parse_resource(resources['features'][0])
+            return cls._parse_resource(resources['features'][0])
         else:
-            return [cls.parse_resource(resource) for resource
+            return [cls._parse_resource(resource) for resource
                     in resources['features']]
 
-    @classmethod
-    def parse_resource(cls, resource):
-        # TODO make this a private API
+    def _parse_resource(self, resource):
         # Return location and coordinates tuple from dict.
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',
