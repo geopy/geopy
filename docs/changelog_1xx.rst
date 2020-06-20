@@ -1,7 +1,7 @@
 :orphan:
 
-Changelog
-=========
+Changelog of the 1.x series
+===========================
 1.22.0
 ------
 2020-05-11

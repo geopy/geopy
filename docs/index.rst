@@ -456,10 +456,11 @@ To make the upgrade less painful, please read the changelog before upgrading.
 Changelog
 ~~~~~~~~~
 
+:doc:`Changelog for 2.x.x series <changelog_2xx>`.
+
 :doc:`Changelog for 1.x.x series <changelog_1xx>`.
 
-For changes in the 0.9 series, see the
-:doc:`0.9x changelog <changelog_09x>`.
+:doc:`Changelog for 0.9x series <changelog_09x>`.
 
 
 Indices and search
