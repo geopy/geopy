@@ -358,8 +358,7 @@ class IGNFrance(Geocoder):
                 ) for place in places
             ]
 
-    @staticmethod
-    def _xml_to_json_places(tree, is_reverse=False):
+    def _xml_to_json_places(self, tree, is_reverse=False):
         """
         Transform the xml ElementTree due to XML webservice return to json
         """
@@ -466,8 +465,7 @@ class IGNFrance(Geocoder):
 
         return raw_xml
 
-    @staticmethod
-    def _parse_place(place, is_freeform=None):
+    def _parse_place(self, place, is_freeform=None):
         """
         Get the location, lat, lng and place from a single json place.
         """

@@ -317,8 +317,7 @@ class Here(Geocoder):
             exactly_one
         )
 
-    @staticmethod
-    def _parse_json(doc, exactly_one=True):
+    def _parse_json(self, doc, exactly_one=True):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """

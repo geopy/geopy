@@ -192,17 +192,16 @@ class Photon(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @classmethod
-    def _parse_json(cls, resources, exactly_one=True):
+    def _parse_json(self, resources, exactly_one=True):
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
         if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
-            return cls._parse_resource(resources['features'][0])
+            return self._parse_resource(resources['features'][0])
         else:
-            return [cls._parse_resource(resource) for resource
+            return [self._parse_resource(resource) for resource
                     in resources['features']]
 
     def _parse_resource(self, resource):

@@ -154,8 +154,7 @@ class BANFrance(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @staticmethod
-    def _parse_feature(feature):
+    def _parse_feature(self, feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -163,7 +162,6 @@ class BANFrance(Geocoder):
 
         return Location(placename, (latitude, longitude), feature)
 
-    @classmethod
     def _parse_json(self, response, exactly_one):
         if response is None or 'features' not in response:
             return None

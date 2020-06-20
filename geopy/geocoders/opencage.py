@@ -200,8 +200,7 @@ class OpenCage(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

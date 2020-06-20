@@ -169,8 +169,7 @@ class TomTom(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @staticmethod
-    def _boolean_value(bool_value):
+    def _boolean_value(self, bool_value):
         return 'true' if bool_value else 'false'
 
     def _geocode_params(self, formatted_query):

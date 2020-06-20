@@ -144,7 +144,7 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
     coordinates_address = "175 5th Avenue, NYC, USA"
 
     def setUp(self):
-        self.method = Geocoder._coerce_point_to_string
+        self.method = Geocoder()._coerce_point_to_string
 
     def test_point(self):
         latlon = self.method(Point(*self.coordinates))
@@ -176,7 +176,7 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
 class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.method = Geocoder._format_bounding_box
+        self.method = Geocoder()._format_bounding_box
 
     def test_string_raises(self):
         with pytest.raises(GeocoderQueryError):

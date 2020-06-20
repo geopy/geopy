@@ -135,8 +135,7 @@ class GoogleV3(Geocoder):
             self.scheme, self.domain, path, signature
         )
 
-    @staticmethod
-    def _format_components_param(components):
+    def _format_components_param(self, components):
         """
         Format the components dict to something Google understands.
         """
@@ -402,8 +401,7 @@ class GoogleV3(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

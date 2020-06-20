@@ -77,8 +77,7 @@ class Baidu(Geocoder):
         self.reverse_api = '%s://api.map.baidu.com%s' % (self.scheme, self.reverse_path)
         self.security_key = security_key
 
-    @staticmethod
-    def _format_components_param(components):
+    def _format_components_param(self, components):
         """
         Format the components dict to something Baidu understands.
         """
@@ -202,8 +201,7 @@ class Baidu(Geocoder):
         else:
             return [parse_place(item) for item in place]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

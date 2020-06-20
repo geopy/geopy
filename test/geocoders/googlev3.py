@@ -105,7 +105,7 @@ class GoogleV3TestCase(GeocoderTestBase):
         assert 'client' in params
 
     def test_format_components_param(self):
-        f = GoogleV3._format_components_param
+        f = self.geocoder._format_components_param
         assert f({}) == ''
         assert f([]) == ''
 
