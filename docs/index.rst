@@ -423,12 +423,8 @@ are still being made in minor releases, such as:
 - Backwards-incompatible changes of the undocumented API. This shouldn't
   affect anyone, unless they extend geocoder classes or use undocumented
   features or monkey-patch anything. If you believe that something is
-  missing in geopy, please consider opening an issue or providing a patch
-  or a PR instead of hacking around geopy.
-
-- Geocoder classes which simply don't work (usually because their service
-  has been discontinued) might get removed. They don't work anyway, so
-  that's hardly a breaking change, right? :)
+  missing in geopy, please consider opening an issue or providing
+  a patch/PR instead of hacking around geopy.
 
 - Geocoding services sometimes introduce new APIs and deprecate the previous
   ones. We try to upgrade without breaking the geocoder's API interface,
@@ -436,11 +432,11 @@ are still being made in minor releases, such as:
   backwards-incompatible way.
 
 - Behavior for invalid input and peculiar edge cases might be altered.
-  For example, :class:`geopy.point.Point` instances did coordinate values
-  normalization, though it's not documented, and it was completely wrong
-  for the latitudes outside the `[-90; 90]` range. So instead of using an
-  incorrectly normalized value for latitude, an :class:`ValueError`
-  exception is now thrown (#294).
+  For example, :class:`geopy.point.Point` instances previously did
+  coordinate values normalization, though it's not documented, and it was
+  completely wrong for the latitudes outside the `[-90; 90]` range.
+  So instead of using an incorrectly normalized value for latitude,
+  a :class:`ValueError` exception is now thrown (#294).
 
 
 To make the upgrade less painful, please read the changelog before upgrading.
