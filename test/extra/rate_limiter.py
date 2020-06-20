@@ -1,4 +1,4 @@
-import warnings
+import asyncio
 from unittest.mock import MagicMock, patch, sentinel
 
 import pytest
@@ -156,12 +156,13 @@ async def test_sync_raises_for_awaitable():
     def g():  # non-async function returning an awaitable -- like `geocode`.
         async def coro():
             pass  # pragma: no cover
-        return coro()
+
+        # Make a task from the coroutine, to avoid
+        # the `coroutine 'coro' was never awaited` warning:
+        task = asyncio.ensure_future(coro())
+        return task
 
     rl = RateLimiter(g)
 
-    # silence `coroutine 'coro' was never awaited`:
-    with warnings.catch_warnings(record=True):
-
-        with pytest.raises(ValueError):
-            await rl()
+    with pytest.raises(ValueError):
+        await rl()
