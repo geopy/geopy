@@ -68,9 +68,9 @@ class BaseNominatimTestCase(with_metaclass(ABCMeta, object)):
 
     def test_user_agent_custom(self):
         geocoder = self.make_geocoder(
-            user_agent='my_user_agent/1.0'
+            user_agent='my_test_application'
         )
-        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
+        assert geocoder.headers['User-Agent'] == 'my_test_application'
 
     def test_reverse(self):
         location = self.reverse_run(
@@ -348,6 +348,13 @@ class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
             Nominatim()
             assert 1 == len(w)
 
+    def test_example_user_agent_warning(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            Nominatim(user_agent="specify_your_app_name_here")
+            assert 1 == len(w)
+
+    def test_custom_user_agent_works(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             Nominatim(user_agent='my_application')

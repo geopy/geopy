@@ -9,6 +9,14 @@ from geopy.util import logger
 __all__ = ("Nominatim", )
 
 _DEFAULT_NOMINATIM_DOMAIN = 'nominatim.openstreetmap.org'
+_REJECTED_USER_AGENTS = (
+    # Various sample user-agent strings mentioned in docs:
+    "my-application",
+    "my_app/1",
+    "my_user_agent/1.0",
+    "specify_your_app_name_here",
+    _DEFAULT_USER_AGENT,
+)
 
 
 class Nominatim(Geocoder):
@@ -175,9 +183,9 @@ class Nominatim(Geocoder):
         self.domain = domain.strip('/')
 
         if (self.domain == _DEFAULT_NOMINATIM_DOMAIN
-                and self.headers['User-Agent'] == _DEFAULT_USER_AGENT):
+                and self.headers['User-Agent'] in _REJECTED_USER_AGENTS):
             warnings.warn(
-                'Using Nominatim with the default "%s" `user_agent` is '
+                'Using Nominatim with default or sample `user_agent` "%s" is '
                 'strongly discouraged, as it violates Nominatim\'s ToS '
                 'https://operations.osmfoundation.org/policies/nominatim/ '
                 'and may possibly cause 403 and 429 HTTP errors. '
@@ -186,7 +194,7 @@ class Nominatim(Geocoder):
                 'overriding the default `user_agent`: '
                 '`geopy.geocoders.options.default_user_agent = "my-application"`. '
                 'In geopy 2.0 this will become an exception.'
-                % _DEFAULT_USER_AGENT,
+                % self.headers['User-Agent'],
                 DeprecationWarning,
                 stacklevel=2
             )
