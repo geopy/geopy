@@ -202,9 +202,7 @@ class Pelias(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def parse_code(feature):
-        # TODO make this a private API
+    def _parse_code(self, feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -218,6 +216,6 @@ class Pelias(Geocoder):
         if not len(features):
             return None
         if exactly_one:
-            return self.parse_code(features[0])
+            return self._parse_code(features[0])
         else:
-            return [self.parse_code(feature) for feature in features]
+            return [self._parse_code(feature) for feature in features]

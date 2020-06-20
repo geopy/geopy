@@ -358,9 +358,7 @@ class Nominatim(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def parse_code(place):
-        # TODO make this a private API
+    def _parse_code(self, place):
         # Parse each resource.
         latitude = place.get('lat', None)
         longitude = place.get('lon', None)
@@ -376,6 +374,6 @@ class Nominatim(Geocoder):
         if not isinstance(places, collections.abc.Sequence):
             places = [places]
         if exactly_one:
-            return self.parse_code(places[0])
+            return self._parse_code(places[0])
         else:
-            return [self.parse_code(place) for place in places]
+            return [self._parse_code(place) for place in places]

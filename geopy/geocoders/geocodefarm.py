@@ -140,9 +140,7 @@ class GeocodeFarm(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def parse_code(results):
-        # TODO make this a private API
+    def _parse_code(self, results):
         # Parse each resource.
         places = []
         for result in results.get('RESULTS'):
@@ -170,7 +168,7 @@ class GeocodeFarm(Geocoder):
         if "NO_RESULTS" in geocoding_results.get("STATUS", {}).get("status", ""):
             return None
 
-        places = self.parse_code(geocoding_results)
+        places = self._parse_code(geocoding_results)
         if exactly_one:
             return places[0]
         else:
