@@ -1,4 +1,3 @@
-import functools
 import json
 from socket import timeout as SocketTimeout
 from ssl import SSLError
@@ -176,11 +175,12 @@ class Geocoder:
 
     def __init__(
             self,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
@@ -211,8 +211,7 @@ class Geocoder:
         )
         self.urlopen = opener.open
 
-    @staticmethod
-    def _coerce_point_to_string(point, output_format="%(lat)s,%(lon)s"):
+    def _coerce_point_to_string(self, point, output_format="%(lat)s,%(lon)s"):
         """
         Do the right thing on "point" input. For geocoders with reverse
         methods.
@@ -230,8 +229,9 @@ class Geocoder:
         return output_format % dict(lat=point.latitude,
                                     lon=point.longitude)
 
-    @staticmethod
-    def _format_bounding_box(bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"):
+    def _format_bounding_box(
+        self, bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"
+    ):
         """
         Transform bounding box boundaries to a string matching
         `output_format` from the following formats:
@@ -265,43 +265,25 @@ class Geocoder:
     def _call_geocoder(
             self,
             url,
+            *,
             timeout=DEFAULT_SENTINEL,
-            raw=False,
-            requester=None,
-            deserializer=json.loads,
-            **kwargs
+            is_json=True,
+            headers=None
     ):
         """
         For a generated query URL, get the results.
         """
 
-        if requester:
-            req = url  # Don't construct an urllib's Request for a custom requester.
-
-            # `requester` might be anything which can issue an HTTP request.
-            # Assume that `requester` is a method of the `requests` library.
-            # Requests, however, doesn't accept SSL context in its HTTP
-            # request methods. A custom HTTP adapter has to be created for that.
-            # So the current usage is not directly compatible with `requests`.
-            requester = functools.partial(requester, context=self.ssl_context,
-                                          proxies=self.proxies,
-                                          headers=self.headers)
-        else:
-            if isinstance(url, Request):
-                # copy Request
-                headers = self.headers.copy()
-                headers.update(url.header_items())
-                req = Request(url=url.get_full_url(), headers=headers)
-            else:
-                req = Request(url=url, headers=self.headers)
-
-        requester = requester or self.urlopen
+        req_headers = self.headers.copy()
+        if headers:
+            req_headers.update(headers)
+        req = Request(url=url, headers=req_headers)
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)
 
         try:
-            page = requester(req, timeout=timeout, **kwargs)
+            page = self.urlopen(req, timeout=timeout)
         except Exception as error:
             message = (
                 str(error.args[0])
@@ -344,14 +326,11 @@ class Geocoder:
         if status_code in ERROR_CODE_MAP:
             raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
 
-        if raw:
-            return page
-
         page = decode_page(page)
 
-        if deserializer is not None:
+        if is_json:
             try:
-                return deserializer(page)
+                return json.loads(page)
             except ValueError:
                 raise GeocoderParseError(
                     "Could not deserialize using deserializer:\n%s" % page
@@ -367,14 +346,8 @@ class Geocoder:
                          exc_info=True)
             return None
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
-        """
-        Implemented in subclasses.
-        """
-        raise NotImplementedError()
+    # def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    #     raise NotImplementedError()
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
-        """
-        Implemented in subclasses.
-        """
-        raise NotImplementedError()
+    # def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    #     raise NotImplementedError()

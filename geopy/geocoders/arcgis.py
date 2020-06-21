@@ -1,7 +1,6 @@
 import json
 from time import time
 from urllib.parse import urlencode
-from urllib.request import Request
 
 from geopy.exc import (
     ConfigurationError,
@@ -35,6 +34,7 @@ class ArcGIS(Geocoder):
             self,
             username=None,
             password=None,
+            *,
             referer=None,
             token_lifetime=60,
             scheme=None,
@@ -43,7 +43,7 @@ class ArcGIS(Geocoder):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             auth_domain='www.arcgis.com',
-            domain='geocode.arcgis.com',
+            domain='geocode.arcgis.com'
     ):
         """
 
@@ -133,13 +133,11 @@ class ArcGIS(Geocoder):
         """
         if self.token is None or int(time()) > self.token_expiry:
             self._refresh_authentication_token()
-        request = Request(
-            "&".join((url, urlencode({"token": self.token}))),
-            headers={"Referer": self.referer}
-        )
-        return self._base_call_geocoder(request, timeout=timeout)
+        url = "&".join((url, urlencode({"token": self.token})))
+        headers = {"Referer": self.referer}
+        return self._base_call_geocoder(url, timeout=timeout, headers=headers)
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
+    def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 out_fields=None):
         """
         Return a location point by address.
@@ -202,7 +200,7 @@ class ArcGIS(Geocoder):
             return geocoded[0]
         return geocoded
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL,
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL,
                 distance=None):
         """
         Return an address by location point.

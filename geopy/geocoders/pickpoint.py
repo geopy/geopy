@@ -17,12 +17,13 @@ class PickPoint(Nominatim):
     def __init__(
             self,
             api_key,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='api.pickpoint.io',
             scheme=None,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 

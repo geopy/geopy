@@ -1,7 +1,6 @@
 import base64
 import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
-from urllib.request import Request
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -39,6 +38,7 @@ class IGNFrance(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             username=None,
             password=None,
             referer=None,
@@ -47,7 +47,7 @@ class IGNFrance(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -121,12 +121,13 @@ class IGNFrance(Geocoder):
     def geocode(
             self,
             query,
+            *,
             query_type='StreetAddress',
             maximum_responses=25,
             is_freeform=False,
             filtering=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -226,11 +227,12 @@ class IGNFrance(Geocoder):
     def reverse(
             self,
             query,
+            *,
             reverse_geocode_preference=('StreetAddress', ),
             maximum_responses=25,
             filtering='',
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
@@ -356,8 +358,7 @@ class IGNFrance(Geocoder):
                 ) for place in places
             ]
 
-    @staticmethod
-    def _xml_to_json_places(tree, is_reverse=False):
+    def _xml_to_json_places(self, tree, is_reverse=False):
         """
         Transform the xml ElementTree due to XML webservice return to json
         """
@@ -446,29 +447,25 @@ class IGNFrance(Geocoder):
         """
         Send the request to get raw content.
         """
-
-        request = Request(url)
-
+        headers = {}
         if self.referer is not None:
-            request.add_header('Referer', self.referer)
+            headers['Referer'] = self.referer
 
         if self.username and self.password and self.referer is None:
             credentials = '{0}:{1}'.format(self.username, self.password).encode()
             auth_str = base64.standard_b64encode(credentials).decode()
-            request.add_unredirected_header(
-                'Authorization',
-                'Basic {}'.format(auth_str.strip()))
+            headers['Authorization'] = 'Basic {}'.format(auth_str.strip())
 
         raw_xml = self._call_geocoder(
-            request,
+            url,
+            headers=headers,
             timeout=timeout,
-            deserializer=None
+            is_json=False,
         )
 
         return raw_xml
 
-    @staticmethod
-    def _parse_place(place, is_freeform=None):
+    def _parse_place(self, place, is_freeform=None):
         """
         Get the location, lat, lng and place from a single json place.
         """

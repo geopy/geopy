@@ -17,12 +17,13 @@ class AzureMaps(TomTom):
     def __init__(
             self,
             subscription_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='atlas.microsoft.com',
+            domain='atlas.microsoft.com'
     ):
         """
         :param str subscription_key: Azure Maps subscription key.

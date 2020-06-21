@@ -9,6 +9,14 @@ Changelog
 -----
 2020-XXX
 
+geopy 2.0 is a major release with lots of cleanup and inner refactorings.
+The public interface of the library is mostly the same, and the set
+of supported geocoders didn't change.
+
+If you have checked your code on the latest 1.x release with enabled
+warnings (i.e. with ``-Wd`` key of the ``python`` command) and fixed
+all of them, then it should be safe to upgrade.
+
 Packaging changes
 ~~~~~~~~~~~~~~~~~
 
@@ -45,3 +53,9 @@ Chores
   used with a default or sample user-agent.
 - :class:`.Point` now raises a ``ValueError`` if constructed from a single number.
   A zero longitude must be explicitly passed to avoid the error.
+- Most of the service-specific arguments of geocoders now must be passed
+  as kwargs, positional arguments are not accepted.
+- Removed default value ``None`` for authentication key arguments of
+  :class:`.GeoNames`, :class:`.OpenMapQuest` and :class:`.Yandex`.
+- ``parse_*`` methods in geocoders have been prefixed with ``_``
+  to explicitly mark that they are private.

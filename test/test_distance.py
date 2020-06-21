@@ -260,9 +260,9 @@ class CommonDistanceCases(CommonDistanceComputationCases,
 
 
 class TestWhenInstantiatingBaseDistanceClass(unittest.TestCase):
-    def test_should_not_be_able_to_give_multiple_points(self):
-        with self.assertRaises(NotImplementedError):
-            Distance(1, 2, 3, 4)
+    def test_should_not_be_able_to_instantiate(self):
+        with self.assertRaises(TypeError):
+            Distance((0, 0), (0, 180))
 
 
 class TestDefaultDistanceClass(unittest.TestCase):

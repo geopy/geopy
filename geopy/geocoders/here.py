@@ -40,6 +40,7 @@ class Here(Geocoder):
 
     def __init__(
             self,
+            *,
             app_id=None,
             app_code=None,
             apikey=None,
@@ -47,7 +48,7 @@ class Here(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -130,6 +131,7 @@ class Here(Geocoder):
     def geocode(
             self,
             query,
+            *,
             bbox=None,
             mapview=None,
             exactly_one=True,
@@ -237,6 +239,7 @@ class Here(Geocoder):
     def reverse(
             self,
             query,
+            *,
             radius=None,
             exactly_one=True,
             maxresults=None,
@@ -314,8 +317,7 @@ class Here(Geocoder):
             exactly_one
         )
 
-    @staticmethod
-    def _parse_json(doc, exactly_one=True):
+    def _parse_json(self, doc, exactly_one=True):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """

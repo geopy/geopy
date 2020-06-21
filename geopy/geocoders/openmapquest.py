@@ -1,4 +1,3 @@
-from geopy.exc import ConfigurationError
 from geopy.geocoders.base import DEFAULT_SENTINEL
 from geopy.geocoders.osm import Nominatim
 
@@ -24,13 +23,14 @@ class OpenMapQuest(Nominatim):
 
     def __init__(
             self,
-            api_key=None,
+            api_key,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='open.mapquestapi.com',
             scheme=None,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -63,8 +63,6 @@ class OpenMapQuest(Nominatim):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        if not api_key:
-            raise ConfigurationError('OpenMapQuest requires an API key')
         self.api_key = api_key
 
     def _construct_url(self, base_api, params):

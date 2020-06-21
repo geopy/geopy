@@ -24,12 +24,13 @@ class Photon(Geocoder):
 
     def __init__(
             self,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='photon.komoot.de',
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -67,6 +68,7 @@ class Photon(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             location_bias=None,
@@ -140,10 +142,11 @@ class Photon(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=False,
-            limit=None,
+            limit=None
     ):
         """
         Return an address by location point.
@@ -189,22 +192,19 @@ class Photon(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @classmethod
-    def _parse_json(cls, resources, exactly_one=True):
+    def _parse_json(self, resources, exactly_one=True):
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
         if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
-            return cls.parse_resource(resources['features'][0])
+            return self._parse_resource(resources['features'][0])
         else:
-            return [cls.parse_resource(resource) for resource
+            return [self._parse_resource(resource) for resource
                     in resources['features']]
 
-    @classmethod
-    def parse_resource(cls, resource):
-        # TODO make this a private API
+    def _parse_resource(self, resource):
         # Return location and coordinates tuple from dict.
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',

@@ -27,12 +27,13 @@ class MapQuest(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='www.mapquestapi.com',
+            domain='www.mapquestapi.com'
     ):
         """
         :param str api_key: The API key required by Mapquest to perform
@@ -111,6 +112,7 @@ class MapQuest(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
@@ -167,6 +169,7 @@ class MapQuest(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL
     ):

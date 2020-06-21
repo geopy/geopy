@@ -105,7 +105,7 @@ class GoogleV3TestCase(GeocoderTestBase):
         assert 'client' in params
 
     def test_format_components_param(self):
-        f = GoogleV3._format_components_param
+        f = self.geocoder._format_components_param
         assert f({}) == ''
         assert f([]) == ''
 
@@ -262,7 +262,7 @@ class GoogleV3TestCase(GeocoderTestBase):
 
     def test_timezone_invalid_at_time(self):
         with pytest.raises(exc.GeocoderQueryError):
-            self.geocoder.reverse_timezone(self.new_york_point, "eek")
+            self.geocoder.reverse_timezone(self.new_york_point, at_time="eek")
 
     def test_reverse_timezone_unknown(self):
         self.reverse_timezone_run(

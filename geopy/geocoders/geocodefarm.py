@@ -25,11 +25,12 @@ class GeocodeFarm(Geocoder):
     def __init__(
             self,
             api_key=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            scheme=None,
+            scheme=None
     ):
         """
 
@@ -68,7 +69,7 @@ class GeocodeFarm(Geocoder):
             "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return a location point by address.
 
@@ -96,7 +97,7 @@ class GeocodeFarm(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return an address by location point.
 
@@ -133,9 +134,7 @@ class GeocodeFarm(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @staticmethod
-    def parse_code(results):
-        # TODO make this a private API
+    def _parse_code(self, results):
         # Parse each resource.
         places = []
         for result in results.get('RESULTS'):
@@ -163,14 +162,13 @@ class GeocodeFarm(Geocoder):
         if "NO_RESULTS" in geocoding_results.get("STATUS", {}).get("status", ""):
             return None
 
-        places = self.parse_code(geocoding_results)
+        places = self._parse_code(geocoding_results)
         if exactly_one:
             return places[0]
         else:
             return places
 
-    @staticmethod
-    def _check_for_api_errors(geocoding_results):
+    def _check_for_api_errors(self, geocoding_results):
         """
         Raise any exceptions if there were problems reported
         in the api response.

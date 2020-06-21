@@ -31,12 +31,13 @@ class Baidu(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            security_key=None,
+            security_key=None
     ):
         """
 
@@ -76,8 +77,7 @@ class Baidu(Geocoder):
         self.reverse_api = '%s://api.map.baidu.com%s' % (self.scheme, self.reverse_path)
         self.security_key = security_key
 
-    @staticmethod
-    def _format_components_param(components):
+    def _format_components_param(self, components):
         """
         Format the components dict to something Baidu understands.
         """
@@ -88,8 +88,9 @@ class Baidu(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -121,7 +122,7 @@ class Baidu(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
         )
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return an address by location point.
 
@@ -200,8 +201,7 @@ class Baidu(Geocoder):
         else:
             return [parse_place(item) for item in place]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

@@ -20,12 +20,13 @@ class OpenCage(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             domain='api.opencagedata.com',
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -67,11 +68,12 @@ class OpenCage(Geocoder):
     def geocode(
             self,
             query,
+            *,
             bounds=None,
             country=None,
             language=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -137,9 +139,10 @@ class OpenCage(Geocoder):
     def reverse(
             self,
             query,
+            *,
             language=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
@@ -197,8 +200,7 @@ class OpenCage(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

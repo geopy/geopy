@@ -20,12 +20,13 @@ class MapBox(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='api.mapbox.com',
+            domain='api.mapbox.com'
     ):
         """
         :param str api_key: The API key required by Mapbox to perform
@@ -80,11 +81,12 @@ class MapBox(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             proximity=None,
             country=None,
-            bbox=None,
+            bbox=None
     ):
         """
         Return a location point by address.
@@ -149,8 +151,9 @@ class MapBox(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.

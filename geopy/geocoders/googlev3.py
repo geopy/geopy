@@ -33,6 +33,7 @@ class GoogleV3(Geocoder):
     def __init__(
             self,
             api_key=None,
+            *,
             domain='maps.googleapis.com',
             scheme=None,
             client_id=None,
@@ -41,7 +42,7 @@ class GoogleV3(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            channel='',
+            channel=''
     ):
         """
 
@@ -134,8 +135,7 @@ class GoogleV3(Geocoder):
             self.scheme, self.domain, path, signature
         )
 
-    @staticmethod
-    def _format_components_param(components):
+    def _format_components_param(self, components):
         """
         Format the components dict to something Google understands.
         """
@@ -159,6 +159,7 @@ class GoogleV3(Geocoder):
     def geocode(
             self,
             query=None,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             bounds=None,
@@ -166,7 +167,7 @@ class GoogleV3(Geocoder):
             components=None,
             place_id=None,
             language=None,
-            sensor=False,
+            sensor=False
     ):
         """
         Return a location point by address.
@@ -260,10 +261,11 @@ class GoogleV3(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=None,
-            sensor=False,
+            sensor=False
     ):
         """
         Return an address by location point.
@@ -309,7 +311,7 @@ class GoogleV3(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    def reverse_timezone(self, query, at_time=None, timeout=DEFAULT_SENTINEL):
+    def reverse_timezone(self, query, *, at_time=None, timeout=DEFAULT_SENTINEL):
         """
         Find the timezone a point in `query` was in for a specified `at_time`.
 
@@ -399,8 +401,7 @@ class GoogleV3(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

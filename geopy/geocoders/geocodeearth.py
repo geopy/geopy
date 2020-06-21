@@ -12,12 +12,13 @@ class GeocodeEarth(Pelias):
     def __init__(
             self,
             api_key,
+            *,
             domain='api.geocode.earth',
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
         :param str api_key: Geocode.earth API key, required.

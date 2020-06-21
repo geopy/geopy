@@ -21,10 +21,11 @@ class LiveAddress(Geocoder):
             self,
             auth_id,
             auth_token,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -61,9 +62,10 @@ class LiveAddress(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            candidates=1,
+            candidates=1
     ):
         """
         Return a location point by address.
@@ -121,8 +123,7 @@ class LiveAddress(Geocoder):
         else:
             return [self._format_structured_address(c) for c in response]
 
-    @staticmethod
-    def _format_structured_address(address):
+    def _format_structured_address(self, address):
         """
         Pretty-print address and return lat, lon tuple.
         """

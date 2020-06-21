@@ -24,11 +24,12 @@ class Pelias(Geocoder):
             self,
             domain,
             api_key=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. GeocodeEarth).
     ):
@@ -75,6 +76,7 @@ class Pelias(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
@@ -141,6 +143,7 @@ class Pelias(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=None
@@ -193,9 +196,7 @@ class Pelias(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @staticmethod
-    def parse_code(feature):
-        # TODO make this a private API
+    def _parse_code(self, feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -209,6 +210,6 @@ class Pelias(Geocoder):
         if not len(features):
             return None
         if exactly_one:
-            return self.parse_code(features[0])
+            return self._parse_code(features[0])
         else:
-            return [self.parse_code(feature) for feature in features]
+            return [self._parse_code(feature) for feature in features]

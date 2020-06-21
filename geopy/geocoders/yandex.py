@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlencode
 
 from geopy.exc import GeocoderParseError, GeocoderServiceError
@@ -24,12 +23,13 @@ class Yandex(Geocoder):
 
     def __init__(
             self,
-            api_key=None,
+            api_key,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -59,14 +59,6 @@ class Yandex(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
         )
-        if not api_key:
-            warnings.warn(
-                'Since September 2019 Yandex requires each request to have an API key. '
-                'Pass a valid `api_key` to Yandex geocoder to hide this warning. '
-                'API keys can be created at https://developer.tech.yandex.ru/',
-                UserWarning,
-                stacklevel=2
-            )
         self.api_key = api_key
         domain = 'geocode-maps.yandex.ru'
         self.api = '%s://%s%s' % (self.scheme, domain, self.api_path)
@@ -74,9 +66,10 @@ class Yandex(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            lang=None,
+            lang=None
     ):
         """
         Return a location point by address.
@@ -108,8 +101,7 @@ class Yandex(Geocoder):
             'geocode': query,
             'format': 'json'
         }
-        if self.api_key:
-            params['apikey'] = self.api_key
+        params['apikey'] = self.api_key
         if lang:
             params['lang'] = lang
         if exactly_one:
@@ -124,10 +116,11 @@ class Yandex(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             kind=None,
-            lang=None,
+            lang=None
     ):
         """
         Return an address by location point.
@@ -170,8 +163,7 @@ class Yandex(Geocoder):
             'geocode': point,
             'format': 'json'
         }
-        if self.api_key:
-            params['apikey'] = self.api_key
+        params['apikey'] = self.api_key
         if lang:
             params['lang'] = lang
         if kind:

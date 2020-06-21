@@ -21,12 +21,13 @@ class TomTom(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='api.tomtom.com',
+            domain='api.tomtom.com'
     ):
         """
         :param str api_key: TomTom API key.
@@ -64,11 +65,12 @@ class TomTom(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
             typeahead=False,
-            language=None,
+            language=None
     ):
         """
         Return a location point by address.
@@ -122,9 +124,10 @@ class TomTom(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.
@@ -166,8 +169,7 @@ class TomTom(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @staticmethod
-    def _boolean_value(bool_value):
+    def _boolean_value(self, bool_value):
         return 'true' if bool_value else 'false'
 
     def _geocode_params(self, formatted_query):

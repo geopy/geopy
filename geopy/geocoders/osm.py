@@ -51,12 +51,13 @@ class Nominatim(Geocoder):
 
     def __init__(
             self,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain=_DEFAULT_NOMINATIM_DOMAIN,
             scheme=None,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. PickPoint).
     ):
@@ -126,6 +127,7 @@ class Nominatim(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
@@ -137,7 +139,7 @@ class Nominatim(Geocoder):
             viewbox=None,
             bounded=False,
             featuretype=None,
-            namedetails=False,
+            namedetails=False
     ):
         """
         Return a location point by address.
@@ -288,6 +290,7 @@ class Nominatim(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=False,
@@ -351,9 +354,7 @@ class Nominatim(Geocoder):
             self._call_geocoder(url, timeout=timeout), exactly_one
         )
 
-    @staticmethod
-    def parse_code(place):
-        # TODO make this a private API
+    def _parse_code(self, place):
         # Parse each resource.
         latitude = place.get('lat', None)
         longitude = place.get('lon', None)
@@ -369,6 +370,6 @@ class Nominatim(Geocoder):
         if not isinstance(places, collections.abc.Sequence):
             places = [places]
         if exactly_one:
-            return self.parse_code(places[0])
+            return self._parse_code(places[0])
         else:
-            return [self.parse_code(place) for place in places]
+            return [self._parse_code(place) for place in places]

@@ -19,11 +19,12 @@ class DataBC(Geocoder):
 
     def __init__(
             self,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
 
@@ -56,11 +57,12 @@ class DataBC(Geocoder):
     def geocode(
             self,
             query,
+            *,
             max_results=25,
             set_back=0,
             location_descriptor='any',
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -122,8 +124,7 @@ class DataBC(Geocoder):
             return geocoded[0]
         return geocoded
 
-    @staticmethod
-    def _parse_feature(feature):
+    def _parse_feature(self, feature):
         properties = feature['properties']
         coordinates = feature['geometry']['coordinates']
         return Location(

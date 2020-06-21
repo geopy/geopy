@@ -96,16 +96,21 @@ class GeocoderTestCase(unittest.TestCase):
         g = Geocoder()
         assert g.timeout == 12
 
-        with patch.object(g, 'urlopen') as mock_urlopen:
-            g._call_geocoder(url, raw=True)
+        with ExitStack() as stack:
+            mock_urlopen = stack.enter_context(patch.object(g, 'urlopen'))
+            stack.enter_context(
+                patch.object(geopy.geocoders.base, 'decode_page', return_value='{}')
+            )
+
+            g._call_geocoder(url)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] == 12
 
-            g._call_geocoder(url, timeout=7, raw=True)
+            g._call_geocoder(url, timeout=7)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] == 7
 
-            g._call_geocoder(url, timeout=None, raw=True)
+            g._call_geocoder(url, timeout=None)
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] is None
 
@@ -139,7 +144,7 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
     coordinates_address = "175 5th Avenue, NYC, USA"
 
     def setUp(self):
-        self.method = Geocoder._coerce_point_to_string
+        self.method = Geocoder()._coerce_point_to_string
 
     def test_point(self):
         latlon = self.method(Point(*self.coordinates))
@@ -171,7 +176,7 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
 class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.method = Geocoder._format_bounding_box
+        self.method = Geocoder()._format_bounding_box
 
     def test_string_raises(self):
         with pytest.raises(GeocoderQueryError):

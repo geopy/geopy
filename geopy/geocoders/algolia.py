@@ -1,6 +1,5 @@
 import collections.abc
 from urllib.parse import urlencode
-from urllib.request import Request
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -22,6 +21,7 @@ class AlgoliaPlaces(Geocoder):
 
     def __init__(
             self,
+            *,
             app_id=None,
             api_key=None,
             domain='places-dsn.algolia.net',
@@ -29,7 +29,7 @@ class AlgoliaPlaces(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
+            ssl_context=DEFAULT_SENTINEL
     ):
         """
         :param str app_id: Unique application identifier. It's used to
@@ -80,6 +80,7 @@ class AlgoliaPlaces(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             type=None,
@@ -90,7 +91,7 @@ class AlgoliaPlaces(Geocoder):
             around=None,
             around_via_ip=None,
             around_radius=None,
-            x_forwarded_for=None,
+            x_forwarded_for=None
     ):
         """
         Return a location point by address.
@@ -184,18 +185,18 @@ class AlgoliaPlaces(Geocoder):
             params['aroundRadius'] = around_radius
 
         url = '?'.join((self.geocode_api, urlencode(params)))
-        request = Request(url)
+        headers = {}
 
         if x_forwarded_for is not None:
-            request.add_header('X-Forwarded-For', x_forwarded_for)
+            headers['X-Forwarded-For'] = x_forwarded_for
 
         if self.app_id is not None and self.api_key is not None:
-            request.add_header('X-Algolia-Application-Id', self.app_id)
-            request.add_header('X-Algolia-API-Key', self.api_key)
+            headers['X-Algolia-Application-Id'] = self.app_id
+            headers['X-Algolia-API-Key'] = self.api_key
 
         logger.debug('%s.geocode: %s', self.__class__.__name__, url)
         return self._parse_json(
-            self._call_geocoder(request, timeout=timeout),
+            self._call_geocoder(url, headers=headers, timeout=timeout),
             exactly_one,
             language=language,
         )
@@ -203,10 +204,11 @@ class AlgoliaPlaces(Geocoder):
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.
@@ -249,21 +251,20 @@ class AlgoliaPlaces(Geocoder):
             params['language'] = language
 
         url = '?'.join((self.reverse_api, urlencode(params)))
-        request = Request(url)
+        headers = {}
 
         if self.app_id is not None and self.api_key is not None:
-            request.add_header('X-Algolia-Application-Id', self.app_id)
-            request.add_header('X-Algolia-API-Key', self.api_key)
+            headers['X-Algolia-Application-Id'] = self.app_id
+            headers['X-Algolia-API-Key'] = self.api_key
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         return self._parse_json(
-            self._call_geocoder(request, timeout=timeout),
+            self._call_geocoder(url, headers=headers, timeout=timeout),
             exactly_one,
             language=language,
         )
 
-    @staticmethod
-    def _parse_feature(feature, language):
+    def _parse_feature(self, feature, language):
         # Parse each resource.
         latitude = feature.get('_geoloc', {}).get('lat')
         longitude = feature.get('_geoloc', {}).get('lng')
@@ -278,7 +279,6 @@ class AlgoliaPlaces(Geocoder):
 
         return Location(placename, (latitude, longitude), feature)
 
-    @classmethod
     def _parse_json(self, response, exactly_one, language):
         if response is None or 'hits' not in response:
             return None
