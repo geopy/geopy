@@ -280,6 +280,12 @@ class Geocoder(object):
             raise
         else:
             # Altitude is silently dropped.
+            #
+            # Geocoding services (almost?) always consider only lat and lon
+            # in queries, so altitude doesn't affect the request.
+            # A non-zero altitude should not raise an exception
+            # though, because PoIs are assumed to span the whole
+            # altitude axis (i.e. not just the 0km plane).
             return output_format % dict(lat=point.latitude,
                                         lon=point.longitude)
 

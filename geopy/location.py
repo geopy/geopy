@@ -72,6 +72,11 @@ class Location(object):
         """
         Location's altitude.
 
+        .. note::
+            Geocoding services usually don't consider altitude neither in
+            requests nor in responses, so almost always the value of this
+            property would be zero.
+
         :rtype: float or None
         """
         return self._point[2]
