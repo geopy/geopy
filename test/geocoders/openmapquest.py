@@ -1,11 +1,11 @@
-import unittest
+import pytest
 
 from geopy.geocoders import OpenMapQuest
-from test.geocoders.nominatim import BaseNominatimTestCase
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.nominatim import BaseTestNominatim
+from test.geocoders.util import env
 
 
-class OpenMapQuestNoNetTestCase(GeocoderTestBase):
+class TestUnitOpenMapQuest:
 
     def test_user_agent_custom(self):
         geocoder = OpenMapQuest(
@@ -15,11 +15,11 @@ class OpenMapQuestNoNetTestCase(GeocoderTestBase):
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@unittest.skipUnless(
-    bool(env.get('OPENMAPQUEST_APIKEY')),
-    "No OPENMAPQUEST_APIKEY env variable set"
+@pytest.mark.skipif(
+    not bool(env.get('OPENMAPQUEST_APIKEY')),
+    reason="No OPENMAPQUEST_APIKEY env variable set"
 )
-class OpenMapQuestTestCase(BaseNominatimTestCase, GeocoderTestBase):
+class TestOpenMapQuest(BaseTestNominatim):
 
     @classmethod
     def make_geocoder(cls, **kwargs):

@@ -401,6 +401,9 @@ Supported Adapters
 .. autoclass:: geopy.adapters.URLLibAdapter
     :show-inheritance:
 
+.. autoclass:: geopy.adapters.AioHTTPAdapter
+    :show-inheritance:
+
 
 Base Classes
 ------------
@@ -414,6 +417,14 @@ Base Classes
     :members:
 
     .. automethod:: __init__
+
+.. autoclass:: geopy.adapters.BaseSyncAdapter
+    :show-inheritance:
+    :members:
+
+.. autoclass:: geopy.adapters.BaseAsyncAdapter
+    :show-inheritance:
+    :members:
 
 Logging
 ~~~~~~~

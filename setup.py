@@ -23,6 +23,7 @@ INSTALL_REQUIRES = [
 ]
 
 EXTRAS_DEV_TESTFILES_COMMON = [
+    "async_generator",
 ]
 
 EXTRAS_DEV_LINT = [
@@ -32,6 +33,7 @@ EXTRAS_DEV_LINT = [
 
 EXTRAS_DEV_TEST = [
     "coverage",
+    "pytest-aiohttp",  # for `async def` tests
     "pytest>=3.10",
 ]
 
@@ -64,6 +66,7 @@ setup(
         "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_TEST),
         "dev-docs": EXTRAS_DEV_DOCS,
+        "aiohttp": ["aiohttp"],
         "requests": [
             "urllib3>=1.24.2",
             # ^^^ earlier versions would work, but a custom ssl
