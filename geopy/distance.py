@@ -85,6 +85,44 @@ calculate the length of a path::
     >>> print((d(ne, cl) + d(cl, wa) + d(wa, pa)).miles)
     3277.30439191
 
+
+.. _distance_altitudes:
+
+Currently all algorithms assume that altitudes of the points are either
+zero (as in the examples above) or equal, and are relatively small.
+Thus altitudes never affect the resulting distances::
+
+    >>> from geopy import distance
+    >>> newport_ri = (41.49008, -71.312796)
+    >>> cleveland_oh = (41.499498, -81.695391)
+    >>> print(distance.distance(newport_ri, cleveland_oh).km)
+    866.4554329098687
+    >>> newport_ri = (41.49008, -71.312796, 100)
+    >>> cleveland_oh = (41.499498, -81.695391, 100)
+    >>> print(distance.distance(newport_ri, cleveland_oh).km)
+    866.4554329098687
+
+If you need to calculate distances with elevation, then for short
+distances the `Euclidean distance
+<https://en.wikipedia.org/wiki/Euclidean_distance>`_ formula might give
+a suitable approximation::
+
+    >>> import math
+    >>> from geopy import distance
+    >>> p1 = (43.668613, 40.258916, 0.976)
+    >>> p2 = (43.658852, 40.250839, 1.475)
+    >>> flat_distance = distance.distance(p1[:2], p2[:2]).km
+    >>> print(flat_distance)
+    1.265133525952866
+    >>> euclidian_distance = math.sqrt(flat_distance**2 + (p2[2] - p1[2])**2)
+    >>> print(euclidian_distance)
+    1.359986705262199
+
+.. versionchanged:: 1.23.0
+    Calculating distances between points with different altitudes now
+    causes a deprecation warning. In geopy 2.0 this will become a
+    ``ValueError`` exception.
+
 """
 from __future__ import division
 
@@ -144,6 +182,20 @@ def lonlat(x, y, z=0):
     :return: Point(latitude, longitude, altitude)
     """
     return Point(y, x, z)
+
+
+def _ensure_same_altitude(a, b):
+    if abs(a.altitude - b.altitude) > 1e-6:
+        warnings.warn(
+            'Calculating distance between points with different altitudes '
+            'is not supported. The calculated distance would be '
+            'at the same elevation (as if the points had equal altitudes). '
+            'In geopy 2.0 this will become a ValueError exception.',
+            DeprecationWarning, stacklevel=3
+        )
+    # Note: non-zero equal altitudes are fine: assuming that
+    # the elevation is many times smaller than the Earth radius
+    # it won't give much error.
 
 
 class Distance(object):
@@ -302,6 +354,7 @@ class great_circle(Distance):
 
     def measure(self, a, b):
         a, b = Point(a), Point(b)
+        _ensure_same_altitude(a, b)
 
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
@@ -408,6 +461,7 @@ class geodesic(Distance):
     # Call geographiclib routines for measure and destination
     def measure(self, a, b):
         a, b = Point(a), Point(b)
+        _ensure_same_altitude(a, b)
         lat1, lon1 = a.latitude, a.longitude
         lat2, lon2 = b.latitude, b.longitude
 
