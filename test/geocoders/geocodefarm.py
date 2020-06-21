@@ -64,19 +64,19 @@ class GeocodeFarmTestCase(GeocoderTestBase):
 
     def test_quota_exceeded(self):
 
-        def mock_call_geocoder(*args, **kwargs):
-            return {
+        def mock_call_geocoder(url, callback, **kwargs):
+            return callback({
                 "geocoding_results": {
                     "STATUS": {
                         "access": "OVER_QUERY_LIMIT",
                         "status": "FAILED, ACCESS_DENIED"
                     }
                 }
-            }
+            })
 
-        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
-                pytest.raises(exc.GeocoderQuotaExceeded):
-            self.geocoder.geocode('435 north michigan ave, chicago il 60611')
+        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder):
+            with pytest.raises(exc.GeocoderQuotaExceeded):
+                self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
     def test_no_results(self):
         self.geocode_run(
@@ -87,16 +87,16 @@ class GeocodeFarmTestCase(GeocoderTestBase):
 
     def test_unhandled_api_error(self):
 
-        def mock_call_geocoder(*args, **kwargs):
-            return {
+        def mock_call_geocoder(url, callback, **kwargs):
+            return callback({
                 "geocoding_results": {
                     "STATUS": {
                         "access": "BILL_PAST_DUE",
                         "status": "FAILED, ACCESS_DENIED"
                     }
                 }
-            }
+            })
 
-        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
-                pytest.raises(exc.GeocoderServiceError):
-            self.geocoder.geocode('435 north michigan ave, chicago il 60611')
+        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder):
+            with pytest.raises(exc.GeocoderServiceError):
+                self.geocoder.geocode('435 north michigan ave, chicago il 60611')

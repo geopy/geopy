@@ -1,4 +1,5 @@
 import hashlib
+from functools import partial
 from urllib.parse import quote_plus, urlencode
 
 from geopy.exc import (
@@ -125,9 +126,8 @@ class Baidu(Geocoder):
         url = self._construct_url(self.api, self.api_path, params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
@@ -159,9 +159,8 @@ class Baidu(Geocoder):
         url = self._construct_url(self.reverse_api, self.reverse_path, params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
-        )
+        callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_reverse_json(self, page, exactly_one=True):
         """

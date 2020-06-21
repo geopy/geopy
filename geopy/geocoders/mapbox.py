@@ -1,3 +1,4 @@
+from functools import partial
 from urllib.parse import quote, urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -150,10 +151,8 @@ class MapBox(Geocoder):
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -189,7 +188,5 @@ class MapBox(Geocoder):
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)

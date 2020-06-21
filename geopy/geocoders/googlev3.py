@@ -5,6 +5,7 @@ import hmac
 import warnings
 from calendar import timegm
 from datetime import datetime
+from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
@@ -261,9 +262,8 @@ class GoogleV3(Geocoder):
             url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
@@ -314,9 +314,8 @@ class GoogleV3(Geocoder):
             url = self._get_signed_url(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse_timezone(self, query, *, at_time=None, timeout=DEFAULT_SENTINEL):
         """
@@ -357,9 +356,7 @@ class GoogleV3(Geocoder):
         url = "?".join((self.tz_api, urlencode(params)))
 
         logger.debug("%s.reverse_timezone: %s", self.__class__.__name__, url)
-        return self._parse_json_timezone(
-            self._call_geocoder(url, timeout=timeout)
-        )
+        return self._call_geocoder(url, self._parse_json_timezone, timeout=timeout)
 
     def _parse_json_timezone(self, response):
         status = response.get('status')

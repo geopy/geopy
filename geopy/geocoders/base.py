@@ -1,3 +1,6 @@
+import functools
+import threading
+
 from geopy.adapters import AdapterHTTPError, RequestsAdapter, URLLibAdapter
 from geopy.exc import (
     ConfigurationError,
@@ -284,6 +287,7 @@ class Geocoder:
     def _call_geocoder(
             self,
             url,
+            callback,
             *,
             timeout=DEFAULT_SENTINEL,
             is_json=True,
@@ -302,9 +306,10 @@ class Geocoder:
 
         try:
             if is_json:
-                return self.adapter.get_json(url, timeout=timeout, headers=req_headers)
+                result = self.adapter.get_json(url, timeout=timeout, headers=req_headers)
             else:
-                return self.adapter.get_text(url, timeout=timeout, headers=req_headers)
+                result = self.adapter.get_text(url, timeout=timeout, headers=req_headers)
+            return callback(result)
         except AdapterHTTPError as error:
             if error.text:
                 logger.info(
@@ -325,3 +330,19 @@ class Geocoder:
 
     # def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
     #     raise NotImplementedError()
+
+
+def _synchronized(func):
+    """A decorator for geocoder methods which makes the method always run
+    under a lock. The lock is reentrant.
+
+    This decorator transparently handles sync and async working modes.
+    """
+    lock = threading.RLock()
+
+    @functools.wraps(func)
+    def f(self, *args, **kwargs):
+        with lock:
+            return func(self, *args, **kwargs)
+
+    return f
