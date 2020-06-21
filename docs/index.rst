@@ -446,6 +446,9 @@ are still being made in minor releases, such as:
   So instead of using an incorrectly normalized value for latitude,
   a :class:`ValueError` exception is now thrown (#294).
 
+Features and usages being phased out are covered with deprecation :mod:`warnings`
+when possible. Make sure to run your python with the ``-Wd`` switch to see
+if your code emits the warnings.
 
 To make the upgrade less painful, please read the changelog before upgrading.
 
