@@ -140,8 +140,12 @@ class Point(object):
         >>> p = Point(41.5, -81.0, 12.3)
         >>> str(p)  # same as `p.format()`
         '41 30m 0s N, 81 0m 0s W, 12.3km'
+        >>> p.format_unicode()
+        '41° 30′ 0″ N, 81° 0′ 0″ W, 12.3km'
         >>> repr(p)
         'Point(41.5, -81.0, 12.3)'
+        >>> repr(tuple(p))
+        '(41.5, -81.0, 12.3)'
     """
 
     __slots__ = ("latitude", "longitude", "altitude")
