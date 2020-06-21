@@ -64,7 +64,7 @@ class ProxyServerThread(threading.Thread):
     spinup_timeout = 10
 
     def __init__(self, timeout=None):
-        self.proxy_host = '127.0.0.1'
+        self.proxy_host = 'localhost'
         self.proxy_port = None  # randomly selected by OS
         self.timeout = timeout
 
@@ -144,3 +144,62 @@ class ProxyServerThread(threading.Thread):
     def stop(self):
         self.proxy_server.shutdown()  # stop serve_forever()
         self.proxy_server.server_close()
+
+
+class HttpServerThread(threading.Thread):
+    spinup_timeout = 10
+
+    def __init__(self, timeout=None):
+        self.server_host = 'localhost'
+        self.server_port = None  # randomly selected by OS
+        self.timeout = timeout
+
+        self.http_server = None
+        self.socket_created_future = Future()
+
+        super(HttpServerThread, self).__init__()
+        self.daemon = True
+
+    def get_server_url(self):
+        assert self.socket_created_future.result(self.spinup_timeout)
+        return "http://%s:%s" % (self.server_host, self.server_port)
+
+    def run(self):
+        assert not self.http_server, ("This class is not reentrable. "
+                                      "Please create a new instance.")
+
+        class Server(SimpleHTTPServer.SimpleHTTPRequestHandler):
+            timeout = self.timeout
+
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header('Connection', 'close')
+                self.end_headers()
+                self.wfile.write(b"Hello world")
+                self.connection.close()
+
+        # ThreadingTCPServer offloads connections to separate threads, so
+        # the serve_forever loop doesn't block until connection is closed
+        # (unlike TCPServer). This allows to shutdown the serve_forever loop
+        # even if there's an open connection.
+        try:
+            self.http_server = SocketServer.ThreadingTCPServer(
+                (self.server_host, 0),
+                Server
+            )
+
+            # don't hang if there're some open connections
+            self.http_server.daemon_threads = True
+
+            self.server_port = self.http_server.server_address[1]
+        except Exception as e:
+            self.socket_created_future.set_exception(e)
+            raise
+        else:
+            self.socket_created_future.set_result(True)
+
+        self.http_server.serve_forever()
+
+    def stop(self):
+        self.http_server.shutdown()  # stop serve_forever()
+        self.http_server.server_close()

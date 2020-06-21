@@ -24,8 +24,27 @@ else:
     from urllib2 import HTTPHandler, HTTPSHandler
 
 
+def pytest_addoption(parser):
+    # This option will probably be used in downstream packages,
+    # thus it should be considered a public interface.
+    parser.addoption(
+        "--skip-tests-requiring-internet",
+        action="store_true",
+        help="Skip tests requiring Internet access.",
+    )
+
+
+@pytest.fixture
+def is_internet_access_allowed(request):
+    return not request.config.getoption("--skip-tests-requiring-internet")
+
+
 def netloc_from_req(req):  # urllib request
     return urlparse(req.get_full_url()).netloc
+
+
+def hostname_from_req(req):  # urllib request
+    return urlparse(req.get_full_url()).hostname
 
 
 def pretty_dict_format(heading, dict_to_format,
@@ -108,11 +127,12 @@ def print_requests_monitor_report(requests_monitor):
 
 
 @pytest.fixture(autouse=True)
-def patch_urllib(monkeypatch, requests_monitor):
+def patch_urllib(monkeypatch, requests_monitor, is_internet_access_allowed):
     """
     Patch urllib to provide the following features:
         - Retry failed requests. Makes test runs more stable.
         - Track statistics with RequestsMonitor.
+        - Skip tests requiring Internet access when Internet access is not allowed.
 
     Retries could have been implemented differently:
         - In test.geocoders.util.GeocoderTestBase._make_request. The issue
@@ -126,10 +146,18 @@ def patch_urllib(monkeypatch, requests_monitor):
 
     def mock_factory(do_open):
         def wrapped_do_open(self, conn, req, *args, **kwargs):
-            requests_monitor.record_request(req)
-
             retries = max_retries
-            netloc = netloc_from_req(req)
+            netloc = netloc_from_req(req)  # `localhost:8080`, `[::1]:8080`
+            hostname = hostname_from_req(req)  # `localhost`, `::1`
+
+            is_hostname_localhost = hostname in ('localhost', '127.0.0.1', '::1')
+            if not is_internet_access_allowed:
+                if not is_hostname_localhost:
+                    pytest.skip("Skipping a test requiring Internet access")
+
+            record_request = not is_hostname_localhost
+            if record_request:
+                requests_monitor.record_request(req)
             is_proxied = req.host != netloc
 
             if is_proxied or netloc in no_retries_for_hosts:
@@ -158,12 +186,14 @@ def patch_urllib(monkeypatch, requests_monitor):
                         # Some geocoders return failures with 200 code
                         # (like GoogleV3 for Quota Exceeded).
                         # Should we detect this somehow to restart such requests?
-                        requests_monitor.record_response(req, resp, end - start)
+                        if record_request:
+                            requests_monitor.record_response(req, resp, end - start)
                         return resp
                 except:  # noqa
                     if i == retries:
                         raise
-                requests_monitor.record_retry(req)
+                if record_request:
+                    requests_monitor.record_retry(req)
                 sleep(error_wait_seconds)
             raise RuntimeError("Should not have been reached")
 
