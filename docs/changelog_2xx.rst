@@ -38,6 +38,8 @@ New features
 - Added optional asyncio support in all geocoders via
   :class:`.AioHTTPAdapter`, see the new :ref:`Async Mode <async_mode>`
   doc section.
+- :class:`.AsyncRateLimiter` -- an async counterpart of :class:`.RateLimiter`.
+- :class:`.RateLimiter` is now thread-safe.
 
 Packaging changes
 ~~~~~~~~~~~~~~~~~
