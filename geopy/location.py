@@ -1,6 +1,3 @@
-"""
-:class:`.Location` returns geocoder results.
-"""
 import collections.abc
 
 from geopy.point import Point
@@ -21,11 +18,12 @@ class Location:
 
     __slots__ = ("_address", "_point", "_tuple", "_raw")
 
-    def __init__(self, address="", point=None, raw=None):
+    def __init__(self, address, point, raw):
+        if address is None:
+            raise TypeError("`address` must not be None")
         self._address = address
-        if point is None:
-            self._point = (None, None, None)
-        elif isinstance(point, Point):
+
+        if isinstance(point, Point):
             self._point = point
         elif isinstance(point, str):
             self._point = Point(point)
@@ -33,10 +31,12 @@ class Location:
             self._point = Point(point)
         else:
             raise TypeError(
-                "point an unsupported type: %r; use %r or Point",
-                type(point), type(str)
+                "`point` is of unsupported type: %r" % type(point)
             )
         self._tuple = _location_tuple(self)
+
+        if raw is None:
+            raise TypeError("`raw` must not be None")
         self._raw = raw
 
     @property
@@ -45,7 +45,7 @@ class Location:
         Location as a formatted string returned by the geocoder or constructed
         by geopy, depending on the service.
 
-        :rtype: unicode
+        :rtype: str
         """
         return self._address
 
@@ -54,7 +54,7 @@ class Location:
         """
         Location's latitude.
 
-        :rtype: float or None
+        :rtype: float
         """
         return self._point[0]
 
@@ -63,7 +63,7 @@ class Location:
         """
         Location's longitude.
 
-        :rtype: float or None
+        :rtype: float
         """
         return self._point[1]
 
@@ -77,7 +77,7 @@ class Location:
             requests nor in responses, so almost always the value of this
             property would be zero.
 
-        :rtype: float or None
+        :rtype: float
         """
         return self._point[2]
 
@@ -87,9 +87,9 @@ class Location:
         :class:`geopy.point.Point` instance representing the location's
         latitude, longitude, and altitude.
 
-        :rtype: :class:`geopy.point.Point` or None
+        :rtype: :class:`geopy.point.Point`
         """
-        return self._point if self._point != (None, None, None) else None
+        return self._point
 
     @property
     def raw(self):
@@ -97,7 +97,7 @@ class Location:
         Location's raw, unparsed geocoder response. For details on this,
         consult the service's documentation.
 
-        :rtype: dict or None
+        :rtype: dict
         """
         return self._raw
 

@@ -35,7 +35,7 @@ class TimezoneTestCase(unittest.TestCase):
 
     def test_create_from_pytz_timezone(self):
         pytz_timezone = pytz.timezone(self.timezone_name)
-        tz = Timezone(pytz_timezone)
+        tz = Timezone(pytz_timezone, {})
         self.assertIs(tz.pytz_timezone, pytz_timezone)
 
     def test_string(self):

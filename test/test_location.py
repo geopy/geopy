@@ -44,37 +44,36 @@ class LocationTestCase(unittest.TestCase):
             self.assertEqual(loc.raw, raw)
 
     def test_location_str(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_STR)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_STR, {})
         self._location_iter_test(loc)
         self.assertEqual(loc.point, GRAND_CENTRAL_POINT)
 
     def test_location_point(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
         self._location_iter_test(loc)
         self.assertEqual(loc.point, GRAND_CENTRAL_POINT)
 
     def test_location_none(self):
-        loc = Location(GRAND_CENTRAL_STR, None)
-        self._location_iter_test(loc, GRAND_CENTRAL_STR, None, None)
-        self.assertEqual(loc.point, None)
+        with self.assertRaises(TypeError):
+            Location(GRAND_CENTRAL_STR, None, {})
 
     def test_location_iter(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_TUPLE)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_TUPLE, {})
         self._location_iter_test(loc)
         self.assertEqual(loc.point, GRAND_CENTRAL_POINT)
 
-    def test_location_typeerror(self):
+    def test_location_point_typeerror(self):
         with self.assertRaises(TypeError):
-            Location(GRAND_CENTRAL_STR, 1)
+            Location(GRAND_CENTRAL_STR, 1, {})
 
     def test_location_array_access(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_TUPLE)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_TUPLE, {})
         self.assertEqual(loc[0], GRAND_CENTRAL_STR)
         self.assertEqual(loc[1][0], GRAND_CENTRAL_COORDS_TUPLE[0])
         self.assertEqual(loc[1][1], GRAND_CENTRAL_COORDS_TUPLE[1])
 
     def test_location_properties(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
         self._location_properties_test(loc)
 
     def test_location_raw(self):
@@ -84,21 +83,21 @@ class LocationTestCase(unittest.TestCase):
         self._location_properties_test(loc, GRAND_CENTRAL_RAW)
 
     def test_location_string(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
         self.assertEqual(str(loc), loc.address)
 
     def test_location_len(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
         self.assertEqual(len(loc), 2)
 
     def test_location_eq(self):
-        loc1 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
-        loc2 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_TUPLE)
+        loc1 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
+        loc2 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_COORDS_TUPLE, {})
         self.assertEqual(loc1, loc2)
 
     def test_location_ne(self):
-        loc1 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
-        loc2 = Location(GRAND_CENTRAL_STR, None)
+        loc1 = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
+        loc2 = Location(GRAND_CENTRAL_STR, Point(0, 0), {})
         self.assertNotEqual(loc1, loc2)
 
     def test_location_repr(self):
@@ -108,14 +107,14 @@ class LocationTestCase(unittest.TestCase):
             "\u015bl\u0105skie, 41-800, Polska"
         )
         point = (0.0, 0.0, 0.0)
-        loc = Location(address, point)
+        loc = Location(address, point, {})
         self.assertEqual(
             repr(loc),
             "Location(%s, %r)" % (address, point)
         )
 
     def test_location_is_picklable(self):
-        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT)
+        loc = Location(GRAND_CENTRAL_STR, GRAND_CENTRAL_POINT, {})
         # https://docs.python.org/2/library/pickle.html#data-stream-format
         for protocol in (0, 1, 2, -1):
             pickled = pickle.dumps(loc, protocol=protocol)
