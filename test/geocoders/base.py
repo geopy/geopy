@@ -1,5 +1,4 @@
 import unittest
-import urllib.request
 from contextlib import ExitStack
 from unittest.mock import patch, sentinel
 
@@ -43,11 +42,15 @@ class GeocoderTestCase(unittest.TestCase):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=lambda **kw: sentinel.local_adapter,
         )
         for attr in ('scheme', 'timeout', 'proxies', 'ssl_context'):
             assert locals()[attr] == getattr(geocoder, attr)
         assert user_agent == geocoder.headers['User-Agent']
+        assert sentinel.local_adapter is geocoder.adapter
 
+    @patch.object(geopy.geocoders.options, 'default_adapter_factory',
+                  lambda **kw: sentinel.default_adapter)
     def test_init_with_defaults(self):
         attr_to_option = {
             'scheme': 'default_scheme',
@@ -66,6 +69,7 @@ class GeocoderTestCase(unittest.TestCase):
             geopy.geocoders.options.default_user_agent ==
             geocoder.headers['User-Agent']
         )
+        assert sentinel.default_adapter is geocoder.adapter
 
     @patch.object(geopy.geocoders.options, 'default_proxies', {'https': '192.0.2.0'})
     @patch.object(geopy.geocoders.options, 'default_timeout', 10)
@@ -97,45 +101,30 @@ class GeocoderTestCase(unittest.TestCase):
         assert g.timeout == 12
 
         with ExitStack() as stack:
-            mock_urlopen = stack.enter_context(patch.object(g, 'urlopen'))
-            stack.enter_context(
-                patch.object(geopy.geocoders.base, 'decode_page', return_value='{}')
-            )
+            mock_get_json = stack.enter_context(patch.object(g.adapter, 'get_json'))
 
             g._call_geocoder(url)
-            args, kwargs = mock_urlopen.call_args
+            args, kwargs = mock_get_json.call_args
             assert kwargs['timeout'] == 12
 
             g._call_geocoder(url, timeout=7)
-            args, kwargs = mock_urlopen.call_args
+            args, kwargs = mock_get_json.call_args
             assert kwargs['timeout'] == 7
 
             g._call_geocoder(url, timeout=None)
-            args, kwargs = mock_urlopen.call_args
+            args, kwargs = mock_get_json.call_args
             assert kwargs['timeout'] is None
 
     def test_ssl_context(self):
-
-        class HTTPSHandlerStub(urllib.request.HTTPSHandler):
-            def __init__(self, context=None):
-                super().__init__()
-
         with ExitStack() as stack:
-            stack.enter_context(
-                patch.object(geopy.geocoders.base, 'HTTPSHandler', HTTPSHandlerStub)
-            )
-            mock_https_handler_init = stack.enter_context(
-                patch.object(
-                    HTTPSHandlerStub, '__init__', autospec=True,
-                    side_effect=HTTPSHandlerStub.__init__
-                )
+            mock_adapter = stack.enter_context(
+                patch.object(geopy.geocoders.base.options, 'default_adapter_factory')
             )
 
             for ssl_context in (None, sentinel.some_ssl_context):
-                mock_https_handler_init.reset_mock()
                 Geocoder(ssl_context=ssl_context)
-                args, kwargs = mock_https_handler_init.call_args
-                assert kwargs['context'] is ssl_context
+                args, kwargs = mock_adapter.call_args
+                assert kwargs['ssl_context'] is ssl_context
 
 
 class GeocoderPointCoercionTestCase(unittest.TestCase):

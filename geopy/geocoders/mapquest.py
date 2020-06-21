@@ -33,6 +33,7 @@ class MapQuest(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None,
             domain='www.mapquestapi.com'
     ):
         """
@@ -56,6 +57,11 @@ class MapQuest(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str domain: base api domain for mapquest
         """
         super().__init__(
@@ -64,6 +70,7 @@ class MapQuest(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
 
         self.api_key = api_key

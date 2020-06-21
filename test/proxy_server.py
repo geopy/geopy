@@ -68,6 +68,14 @@ class ProxyServerThread(threading.Thread):
         super().__init__()
         self.daemon = True
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+        self.join()
+
     def get_proxy_url(self):
         assert self.socket_created_future.result(self.spinup_timeout)
         return "http://%s:%s" % (self.proxy_host, self.proxy_port)
@@ -86,6 +94,9 @@ class ProxyServerThread(threading.Thread):
 
                 req = urlopen(self.path, timeout=self.timeout)
                 self.send_response(req.getcode())
+                content_type = req.info().get('content-type', None)
+                if content_type:
+                    self.send_header('Content-Type', content_type)
                 self.send_header('Connection', 'close')
                 self.end_headers()
                 self.copyfile(req, self.wfile)
@@ -153,6 +164,14 @@ class HttpServerThread(threading.Thread):
         super(HttpServerThread, self).__init__()
         self.daemon = True
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+        self.join()
+
     def get_server_url(self):
         assert self.socket_created_future.result(self.spinup_timeout)
         return "http://%s:%s" % (self.server_host, self.server_port)
@@ -165,10 +184,22 @@ class HttpServerThread(threading.Thread):
             timeout = self.timeout
 
             def do_GET(self):
-                self.send_response(200)
-                self.send_header('Connection', 'close')
-                self.end_headers()
-                self.wfile.write(b"Hello world")
+                if self.path == "/":
+                    self.send_response(200)
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    self.wfile.write(b"Hello world")
+                elif self.path == "/json":
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    self.wfile.write(b'{"hello":"world"}')
+                else:
+                    self.send_response(404)
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    self.wfile.write(b"Not found")
                 self.connection.close()
 
         # ThreadingTCPServer offloads connections to separate threads, so

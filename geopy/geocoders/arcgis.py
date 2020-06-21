@@ -42,6 +42,7 @@ class ArcGIS(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None,
             auth_domain='www.arcgis.com',
             domain='geocode.arcgis.com'
     ):
@@ -79,6 +80,11 @@ class ArcGIS(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str auth_domain: Domain where the target ArcGIS auth service
             is hosted. Used only in authenticated mode (i.e. username,
             password and referer are set).
@@ -92,6 +98,7 @@ class ArcGIS(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         if username or password or referer:
             if not (username and password and referer):

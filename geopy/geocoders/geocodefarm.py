@@ -30,6 +30,7 @@ class GeocodeFarm(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None,
             scheme=None
     ):
         """
@@ -50,6 +51,11 @@ class GeocodeFarm(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
         """
@@ -59,6 +65,7 @@ class GeocodeFarm(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         domain = 'www.geocode.farm'

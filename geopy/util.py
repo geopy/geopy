@@ -24,20 +24,5 @@ def join_filter(sep, seq, pred=bool):
     return sep.join([str(i) for i in seq if pred(i)])
 
 
-def decode_page(page):
-    """
-    Return unicode string of geocoder results.
-
-    Nearly all services use JSON, so assume UTF8 encoding unless the
-    response specifies otherwise.
-    """
-    if hasattr(page, 'read'):  # urllib
-        encoding = page.headers.get_param("charset") or "utf-8"
-        return str(page.read(), encoding=encoding)
-    else:  # requests?
-        encoding = page.headers.get("charset") or "utf-8"
-        return str(page.content, encoding=encoding)
-
-
 def get_version():
     return __version__

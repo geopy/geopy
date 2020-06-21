@@ -42,6 +42,7 @@ class GoogleV3(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None,
             channel=''
     ):
         """
@@ -77,6 +78,11 @@ class GoogleV3(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str channel: If using premier, the channel identifier.
         """
         super().__init__(
@@ -85,6 +91,7 @@ class GoogleV3(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')

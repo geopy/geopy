@@ -64,6 +64,16 @@ setup(
         "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_TEST),
         "dev-docs": EXTRAS_DEV_DOCS,
+        "requests": [
+            "urllib3>=1.24.2",
+            # ^^^ earlier versions would work, but a custom ssl
+            # context would silently have system certificates be loaded as
+            # trusted: https://github.com/urllib3/urllib3/pull/1566
+
+            "requests>=2.16.2",
+            # ^^^ earlier versions would work, but they use an older
+            # vendored version of urllib3 (see note above)
+        ],
         "timezone": ["pytz"],
     },
     license='MIT',

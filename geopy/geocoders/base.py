@@ -1,22 +1,15 @@
-import json
-from socket import timeout as SocketTimeout
-from ssl import SSLError
-from urllib.error import HTTPError
-from urllib.request import HTTPSHandler, ProxyHandler, Request, URLError, build_opener
-
+from geopy.adapters import AdapterHTTPError, RequestsAdapter, URLLibAdapter
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
-    GeocoderParseError,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
     GeocoderServiceError,
     GeocoderTimedOut,
-    GeocoderUnavailable,
 )
 from geopy.point import Point
-from geopy.util import __version__, decode_page, logger
+from geopy.util import __version__, logger
 
 __all__ = (
     "Geocoder",
@@ -24,6 +17,12 @@ __all__ = (
 )
 
 _DEFAULT_USER_AGENT = "geopy/%s" % __version__
+
+_DEFAULT_ADAPTER_CLASS = next(
+    adapter_cls
+    for adapter_cls in (RequestsAdapter, URLLibAdapter,)
+    if adapter_cls.is_available
+)
 
 
 class options:
@@ -50,6 +49,32 @@ class options:
         7
 
     Attributes:
+        default_adapter_factory
+            A callable which returns a :class:`geopy.adapters.BaseAdapter`
+            instance. Adapters are different implementations of HTTP clients.
+            See :mod:`geopy.adapters` for more info.
+
+            This callable accepts two keyword args: ``proxies`` and ``ssl_context``.
+            A class might be specified as this callable as well.
+
+            Example::
+
+                import geopy.geocoders
+                geopy.geocoders.options.default_adapter_factory \
+= geopy.adapters.URLLibAdapter
+
+                geopy.geocoders.options.default_adapter_factory = (
+                    lambda proxies, ssl_context: MyAdapter(
+                        proxies=proxies, ssl_context=ssl_context, my_custom_arg=42
+                    )
+                )
+
+            If `requests <https://requests.readthedocs.io>`_ package is
+            installed, the default adapter is
+            :class:`geopy.adapters.RequestsAdapter`. Otherwise it is
+            :class:`geopy.adapters.URLLibAdapter`.
+
+            .. versionadded:: 2.0
 
         default_proxies
             Tunnel requests through HTTP proxy.
@@ -140,6 +165,7 @@ class options:
     #
     # [1]: http://www.sphinx-doc.org/en/master/ext/autodoc.html#directive-autoattribute
     # [2]: https://github.com/rtfd/readthedocs.org/issues/855#issuecomment-261337038
+    default_adapter_factory = _DEFAULT_ADAPTER_CLASS
     default_proxies = None
     default_scheme = 'https'
     default_ssl_context = None
@@ -180,7 +206,8 @@ class Geocoder:
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            ssl_context=DEFAULT_SENTINEL
+            ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
@@ -198,18 +225,12 @@ class Geocoder:
         if isinstance(self.proxies, str):
             self.proxies = {'http': self.proxies, 'https': self.proxies}
 
-        # `ProxyHandler` should be present even when actually there're
-        # no proxies. `build_opener` contains it anyway. By specifying
-        # it here explicitly we can disable system proxies (i.e.
-        # from HTTP_PROXY env var) by setting `self.proxies` to `{}`.
-        # Otherwise, if we didn't specify ProxyHandler for empty
-        # `self.proxies` here, build_opener would have used one internally
-        # which could have unwillingly picked up the system proxies.
-        opener = build_opener(
-            HTTPSHandler(context=self.ssl_context),
-            ProxyHandler(self.proxies),
+        if adapter_factory is None:
+            adapter_factory = options.default_adapter_factory
+        self.adapter = adapter_factory(
+            proxies=self.proxies,
+            ssl_context=self.ssl_context,
         )
-        self.urlopen = opener.open
 
     def _coerce_point_to_string(self, point, output_format="%(lat)s,%(lon)s"):
         """
@@ -251,9 +272,7 @@ class Geocoder:
                                     lat2=max(p1.latitude, p2.latitude),
                                     lon2=max(p1.longitude, p2.longitude))
 
-    def _geocoder_exception_handler(
-            self, error, message, http_code=None, http_body=None
-    ):
+    def _geocoder_exception_handler(self, error):
         """
         Geocoder-specific exceptions handler.
         Override if custom exceptions processing is needed.
@@ -277,74 +296,29 @@ class Geocoder:
         req_headers = self.headers.copy()
         if headers:
             req_headers.update(headers)
-        req = Request(url=url, headers=req_headers)
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)
 
         try:
-            page = self.urlopen(req, timeout=timeout)
-        except Exception as error:
-            message = (
-                str(error.args[0])
-                if len(error.args)
-                else str(error)
-            )
-            if isinstance(error, HTTPError):
-                http_code = error.getcode()
-                http_body = self._read_http_error_body(error)
-                if http_body:
-                    logger.info('Received an HTTP error (%s): %s', http_code, http_body,
-                                exc_info=False)
+            if is_json:
+                return self.adapter.get_json(url, timeout=timeout, headers=req_headers)
             else:
-                http_code = None
-                http_body = None
-            self._geocoder_exception_handler(error, message, http_code, http_body)
-            if isinstance(error, HTTPError):
-                try:
-                    raise ERROR_CODE_MAP[http_code](message)
-                except KeyError:
-                    raise GeocoderServiceError(message)
-            elif isinstance(error, URLError):
-                if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
-                elif "unreachable" in message:
-                    raise GeocoderUnavailable('Service not available')
-            elif isinstance(error, SocketTimeout):
-                raise GeocoderTimedOut('Service timed out')
-            elif isinstance(error, SSLError):
-                if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
-            raise GeocoderServiceError(message)
-
-        if hasattr(page, 'getcode'):
-            status_code = page.getcode()
-        elif hasattr(page, 'status_code'):
-            status_code = page.status_code
-        else:
-            status_code = None
-        if status_code in ERROR_CODE_MAP:
-            raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
-
-        page = decode_page(page)
-
-        if is_json:
-            try:
-                return json.loads(page)
-            except ValueError:
-                raise GeocoderParseError(
-                    "Could not deserialize using deserializer:\n%s" % page
+                return self.adapter.get_text(url, timeout=timeout, headers=req_headers)
+        except AdapterHTTPError as error:
+            if error.text:
+                logger.info(
+                    'Received an HTTP error (%s): %s',
+                    error.status_code,
+                    error.text,
+                    exc_info=False,
                 )
-        else:
-            return page
-
-    def _read_http_error_body(self, error):
-        try:
-            return decode_page(error)
-        except Exception:
-            logger.debug('Unable to fetch body for a non-successful HTTP response',
-                         exc_info=True)
-            return None
+            self._geocoder_exception_handler(error)
+            exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
+            raise exc_cls(str(error)) from error
+        except Exception as error:
+            self._geocoder_exception_handler(error)
+            raise
 
     # def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
     #     raise NotImplementedError()

@@ -1,5 +1,6 @@
 from urllib.parse import quote, urlencode
 
+from geopy.adapters import AdapterHTTPError
 from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -27,6 +28,7 @@ class TomTom(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None,
             domain='api.tomtom.com'
     ):
         """
@@ -48,6 +50,11 @@ class TomTom(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str domain: Domain where the target TomTom service
             is hosted.
         """
@@ -57,6 +64,7 @@ class TomTom(Geocoder):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         self.api = "%s://%s%s" % (self.scheme, domain, self.geocode_path)
@@ -213,9 +221,10 @@ class TomTom(Geocoder):
         return Location(result['address']['freeformAddress'],
                         (latitude, longitude), result)
 
-    def _geocoder_exception_handler(
-            self, error, message, http_code=None, http_body=None
-    ):
-        if http_code is not None and http_body is not None:
-            if http_code >= 400 and "Developer Over Qps" in http_body:
-                raise GeocoderQuotaExceeded("Developer Over Qps")
+    def _geocoder_exception_handler(self, error):
+        if not isinstance(error, AdapterHTTPError):
+            return
+        if error.status_code is None or error.text is None:
+            return
+        if error.status_code >= 400 and "Developer Over Qps" in error.text:
+            raise GeocoderQuotaExceeded("Developer Over Qps") from error
