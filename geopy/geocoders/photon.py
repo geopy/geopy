@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -23,7 +24,6 @@ class Photon(Geocoder):
 
     def __init__(
             self,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -32,11 +32,6 @@ class Photon(Geocoder):
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -54,16 +49,11 @@ class Photon(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -104,8 +94,6 @@ class Photon(Geocoder):
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
-            .. versionadded:: 1.12.0
-
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as ``'key:value'`` or list/set of str if multiple
             filters are required as ``['key:!val', '!key', ':!value']``.
@@ -116,7 +104,7 @@ class Photon(Geocoder):
 
         """
         params = {
-            'q': self.format_string % query
+            'q': query
         }
         if limit:
             params['limit'] = int(limit)
@@ -136,12 +124,12 @@ class Photon(Geocoder):
             if isinstance(osm_tag, str):
                 params['osm_tag'] = [osm_tag]
             else:
-                if not isinstance(osm_tag, (list, set)):
+                if not isinstance(osm_tag, collections.abc.Iterable):
                     raise ValueError(
-                        "osm_tag must be a string expression or "
-                        "a set/list of string expressions"
+                        "osm_tag must be a string or "
+                        "an iterable of strings"
                     )
-                params['osm_tag'] = osm_tag
+                params['osm_tag'] = list(osm_tag)
         url = "?".join((self.api, urlencode(params, doseq=True)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         return self._parse_json(
@@ -178,11 +166,8 @@ class Photon(Geocoder):
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
-            .. versionadded:: 1.12.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
-
         """
         try:
             lat, lon = self._coerce_point_to_string(query).split(',')

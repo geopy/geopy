@@ -2,7 +2,7 @@
 :class:`.Point` data structure.
 """
 
-import collections
+import collections.abc
 import re
 import warnings
 from itertools import islice
@@ -174,14 +174,14 @@ class Point:
                     return cls.from_sequence(seq)
 
         if single_arg:
-            warnings.warn('A single number has been passed to the Point '
-                          'constructor. This is probably a mistake, because '
-                          'constructing a Point with just a latitude '
-                          'seems senseless. If this is exactly what was '
-                          'meant, then pass the zero longitude explicitly '
-                          'to get rid of this warning. '
-                          'In geopy 2.0 this will become an exception.',
-                          DeprecationWarning, stacklevel=2)
+            raise ValueError(
+                'A single number has been passed to the Point '
+                'constructor. This is probably a mistake, because '
+                'constructing a Point with just a latitude '
+                'seems senseless. If this is exactly what was '
+                'meant, then pass the zero longitude explicitly '
+                'to get rid of this error.'
+            )
 
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)
@@ -261,8 +261,6 @@ class Point:
             >>> p.format_unicode()
             '41° 30′ 0″ N, 81° 0′ 0″ W, 12.3km'
 
-        .. versionadded:: 1.23.0
-
         :param bool altitude: Whether to include ``altitude`` value.
             By default it is automatically included if it is non-zero.
         """
@@ -315,7 +313,7 @@ class Point:
         return self.format()
 
     def __eq__(self, other):
-        if not isinstance(other, collections.Iterable):
+        if not isinstance(other, collections.abc.Iterable):
             return NotImplemented
         return tuple(self) == tuple(other)
 

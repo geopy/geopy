@@ -19,8 +19,6 @@ class MapQuest(Geocoder):
       which is based on Open data from OpenStreetMap.
     - :class:`geopy.geocoders.MapQuest` (this class) MapQuest's own API
       which is based on Licensed data.
-
-    .. versionadded:: 1.22.0
     """
 
     geocode_path = '/geocoding/v1/address'
@@ -29,7 +27,6 @@ class MapQuest(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -41,11 +38,6 @@ class MapQuest(Geocoder):
         :param str api_key: The API key required by Mapquest to perform
             geocoding requests. API keys are managed through MapQuest's "Manage Keys"
             page (https://developer.mapquest.com/user/me/apps).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -66,7 +58,6 @@ class MapQuest(Geocoder):
         :param str domain: base api domain for mapquest
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -152,7 +143,7 @@ class MapQuest(Geocoder):
         """
         params = {}
         params['key'] = self.api_key
-        params['location'] = self.format_string % query
+        params['location'] = query
 
         if limit is not None:
             params['maxResults'] = limit

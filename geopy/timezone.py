@@ -21,7 +21,7 @@ def ensure_pytz_is_installed():
         )
 
 
-def from_timezone_name(timezone_name, raw=None):
+def from_timezone_name(timezone_name, raw):
     ensure_pytz_is_installed()
     try:
         pytz_timezone = pytz.timezone(timezone_name)
@@ -38,7 +38,7 @@ def from_timezone_name(timezone_name, raw=None):
     return Timezone(pytz_timezone, raw)
 
 
-def from_fixed_gmt_offset(gmt_offset_hours, raw=None):
+def from_fixed_gmt_offset(gmt_offset_hours, raw):
     ensure_pytz_is_installed()
     pytz_timezone = pytz.FixedOffset(gmt_offset_hours * 60)
     return Timezone(pytz_timezone, raw)
@@ -48,13 +48,11 @@ class Timezone:
     """
     Contains a parsed response for a timezone request, which is
     implemented in few geocoders which provide such lookups.
-
-    .. versionadded:: 1.18.0
     """
 
     __slots__ = ("_pytz_timezone", "_raw")
 
-    def __init__(self, pytz_timezone, raw=None):
+    def __init__(self, pytz_timezone, raw):
         self._pytz_timezone = pytz_timezone
         self._raw = raw
 
@@ -73,7 +71,7 @@ class Timezone:
         Timezone's raw, unparsed geocoder response. For details on this,
         consult the service's documentation.
 
-        :rtype: dict or None
+        :rtype: dict
         """
         return self._raw
 

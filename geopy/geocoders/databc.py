@@ -23,7 +23,6 @@ class DataBC(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
@@ -40,23 +39,11 @@ class DataBC(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -102,7 +89,7 @@ class DataBC(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {'addressString': self.format_string % query}
+        params = {'addressString': query}
         if set_back != 0:
             params['setBack'] = set_back
         if location_descriptor not in ['any',

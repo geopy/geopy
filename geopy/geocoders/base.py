@@ -1,6 +1,5 @@
 import functools
 import json
-import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
 from urllib.error import HTTPError
@@ -52,16 +51,6 @@ class options:
         7
 
     Attributes:
-        default_format_string
-            String containing ``'%s'`` where the string to geocode should
-            be interpolated before querying the geocoder. Used by `geocode`
-            calls only. For example: ``'%s, Mountain View, CA'``.
-
-            .. deprecated:: 1.22.0
-                ``format_string`` is deprecated in favor of more advanced
-                alternatives (see :ref:`Specifying Parameters Once
-                <specifying_parameters_once>`) and will be removed in
-                geopy 2.0.
 
         default_proxies
             Tunnel requests through HTTP proxy.
@@ -105,9 +94,6 @@ class options:
             For more information, see
             documentation on :class:`urllib.request.ProxyHandler`.
 
-            .. versionchanged:: 1.15.0
-               Added support for the string value.
-
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
 
@@ -140,17 +126,6 @@ class options:
             before raising a :class:`geopy.exc.GeocoderTimedOut` exception.
             Pass `None` to disable timeout.
 
-            .. note::
-               Currently ``None`` as a value is processed correctly only
-               for the ``geopy.geocoders.options.default_timeout`` option
-               value. ``timeout=None`` as a method argument (i.e.
-               ``geocoder.geocode(..., timeout=None)``) would be treated
-               as "use timeout, as set in
-               ``geopy.geocoders.options.default_timeout``", and
-               a deprecation warning would be raised.
-               In geopy 2.0 this will change, so that ``timeout=None``
-               would actually disable timeout.
-
         default_user_agent
             User-Agent header to send with the requests to geocoder API.
     """
@@ -166,7 +141,6 @@ class options:
     #
     # [1]: http://www.sphinx-doc.org/en/master/ext/autodoc.html#directive-autoattribute
     # [2]: https://github.com/rtfd/readthedocs.org/issues/855#issuecomment-261337038
-    default_format_string = '%s'
     default_proxies = None
     default_scheme = 'https'
     default_ssl_context = None
@@ -202,22 +176,12 @@ class Geocoder:
 
     def __init__(
             self,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
-        if format_string is not None or options.default_format_string != "%s":
-            warnings.warn(
-                '`format_string` is deprecated. Please pass the already '
-                'formatted queries to `geocode` instead. See '
-                '`Specifying Parameters Once` section in docs for more '
-                'details. In geopy 2.0 `format_string` will be removed.',
-                DeprecationWarning, stacklevel=3
-            )
-        self.format_string = format_string or options.default_format_string
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
             raise ConfigurationError(
@@ -253,28 +217,18 @@ class Geocoder:
         Do the right thing on "point" input. For geocoders with reverse
         methods.
         """
-        try:
-            if not isinstance(point, Point):
-                point = Point(point)
-        except ValueError as e:
-            if isinstance(point, str):
-                warnings.warn(
-                    'Unable to parse the string as Point: "%s". Using the value '
-                    'as-is for the query. In geopy 2.0 this will become an '
-                    'exception.' % str(e), DeprecationWarning, stacklevel=3
-                )
-                return point
-            raise
-        else:
-            # Altitude is silently dropped.
-            #
-            # Geocoding services (almost?) always consider only lat and lon
-            # in queries, so altitude doesn't affect the request.
-            # A non-zero altitude should not raise an exception
-            # though, because PoIs are assumed to span the whole
-            # altitude axis (i.e. not just the 0km plane).
-            return output_format % dict(lat=point.latitude,
-                                        lon=point.longitude)
+        if not isinstance(point, Point):
+            point = Point(point)
+
+        # Altitude is silently dropped.
+        #
+        # Geocoding services (almost?) always consider only lat and lon
+        # in queries, so altitude doesn't affect the request.
+        # A non-zero altitude should not raise an exception
+        # though, because PoIs are assumed to span the whole
+        # altitude axis (i.e. not just the 0km plane).
+        return output_format % dict(lat=point.latitude,
+                                    lon=point.longitude)
 
     @staticmethod
     def _format_bounding_box(bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"):
@@ -342,16 +296,6 @@ class Geocoder:
                 req = Request(url=url, headers=self.headers)
 
         requester = requester or self.urlopen
-
-        if timeout is None:
-            warnings.warn(
-                ('`timeout=None` has been passed to a geocoder call. Using '
-                 'default geocoder timeout. In geopy 2.0 the '
-                 'behavior will be different: None will mean "no timeout" '
-                 'instead of "default geocoder timeout". Pass '
-                 'geopy.geocoders.base.DEFAULT_SENTINEL instead of None '
-                 'to get rid of this warning.'), DeprecationWarning, stacklevel=3)
-            timeout = DEFAULT_SENTINEL
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)

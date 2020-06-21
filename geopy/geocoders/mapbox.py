@@ -13,8 +13,6 @@ class MapBox(Geocoder):
 
     Documentation at:
         https://www.mapbox.com/api-documentation/
-
-    .. versionadded:: 1.17.0
     """
 
     api_path = '/geocoding/v5/mapbox.places/%(query)s.json/'
@@ -22,7 +20,6 @@ class MapBox(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -34,11 +31,6 @@ class MapBox(Geocoder):
         :param str api_key: The API key required by Mapbox to perform
             geocoding requests. API keys are managed through Mapox's account
             page (https://www.mapbox.com/account/access-tokens).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -59,7 +51,6 @@ class MapBox(Geocoder):
         :param str domain: base api domain for mapbox
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -98,18 +89,10 @@ class MapBox(Geocoder):
         """
         Return a location point by address.
 
-        .. versionchanged:: 1.20.0
-            Previously due to a bug the resulting :class:`geopy.location.Location`'s
-            ``raw`` attribute contained a single string instead of a full
-            service response.
-
         :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
-
-            .. versionchanged:: 1.20.0
-                Previously due to a bug this parameter wasn't respected.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -125,10 +108,6 @@ class MapBox(Geocoder):
             ISO 3166-1 alpha-2 country code (e.g. ``FR``).
             Might be a Python list of strings.
 
-            .. versionchanged:: 1.19.0
-                Previously only a single string could be specified.
-                Now a Python list of individual countries is supported.
-
         :type country: str or list
 
         :param bbox: The bounding box of the viewport within which
@@ -143,7 +122,6 @@ class MapBox(Geocoder):
         params = {}
 
         params['access_token'] = self.api_key
-        query = self.format_string % query
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
@@ -176,11 +154,6 @@ class MapBox(Geocoder):
     ):
         """
         Return an address by location point.
-
-        .. versionchanged:: 1.20.0
-            Previously due to a bug the resulting :class:`geopy.location.Location`'s
-            ``raw`` attribute contained a single string instead of a full
-            service response.
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.

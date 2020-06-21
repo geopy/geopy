@@ -1,5 +1,4 @@
 import base64
-import warnings
 import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
 from urllib.request import Request
@@ -48,7 +47,6 @@ class IGNFrance(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
@@ -84,24 +82,11 @@ class IGNFrance(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
-
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -176,8 +161,6 @@ class IGNFrance(Geocoder):
 
         """
 
-        query = self.format_string % query
-
         # Check if acceptable query type
         if query_type not in ['PositionOfInterest',
                               'StreetAddress',
@@ -246,7 +229,7 @@ class IGNFrance(Geocoder):
             reverse_geocode_preference=('StreetAddress', ),
             maximum_responses=25,
             filtering='',
-            exactly_one=DEFAULT_SENTINEL,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL,
     ):
         """
@@ -271,12 +254,6 @@ class IGNFrance(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -286,13 +263,6 @@ class IGNFrance(Geocoder):
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         sub_request = """
             <ReverseGeocodeRequest>

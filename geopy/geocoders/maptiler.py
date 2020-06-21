@@ -13,8 +13,6 @@ class MapTiler(Geocoder):
 
     Documentation at:
         https://cloud.maptiler.com/geocoding/ (requires sign-up)
-
-    .. versionadded:: 1.22.0
     """
 
     api_path = '/geocoding/%(query)s.json'
@@ -22,7 +20,6 @@ class MapTiler(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -34,11 +31,6 @@ class MapTiler(Geocoder):
         :param str api_key: The API key required by Maptiler to perform
             geocoding requests. API keys are managed through Maptiler's account
             page (https://cloud.maptiler.com/account/keys).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -59,7 +51,6 @@ class MapTiler(Geocoder):
         :param str domain: base api domain for Maptiler
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -129,7 +120,7 @@ class MapTiler(Geocoder):
         """
         params = {'key': self.api_key}
 
-        query = self.format_string % query
+        query = query
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")

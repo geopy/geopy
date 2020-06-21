@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 import pytest
 
@@ -94,18 +93,6 @@ class ArcGISTestCase(GeocoderTestBase):
             {},
             expect_failure=True
         )
-
-    def test_custom_wkid(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            # Custom wkid should be ignored and a warning should be issued.
-            location = self.reverse_run(
-                {"query": Point(40.753898, -73.985071), "wkid": 2000},
-                {"latitude": 40.75376406311989,
-                 "longitude": -73.98489005863667},
-            )
-            assert 'New York' in location.address
-            assert 1 == len(w)
 
 
 @unittest.skipUnless(

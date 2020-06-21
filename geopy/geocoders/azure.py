@@ -9,8 +9,6 @@ class AzureMaps(TomTom):
 
     Documentation at:
         https://docs.microsoft.com/en-us/azure/azure-maps/index
-
-    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/address/json'
@@ -19,7 +17,6 @@ class AzureMaps(TomTom):
     def __init__(
             self,
             subscription_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -29,11 +26,6 @@ class AzureMaps(TomTom):
     ):
         """
         :param str subscription_key: Azure Maps subscription key.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -56,7 +48,6 @@ class AzureMaps(TomTom):
         """
         super().__init__(
             api_key=subscription_key,
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,

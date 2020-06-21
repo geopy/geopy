@@ -1,10 +1,10 @@
-import warnings
 from abc import ABC, abstractmethod
 from unittest.mock import patch
 
 import pytest
 
 import geopy.geocoders
+from geopy.exc import ConfigurationError
 from geopy.geocoders import Nominatim
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase
@@ -117,13 +117,13 @@ class BaseNominatimTestCase(ABC):
     def test_reverse_language_parameter(self):
         query = "52.51693903613385, 13.3859332733135"
         result_reverse_de = self.reverse_run(
-            {"query": query, "exactly_one": True, "language": "de"},
+            {"query": query, "language": "de"},
             {},
         )
         assert result_reverse_de.raw['address']['country'] == "Deutschland"
 
         result_reverse_en = self.reverse_run(
-            {"query": query, "exactly_one": True, "language": "en"},
+            {"query": query, "language": "en"},
             {},
         )
         # have had a change in the exact authority name
@@ -188,26 +188,6 @@ class BaseNominatimTestCase(ABC):
                 {"query": "Maple Street", "viewbox": viewbox},
                 {"latitude": 51.5223513, "longitude": -0.1382104}
             )
-
-    def test_deprecated_viewbox(self):
-        res = self.geocode_run(
-            {"query": "Maple Street"},
-            {},
-        )
-        assert not (50 <= res.latitude <= 52)
-        assert not (-0.15 <= res.longitude <= -0.11)
-
-        for viewbox in [
-            (-0.11, 52, -0.15, 50),
-            ("-0.11", "52", "-0.15", "50")
-        ]:
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter('always')
-                self.geocode_run(
-                    {"query": "Maple Street", "viewbox": viewbox},
-                    {"latitude": 51.5223513, "longitude": -0.1382104}
-                )
-                assert 1 == len(w)
 
     def test_bounded(self):
         bb = (Point('56.588456', '84.719353'), Point('56.437293', '85.296822'))
@@ -321,14 +301,14 @@ class BaseNominatimTestCase(ABC):
     def test_reverse_zoom_parameter(self):
         query = "40.689253199999996, -74.04454817144321"
         result_reverse = self.reverse_run(
-            {"query": query, "exactly_one": True, "zoom": 10},
+            {"query": query, "zoom": 10},
             {},
         )
         assert "New York" in result_reverse.address
         assert "Statue of Liberty" not in result_reverse.address
 
         result_reverse = self.reverse_run(
-            {"query": query, "exactly_one": True},
+            {"query": query},
             {},
         )
         assert "New York" in result_reverse.address
@@ -342,27 +322,17 @@ class NominatimTestCase(BaseNominatimTestCase, GeocoderTestBase):
         kwargs.setdefault('user_agent', 'geopy-test')
         return Nominatim(**kwargs)
 
-    def test_default_user_agent_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+    def test_default_user_agent_error(self):
+        with pytest.raises(ConfigurationError):
             Nominatim()
-            assert 1 == len(w)
 
-    def test_example_user_agent_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+    def test_example_user_agent_error(self):
+        with pytest.raises(ConfigurationError):
             Nominatim(user_agent="specify_your_app_name_here")
-            assert 1 == len(w)
 
     def test_custom_user_agent_works(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            Nominatim(user_agent='my_application')
-            assert 0 == len(w)
+        Nominatim(user_agent='my_application')
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            with patch.object(geopy.geocoders.options, 'default_user_agent',
-                              'my_application'):
-                Nominatim()
-            assert 0 == len(w)
+        with patch.object(geopy.geocoders.options, 'default_user_agent',
+                          'my_application'):
+            Nominatim()

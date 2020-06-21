@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import quote, urlencode
 
 from geopy.exc import (
@@ -35,7 +36,6 @@ class Bing(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -46,11 +46,6 @@ class Bing(Geocoder):
 
         :param str api_key: Should be a valid Bing Maps API key
             (https://www.microsoft.com/en-us/maps/create-a-bing-maps-key).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -64,16 +59,11 @@ class Bing(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
-
-            .. versionadded:: 1.14.0
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -119,23 +109,17 @@ class Bing(Geocoder):
         :param str culture: Affects the language of the response,
             must be a two-letter country code.
 
-            .. versionadded:: 1.4.0
-
         :param bool include_neighborhood: Sets whether to include the
             neighborhood field in the response.
-
-            .. versionadded:: 1.4.0
 
         :param bool include_country_code: Sets whether to include the
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
 
-            .. versionadded:: 1.4.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        if isinstance(query, dict):
+        if isinstance(query, collections.abc.Mapping):
             params = {
                 key: val
                 for key, val
@@ -145,7 +129,7 @@ class Bing(Geocoder):
             params['key'] = self.api_key
         else:
             params = {
-                'query': self.format_string % query,
+                'query': query,
                 'key': self.api_key
             }
         if user_location:

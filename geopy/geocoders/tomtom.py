@@ -13,8 +13,6 @@ class TomTom(Geocoder):
 
     Documentation at:
         https://developer.tomtom.com/search-api/search-api-documentation
-
-    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/2/geocode/%(query)s.json'
@@ -23,7 +21,6 @@ class TomTom(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -33,11 +30,6 @@ class TomTom(Geocoder):
     ):
         """
         :param str api_key: TomTom API key.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -59,7 +51,6 @@ class TomTom(Geocoder):
             is hosted.
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -108,7 +99,6 @@ class TomTom(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        query = self.format_string % query
         params = self._geocode_params(query)
         params['typeahead'] = self._boolean_value(typeahead)
 
@@ -157,8 +147,6 @@ class TomTom(Geocoder):
             available for a specific field, default language is used.
             List of supported languages (case-insensitive):
             https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
-
-            .. versionadded:: 1.18.0
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

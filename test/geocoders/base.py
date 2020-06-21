@@ -1,6 +1,5 @@
 import unittest
 import urllib.request
-import warnings
 from contextlib import ExitStack
 from unittest.mock import patch, sentinel
 
@@ -49,20 +48,8 @@ class GeocoderTestCase(unittest.TestCase):
             assert locals()[attr] == getattr(geocoder, attr)
         assert user_agent == geocoder.headers['User-Agent']
 
-    def test_deprecated_format_string(self):
-        format_string = '%s Los Angeles, CA USA'
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            geocoder = Geocoder(
-                format_string=format_string,
-            )
-            assert format_string == geocoder.format_string
-            assert 1 == len(w)
-
     def test_init_with_defaults(self):
         attr_to_option = {
-            'format_string': 'default_format_string',
             'scheme': 'default_scheme',
             'timeout': 'default_timeout',
             'proxies': 'default_proxies',
@@ -118,12 +105,9 @@ class GeocoderTestCase(unittest.TestCase):
             args, kwargs = mock_urlopen.call_args
             assert kwargs['timeout'] == 7
 
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter('always')
-                g._call_geocoder(url, timeout=None, raw=True)
-                args, kwargs = mock_urlopen.call_args
-                assert kwargs['timeout'] == 12
-                assert 1 == len(w)
+            g._call_geocoder(url, timeout=None, raw=True)
+            args, kwargs = mock_urlopen.call_args
+            assert kwargs['timeout'] is None
 
     def test_ssl_context(self):
 
@@ -180,12 +164,8 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
         assert lonlat == expected
 
     def test_address(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            latlon = self.method(self.coordinates_address)
-            assert 1 == len(w)
-
-        assert latlon == self.coordinates_address
+        with pytest.raises(ValueError):
+            self.method(self.coordinates_address)
 
 
 class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):

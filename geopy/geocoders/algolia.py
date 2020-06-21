@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import urlencode
 from urllib.request import Request
 
@@ -14,8 +15,6 @@ class AlgoliaPlaces(Geocoder):
 
     Documentation at:
         https://community.algolia.com/places/documentation.html
-
-    .. versionadded:: 1.22.0
     """
 
     geocode_path = '/1/places/query'
@@ -26,7 +25,6 @@ class AlgoliaPlaces(Geocoder):
             app_id=None,
             api_key=None,
             domain='places-dsn.algolia.net',
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -42,11 +40,6 @@ class AlgoliaPlaces(Geocoder):
 
         :param str domain: Currently it is ``'places-dsn.algolia.net'``,
             can be changed for testing purposes.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -66,7 +59,6 @@ class AlgoliaPlaces(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -159,7 +151,7 @@ class AlgoliaPlaces(Geocoder):
         """
 
         params = {
-            'query': self.format_string % query,
+            'query': query,
         }
 
         if type is not None:
@@ -276,7 +268,7 @@ class AlgoliaPlaces(Geocoder):
         latitude = feature.get('_geoloc', {}).get('lat')
         longitude = feature.get('_geoloc', {}).get('lng')
 
-        if isinstance(feature['locale_names'], dict):
+        if isinstance(feature['locale_names'], collections.abc.Mapping):
             if language in feature['locale_names']:
                 placename = feature['locale_names'][language][0]
             else:

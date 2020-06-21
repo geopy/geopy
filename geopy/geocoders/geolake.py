@@ -1,3 +1,4 @@
+import collections.abc
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -15,8 +16,6 @@ class Geolake(Geocoder):
 
     Terms of Service at:
         https://geolake.com/terms-of-use
-
-    .. versionadded:: 1.18.0
     """
 
     structured_query_params = {
@@ -40,15 +39,9 @@ class Geolake(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
     ):
         """
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str api_key: The API key required by Geolake
             to perform geocoding requests. You can get your key here:
@@ -75,7 +68,6 @@ class Geolake(Geocoder):
 
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -110,10 +102,6 @@ class Geolake(Geocoder):
             standard (e.g. ``FR``). Multiple countries can be specified with
             a Python list.
 
-            .. versionchanged:: 1.19.0
-                Previously only a Python list of countries could be specified.
-                Now a single country as a string can be specified as well.
-
         :type country_codes: str or list
 
         :param bool exactly_one: Return one result or a list of one result.
@@ -128,7 +116,7 @@ class Geolake(Geocoder):
 
         """
 
-        if isinstance(query, dict):
+        if isinstance(query, collections.abc.Mapping):
             params = {
                 key: val
                 for key, val
@@ -139,7 +127,7 @@ class Geolake(Geocoder):
         else:
             params = {
                 'api_key': self.api_key,
-                'q': self.format_string % query,
+                'q': query,
             }
 
         if not country_codes:

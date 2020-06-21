@@ -1,3 +1,4 @@
+import collections.abc
 import warnings
 from urllib.parse import urlencode
 
@@ -21,8 +22,6 @@ class Here(Geocoder):
 
     Documentation at:
         https://developer.here.com/documentation/geocoder/
-
-    .. versionadded:: 1.15.0
     """
 
     structured_query_params = {
@@ -44,7 +43,6 @@ class Here(Geocoder):
             app_id=None,
             app_code=None,
             apikey=None,
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -57,7 +55,7 @@ class Here(Geocoder):
             be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
-            .. deprecated:: 1.21.0
+            .. attention::
                 App ID and App Code are being replaced by API Keys and OAuth 2.0
                 by HERE. Consider getting an ``apikey`` instead of using
                 ``app_id`` and ``app_code``.
@@ -66,7 +64,10 @@ class Here(Geocoder):
             eventually be replaced with APIKEY.
             See https://developer.here.com/authenticationpage.
 
-            .. deprecated:: 1.21.0
+            .. attention::
+                App ID and App Code are being replaced by API Keys and OAuth 2.0
+                by HERE. Consider getting an ``apikey`` instead of using
+                ``app_id`` and ``app_code``.
 
         :param str apikey: Should be a valid HERE Maps APIKEY. These keys were
             introduced in December 2019 and will eventually replace the legacy
@@ -75,13 +76,6 @@ class Here(Geocoder):
             More authentication details are available at
             https://developer.here.com/blog/announcing-two-new-authentication-types.
             See https://developer.here.com/authenticationpage.
-
-            .. versionadded:: 1.21.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -100,7 +94,6 @@ class Here(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
         """
         super().__init__(
-            format_string=format_string,
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
@@ -203,7 +196,7 @@ class Here(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        if isinstance(query, dict):
+        if isinstance(query, collections.abc.Mapping):
             params = {
                 key: val
                 for key, val
@@ -211,7 +204,7 @@ class Here(Geocoder):
                 if key in self.structured_query_params
             }
         else:
-            params = {'searchtext': self.format_string % query}
+            params = {'searchtext': query}
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lat2)s,%(lon1)s;%(lat1)s,%(lon2)s")

@@ -80,29 +80,23 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(point.format_decimal('m'), "41.5, 81.0, 0.0m")
 
     def test_point_from_iterable(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            self.assertEqual(Point(1, 2, 3), Point([1, 2, 3]))
-            self.assertEqual(Point(1, 2, 0), Point([1, 2]))
-            self.assertEqual(0, len(w))
-            self.assertEqual(Point(1, 0, 0), Point([1]))
-            self.assertEqual(1, len(w))  # a single latitude is discouraged
-            self.assertEqual(Point(0, 0, 0), Point([]))
-            self.assertEqual(1, len(w))
+        self.assertEqual(Point(1, 2, 3), Point([1, 2, 3]))
+        self.assertEqual(Point(1, 2, 0), Point([1, 2]))
+        with self.assertRaises(ValueError):
+            Point([1])
+        self.assertEqual(Point(0, 0, 0), Point([]))
 
         with self.assertRaises(ValueError):
             Point([1, 2, 3, 4])
 
     def test_point_from_single_number(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+        with self.assertRaises(ValueError):
             # Point from a single number is probably a misuse,
             # thus it's discouraged.
-            self.assertEqual((5, 0, 0), tuple(Point(5)))
-            self.assertEqual(1, len(w))
-            # But an explicit zero longitude is fine
-            self.assertEqual((5, 0, 0), tuple(Point(5, 0)))
-            self.assertEqual(1, len(w))
+            Point(5)
+
+        # But an explicit zero longitude is fine
+        self.assertEqual((5, 0, 0), tuple(Point(5, 0)))
 
     def test_point_from_point(self):
         point = Point(self.lat, self.lon, self.alt)

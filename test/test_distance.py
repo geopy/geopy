@@ -1,15 +1,12 @@
 import math
 import unittest
 import warnings
-from unittest.mock import patch
 
 from geopy.distance import (
     EARTH_RADIUS,
-    ELLIPSOIDS,
     Distance,
     GeodesicDistance,
     GreatCircleDistance,
-    VincentyDistance,
     distance,
     lonlat,
 )
@@ -94,18 +91,15 @@ class CommonDistanceComputationCases:
         self.assertAlmostEqual(dist_total.kilometers,
                                dist1.km + dist2.km + dist3.km)
 
-    def test_should_warn_when_using_single_numbers_as_points(self):
+    def test_should_raise_when_using_single_numbers_as_points(self):
         # Each argument is expected to be a Point. If it's not a point,
         # it will be wrapped in Point.
         # Point(10) equals to Point(10, 0).
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            dist1 = self.cls(10, 20)
-            self.assertEqual(2, len(w))  # 1 per each point
-            dist2 = self.cls((10, 0), (20, 0))
-            # no warnings: explicit tuples are not that suspicious
-            self.assertEqual(2, len(w))
-        self.assertAlmostEqual(dist1.kilometers, dist2.kilometers)
+        with self.assertRaises(ValueError):
+            self.cls(10, 20)
+
+        # no error: explicit tuples are not that suspicious
+        self.cls((10, 0), (20, 0))
 
     def test_should_tolerate_tuples_with_textual_numbers(self):
         dist1 = self.cls(("1", "30"), ("20", "60"))
@@ -272,28 +266,14 @@ class TestWhenInstantiatingBaseDistanceClass(unittest.TestCase):
 
 
 class TestDefaultDistanceClass(unittest.TestCase):
-    def test_should_accept_iterations_constructor_kwarg(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            # `iterations` kwarg is a legacy from Vincenty.
-            self.assertEqual(distance(132, iterations=20).km, 132)
-            # `iterations` is not a valid arg of the base Distance class,
-            # so it should raise a warning.
-            self.assertEqual(1, len(w))
 
-            self.assertEqual(distance(132).km, 132)
-            self.assertEqual(1, len(w))
+    def test_default_distance(self):
+        self.assertEqual(distance(132).km, 132)
 
     def test_lonlat_function(self):
         newport_ri_xy = (-71.312796, 41.49008)
         point = lonlat(*newport_ri_xy)
         self.assertEqual(point, (41.49008, -71.312796, 0))
-
-    def test_vincenty_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            VincentyDistance((0, 0), (10, 10))
-            self.assertEqual(1, len(w))
 
 
 class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
@@ -310,57 +290,13 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
         self.assertAlmostEqual(destination.latitude, 0)
         self.assertAlmostEqual(destination.longitude, 180)
 
-    def test_different_altitudes_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            # Different altitudes emit a warning:
-            self.cls((10, 10, 10), (20, 20, 15))
-            self.assertEqual(1, len(w))
-
-            # Equal non-zero altitudes don't warn:
-            self.cls((10, 10, 10), (20, 20, 10))
-            self.assertEqual(1, len(w))
-
-
-@patch.object(VincentyDistance, '_show_deprecation_warning', False)
-class TestWhenComputingVincentyDistance(CommonDistanceCases,
-                                        unittest.TestCase):
-
-    cls = VincentyDistance
-
-    def setUp(self):
-        self.original_ellipsoid = self.cls.ELLIPSOID
-
-    def tearDown(self):
-        self.cls.ELLIPSOID = self.original_ellipsoid
-
-    def test_should_not_converge_for_half_trip_around_equator(self):
+    def test_different_altitudes_error(self):
         with self.assertRaises(ValueError):
-            self.cls((0, 0), (0, 180))
+            # Different altitudes raise an exception:
+            self.cls((10, 10, 10), (20, 20, 15))
 
-    def test_should_compute_destination_for_half_trip_around_equator(self):
-        distance = self.cls()
-        destination = distance.destination((0, 0), 90,
-                                           math.pi * distance.ELLIPSOID[0])
-        self.assertAlmostEqual(destination.latitude, 0, 8)
-        self.assertAlmostEqual(abs(destination.longitude), 180, 8)
-
-    def test_should_compute_same_destination_as_other_libraries(self):
-        distance = self.cls(54.972271)
-        destination = distance.destination((-37.95103, 144.42487), 306.86816)
-        self.assertAlmostEqual(destination.latitude, -37.6528177174, 10)
-        self.assertAlmostEqual(destination.longitude, 143.9264976682, 10)
-
-    def test_should_get_distinct_results_for_different_ellipsoids(self):
-        results = [
-            self.cls((0, 0), (0, 1), ellipsoid=ELLIPSOIDS[ellipsoid_name])
-            for ellipsoid_name in ELLIPSOIDS.keys()
-        ]
-
-        self.assertFalse(any(results[x].kilometers == results[y].kilometers
-                             for x in range(len(results))
-                             for y in range(len(results))
-                             if x != y))
+        # Equal non-zero altitudes don't raise:
+        self.cls((10, 10, 10), (20, 20, 10))
 
 
 class TestWhenComputingGeodesicDistance(CommonDistanceCases,
@@ -374,16 +310,13 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
     def tearDown(self):
         self.cls.ELLIPSOID = self.original_ellipsoid
 
-    def test_different_altitudes_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            # Different altitudes emit a warning:
+    def test_different_altitudes_error(self):
+        with self.assertRaises(ValueError):
+            # Different altitudes raise an exception:
             self.cls((10, 10, 10), (20, 20, 15))
-            self.assertEqual(1, len(w))
 
-            # Equal non-zero altitudes don't warn:
-            self.cls((10, 10, 10), (20, 20, 10))
-            self.assertEqual(1, len(w))
+        # Equal non-zero altitudes don't raise:
+        self.cls((10, 10, 10), (20, 20, 10))
 
     def test_miscellaneous_high_accuracy_cases(self):
 

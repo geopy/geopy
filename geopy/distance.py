@@ -19,12 +19,7 @@ The geodesic distance is the shortest distance on the surface of an
 ellipsoidal model of the earth.  The default algorithm uses the method
 is given by `Karney (2013)
 <https://doi.org/10.1007%2Fs00190-012-0578-z>`_ (:class:`.geodesic`);
-this is accurate to round-off and always converges.  An older
-*deprecated* method due to `Vincenty (1975)
-<https://en.wikipedia.org/wiki/Vincenty's_formulae>`_
-(:class:`.vincenty`) is also available; this is only accurate to 0.2 mm
-and the distance calculation fails to converge for nearly antipodal
-points.
+this is accurate to round-off and always converges.
 
 ``geopy.distance.distance`` currently uses :class:`.geodesic`.
 
@@ -55,8 +50,6 @@ Here are examples of ``distance.distance`` usage::
     >>> salamanca = (40.96, -5.50)
     >>> print(distance.distance(wellington, salamanca).km)
     19959.6792674
-
-The second example above fails with :class:`.vincenty`.
 
 Using :class:`.great_circle` distance::
 
@@ -118,14 +111,11 @@ a suitable approximation::
     >>> print(euclidian_distance)
     1.359986705262199
 
-.. versionchanged:: 1.23.0
-    Calculating distances between points with different altitudes now
-    causes a deprecation warning. In geopy 2.0 this will become a
-    ``ValueError`` exception.
+An attempt to calculate distances between points with different altitudes
+would result in a ``ValueError`` exception.
 
 """
-import warnings
-from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
+from math import asin, atan2, cos, sin, sqrt
 
 from geographiclib.geodesic import Geodesic
 
@@ -187,12 +177,9 @@ def lonlat(x, y, z=0):
 
 def _ensure_same_altitude(a, b):
     if abs(a.altitude - b.altitude) > 1e-6:
-        warnings.warn(
+        raise ValueError(
             'Calculating distance between points with different altitudes '
-            'is not supported. The calculated distance would be '
-            'at the same elevation (as if the points had equal altitudes). '
-            'In geopy 2.0 this will become a ValueError exception.',
-            DeprecationWarning, stacklevel=3
+            'is not supported'
         )
     # Note: non-zero equal altitudes are fine: assuming that
     # the elevation is many times smaller than the Earth radius
@@ -200,10 +187,6 @@ def _ensure_same_altitude(a, b):
 
 
 class Distance:
-    """
-    Base for :class:`.great_circle`, :class:`.vincenty`, and
-    :class:`.geodesic`.
-    """
 
     def __init__(self, *args, **kwargs):
         kilometers = kwargs.pop('kilometers', 0)
@@ -424,8 +407,6 @@ class geodesic(Distance):
         >>> print(geodesic(newport_ri, cleveland_oh).miles)
         538.390445368
 
-
-    .. versionadded:: 1.13.0
     """
 
     ellipsoid_key = None
@@ -434,10 +415,6 @@ class geodesic(Distance):
 
     def __init__(self, *args, **kwargs):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
-        if 'iterations' in kwargs:
-            warnings.warn('Ignoring unused `iterations` kwarg for geodesic '
-                          'distance.', DeprecationWarning, stacklevel=2)
-        kwargs.pop('iterations', 0)
         major, minor, f = self.ELLIPSOID
         super().__init__(*args, **kwargs)
 
@@ -445,7 +422,7 @@ class geodesic(Distance):
         """
         Change the ellipsoid used in the calculation.
         """
-        if not isinstance(ellipsoid, (list, tuple)):
+        if isinstance(ellipsoid, str):
             try:
                 self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
                 self.ellipsoid_key = ellipsoid
@@ -456,7 +433,6 @@ class geodesic(Distance):
         else:
             self.ELLIPSOID = ellipsoid
             self.ellipsoid_key = None
-        return
 
     # Call geographiclib routines for measure and destination
     def measure(self, a, b):
@@ -501,261 +477,6 @@ class geodesic(Distance):
 
 
 GeodesicDistance = geodesic
-
-
-class vincenty(Distance):
-    """
-    .. deprecated:: 1.13
-       Use :class:`.geodesic` instead.
-       Vincenty will be removed in geopy 2.0.
-
-    Calculate the geodesic distance between two points using the Vincenty's
-    method.
-
-    Set which ellipsoidal model of the earth to use by specifying an
-    ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
-    most globally accurate model.  If ``ellipsoid`` is a string, it is
-    looked up in the `ELLIPSOIDS` dictionary to obtain the major and minor
-    semiaxes and the flattening. Otherwise, it should be a tuple with those
-    values.  See the comments above the `ELLIPSOIDS` dictionary for
-    more information.
-
-    Example::
-
-        >>> from geopy.distance import vincenty
-        >>> newport_ri = (41.49008, -71.312796)
-        >>> cleveland_oh = (41.499498, -81.695391)
-        >>> print(vincenty(newport_ri, cleveland_oh).miles)
-        538.390445362
-
-    Note: Vincenty's method for distance fails to converge for some
-    valid (nearly antipodal) points. In such cases, use
-    :class:`.geodesic` which always produces an accurate result.
-
-    """
-
-    ellipsoid_key = None
-    ELLIPSOID = None
-    _show_deprecation_warning = True
-
-    def __init__(self, *args, **kwargs):
-        if self._show_deprecation_warning:
-            warnings.warn('Vincenty is deprecated and is going to be removed '
-                          'in geopy 2.0. Use `geopy.distance.geodesic` '
-                          '(or the default `geopy.distance.distance`) '
-                          'instead, which is more accurate and always converges.',
-                          DeprecationWarning, stacklevel=2)
-        self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
-        self.iterations = kwargs.pop('iterations', 20)
-        major, minor, f = self.ELLIPSOID
-        super().__init__(*args, **kwargs)
-
-    def set_ellipsoid(self, ellipsoid):
-        """
-        Change the ellipsoid used in the calculation.
-        """
-        if not isinstance(ellipsoid, (list, tuple)):
-            try:
-                self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
-                self.ellipsoid_key = ellipsoid
-            except KeyError:
-                raise Exception(
-                    "Invalid ellipsoid. See geopy.distance.ELIPSOIDS"
-                )
-        else:
-            self.ELLIPSOID = ellipsoid
-            self.ellipsoid_key = None
-        return
-
-    def measure(self, a, b):
-        a, b = Point(a), Point(b)
-        lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
-        lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
-
-        if isinstance(self.ELLIPSOID, str):
-            major, minor, f = ELLIPSOIDS[self.ELLIPSOID]
-        else:
-            major, minor, f = self.ELLIPSOID
-
-        delta_lng = lng2 - lng1
-
-        reduced_lat1 = atan((1 - f) * tan(lat1))
-        reduced_lat2 = atan((1 - f) * tan(lat2))
-
-        sin_reduced1, cos_reduced1 = sin(reduced_lat1), cos(reduced_lat1)
-        sin_reduced2, cos_reduced2 = sin(reduced_lat2), cos(reduced_lat2)
-
-        lambda_lng = delta_lng
-        lambda_prime = 2 * pi
-
-        iter_limit = self.iterations
-
-        i = 0
-
-        while (i == 0 or
-               (abs(lambda_lng - lambda_prime) > 10e-12 and i <= iter_limit)):
-            i += 1
-
-            sin_lambda_lng, cos_lambda_lng = sin(lambda_lng), cos(lambda_lng)
-
-            sin_sigma = sqrt(
-                (cos_reduced2 * sin_lambda_lng) ** 2 +
-                (cos_reduced1 * sin_reduced2 -
-                 sin_reduced1 * cos_reduced2 * cos_lambda_lng) ** 2
-            )
-
-            if sin_sigma == 0:
-                return 0  # Coincident points
-
-            cos_sigma = (
-                sin_reduced1 * sin_reduced2 +
-                cos_reduced1 * cos_reduced2 * cos_lambda_lng
-            )
-
-            sigma = atan2(sin_sigma, cos_sigma)
-
-            sin_alpha = (
-                cos_reduced1 * cos_reduced2 * sin_lambda_lng / sin_sigma
-            )
-            cos_sq_alpha = 1 - sin_alpha ** 2
-
-            if cos_sq_alpha != 0:
-                cos2_sigma_m = cos_sigma - 2 * (
-                    sin_reduced1 * sin_reduced2 / cos_sq_alpha
-                )
-            else:
-                cos2_sigma_m = 0.0  # Equatorial line
-
-            C = f / 16. * cos_sq_alpha * (4 + f * (4 - 3 * cos_sq_alpha))
-
-            lambda_prime = lambda_lng
-            lambda_lng = (
-                delta_lng + (1 - C) * f * sin_alpha * (
-                    sigma + C * sin_sigma * (
-                        cos2_sigma_m + C * cos_sigma * (
-                            -1 + 2 * cos2_sigma_m ** 2
-                        )
-                    )
-                )
-            )
-
-        if i > iter_limit:
-            raise ValueError("Vincenty formula failed to converge!")
-
-        u_sq = cos_sq_alpha * (major ** 2 - minor ** 2) / minor ** 2
-
-        A = 1 + u_sq / 16384. * (
-            4096 + u_sq * (-768 + u_sq * (320 - 175 * u_sq))
-        )
-
-        B = u_sq / 1024. * (256 + u_sq * (-128 + u_sq * (74 - 47 * u_sq)))
-
-        delta_sigma = (
-            B * sin_sigma * (
-                cos2_sigma_m + B / 4. * (
-                    cos_sigma * (
-                        -1 + 2 * cos2_sigma_m ** 2
-                    ) - B / 6. * cos2_sigma_m * (
-                        -3 + 4 * sin_sigma ** 2
-                    ) * (
-                        -3 + 4 * cos2_sigma_m ** 2
-                    )
-                )
-            )
-        )
-
-        s = minor * A * (sigma - delta_sigma)
-        return s
-
-    def destination(self, point, bearing, distance=None):
-        """
-        TODO docs.
-        """
-        point = Point(point)
-        lat1 = units.radians(degrees=point.latitude)
-        lng1 = units.radians(degrees=point.longitude)
-        bearing = units.radians(degrees=bearing)
-
-        if distance is None:
-            distance = self
-        if isinstance(distance, Distance):
-            distance = distance.kilometers
-
-        ellipsoid = self.ELLIPSOID
-        if isinstance(ellipsoid, str):
-            ellipsoid = ELLIPSOIDS[ellipsoid]
-
-        major, minor, f = ellipsoid
-
-        tan_reduced1 = (1 - f) * tan(lat1)
-        cos_reduced1 = 1 / sqrt(1 + tan_reduced1 ** 2)
-        sin_reduced1 = tan_reduced1 * cos_reduced1
-        sin_bearing, cos_bearing = sin(bearing), cos(bearing)
-        sigma1 = atan2(tan_reduced1, cos_bearing)
-        sin_alpha = cos_reduced1 * sin_bearing
-        cos_sq_alpha = 1 - sin_alpha ** 2
-        u_sq = cos_sq_alpha * (major ** 2 - minor ** 2) / minor ** 2
-
-        A = 1 + u_sq / 16384. * (
-            4096 + u_sq * (-768 + u_sq * (320 - 175 * u_sq))
-        )
-        B = u_sq / 1024. * (256 + u_sq * (-128 + u_sq * (74 - 47 * u_sq)))
-
-        sigma = distance / (minor * A)
-        sigma_prime = 2 * pi
-
-        while abs(sigma - sigma_prime) > 10e-12:
-            cos2_sigma_m = cos(2 * sigma1 + sigma)
-            sin_sigma, cos_sigma = sin(sigma), cos(sigma)
-            delta_sigma = B * sin_sigma * (
-                cos2_sigma_m + B / 4. * (
-                    cos_sigma * (
-                        -1 + 2 * cos2_sigma_m ** 2
-                    ) - B / 6. * cos2_sigma_m * (
-                        -3 + 4 * sin_sigma ** 2
-                    ) * (
-                        -3 + 4 * cos2_sigma_m ** 2
-                    )
-                )
-            )
-            sigma_prime = sigma
-            sigma = distance / (minor * A) + delta_sigma
-
-        sin_sigma, cos_sigma = sin(sigma), cos(sigma)
-
-        lat2 = atan2(
-            sin_reduced1 * cos_sigma + cos_reduced1 * sin_sigma * cos_bearing,
-            (1 - f) * sqrt(
-                sin_alpha ** 2 + (
-                    sin_reduced1 * sin_sigma -
-                    cos_reduced1 * cos_sigma * cos_bearing
-                ) ** 2
-            )
-        )
-
-        lambda_lng = atan2(
-            sin_sigma * sin_bearing,
-            cos_reduced1 * cos_sigma - sin_reduced1 * sin_sigma * cos_bearing
-        )
-
-        C = f / 16. * cos_sq_alpha * (4 + f * (4 - 3 * cos_sq_alpha))
-
-        delta_lng = (
-            lambda_lng - (1 - C) * f * sin_alpha * (
-                sigma + C * sin_sigma * (
-                    cos2_sigma_m + C * cos_sigma * (
-                        -1 + 2 * cos2_sigma_m ** 2
-                    )
-                )
-            )
-        )
-
-        lng2 = lng1 + delta_lng
-
-        return Point(units.degrees(radians=lat2), units.degrees(radians=lng2))
-
-
-VincentyDistance = vincenty
 
 # Set the default distance formula
 distance = GeodesicDistance

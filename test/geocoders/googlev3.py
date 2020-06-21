@@ -32,19 +32,6 @@ class GoogleV3TestCase(GeocoderTestBase):
         else:
             assert timezone.pytz_timezone == expected
 
-        # `timezone` method is deprecated, but we still support it.
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            if 'query' in payload:
-                payload['location'] = payload['query']
-                del payload['query']
-            pytz_timezone = self._make_request(self.geocoder.timezone, **payload)
-            if expected is None:
-                assert pytz_timezone is None
-            else:
-                assert pytz_timezone == expected
-            assert 0 < len(w)
-
         return timezone
 
     def test_user_agent_custom(self):
@@ -222,7 +209,7 @@ class GoogleV3TestCase(GeocoderTestBase):
 
     def test_reverse(self):
         self.reverse_run(
-            {"query": self.new_york_point, "exactly_one": True},
+            {"query": self.new_york_point},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
@@ -258,15 +245,14 @@ class GoogleV3TestCase(GeocoderTestBase):
             utc_timestamp == self.geocoder._normalize_timezone_at_time(local_aware_dt)
         )
 
-    def test_timezone_integer(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
+    def test_timezone_integer_raises(self):
+        # In geopy 1.x `at_time` could be an integer -- a unix timestamp.
+        # This is an error since geopy 2.0.
+        with pytest.raises(exc.GeocoderQueryError):
             self.reverse_timezone_run(
                 {"query": self.new_york_point, "at_time": 0},
                 self.america_new_york,
             )
-            # at_time as number should issue a warning
-            assert 0 < len(w)
 
     def test_timezone_no_date(self):
         self.reverse_timezone_run(
@@ -290,15 +276,6 @@ class GoogleV3TestCase(GeocoderTestBase):
             {"query": "221b Baker St", "bounds": [[50, -2], [55, 2]]},
             {"latitude": 51.52, "longitude": -0.15},
         )
-
-    def test_geocode_bounds_deprecated(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            self.geocode_run(
-                {"query": "221b Baker St", "bounds": [50, -2, 55, 2]},
-                {"latitude": 51.52, "longitude": -0.15},
-            )
-            assert 1 == len(w)
 
     def test_geocode_bounds_invalid(self):
         with pytest.raises(exc.GeocoderQueryError):
