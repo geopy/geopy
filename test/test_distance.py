@@ -310,16 +310,13 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
         self.assertAlmostEqual(destination.latitude, 0)
         self.assertAlmostEqual(destination.longitude, 180)
 
-    def test_different_altitudes_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            # Different altitudes emit a warning:
+    def test_different_altitudes_error(self):
+        with self.assertRaises(ValueError):
+            # Different altitudes raise an exception:
             self.cls((10, 10, 10), (20, 20, 15))
-            self.assertEqual(1, len(w))
 
-            # Equal non-zero altitudes don't warn:
-            self.cls((10, 10, 10), (20, 20, 10))
-            self.assertEqual(1, len(w))
+        # Equal non-zero altitudes don't raise:
+        self.cls((10, 10, 10), (20, 20, 10))
 
 
 @patch.object(VincentyDistance, '_show_deprecation_warning', False)
@@ -374,16 +371,13 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
     def tearDown(self):
         self.cls.ELLIPSOID = self.original_ellipsoid
 
-    def test_different_altitudes_warning(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            # Different altitudes emit a warning:
+    def test_different_altitudes_error(self):
+        with self.assertRaises(ValueError):
+            # Different altitudes raise an exception:
             self.cls((10, 10, 10), (20, 20, 15))
-            self.assertEqual(1, len(w))
 
-            # Equal non-zero altitudes don't warn:
-            self.cls((10, 10, 10), (20, 20, 10))
-            self.assertEqual(1, len(w))
+        # Equal non-zero altitudes don't raise:
+        self.cls((10, 10, 10), (20, 20, 10))
 
     def test_miscellaneous_high_accuracy_cases(self):
 

@@ -187,12 +187,9 @@ def lonlat(x, y, z=0):
 
 def _ensure_same_altitude(a, b):
     if abs(a.altitude - b.altitude) > 1e-6:
-        warnings.warn(
+        raise ValueError(
             'Calculating distance between points with different altitudes '
-            'is not supported. The calculated distance would be '
-            'at the same elevation (as if the points had equal altitudes). '
-            'In geopy 2.0 this will become a ValueError exception.',
-            DeprecationWarning, stacklevel=3
+            'is not supported'
         )
     # Note: non-zero equal altitudes are fine: assuming that
     # the elevation is many times smaller than the Earth radius
