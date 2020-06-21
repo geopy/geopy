@@ -107,7 +107,7 @@ class OpenMapQuest(Nominatim):
 
             .. versionadded:: 1.14.0
         """
-        super(OpenMapQuest, self).__init__(
+        super().__init__(
             format_string=format_string,
             view_box=view_box,
             bounded=bounded,
@@ -135,4 +135,4 @@ class OpenMapQuest(Nominatim):
         :return: string URL.
         """
         params['key'] = self.api_key
-        return super(OpenMapQuest, self)._construct_url(base_api, params)
+        return super()._construct_url(base_api, params)

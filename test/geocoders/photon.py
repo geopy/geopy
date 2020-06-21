@@ -1,6 +1,3 @@
-# coding: utf8
-from __future__ import unicode_literals
-
 from geopy.geocoders import Photon
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase

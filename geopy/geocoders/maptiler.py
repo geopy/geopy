@@ -1,4 +1,5 @@
-from geopy.compat import quote, string_compare, urlencode
+from urllib.parse import quote, urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point
@@ -57,7 +58,7 @@ class MapTiler(Geocoder):
 
         :param str domain: base api domain for Maptiler
         """
-        super(MapTiler, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -133,7 +134,7 @@ class MapTiler(Geocoder):
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
 
-        if isinstance(language, string_compare):
+        if isinstance(language, str):
             language = [language]
         if language:
             params['language'] = ','.join(language)
@@ -182,7 +183,7 @@ class MapTiler(Geocoder):
         """
         params = {'key': self.api_key}
 
-        if isinstance(language, string_compare):
+        if isinstance(language, str):
             language = [language]
         if language:
             params['language'] = ','.join(language)

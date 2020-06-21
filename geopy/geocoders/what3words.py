@@ -1,7 +1,7 @@
 import re
+from urllib.parse import urlencode
 
 from geopy import exc
-from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -73,7 +73,7 @@ class What3Words(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(What3Words, self).__init__(
+        super().__init__(
             format_string=format_string,
             # The `scheme` argument is present for the legacy reasons only.
             # If a custom value has been passed, it should be validated.

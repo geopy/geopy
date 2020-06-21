@@ -1,8 +1,7 @@
-# coding: utf-8
 from itertools import chain, count
+from time import sleep
 from timeit import default_timer
 
-from geopy.compat import sleep_at_least
 from geopy.exc import GeocoderServiceError
 from geopy.util import logger
 
@@ -12,7 +11,7 @@ def _is_last_gen(count):
     return chain((False for _ in range(count)), [True])
 
 
-class RateLimiter(object):
+class RateLimiter:
     """RateLimiter allows to perform bulk operations while gracefully
     handling error responses and adding delays when needed.
 
@@ -110,7 +109,7 @@ class RateLimiter(object):
 
     def _sleep(self, seconds):  # pragma: no coverage
         logger.debug('RateLimiter sleep(%r)', seconds)
-        sleep_at_least(seconds)
+        sleep(seconds)
 
     def _sleep_between(self):
         seconds_since_last_call = self._clock() - self._last_call

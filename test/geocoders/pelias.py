@@ -1,18 +1,13 @@
-# coding: utf8
-from __future__ import unicode_literals
-
 import unittest
 import warnings
-from abc import ABCMeta, abstractmethod
-
-from six import with_metaclass
+from abc import ABC, abstractmethod
 
 from geopy.geocoders import Pelias
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
 
 
-class BasePeliasTestCase(with_metaclass(ABCMeta, object)):
+class BasePeliasTestCase(ABC):
 
     delta = 0.04
 

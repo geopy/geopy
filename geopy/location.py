@@ -2,7 +2,6 @@
 :class:`.Location` returns geocoder results.
 """
 
-from geopy.compat import py3k, string_compare
 from geopy.point import Point
 
 
@@ -10,7 +9,7 @@ def _location_tuple(location):
     return location._address, (location._point[0], location._point[1])
 
 
-class Location(object):
+class Location:
     """
     Contains a parsed geocoder response. Can be iterated over as
     ``(location<String>, (latitude<float>, longitude<Float))``.
@@ -27,14 +26,14 @@ class Location(object):
             self._point = (None, None, None)
         elif isinstance(point, Point):
             self._point = point
-        elif isinstance(point, string_compare):
+        elif isinstance(point, str):
             self._point = Point(point)
         elif isinstance(point, (tuple, list)):
             self._point = Point(point)
         else:
             raise TypeError(
                 "point an unsupported type: %r; use %r or Point",
-                type(point), type(string_compare)
+                type(point), type(str)
             )
         self._tuple = _location_tuple(self)
         self._raw = raw
@@ -107,22 +106,13 @@ class Location(object):
         """
         return self._tuple[index]
 
-    def __unicode__(self):
+    def __str__(self):
         return self._address
 
-    __str__ = __unicode__
-
     def __repr__(self):
-        if py3k:
-            return "Location(%s, (%s, %s, %s))" % (
-                self._address, self.latitude, self.longitude, self.altitude
-            )
-        else:
-            # Python 2 should not return unicode in __repr__:
-            # http://bugs.python.org/issue5876
-            return "Location((%s, %s, %s))" % (
-                self.latitude, self.longitude, self.altitude
-            )
+        return "Location(%s, (%s, %s, %s))" % (
+            self._address, self.latitude, self.longitude, self.altitude
+        )
 
     def __iter__(self):
         return iter(self._tuple)

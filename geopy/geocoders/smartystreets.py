@@ -1,6 +1,6 @@
 import warnings
+from urllib.parse import urlencode
 
-from geopy.compat import urlencode
 from geopy.exc import ConfigurationError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -80,7 +80,7 @@ class LiveAddress(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(LiveAddress, self).__init__(
+        super().__init__(
             format_string=format_string,
             # The `scheme` argument is present for the legacy reasons only.
             # If a custom value has been passed, it should be validated.

@@ -5,14 +5,13 @@ import unittest
 import pytz
 import pytz.tzinfo
 
-from geopy.compat import u
 from geopy.timezone import Timezone, from_fixed_gmt_offset, from_timezone_name
 
 
 class TimezoneTestCase(unittest.TestCase):
 
     timezone_gmt_offset_hours = 3.0
-    timezone_name = u("Europe/Moscow")  # a DST-less timezone
+    timezone_name = "Europe/Moscow"  # a DST-less timezone
 
     def test_create_from_timezone_name(self):
         raw = dict(foo="bar")

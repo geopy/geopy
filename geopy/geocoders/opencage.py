@@ -1,6 +1,6 @@
 import warnings
+from urllib.parse import urlencode
 
-from geopy.compat import string_compare, urlencode
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -68,7 +68,7 @@ class OpenCage(Geocoder):
             .. versionadded:: 1.14.0
 
         """
-        super(OpenCage, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -144,7 +144,7 @@ class OpenCage(Geocoder):
             'q': self.format_string % query,
         }
         if bounds:
-            if isinstance(bounds, string_compare):
+            if isinstance(bounds, str):
                 warnings.warn(
                     'OpenCage `bounds` format of '
                     '`"longitude,latitude,longitude,latitude"` is now '
@@ -163,7 +163,7 @@ class OpenCage(Geocoder):
 
         if not country:
             country = []
-        if isinstance(country, string_compare):
+        if isinstance(country, str):
             country = [country]
         if country:
             params['countrycode'] = ",".join(country)

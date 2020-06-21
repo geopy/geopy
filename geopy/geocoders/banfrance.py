@@ -1,4 +1,5 @@
-from geopy.compat import urlencode
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -55,7 +56,7 @@ class BANFrance(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
         """
-        super(BANFrance, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

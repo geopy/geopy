@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # GeoPy documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 24 19:28:11 2013.

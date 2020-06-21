@@ -3,16 +3,9 @@ import json
 import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
+from urllib.error import HTTPError
+from urllib.request import HTTPSHandler, ProxyHandler, Request, URLError, build_opener
 
-from geopy.compat import (
-    HTTPError,
-    ProxyHandler,
-    Request,
-    URLError,
-    build_opener_with_context,
-    py3k,
-    string_compare,
-)
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -35,7 +28,7 @@ __all__ = (
 _DEFAULT_USER_AGENT = "geopy/%s" % __version__
 
 
-class options(object):
+class options:
     """The `options` object contains default configuration values for
     geocoders, e.g. `timeout` and `User-Agent`.
     Instead of passing a custom value to each geocoder individually, you can
@@ -121,13 +114,7 @@ class options(object):
         default_ssl_context
             An :class:`ssl.SSLContext` instance with custom TLS
             verification settings. Pass ``None`` to use the interpreter's
-            defaults (starting from Python 2.7.9 and 3.4.3 that is to use
-            the system's trusted CA certificates; the older versions don't
-            support TLS verification completely).
-
-            For older versions of Python (before 2.7.9 and 3.4.3) this
-            argument is ignored, as `urlopen` doesn't accept an ssl
-            context there, and a warning is issued.
+            defaults (that is to use the system's trusted CA certificates).
 
             To use the CA bundle used by `requests` library::
 
@@ -208,7 +195,7 @@ ERROR_CODE_MAP = {
 }
 
 
-class Geocoder(object):
+class Geocoder:
     """
     Template object for geocoders.
     """
@@ -244,7 +231,7 @@ class Geocoder(object):
         self.ssl_context = (ssl_context if ssl_context is not DEFAULT_SENTINEL
                             else options.default_ssl_context)
 
-        if isinstance(self.proxies, string_compare):
+        if isinstance(self.proxies, str):
             self.proxies = {'http': self.proxies, 'https': self.proxies}
 
         # `ProxyHandler` should be present even when actually there're
@@ -254,8 +241,8 @@ class Geocoder(object):
         # Otherwise, if we didn't specify ProxyHandler for empty
         # `self.proxies` here, build_opener would have used one internally
         # which could have unwillingly picked up the system proxies.
-        opener = build_opener_with_context(
-            self.ssl_context,
+        opener = build_opener(
+            HTTPSHandler(context=self.ssl_context),
             ProxyHandler(self.proxies),
         )
         self.urlopen = opener.open
@@ -270,7 +257,7 @@ class Geocoder(object):
             if not isinstance(point, Point):
                 point = Point(point)
         except ValueError as e:
-            if isinstance(point, string_compare):
+            if isinstance(point, str):
                 warnings.warn(
                     'Unable to parse the string as Point: "%s". Using the value '
                     'as-is for the query. In geopy 2.0 this will become an '
@@ -373,12 +360,9 @@ class Geocoder(object):
             page = requester(req, timeout=timeout, **kwargs)
         except Exception as error:
             message = (
-                str(error) if not py3k
-                else (
-                    str(error.args[0])
-                    if len(error.args)
-                    else str(error)
-                )
+                str(error.args[0])
+                if len(error.args)
+                else str(error)
             )
             if isinstance(error, HTTPError):
                 http_code = error.getcode()

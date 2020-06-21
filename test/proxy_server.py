@@ -1,16 +1,9 @@
+import http.server as SimpleHTTPServer
 import select
 import socket
+import socketserver as SocketServer
 import threading
-
-from geopy.compat import urlopen
-
-try:
-    # python 2
-    import SimpleHTTPServer
-    import SocketServer
-except ImportError:
-    import socketserver as SocketServer
-    import http.server as SimpleHTTPServer
+from urllib.request import urlopen
 
 
 def pipe_sockets(sock1, sock2, timeout):
@@ -34,7 +27,7 @@ def pipe_sockets(sock1, sock2, timeout):
             sock.close()
 
 
-class Future(object):
+class Future:
     # concurrent.futures.Future docs say that they shouldn't be instantiated
     # directly, so this is a simple implementation which mimics the Future
     # which can safely be instantiated!
@@ -72,7 +65,7 @@ class ProxyServerThread(threading.Thread):
         self.socket_created_future = Future()
         self.requests = []
 
-        super(ProxyServerThread, self).__init__()
+        super().__init__()
         self.daemon = True
 
     def get_proxy_url(self):

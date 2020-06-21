@@ -1,4 +1,5 @@
-from geopy.compat import quote, urlencode
+from urllib.parse import quote, urlencode
+
 from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -57,7 +58,7 @@ class TomTom(Geocoder):
         :param str domain: Domain where the target TomTom service
             is hosted.
         """
-        super(TomTom, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

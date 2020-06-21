@@ -1,8 +1,9 @@
 import base64
 import warnings
 import xml.etree.ElementTree as ET
+from urllib.parse import urlencode
+from urllib.request import Request
 
-from geopy.compat import Request, iteritems, u, urlencode
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -99,7 +100,7 @@ class IGNFrance(Geocoder):
             .. versionadded:: 1.14.0
 
         """
-        super(IGNFrance, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -361,7 +362,6 @@ class IGNFrance(Geocoder):
         def remove_namespace(doc, namespace):
             """Remove namespace in the document in place."""
             ns = '{%s}' % namespace
-            ns = u(ns)
             nsl = len(ns)
             for elem in doc.iter():
                 if elem.tag.startswith(ns):
@@ -450,7 +450,7 @@ class IGNFrance(Geocoder):
             place['search_centre_distance'] = testContentAttrib(
                 adr.find('.//SearchCentreDistance'), 'value')
 
-            for key, value in iteritems(el):
+            for key, value in iter(el.items()):
                 if value is not None:
                     place[key] = value.text
                     if value.text is None:

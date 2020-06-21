@@ -1,4 +1,5 @@
-from geopy.compat import urlencode
+from urllib.parse import urlencode
+
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -54,7 +55,7 @@ class DataBC(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(DataBC, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

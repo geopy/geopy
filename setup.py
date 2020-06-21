@@ -3,18 +3,26 @@
 geopy
 """
 
+import sys
+
 from setuptools import find_packages, setup
 
-from geopy import __version__ as version
+if sys.version_info < (3, 5):
+    raise RuntimeError(
+        "geopy 2 supports Python 3.5 and above. "
+        "Use geopy 1.x if you need Python 2.7 or 3.4 support."
+    )
+
+# This import must be below the above `sys.version_info` check,
+# because the code being imported here is not compatible with the older
+# versions of Python.
+from geopy import __version__ as version  # noqa  # isort:skip
 
 INSTALL_REQUIRES = [
     'geographiclib<2,>=1.49',
 ]
 
 EXTRAS_DEV_TESTFILES_COMMON = [
-    "contextlib2; python_version<'3.0'",
-    "mock",
-    "six",
 ]
 
 EXTRAS_DEV_LINT = [
@@ -25,7 +33,6 @@ EXTRAS_DEV_LINT = [
 EXTRAS_DEV_TEST = [
     "coverage",
     "pytest>=3.10",
-    "statistics; python_version<'3.0'",
 ]
 
 EXTRAS_DEV_DOCS = [
@@ -39,8 +46,8 @@ setup(
     version=version,
     description='Python Geocoding Toolbox',
     long_description=open('README.rst').read(),
-    author='GeoPy Contributors',
-    author_email='uijllji@gmail.com',
+    maintainer='Kostya Esmukov',
+    maintainer_email='kostya@esmukov.ru',
     url='https://github.com/geopy/geopy',
     download_url=(
         'https://github.com/geopy/geopy/archive/%s.tar.gz' % version
@@ -61,6 +68,7 @@ setup(
     },
     license='MIT',
     keywords='geocode geocoding gis geographical maps earth distance',
+    python_requires=">=3.5",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -70,10 +78,8 @@ setup(
         "Programming Language :: Python",
         "Topic :: Scientific/Engineering :: GIS",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

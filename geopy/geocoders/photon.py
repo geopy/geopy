@@ -1,4 +1,5 @@
-from geopy.compat import string_compare, urlencode
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -61,7 +62,7 @@ class Photon(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(Photon, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -132,7 +133,7 @@ class Photon(Geocoder):
                 raise ValueError(("Location bias must be a"
                                   " coordinate pair or Point"))
         if osm_tag:
-            if isinstance(osm_tag, string_compare):
+            if isinstance(osm_tag, str):
                 params['osm_tag'] = [osm_tag]
             else:
                 if not isinstance(osm_tag, (list, set)):

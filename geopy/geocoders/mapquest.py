@@ -1,4 +1,5 @@
-from geopy.compat import urlencode
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -64,7 +65,7 @@ class MapQuest(Geocoder):
 
         :param str domain: base api domain for mapquest
         """
-        super(MapQuest, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

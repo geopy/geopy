@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 import unittest
 
 import pytest
 
-from geopy.compat import u
 from geopy.geocoders import MapTiler
 from geopy.point import Point
 from test.geocoders.util import GeocoderTestBase, env
@@ -26,7 +24,7 @@ class MapTilerTestCase(GeocoderTestBase):
 
     def test_unicode_name(self):
         self.geocode_run(
-            {"query": u("Stadelhoferstrasse 8, 8001 Z\u00fcrich")},
+            {"query": "Stadelhoferstrasse 8, 8001 Z\u00fcrich"},
             {"latitude": 47.36649, "longitude": 8.54855},
         )
 
@@ -78,15 +76,15 @@ class MapTilerTestCase(GeocoderTestBase):
             {"query": zurich_point, "language": "ja"},
             {"latitude": 47.3723, "longitude": 8.5422, "delta": 1},
         )
-        assert u("\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2") in location.address
+        assert "\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2" in location.address
 
     def test_geocode_language(self):
         location = self.geocode_run(
-            {"query": u("Z\u00fcrich"), "language": "ja",
+            {"query": "Z\u00fcrich", "language": "ja",
              "proximity": Point(47.3723, 8.5422)},
             {"latitude": 47.3723, "longitude": 8.5422, "delta": 1},
         )
-        assert u("\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2") in location.address
+        assert "\u30c1\u30e5\u30fc\u30ea\u30c3\u30d2" in location.address
 
     def test_geocode_raw(self):
         result = self.geocode_run({"query": "New York"}, {})

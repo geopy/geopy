@@ -54,7 +54,7 @@ class AzureMaps(TomTom):
         :param str domain: Domain where the target Azure Maps service
             is hosted.
         """
-        super(AzureMaps, self).__init__(
+        super().__init__(
             api_key=subscription_key,
             format_string=format_string,
             scheme=scheme,

@@ -1,4 +1,3 @@
-from geopy.compat import text_type
 from geopy.exc import GeocoderParseError
 
 try:
@@ -45,7 +44,7 @@ def from_fixed_gmt_offset(gmt_offset_hours, raw=None):
     return Timezone(pytz_timezone, raw)
 
 
-class Timezone(object):
+class Timezone:
     """
     Contains a parsed response for a timezone request, which is
     implemented in few geocoders which provide such lookups.
@@ -78,10 +77,8 @@ class Timezone(object):
         """
         return self._raw
 
-    def __unicode__(self):
-        return text_type(self._pytz_timezone)
-
-    __str__ = __unicode__
+    def __str__(self):
+        return str(self._pytz_timezone)
 
     def __repr__(self):
         return "Timezone(%s)" % repr(self.pytz_timezone)

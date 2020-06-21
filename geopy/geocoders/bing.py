@@ -1,4 +1,5 @@
-from geopy.compat import quote, urlencode
+from urllib.parse import quote, urlencode
+
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
@@ -71,7 +72,7 @@ class Bing(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(Bing, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

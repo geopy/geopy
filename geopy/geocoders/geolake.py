@@ -1,4 +1,5 @@
-from geopy.compat import string_compare, urlencode
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import join_filter, logger
@@ -73,7 +74,7 @@ class Geolake(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
         """
-        super(Geolake, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -143,7 +144,7 @@ class Geolake(Geocoder):
 
         if not country_codes:
             country_codes = []
-        if isinstance(country_codes, string_compare):
+        if isinstance(country_codes, str):
             country_codes = [country_codes]
         if country_codes:
             params['countryCodes'] = ",".join(country_codes)

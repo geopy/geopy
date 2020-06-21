@@ -1,4 +1,3 @@
-# encoding: utf-8
 """
 :class:`.Point` data structure.
 """
@@ -7,10 +6,9 @@ import collections
 import re
 import warnings
 from itertools import islice
-from math import fmod
+from math import fmod, isfinite
 
 from geopy import units, util
-from geopy.compat import isfinite, string_compare
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
 
 POINT_PATTERN = re.compile(r"""
@@ -83,7 +81,7 @@ def _normalize_coordinates(latitude, longitude, altitude):
     return latitude, longitude, altitude
 
 
-class Point(object):
+class Point:
     """
     A geodetic point with latitude, longitude, and altitude.
 
@@ -163,7 +161,7 @@ class Point(object):
             arg = latitude
             if isinstance(arg, Point):
                 return cls.from_point(arg)
-            elif isinstance(arg, string_compare):
+            elif isinstance(arg, str):
                 return cls.from_string(arg)
             else:
                 try:
@@ -188,7 +186,7 @@ class Point(object):
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)
 
-        self = super(Point, cls).__new__(cls)
+        self = super().__new__(cls)
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
@@ -248,7 +246,7 @@ class Point(object):
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, string_compare):
+            if not isinstance(altitude, str):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
@@ -291,7 +289,7 @@ class Point(object):
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, string_compare):
+            if not isinstance(altitude, str):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
@@ -315,9 +313,6 @@ class Point(object):
 
     def __str__(self):
         return self.format()
-
-    def __unicode__(self):
-        return self.format_unicode()
 
     def __eq__(self, other):
         if not isinstance(other, collections.Iterable):

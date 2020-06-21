@@ -1,6 +1,6 @@
 import hashlib
+from urllib.parse import quote_plus, urlencode
 
-from geopy.compat import quote_plus, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderQueryError,
@@ -83,7 +83,7 @@ class Baidu(Geocoder):
 
             .. versionadded:: 1.15.0
         """
-        super(Baidu, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

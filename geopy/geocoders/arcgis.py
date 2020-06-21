@@ -1,8 +1,9 @@
 import json
 import warnings
 from time import time
+from urllib.parse import urlencode
+from urllib.request import Request
 
-from geopy.compat import Request, string_compare, urlencode
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
@@ -102,7 +103,7 @@ class ArcGIS(Geocoder):
 
             .. versionadded:: 1.17.0
         """
-        super(ArcGIS, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,
@@ -188,7 +189,7 @@ class ArcGIS(Geocoder):
         if exactly_one:
             params['maxLocations'] = 1
         if out_fields is not None:
-            if isinstance(out_fields, string_compare):
+            if isinstance(out_fields, str):
                 params['outFields'] = out_fields
             else:
                 params['outFields'] = ",".join(out_fields)

@@ -5,8 +5,8 @@ import warnings
 from calendar import timegm
 from datetime import datetime
 from numbers import Number
+from urllib.parse import urlencode
 
-from geopy.compat import urlencode
 from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -92,7 +92,7 @@ class GoogleV3(Geocoder):
 
             .. versionadded:: 1.12.0
         """
-        super(GoogleV3, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

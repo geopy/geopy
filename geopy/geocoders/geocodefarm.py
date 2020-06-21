@@ -1,4 +1,5 @@
-from geopy.compat import urlencode
+from urllib.parse import urlencode
+
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderQuotaExceeded,
@@ -63,7 +64,7 @@ class GeocodeFarm(Geocoder):
 
             .. versionadded:: 1.14.0
         """
-        super(GeocodeFarm, self).__init__(
+        super().__init__(
             format_string=format_string,
             scheme=scheme,
             timeout=timeout,

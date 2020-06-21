@@ -124,15 +124,12 @@ a suitable approximation::
     ``ValueError`` exception.
 
 """
-from __future__ import division
-
 import warnings
 from math import asin, atan, atan2, cos, pi, sin, sqrt, tan
 
 from geographiclib.geodesic import Geodesic
 
 from geopy import units, util
-from geopy.compat import cmp, py3k, string_compare
 from geopy.point import Point
 from geopy.units import radians
 
@@ -157,6 +154,10 @@ ELLIPSOIDS = {
     'Clarke (1880)': (6378.249145, 6356.51486955, 1 / 293.465),
     'GRS-67':        (6378.1600, 6356.774719, 1 / 298.25)
 }
+
+
+def cmp(a, b):
+    return (a > b) - (a < b)
 
 
 def lonlat(x, y, z=0):
@@ -198,7 +199,7 @@ def _ensure_same_altitude(a, b):
     # it won't give much error.
 
 
-class Distance(object):
+class Distance:
     """
     Base for :class:`.great_circle`, :class:`.vincenty`, and
     :class:`.geodesic`.
@@ -269,24 +270,23 @@ class Distance(object):
         else:
             return cmp(self.kilometers, other)
 
-    if py3k:
-        def __eq__(self, other):
-            return self.__cmp__(other) == 0
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
 
-        def __ne__(self, other):
-            return self.__cmp__(other) != 0
+    def __ne__(self, other):
+        return self.__cmp__(other) != 0
 
-        def __gt__(self, other):
-            return self.__cmp__(other) > 0
+    def __gt__(self, other):
+        return self.__cmp__(other) > 0
 
-        def __lt__(self, other):
-            return self.__cmp__(other) < 0
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
 
-        def __ge__(self, other):
-            return self.__cmp__(other) >= 0
+    def __ge__(self, other):
+        return self.__cmp__(other) >= 0
 
-        def __le__(self, other):
-            return self.__cmp__(other) <= 0
+    def __le__(self, other):
+        return self.__cmp__(other) <= 0
 
     @property
     def kilometers(self):
@@ -350,7 +350,7 @@ class great_circle(Distance):
 
     def __init__(self, *args, **kwargs):
         self.RADIUS = kwargs.pop('radius', EARTH_RADIUS)
-        super(great_circle, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def measure(self, a, b):
         a, b = Point(a), Point(b)
@@ -439,7 +439,7 @@ class geodesic(Distance):
                           'distance.', DeprecationWarning, stacklevel=2)
         kwargs.pop('iterations', 0)
         major, minor, f = self.ELLIPSOID
-        super(geodesic, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
         """
@@ -548,7 +548,7 @@ class vincenty(Distance):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         self.iterations = kwargs.pop('iterations', 20)
         major, minor, f = self.ELLIPSOID
-        super(vincenty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
         """
@@ -572,7 +572,7 @@ class vincenty(Distance):
         lat1, lng1 = radians(degrees=a.latitude), radians(degrees=a.longitude)
         lat2, lng2 = radians(degrees=b.latitude), radians(degrees=b.longitude)
 
-        if isinstance(self.ELLIPSOID, string_compare):
+        if isinstance(self.ELLIPSOID, str):
             major, minor, f = ELLIPSOIDS[self.ELLIPSOID]
         else:
             major, minor, f = self.ELLIPSOID
@@ -682,7 +682,7 @@ class vincenty(Distance):
             distance = distance.kilometers
 
         ellipsoid = self.ELLIPSOID
-        if isinstance(ellipsoid, string_compare):
+        if isinstance(ellipsoid, str):
             ellipsoid = ELLIPSOIDS[ellipsoid]
 
         major, minor, f = ellipsoid
