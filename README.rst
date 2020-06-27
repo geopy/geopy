@@ -17,6 +17,13 @@ geopy
 geopy is a Python 2 and 3 client for several popular geocoding web
 services.
 
+    Warning
+
+    The 1.x series will not receive any new features or bugfixes
+    unless explicitly asked on the issue tracker.
+
+    Consider upgrading to geopy 2.
+
 geopy makes it easy for Python developers to locate the coordinates of
 addresses, cities, countries, and landmarks across the globe using
 third-party geocoders and other data sources.
