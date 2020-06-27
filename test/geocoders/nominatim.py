@@ -1,3 +1,4 @@
+import warnings
 from unittest.mock import patch
 
 import pytest
@@ -326,3 +327,9 @@ class TestNominatim(BaseTestNominatim):
         with patch.object(geopy.geocoders.options, 'default_user_agent',
                           'my_application'):
             Nominatim()
+
+    def test_import_deprecated_osm_module(self):
+        with warnings.catch_warnings(record=True) as w:
+            from geopy.geocoders.osm import Nominatim as OsmNominatim
+        assert len(w) == 1
+        assert OsmNominatim is Nominatim
