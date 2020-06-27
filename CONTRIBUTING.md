@@ -116,7 +116,7 @@ A checklist for adding a new geocoder:
     `geopy/geocoders` package. Please look around to make sure that you're
     not reimplementing something that's already there! For example, if you're
     adding a Nominatim-based service, then your new geocoder class should
-    probably extend the `geopy.geocoders.osm.Nominatim` class.
+    probably extend the `geopy.geocoders.Nominatim` class.
 
 2.  Follow the instructions in the `geopy/geocoders/__init__.py` module for
     adding the required imports.
