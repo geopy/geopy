@@ -5,7 +5,7 @@ Changelog of the 1.x series
 
 1.23.0
 ------
-2020-TBD
+2020-06-27
 
 This is the last feature release for the 1.x series, as geopy 2.0 has been
 released. The 1.x series will not receive any new features or bugfixes
