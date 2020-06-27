@@ -1,5 +1,5 @@
-from geopy.geocoders import Nominatim
 from geopy.geocoders.base import DEFAULT_SENTINEL
+from geopy.geocoders.nominatim import Nominatim
 
 __all__ = ("PickPoint",)
 

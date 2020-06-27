@@ -204,10 +204,10 @@ __all__ = (
     "MapBox",
     "MapQuest",
     "MapTiler",
+    "Nominatim",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
-    "Nominatim",
     "Pelias",
     "Photon",
     "LiveAddress",
@@ -236,9 +236,9 @@ from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.maptiler import MapTiler
+from geopy.geocoders.nominatim import Nominatim
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
-from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
@@ -267,10 +267,10 @@ SERVICE_TO_GEOCODER = {
     "mapbox": MapBox,
     "mapquest": MapQuest,
     "maptiler": MapTiler,
+    "nominatim": Nominatim,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
-    "nominatim": Nominatim,
     "pelias": Pelias,
     "photon": Photon,
     "liveaddress": LiveAddress,
@@ -286,7 +286,7 @@ def get_geocoder_for_service(service):
 
     >>> from geopy.geocoders import get_geocoder_for_service
     >>> get_geocoder_for_service("nominatim")
-    geopy.geocoders.osm.Nominatim
+    geopy.geocoders.nominatim.Nominatim
 
     If the string given is not recognized, a
     :class:`geopy.exc.GeocoderNotFound` exception is raised.

@@ -1,5 +1,5 @@
 from geopy.geocoders.base import DEFAULT_SENTINEL
-from geopy.geocoders.osm import Nominatim
+from geopy.geocoders.nominatim import Nominatim
 
 __all__ = ("OpenMapQuest", )
 

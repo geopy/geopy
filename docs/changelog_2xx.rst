@@ -17,7 +17,7 @@ If you have checked your code on the latest 1.x release with enabled
 warnings (i.e. with ``-Wd`` key of the ``python`` command) and fixed
 all of them, then it should be safe to upgrade.
 
-New features
+New Features
 ~~~~~~~~~~~~
 
 - :mod:`geopy.adapters` module. Previously all geocoders used :mod:`urllib`
@@ -41,7 +41,7 @@ New features
 - :class:`.AsyncRateLimiter` -- an async counterpart of :class:`.RateLimiter`.
 - :class:`.RateLimiter` is now thread-safe.
 
-Packaging changes
+Packaging Changes
 ~~~~~~~~~~~~~~~~~
 
 - Dropped support for Python 2.7 and 3.4.
@@ -50,8 +50,8 @@ Packaging changes
   + ``geopy[requests]`` for :class:`geopy.adapters.RequestsAdapter`.
   + ``geopy[aiohttp]`` for :class:`geopy.adapters.AioHTTPAdapter`.
 
-Chores
-~~~~~~
+Breaking Changes
+~~~~~~~~~~~~~~~~
 
 - ``geopy.distance`` algorithms now raise ``ValueError`` for points with
   different altitudes, because :ref:`altitude is ignored in calculations
@@ -87,3 +87,10 @@ Chores
   :class:`.GeoNames`, :class:`.OpenMapQuest` and :class:`.Yandex`.
 - ``parse_*`` methods in geocoders have been prefixed with ``_``
   to explicitly mark that they are private.
+
+Deprecations
+~~~~~~~~~~~~
+
+- :class:`.Nominatim` has been moved from ``geopy.geocoders.osm`` module
+  to ``geopy.geocoders.nominatim``. The old module is still present for
+  backwards compatibility, but it will be removed in geopy 3.
