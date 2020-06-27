@@ -7,7 +7,7 @@ Changelog
 
 2.0.0
 -----
-2020-XXX
+2020-06-27
 
 geopy 2.0 is a major release with lots of cleanup and inner refactorings.
 The public interface of the library is mostly the same, and the set
