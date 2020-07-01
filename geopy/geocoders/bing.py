@@ -102,7 +102,7 @@ class Bing(Geocoder):
 
             For a structured query, provide a dictionary whose keys
             are one of: `addressLine`, `locality` (city),
-            `adminDistrict` (state), `countryRegion`, or `postalcode`.
+            `adminDistrict` (state), `countryRegion`, or `postalCode`.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
