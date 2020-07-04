@@ -36,14 +36,24 @@ class TestGeolake(BaseTestGeocoder):
 
     async def test_geocode_country_codes_str(self):
         await self.geocode_run(
-            {"query": "Toronto", "country_codes": "US"},
-            {"latitude": 40.46, "longitude": -80.6, "address": "Toronto, US"},
+            {"query": "Toronto", "country_codes": "CA"},
+            {"latitude": 43.72, "longitude": -79.47, "address": "Toronto, CA"},
+        )
+        await self.geocode_run(
+            {"query": "Toronto", "country_codes": "RU"},
+            {},
+            expect_failure=True
         )
 
     async def test_geocode_country_codes_list(self):
         await self.geocode_run(
-            {"query": "Toronto", "country_codes": ["CN", "US"]},
-            {"latitude": 40.46, "longitude": -80.6, "address": "Toronto, US"},
+            {"query": "Toronto", "country_codes": ["CA", "RU"]},
+            {"latitude": 43.72, "longitude": -79.47, "address": "Toronto, CA"},
+        )
+        await self.geocode_run(
+            {"query": "Toronto", "country_codes": ["UA", "RU"]},
+            {},
+            expect_failure=True
         )
 
     async def test_geocode_structured(self):
