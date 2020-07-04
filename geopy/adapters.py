@@ -170,6 +170,8 @@ class BaseSyncAdapter(BaseAdapter):
 
 class BaseAsyncAdapter(BaseAdapter):
     """Base class for asynchronous adapters.
+
+    See also: :ref:`Async Mode <async_mode>`.
     """
 
     async def __aenter__(self):
