@@ -139,7 +139,7 @@ class BaseAdapter(abc.ABC):
 
         This method should not raise any exceptions other than these:
 
-        - :class:`geopy.exc.AdapterHTTPError` should be raised if the response
+        - :class:`geopy.adapters.AdapterHTTPError` should be raised if the response
           was successfully retrieved but the status code was non-successful.
         - :class:`geopy.exc.GeocoderTimedOut` should be raised when the request
           times out.
