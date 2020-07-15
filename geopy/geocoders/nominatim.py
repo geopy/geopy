@@ -176,7 +176,8 @@ class Nominatim(Geocoder):
             Unless exactly_one is set to False, limit will always be 1.
 
         :param bool addressdetails: If you want in *Location.raw* to include
-            addressdetails such as city_district, etc set it to True
+            address details such as house_number, city_district, postcode, etc
+            (in a structured form) set it to True
 
         :param str language: Preferred language in which to return results.
             Either uses standard
