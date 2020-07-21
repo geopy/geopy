@@ -22,7 +22,7 @@ class HereV7(Geocoder):
     """Geocoder using the HERE Geocoder API.
 
     Documentation at:
-        https://developer.here.com/documentation/geocoder/
+        https://developer.here.com/documentation/geocoding-search-api/
     """
 
     structured_query_params = {
@@ -52,31 +52,9 @@ class HereV7(Geocoder):
     ):
         """
 
-        :param str app_id: Should be a valid HERE Maps APP ID. Will eventually
-            be replaced with apiKey.
-            See https://developer.here.com/authenticationpage.
-
-            .. attention::
-                App ID and App Code are being replaced by API Keys and OAuth 2.0
-                by HERE. Consider getting an ``apiKey`` instead of using
-                ``app_id`` and ``app_code``.
-
-        :param str app_code: Should be a valid HERE Maps APP CODE. Will
-            eventually be replaced with apiKey.
-            See https://developer.here.com/authenticationpage.
-
-            .. attention::
-                App ID and App Code are being replaced by API Keys and OAuth 2.0
-                by HERE. Consider getting an ``apiKey`` instead of using
-                ``app_id`` and ``app_code``.
-
-        :param str apiKey: Should be a valid HERE Maps apiKey. These keys were
-            introduced in December 2019 and will eventually replace the legacy
-            APP CODE/APP ID pairs which are already no longer available for new
-            accounts (but still work for old accounts).
+        :param str apiKey: Should be a valid HERE Maps apiKey.
             More authentication details are available at
-            https://developer.here.com/blog/announcing-two-new-authentication-types.
-            See https://developer.here.com/authenticationpage.
+            https://developer.here.com/authenticationpage.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -108,9 +86,9 @@ class HereV7(Geocoder):
             adapter_factory=adapter_factory,
         )
 
-        self.apiKey = apiKey
         domain = "search.hereapi.com"
 
+        self.apiKey = apiKey
         self.api = "%s://geocode.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
             "%s://revgeocode.%s%s" % (self.scheme, domain, self.reverse_path)
@@ -128,6 +106,42 @@ class HereV7(Geocoder):
         additional_data=None,
         timeout=DEFAULT_SENTINEL
     ):
+        """
+        Return a location point by address.
+
+        :param query: The address or query you wish to geocode.
+
+            For a structured query, provide a dictionary whose keys are one of:
+            `street`, `houseNumber`, `postalCode`, `city`, `district`
+            `county`, `state`, `country`.
+
+            You can specify a free-text query with conditional parameters
+            by specifying a string in this param and a dict in the components
+            parameter.
+        
+        :param dict components: Components to generate a qualified query.
+        
+            Provide a dictionary whose keys are one of: `street`, `houseNumber`,
+            `postalCode`, `city`, `district`, `county`, `state`, `country`.
+        
+        :param bbox: A type of spatial filter, limits the search for any other attributes
+            in the request. Specified by two coordinate (lat/lon)
+            pairs -- corners of the box. `The bbox search is currently similar
+            to mapview but it is not extended` (cited from the REST API docs).
+            Relevant global results are also returned.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+        :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int maxresults: Defines the maximum number of items in the
+            response structure. If not provided and there are multiple results
+            the HERE API will return 10 results by default. This will be reset
+            to one if ``exactly_one`` is True.
+
+        """
         params = {}
 
         def create_structured_query(d):
@@ -184,16 +198,10 @@ class HereV7(Geocoder):
         """
         Return an address by location point.
 
-        This implementation supports only a subset of all available parameters.
-        A list of all parameters of the pure REST API is available here:
-        https://developer.here.com/documentation/geocoder/topics/resource-reverse-geocode.html
-
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
         :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
-
-        :param float radius: Proximity radius in meters.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -203,17 +211,8 @@ class HereV7(Geocoder):
             the HERE API will return 10 results by default. This will be reset
             to one if ``exactly_one`` is True.
 
-        :param int pageinformation: A key which identifies the page to be returned
-            when the response is separated into multiple pages. Only useful when
-            ``maxresults`` is also provided.
-
         :param str language: Affects the language of the response,
             must be a RFC 4647 language code, e.g. 'en-US'.
-
-        :param str mode: Affects the type of returned response items, must be
-            one of: 'retrieveAddresses' (default), 'retrieveAreas', 'retrieveLandmarks',
-            'retrieveAll', or 'trackPosition'. See online documentation for more
-            information.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
