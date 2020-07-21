@@ -176,12 +176,9 @@ class HereV7(Geocoder):
             self,
             query,
             *,
-            radius=None,
             exactly_one=True,
             maxresults=None,
-            pageinformation=None,
             language=None,
-            mode='retrieveAddresses',
             timeout=DEFAULT_SENTINEL
     ):
         """
@@ -226,26 +223,20 @@ class HereV7(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        point = self._coerce_point_to_string(query)
+        point = self._coerce_point_to_string(query, output_format="%(lat)s,%(lon)s")
+        
         params = {
-            'mode': mode,
-            'prox': point,
+            'at': point,
+            'apiKey': self.apiKey
         }
-        if radius is not None:
-            params['prox'] = '%s,%s' % (params['prox'], float(radius))
-        if pageinformation:
-            params['pageinformation'] = pageinformation
+
         if maxresults:
-            params['maxresults'] = maxresults
+            params['limit'] = min(maxresults, 100)
         if exactly_one:
-            params['maxresults'] = 1
+            params['limit'] = 1
         if language:
             params['language'] = language
-        if self.apiKey:
-            params['apiKey'] = self.apiKey
-        else:
-            params['app_id'] = self.app_id
-            params['app_code'] = self.app_code
+
         url = "%s?%s" % (self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
