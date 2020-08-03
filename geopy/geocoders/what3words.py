@@ -7,32 +7,32 @@ from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
-__all__ = ("What3Words", )
+__all__ = ("What3Words",)
 
 
 class What3Words(Geocoder):
     """What3Words geocoder.
 
     Documentation at:
-        https://docs.what3words.com/api/v2/
+        https://developer.what3words.com/public-api/
     """
 
     multiple_word_re = re.compile(
         r"[^\W\d\_]+\.{1,1}[^\W\d\_]+\.{1,1}[^\W\d\_]+$", re.U
-        )
+    )
 
-    geocode_path = '/v2/forward'
-    reverse_path = '/v2/reverse'
+    geocode_path = "/v3/convert-to-coordinates"
+    reverse_path = "/v3/convert-to-3wa"
 
     def __init__(
-            self,
-            api_key,
-            *,
-            timeout=DEFAULT_SENTINEL,
-            proxies=DEFAULT_SENTINEL,
-            user_agent=None,
-            ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+        self,
+        api_key,
+        *,
+        timeout=DEFAULT_SENTINEL,
+        proxies=DEFAULT_SENTINEL,
+        user_agent=None,
+        ssl_context=DEFAULT_SENTINEL,
+        adapter_factory=None
     ):
         """
 
@@ -58,7 +58,7 @@ class What3Words(Geocoder):
             .. versionadded:: 2.0
         """
         super().__init__(
-            scheme='https',
+            scheme="https",
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
@@ -67,9 +67,9 @@ class What3Words(Geocoder):
         )
 
         self.api_key = api_key
-        domain = 'api.what3words.com'
-        self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
-        self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
+        domain = "api.what3words.com"
+        self.geocode_api = "%s://%s%s" % (self.scheme, domain, self.geocode_path)
+        self.reverse_api = "%s://%s%s" % (self.scheme, domain, self.reverse_path)
 
     def _check_query(self, query):
         """
@@ -80,14 +80,7 @@ class What3Words(Geocoder):
         else:
             return True
 
-    def geocode(
-            self,
-            query,
-            *,
-            lang='en',
-            exactly_one=True,
-            timeout=DEFAULT_SENTINEL
-    ):
+    def geocode(self, query, *, lang="en", exactly_one=True, timeout=DEFAULT_SENTINEL):
 
         """
         Return a location point for a `3 words` query. If the `3 words` address
@@ -114,14 +107,11 @@ class What3Words(Geocoder):
         """
 
         if not self._check_query(query):
-            raise exc.GeocoderQueryError(
-                "Search string must be 'word.word.word'"
-            )
+            raise exc.GeocoderQueryError("Search string must be 'word.word.word'")
 
         params = {
-            'addr': query,
-            'lang': lang.lower(),
-            'key': self.api_key,
+            "words": query,
+            "key": self.api_key,
         }
 
         url = "?".join((self.geocode_api, urlencode(params)))
@@ -135,11 +125,11 @@ class What3Words(Geocoder):
         JSON response.
         """
 
-        code = resources['status'].get('code')
+        error = resources.get("error", None)
 
-        if code:
-            # https://docs.what3words.com/api/v2/#errors
-            exc_msg = "Error returned by What3Words: %s" % resources['status']['message']
+        if error is not None:
+            # https://developer.what3words.com/public-api/docs#error-handling
+            exc_msg = "Error returned by What3Words: %s" % resources["error"]["message"]
             if code == 401:
                 raise exc.GeocoderAuthenticationFailure(exc_msg)
 
@@ -150,17 +140,17 @@ class What3Words(Geocoder):
             Parse record.
             """
 
-            if 'geometry' in resource:
-                words = resource['words']
-                position = resource['geometry']
-                latitude, longitude = position['lat'], position['lng']
+            if "coordinates" in resource:
+                words = resource["words"]
+                position = resource["coordinates"]
+                latitude, longitude = position["lat"], position["lng"]
                 if latitude and longitude:
                     latitude = float(latitude)
                     longitude = float(longitude)
 
                 return Location(words, (latitude, longitude), resource)
             else:
-                raise exc.GeocoderParseError('Error parsing result.')
+                raise exc.GeocoderParseError("Error parsing result.")
 
         location = parse_resource(resources)
         if exactly_one:
@@ -168,14 +158,7 @@ class What3Words(Geocoder):
         else:
             return [location]
 
-    def reverse(
-            self,
-            query,
-            *,
-            lang='en',
-            exactly_one=True,
-            timeout=DEFAULT_SENTINEL
-    ):
+    def reverse(self, query, *, lang="en", exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return a `3 words` address by location point. Each point on surface has
         a `3 words` address, so there's always a non-empty response.
@@ -205,12 +188,13 @@ class What3Words(Geocoder):
         lang = lang.lower()
 
         params = {
-            'coords': self._coerce_point_to_string(query),
-            'lang': lang.lower(),
-            'key': self.api_key,
+            "coordinates": self._coerce_point_to_string(query),
+            "language": lang.lower(),
+            "key": self.api_key,
         }
 
         url = "?".join((self.reverse_api, urlencode(params)))
+        print(url)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
