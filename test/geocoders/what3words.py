@@ -80,9 +80,9 @@ class TestWhat3Words(BaseTestGeocoder):
         )
 
     async def test_result_language(self):
-        await self.geocode_run(
-            {"query": "piped.gains.jangle", "lang": 'DE'},
-            {"address": 'fortschrittliche.voll.schnitt'},
+        await self.reverse_run(
+            {"query": (53.037611, 11.565012), "lang": "en", "exactly_one": False},
+            {"address": "piped.gains.jangle"},
         )
 
     async def test_check_query(self):
