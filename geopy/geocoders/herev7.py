@@ -2,17 +2,17 @@ from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import (
-    GeocoderQueryError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
+    GeocoderQueryError,
     GeocoderQuotaExceeded,
     GeocoderServiceError,
     GeocoderUnavailable,
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.util import logger
 from geopy.point import Point
+from geopy.util import logger
 
 __all__ = ("HereV7", )
 
