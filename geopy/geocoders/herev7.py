@@ -77,8 +77,6 @@ class HereV7(Geocoder):
 
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
-
-            .. versionadded:: 2.0
         """
         super().__init__(
             scheme=scheme,
@@ -100,13 +98,11 @@ class HereV7(Geocoder):
     def geocode(
         self,
         query,
-        components=None,
         *,
         bbox=None,
         exactly_one=True,
         maxresults=None,
         language=None,
-        additional_data=None,
         timeout=DEFAULT_SENTINEL
     ):
         """
