@@ -23,6 +23,9 @@ class HereV7(Geocoder):
     Documentation at:
         https://developer.here.com/documentation/geocoding-search-api/
 
+    Terms of Service at:
+        https://legal.here.com/en-gb/terms
+
     ..attention::
         If you need to use the v6 API, use :class: `.HERE` instead.
     """
