@@ -19,10 +19,13 @@ __all__ = ("HereV7", )
 
 
 class HereV7(Geocoder):
-    """Geocoder using the HERE Geocoder API.
-
+    """Geocoder using the HERE Geocoding & Search v7 API.
+    
     Documentation at:
         https://developer.here.com/documentation/geocoding-search-api/
+    
+    ..attention::
+        If you need to use the v6 API, use :class: `.HERE` instead.
     """
 
     structured_query_params = {
