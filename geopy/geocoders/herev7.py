@@ -14,6 +14,7 @@ from geopy.exc import (
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import join_filter, logger
+from geopy.point import Point
 
 __all__ = ("HereV7", )
 
@@ -99,10 +100,13 @@ class HereV7(Geocoder):
         self,
         query,
         *,
+        components=None,
+        circle=None,
+        country=None,
         bbox=None,
+        language=None,
         exactly_one=True,
         maxresults=None,
-        language=None,
         timeout=DEFAULT_SENTINEL
     ):
         """
@@ -123,6 +127,19 @@ class HereV7(Geocoder):
             Provide a dictionary whose keys are one of: `street`, `houseNumber`,
             `postalCode`, `city`, `district`, `county`, `state`, `country`.
         
+        :param circle: A type of spatial filter, limits the search for any other attributes
+            in the request. Specified by one coordinate (lat/lon) and a radius (in meters).
+        :type circle: list or tuple of 2 items: one :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"`` and a numeric
+            value representing the radius of the circle.
+
+            Only one of either circle, bbox or country can be provided.
+        
+        :param country: A list of country codes specified in `ISO 3166-1 alpha-3` format.
+            This is a hard filter.
+
+            Only one of either country, circle or bbox can be provided.
+
         :param bbox: A type of spatial filter, limits the search for any other attributes
             in the request. Specified by two coordinate (lat/lon)
             pairs -- corners of the box. `The bbox search is currently similar
@@ -132,6 +149,8 @@ class HereV7(Geocoder):
         :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
+            Only one of either bbox, circle or country can be provided.
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
@@ -140,6 +159,14 @@ class HereV7(Geocoder):
             the HERE API will return 10 results by default. This will be reset
             to one if ``exactly_one`` is True.
 
+        :param str language: Affects the language of the response,
+            must be a RFC 4647 language code, e.g. 'en-US'.
+
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
         """
         params = {}
 
@@ -160,11 +187,29 @@ class HereV7(Geocoder):
         if components and isinstance(components, dict):
             params['qq'] = create_structured_query(components)
 
+        if circle:
+            center, radius = circle
+            center = Point(center)
+            circle_str = "{latitude},{longitude};r={radius}".format(
+                latitude=center.latitude,
+                longitude=center.longitude,
+                radius=radius
+            )
+            params['in'] = 'circle:' + circle_str
+        
+        if country:
+            if isinstance(country, list):
+                country_str = ','.join(country)
+            else:
+                country_str = country
+            
+            params['in'] = 'countryCode:' + country_str
+
         if bbox:
             bbox_str = self._format_bounding_box(
                 bbox, "%(lon2)s,%(lat2)s,%(lon1)s,%(lat1)s"
             )
-            params['in'] = 'bbox=' + bbox_str
+            params['in'] = 'bbox:' + bbox_str
         
         if maxresults:
             params['limit'] = maxresults
@@ -174,9 +219,6 @@ class HereV7(Geocoder):
 
         if language:
             params['lang'] = language
-
-        if additional_data:
-            params.update(additional_data)
 
         params['apiKey'] = self.apikey
 
