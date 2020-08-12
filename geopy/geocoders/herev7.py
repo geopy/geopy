@@ -1,10 +1,8 @@
-import collections.abc
-import warnings
 from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import (
-    ConfigurationError,
+    GeocoderQueryError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
     GeocoderQuotaExceeded,
@@ -13,7 +11,7 @@ from geopy.exc import (
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.util import join_filter, logger
+from geopy.util import logger
 from geopy.point import Point
 
 __all__ = ("HereV7", )
@@ -21,10 +19,10 @@ __all__ = ("HereV7", )
 
 class HereV7(Geocoder):
     """Geocoder using the HERE Geocoding & Search v7 API.
-    
+
     Documentation at:
         https://developer.here.com/documentation/geocoding-search-api/
-    
+
     ..attention::
         If you need to use the v6 API, use :class: `.HERE` instead.
     """
@@ -121,20 +119,21 @@ class HereV7(Geocoder):
             You can specify a free-text query with conditional parameters
             by specifying a string in this param and a dict in the components
             parameter.
-        
+
         :param dict components: Components to generate a qualified query.
-        
+
             Provide a dictionary whose keys are one of: `street`, `houseNumber`,
             `postalCode`, `city`, `district`, `county`, `state`, `country`.
-        
-        :param circle: A type of spatial filter, limits the search for any other attributes
-            in the request. Specified by one coordinate (lat/lon) and a radius (in meters).
+
+        :param circle: A type of spatial filter, limits the search for any other
+            attributes in the request. Specified by one coordinate (lat/lon)
+            and a radius (in meters).
         :type circle: list or tuple of 2 items: one :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"`` and a numeric
             value representing the radius of the circle.
 
             Only one of either circle, bbox or country can be provided.
-        
+
         :param country: A list of country codes specified in `ISO 3166-1 alpha-3` format.
             This is a hard filter.
 
@@ -176,14 +175,16 @@ class HereV7(Geocoder):
                 for key, val
                 in d.items() if key in self.structured_query_params
             ]
-            if components: return ';'.join(components)
-            else: return None
+            if components:
+                return ';'.join(components)
+            else:
+                return None
 
         if isinstance(query, dict):
             params['qq'] = create_structured_query(query)
         else:
             params['q'] = query
-        
+
         if components and isinstance(components, dict):
             params['qq'] = create_structured_query(components)
 
@@ -196,13 +197,16 @@ class HereV7(Geocoder):
                 radius=radius
             )
             params['in'] = 'circle:' + circle_str
-        
+
+        if [bool(c) for c in [country, bbox, circle]].count(True) > 1:
+            raise GeocoderQueryError('Only one of country, bbox or circle can be used.')
+
         if country:
             if isinstance(country, list):
                 country_str = ','.join(country)
             else:
                 country_str = country
-            
+
             params['in'] = 'countryCode:' + country_str
 
         if bbox:
@@ -210,7 +214,7 @@ class HereV7(Geocoder):
                 bbox, "%(lon2)s,%(lat2)s,%(lon1)s,%(lat1)s"
             )
             params['in'] = 'bbox:' + bbox_str
-        
+
         if maxresults:
             params['limit'] = maxresults
 
@@ -264,7 +268,7 @@ class HereV7(Geocoder):
             ``exactly_one=False``.
         """
         point = self._coerce_point_to_string(query, output_format="%(lat)s,%(lon)s")
-        
+
         params = {
             'at': point,
             'apiKey': self.apikey
@@ -312,9 +316,9 @@ class HereV7(Geocoder):
             """
             Parse each return object.
             """
-            stripchars = ", \n"
+            # stripchars = ", \n"
 
-            location =resource['title']
+            location = resource['title']
             position = resource['position']
 
             latitude, longitude = position['lat'], position['lng']
