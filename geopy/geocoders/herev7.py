@@ -42,7 +42,7 @@ class HereV7(Geocoder):
     def __init__(
             self,
             *,
-            apiKey=None,
+            apikey=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -52,7 +52,7 @@ class HereV7(Geocoder):
     ):
         """
 
-        :param str apiKey: Should be a valid HERE Maps apiKey.
+        :param str apikey: Should be a valid HERE Maps apikey.
             More authentication details are available at
             https://developer.here.com/authenticationpage.
 
@@ -88,7 +88,7 @@ class HereV7(Geocoder):
 
         domain = "search.hereapi.com"
 
-        self.apiKey = apiKey
+        self.apikey = apikey
         self.api = "%s://geocode.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
             "%s://revgeocode.%s%s" % (self.scheme, domain, self.reverse_path)
@@ -179,7 +179,7 @@ class HereV7(Geocoder):
         if additional_data:
             params.update(additional_data)
 
-        params['apiKey'] = self.apiKey
+        params['apiKey'] = self.apikey
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -226,7 +226,7 @@ class HereV7(Geocoder):
         
         params = {
             'at': point,
-            'apiKey': self.apiKey
+            'apiKey': self.apikey
         }
 
         if maxresults:
