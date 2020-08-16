@@ -2,16 +2,15 @@ from functools import partial
 from urllib.parse import urlencode
 
 from geopy.exc import (
+    ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
-    GeocoderQueryError,
     GeocoderQuotaExceeded,
     GeocoderServiceError,
     GeocoderUnavailable,
 )
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
-from geopy.point import Point
 from geopy.util import logger
 
 __all__ = ("HereV7", )
@@ -91,6 +90,10 @@ class HereV7(Geocoder):
 
         domain = "search.hereapi.com"
 
+        if not apikey:
+            raise ConfigurationError(
+                "HEREv7 geocoder requires authentication, `apikey` must be set"
+            )
         self.apikey = apikey
         self.api = "%s://geocode.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
@@ -102,9 +105,8 @@ class HereV7(Geocoder):
         query,
         *,
         components=None,
-        circle=None,
+        at=None,
         country=None,
-        bbox=None,
         language=None,
         exactly_one=True,
         maxresults=None,
@@ -128,9 +130,11 @@ class HereV7(Geocoder):
             Provide a dictionary whose keys are one of: `street`, `houseNumber`,
             `postalCode`, `city`, `district`, `county`, `state`, `country`.
 
-        :param circle: A type of spatial filter, limits the search for any other
-            attributes in the request. Specified by one coordinate (lat/lon)
-            and a radius (in meters).
+        :param at: The center of the search context.
+
+        :type at: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
         :type circle: list or tuple of 2 items: one :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"`` and a numeric
             value representing the radius of the circle.
@@ -141,17 +145,6 @@ class HereV7(Geocoder):
             This is a hard filter.
 
             Only one of either country, circle or bbox can be provided.
-
-        :param bbox: A type of spatial filter, limits the search for any other attributes
-            in the request. Specified by two coordinate (lat/lon)
-            pairs -- corners of the box. `The bbox search is currently similar
-            to mapview but it is not extended` (cited from the REST API docs).
-            Relevant global results are also returned.
-            Example: ``[Point(22, 180), Point(-22, -180)]``.
-        :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
-            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
-
-            Only one of either bbox, circle or country can be provided.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -191,19 +184,6 @@ class HereV7(Geocoder):
         if components and isinstance(components, dict):
             params['qq'] = create_structured_query(components)
 
-        if circle:
-            center, radius = circle
-            center = Point(center)
-            circle_str = "{latitude},{longitude};r={radius}".format(
-                latitude=center.latitude,
-                longitude=center.longitude,
-                radius=radius
-            )
-            params['in'] = 'circle:' + circle_str
-
-        if [bool(c) for c in [country, bbox, circle]].count(True) > 1:
-            raise GeocoderQueryError('Only one of country, bbox or circle can be used.')
-
         if country:
             if isinstance(country, list):
                 country_str = ','.join(country)
@@ -212,11 +192,9 @@ class HereV7(Geocoder):
 
             params['in'] = 'countryCode:' + country_str
 
-        if bbox:
-            bbox_str = self._format_bounding_box(
-                bbox, "%(lon2)s,%(lat2)s,%(lon1)s,%(lat1)s"
-            )
-            params['in'] = 'bbox:' + bbox_str
+        if at:
+            point = self._coerce_point_to_string(at, output_format="%(lat)s,%(lon)s")
+            params['at'] = point
 
         if maxresults:
             params['limit'] = maxresults
@@ -282,7 +260,7 @@ class HereV7(Geocoder):
         if exactly_one:
             params['limit'] = 1
         if language:
-            params['language'] = language
+            params['lang'] = language
 
         url = "%s?%s" % (self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
