@@ -198,7 +198,7 @@ class BaseTestNominatim(BaseTestGeocoder):
         )
 
     async def test_extratags(self):
-        query = "175 5th Avenue NYC"
+        query = "Statue of Liberty"
         location = await self.geocode_run(
             {"query": query},
             {},
@@ -208,13 +208,9 @@ class BaseTestNominatim(BaseTestGeocoder):
             {"query": query, "extratags": True},
             {},
         )
-        # Nominatim and OpenMapQuest contain the following in extratags:
-        # {'wikidata': 'Q220728', 'wikipedia': 'en:Flatiron Building'}
-        # But PickPoint *sometimes* returns the following instead:
-        # {'wikidata': 'Q1427377'}
-        # So let's simply consider just having the `wikidata` key
-        # in response a success.
-        assert location.raw['extratags']['wikidata']
+
+        # 'wikidata': 'Q9202', 'wikipedia': 'en:Statue of Liberty'
+        assert location.raw['extratags']['wikidata'] == 'Q9202'
 
     async def test_country_codes_moscow(self):
         await self.geocode_run(
@@ -254,25 +250,25 @@ class BaseTestNominatim(BaseTestGeocoder):
         await self.geocode_run(
             {"query": "mexico",
              "featuretype": 'country'},
-            {"latitude": 22.5000485, "longitude": -100.0000375},
+            {"latitude": 22.5000485, "longitude": -100.0000375, "delta": 5.0},
         )
 
         await self.geocode_run(
             {"query": "mexico",
              "featuretype": 'state'},
-            {"latitude": 19.4839446, "longitude": -99.6899716},
+            {"latitude": 19.4839446, "longitude": -99.6899716, "delta": 2.0},
         )
 
         await self.geocode_run(
             {"query": "mexico",
              "featuretype": 'city'},
-            {"latitude": 19.4326009, "longitude": -99.1333416},
+            {"latitude": 19.4326009, "longitude": -99.1333416, "delta": 2.0},
         )
 
         await self.geocode_run(
             {"query": "georgia",
              "featuretype": 'settlement'},
-            {"latitude": 32.3293809, "longitude": -83.1137366},
+            {"latitude": 32.3293809, "longitude": -83.1137366, "delta": 2.0},
         )
 
     async def test_namedetails(self):

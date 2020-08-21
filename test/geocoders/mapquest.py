@@ -23,7 +23,7 @@ class TestMapQuest(BaseTestGeocoder):
     async def test_unicode_name(self):
         await self.geocode_run(
             {"query": "\u6545\u5bab"},
-            {"latitude": 25.0968, "longitude": 121.54714},
+            {"latitude": 25.0968, "longitude": 121.54714, "delta": 5.0},
         )
 
     async def test_reverse(self):
