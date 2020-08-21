@@ -116,6 +116,11 @@ class CommonDistanceComputationCases:
                 self.cls((lon, lat), (lon - 10, lat))
             self.assertEqual(1, len(w))
 
+    def test_should_get_consistent_results_for_distance_calculations(self):
+        distance1, distance2 = [self.cls((0, 0), (0, 1))
+                                for _ in range(2)]
+        self.assertEqual(distance1.kilometers, distance2.kilometers)
+
 
 class CommonMathematicalOperatorCases:
 
@@ -163,11 +168,6 @@ class CommonMathematicalOperatorCases:
 
     def test_should_be_false_in_boolean_context_when_zero_length(self):
         self.assertFalse(self.cls(0))
-
-    def test_should_get_consistent_results_for_distance_calculations(self):
-        distance1, distance2 = [self.cls((0, 0), (0, 1))
-                                for _ in range(2)]
-        self.assertEqual(distance1.kilometers, distance2.kilometers)
 
 
 class CommonConversionCases:
@@ -259,13 +259,11 @@ class CommonDistanceCases(CommonDistanceComputationCases,
     pass
 
 
-class TestWhenInstantiatingBaseDistanceClass(unittest.TestCase):
-    def test_should_not_be_able_to_instantiate(self):
-        with self.assertRaises(TypeError):
-            Distance((0, 0), (0, 180))
-
-
-class TestDefaultDistanceClass(unittest.TestCase):
+class TestDefaultDistanceClass(CommonMathematicalOperatorCases,
+                               CommonConversionCases,
+                               CommonComparisonCases,
+                               unittest.TestCase):
+    cls = Distance
 
     def test_default_distance(self):
         self.assertEqual(distance(132).km, 132)
