@@ -218,8 +218,8 @@ class Photon(Geocoder):
                 in name_elements if resource['properties'].get(k)]
         location = ', '.join(name)
 
-        latitude = resource['geometry']['coordinates'][1] or None
-        longitude = resource['geometry']['coordinates'][0] or None
+        latitude = resource['geometry']['coordinates'][1]
+        longitude = resource['geometry']['coordinates'][0]
         if latitude and longitude:
             latitude = float(latitude)
             longitude = float(longitude)
