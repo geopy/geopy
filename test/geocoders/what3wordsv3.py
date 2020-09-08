@@ -31,7 +31,7 @@ class TestUnitWhat3WordsV3:
 class TestWhat3WordsV3(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):
-        return What3Words(
+        return What3WordsV3(
             env['WHAT3WORDS_KEY'],
             timeout=3,
             **kwargs
