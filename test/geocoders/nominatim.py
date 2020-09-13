@@ -255,8 +255,8 @@ class BaseTestNominatim(BaseTestGeocoder):
 
         await self.geocode_run(
             {"query": "mexico",
-             "featuretype": 'state'},
-            {"latitude": 19.4839446, "longitude": -99.6899716, "delta": 2.0},
+             "featuretype": 'state', "country_codes": "US"},
+            {"latitude": 34.5708167, "longitude": -105.993007, "delta": 2.0},
         )
 
         await self.geocode_run(
