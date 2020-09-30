@@ -15,20 +15,20 @@ POINT_PATTERN = re.compile(r"""
     .*?
     (?P<latitude>
       (?P<latitude_direction_front>[NS])?[ ]*
-        (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+        (?P<latitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
         (?:(?P<latitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
         (?:(?P<latitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
         )?(?P<latitude_direction_back>[NS])?)
     %(SEP)s
     (?P<longitude>
       (?P<longitude_direction_front>[EW])?[ ]*
-      (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+      (?P<longitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
       (?:(?P<longitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
       (?:(?P<longitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
       )?(?P<longitude_direction_back>[EW])?)(?:
     %(SEP)s
       (?P<altitude>
-        (?P<altitude_distance>-?%(FLOAT)s)[ ]*
+        (?P<altitude_distance>[+-]?%(FLOAT)s)[ ]*
         (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
     \s*$
 """ % {
