@@ -212,6 +212,7 @@ __all__ = (
     "Photon",
     "LiveAddress",
     "TomTom",
+    "USCensus",
     "What3Words",
     "Yandex",
 )
@@ -244,6 +245,7 @@ from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.tomtom import TomTom
+from geopy.geocoders.uscensus import USCensus
 from geopy.geocoders.what3words import What3Words
 from geopy.geocoders.yandex import Yandex
 
@@ -275,6 +277,7 @@ SERVICE_TO_GEOCODER = {
     "photon": Photon,
     "liveaddress": LiveAddress,
     "tomtom": TomTom,
+    "uscensus": USCensus,
     "what3words": What3Words,
     "yandex": Yandex,
 }
