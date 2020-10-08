@@ -24,7 +24,9 @@ class GoogleV3(Geocoder):
         https://developers.google.com/maps/documentation/geocoding/
 
     .. attention::
-        Since July 2018 Google requires each request to have an API key.
+        Since July 2018 Google requires each request to have an API key with
+        the Geocoding API enabled on the project. Additionally
+        `reverse_timezone` will also require the Time Zone API to be turned on.
         See https://developers.google.com/maps/documentation/geocoding/usage-and-billing
     """
 
