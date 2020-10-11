@@ -42,7 +42,7 @@ class TestUSCensus(BaseTestGeocoder):
 
     async def test_geocode_empty_result(self):
         result = await self.geocode_run(
-            {"query": "dsadjkasdjasd"},
+            {'query': 'dsadjkasdjasd'},
             {},
             expect_failure=True,
         )
