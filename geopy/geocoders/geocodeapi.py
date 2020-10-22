@@ -89,6 +89,10 @@ class GeocodeAPI(Geocoder):
 
     def _parse_feature(self, feature):
         latitude, longitude = self._get_coordinates(feature)
+        place_name = self._get_place_name(feature)
+
+    def _get_place_name(self, feature):
+        return feature.get('properties', {}).get('label')
 
     def _get_coordinates(self, feature):
         coordinates = feature.get('geometry', {}).get('coordinates', [])
