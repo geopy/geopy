@@ -73,3 +73,8 @@ class GeocodeAPI(Geocoder):
         url = self.api_geocode + params
 
         logger.debug('%s.geocode: %s', self.__class__.__name__, url)
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
+
+    def _parse_json(self, exactly_one):
+        pass
