@@ -33,3 +33,6 @@ class GeocodeAPI(Geocoder):
         """
         super().__init__(timeout=timeout, proxies=proxies)
         self.api_key = api_key
+
+        self.api_geocode = self.base_api_url + self.geocode_path
+        self.api_reverse = self.base_api_url + self.reverse_path
