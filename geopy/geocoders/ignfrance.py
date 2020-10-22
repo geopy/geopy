@@ -1,15 +1,8 @@
-import warnings
+import base64
 import xml.etree.ElementTree as ET
+from functools import partial
+from urllib.parse import urlencode
 
-from geopy.compat import (
-    HTTPBasicAuthHandler,
-    HTTPPasswordMgrWithDefaultRealm,
-    Request,
-    build_opener,
-    iteritems,
-    u,
-    urlencode,
-)
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -46,6 +39,7 @@ class IGNFrance(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             username=None,
             password=None,
             referer=None,
@@ -54,8 +48,8 @@ class IGNFrance(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
@@ -90,27 +84,22 @@ class IGNFrance(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
+            .. versionadded:: 2.0
         """
-        super(IGNFrance, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
 
         # Catch if no api key with username and password
@@ -136,18 +125,17 @@ class IGNFrance(Geocoder):
         self.domain = domain.strip('/')
         api_path = self.api_path % dict(api_key=self.api_key)
         self.api = '%s://%s%s' % (self.scheme, self.domain, api_path)
-        if username and password and referer is None:
-            self.addSimpleHTTPAuthHeader()
 
     def geocode(
             self,
             query,
+            *,
             query_type='StreetAddress',
             maximum_responses=25,
             is_freeform=False,
             filtering=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -181,8 +169,6 @@ class IGNFrance(Geocoder):
             ``exactly_one=False``.
 
         """
-
-        query = self.format_string % query
 
         # Check if acceptable query type
         if query_type not in ['PositionOfInterest',
@@ -237,23 +223,20 @@ class IGNFrance(Geocoder):
         url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        raw_xml = self._request_raw_content(url, timeout)
-
-        return self._parse_xml(
-            raw_xml,
-            is_freeform=is_freeform,
-            exactly_one=exactly_one
+        callback = partial(
+            self._parse_xml, is_freeform=is_freeform, exactly_one=exactly_one
         )
+        return self._request_raw_content(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             reverse_geocode_preference=('StreetAddress', ),
             maximum_responses=25,
             filtering='',
-            exactly_one=DEFAULT_SENTINEL,
-            timeout=DEFAULT_SENTINEL,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
@@ -277,12 +260,6 @@ class IGNFrance(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -292,13 +269,6 @@ class IGNFrance(Geocoder):
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         sub_request = """
             <ReverseGeocodeRequest>
@@ -342,64 +312,13 @@ class IGNFrance(Geocoder):
         url = "?".join((self.api, urlencode({'xls': request_string})))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-
-        raw_xml = self._request_raw_content(url, timeout)
-
-        return self._parse_xml(
-            raw_xml,
+        callback = partial(
+            self._parse_xml,
             exactly_one=exactly_one,
             is_reverse=True,
             is_freeform='false'
         )
-
-    def addSimpleHTTPAuthHeader(self):
-        # TODO make this a private API
-        # Create Urllib request object embedding HTTP simple authentication
-        sub_request = """
-        <GeocodeRequest returnFreeForm="{is_freeform}">
-            <Address countryCode="{query_type}">
-                <freeFormAddress>{query}</freeFormAddress>
-            </Address>
-        </GeocodeRequest>
-        """
-
-        xml_request = self.xml_request.format(
-            method_name='LocationUtilityService',
-            sub_request=sub_request,
-            maximum_responses=1
-        )
-
-        # Create query using parameters
-        request_string = xml_request.format(
-            is_freeform='false',
-            query='rennes',
-            query_type='PositionOfInterest'
-        )
-
-        params = {
-            'xls':  request_string
-        }
-
-        top_level_url = "?".join((self.api, urlencode(params)))
-        password_mgr = HTTPPasswordMgrWithDefaultRealm()
-
-        # Add the username and password.
-        # If we knew the realm, we could use it instead of None.
-        password_mgr.add_password(
-            None,
-            top_level_url,
-            self.username,
-            self.password
-        )
-
-        handler = HTTPBasicAuthHandler(password_mgr)
-
-        # create "opener" (OpenerDirector instance)
-        opener = build_opener(handler)
-
-        # Install the opener.
-        # Now all calls to urllib.request.urlopen use our opener.
-        self.urlopen = opener.open
+        return self._request_raw_content(url, callback, timeout=timeout)
 
     def _parse_xml(self,
                    page,
@@ -417,9 +336,8 @@ class IGNFrance(Geocoder):
         def remove_namespace(doc, namespace):
             """Remove namespace in the document in place."""
             ns = '{%s}' % namespace
-            ns = u(ns)
             nsl = len(ns)
-            for elem in doc.getiterator():
+            for elem in doc.iter():
                 if elem.tag.startswith(ns):
                     elem.tag = elem.tag[nsl:]
 
@@ -430,6 +348,8 @@ class IGNFrance(Geocoder):
         # Return places as json instead of XML
         places = self._xml_to_json_places(tree, is_reverse=is_reverse)
 
+        if not places:
+            return None
         if exactly_one:
             return self._parse_place(places[0], is_freeform=is_freeform)
         else:
@@ -440,8 +360,7 @@ class IGNFrance(Geocoder):
                 ) for place in places
             ]
 
-    @staticmethod
-    def _xml_to_json_places(tree, is_reverse=False):
+    def _xml_to_json_places(self, tree, is_reverse=False):
         """
         Transform the xml ElementTree due to XML webservice return to json
         """
@@ -504,7 +423,7 @@ class IGNFrance(Geocoder):
             place['search_centre_distance'] = testContentAttrib(
                 adr.find('.//SearchCentreDistance'), 'value')
 
-            for key, value in iteritems(el):
+            for key, value in iter(el.items()):
                 if value is not None:
                     place[key] = value.text
                     if value.text is None:
@@ -526,26 +445,28 @@ class IGNFrance(Geocoder):
 
         return places
 
-    def _request_raw_content(self, url, timeout):
+    def _request_raw_content(self, url, callback, *, timeout):
         """
         Send the request to get raw content.
         """
-
-        request = Request(url)
-
+        headers = {}
         if self.referer is not None:
-            request.add_header('Referer', self.referer)
+            headers['Referer'] = self.referer
 
-        raw_xml = self._call_geocoder(
-            request,
+        if self.username and self.password and self.referer is None:
+            credentials = '{0}:{1}'.format(self.username, self.password).encode()
+            auth_str = base64.standard_b64encode(credentials).decode()
+            headers['Authorization'] = 'Basic {}'.format(auth_str.strip())
+
+        return self._call_geocoder(
+            url,
+            callback,
+            headers=headers,
             timeout=timeout,
-            deserializer=None
+            is_json=False,
         )
 
-        return raw_xml
-
-    @staticmethod
-    def _parse_place(place, is_freeform=None):
+    def _parse_place(self, place, is_freeform=None):
         """
         Get the location, lat, lng and place from a single json place.
         """

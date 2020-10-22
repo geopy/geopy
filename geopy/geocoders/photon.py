@@ -1,4 +1,7 @@
-from geopy.compat import string_compare, urlencode
+import collections.abc
+from functools import partial
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -22,18 +25,16 @@ class Photon(Geocoder):
 
     def __init__(
             self,
-            format_string=None,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='photon.komoot.de',
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -51,21 +52,22 @@ class Photon(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
-        super(Photon, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.domain = domain.strip('/')
         self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
@@ -74,6 +76,7 @@ class Photon(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             location_bias=None,
@@ -101,8 +104,6 @@ class Photon(Geocoder):
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
-            .. versionadded:: 1.12.0
-
         :param osm_tag: The expression to filter (include/exclude) by key and/
             or value, str as ``'key:value'`` or list/set of str if multiple
             filters are required as ``['key:!val', '!key', ':!value']``.
@@ -113,7 +114,7 @@ class Photon(Geocoder):
 
         """
         params = {
-            'q': self.format_string % query
+            'q': query
         }
         if limit:
             params['limit'] = int(limit)
@@ -130,29 +131,28 @@ class Photon(Geocoder):
                 raise ValueError(("Location bias must be a"
                                   " coordinate pair or Point"))
         if osm_tag:
-            if isinstance(osm_tag, string_compare):
+            if isinstance(osm_tag, str):
                 params['osm_tag'] = [osm_tag]
             else:
-                if not isinstance(osm_tag, (list, set)):
+                if not isinstance(osm_tag, collections.abc.Iterable):
                     raise ValueError(
-                        "osm_tag must be a string expression or "
-                        "a set/list of string expressions"
+                        "osm_tag must be a string or "
+                        "an iterable of strings"
                     )
-                params['osm_tag'] = osm_tag
+                params['osm_tag'] = list(osm_tag)
         url = "?".join((self.api, urlencode(params, doseq=True)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=False,
-            limit=None,
+            limit=None
     ):
         """
         Return an address by location point.
@@ -175,11 +175,8 @@ class Photon(Geocoder):
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
-            .. versionadded:: 1.12.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
-
         """
         try:
             lat, lon = self._coerce_point_to_string(query).split(',')
@@ -197,26 +194,22 @@ class Photon(Geocoder):
             params['lang'] = language
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    @classmethod
-    def _parse_json(cls, resources, exactly_one=True):
+    def _parse_json(self, resources, exactly_one=True):
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
         if not len(resources['features']):  # pragma: no cover
             return None
         if exactly_one:
-            return cls.parse_resource(resources['features'][0])
+            return self._parse_resource(resources['features'][0])
         else:
-            return [cls.parse_resource(resource) for resource
+            return [self._parse_resource(resource) for resource
                     in resources['features']]
 
-    @classmethod
-    def parse_resource(cls, resource):
-        # TODO make this a private API
+    def _parse_resource(self, resource):
         # Return location and coordinates tuple from dict.
         name_elements = ['name', 'housenumber', 'street',
                          'postcode', 'street', 'city',
@@ -225,8 +218,8 @@ class Photon(Geocoder):
                 in name_elements if resource['properties'].get(k)]
         location = ', '.join(name)
 
-        latitude = resource['geometry']['coordinates'][1] or None
-        longitude = resource['geometry']['coordinates'][0] or None
+        latitude = resource['geometry']['coordinates'][1]
+        longitude = resource['geometry']['coordinates'][0]
         if latitude and longitude:
             latitude = float(latitude)
             longitude = float(longitude)

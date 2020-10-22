@@ -1,4 +1,6 @@
-from geopy.compat import urlencode
+from functools import partial
+from urllib.parse import urlencode
+
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderQuotaExceeded,
@@ -24,20 +26,18 @@ class GeocodeFarm(Geocoder):
     def __init__(
             self,
             api_key=None,
-            format_string=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            scheme=None,
+            adapter_factory=None,
+            scheme=None
     ):
         """
 
         :param str api_key: (optional) The API key required by GeocodeFarm
             to perform geocoding requests.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -48,26 +48,25 @@ class GeocodeFarm(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
-
-            .. versionadded:: 1.14.0
         """
-        super(GeocodeFarm, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         domain = 'www.geocode.farm'
@@ -78,7 +77,7 @@ class GeocodeFarm(Geocoder):
             "%s://%s%s" % (self.scheme, domain, self.reverse_path)
         )
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return a location point by address.
 
@@ -96,17 +95,16 @@ class GeocodeFarm(Geocoder):
             ``exactly_one=False``.
         """
         params = {
-            'addr': self.format_string % query,
+            'addr': query,
         }
         if self.api_key:
             params['key'] = self.api_key
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return an address by location point.
 
@@ -139,13 +137,10 @@ class GeocodeFarm(Geocoder):
             params['key'] = self.api_key
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def parse_code(results):
-        # TODO make this a private API
+    def _parse_code(self, results):
         # Parse each resource.
         places = []
         for result in results.get('RESULTS'):
@@ -173,14 +168,13 @@ class GeocodeFarm(Geocoder):
         if "NO_RESULTS" in geocoding_results.get("STATUS", {}).get("status", ""):
             return None
 
-        places = self.parse_code(geocoding_results)
+        places = self._parse_code(geocoding_results)
         if exactly_one:
             return places[0]
         else:
             return places
 
-    @staticmethod
-    def _check_for_api_errors(geocoding_results):
+    def _check_for_api_errors(self, geocoding_results):
         """
         Raise any exceptions if there were problems reported
         in the api response.

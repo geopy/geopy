@@ -1,7 +1,119 @@
 :orphan:
 
-Changelog
-=========
+Changelog of the 1.x series
+===========================
+
+1.23.0
+------
+2020-06-27
+
+This is the last feature release for the 1.x series, as geopy 2.0 has been
+released. The 1.x series will not receive any new features or bugfixes
+unless explicitly asked on the issue tracker.
+
+*   ADDED: `Units Conversion` docs section.
+
+*   ADDED: Docs now explicitly clarify that geocoding services
+    don't consider altitudes. (#165)
+
+*   ADDED: `Point.format_unicode` method. It was always present as
+    `__unicode__` magic for Python 2.7, and now it can be accessed
+    as a public method.
+
+*   ADDED: `geopy.__version_info__` tuple which can be used to dynamically
+    compare geopy version.
+
+*   ADDED: pytest `--skip-tests-requiring-internet` switch (might be useful
+    for downstream package maintainers). (#413)
+
+*   CHANGED: Points with different altitudes now emit a warning
+    in distance computations. In geopy 2.0 the warning would become
+    an exception. (#387)
+
+*   CHANGED: Improved `Point` docs: added missing public methods,
+    added more examples.
+
+*   CHANGED: `Nominatim` started emitting warnings for a number of sample
+    user agents mentioned in the docs, such as `specify_your_app_name_here`.
+
+*   FIXED: `IGNFrance` ignored proxies with username + password auth. (#289)
+
+
+1.22.0
+------
+2020-05-11
+
+*   ADDED: `AlgoliaPlaces` geocoder.
+    Contributed by Álvaro Mondéjar. (#405)
+
+*   ADDED: `BaiduV3` geocoder. (#394)
+
+*   ADDED: `MapQuest` geocoder.
+    Contributed by Pratheek Rebala. (#399)
+
+*   ADDED: `MapTiler` geocoder.
+    Contributed by chilfing. (#397)
+
+*   ADDED: `Nominatim`-based geocoders: `zoom` parameter
+    has been added to the `reverse` method.
+    Contributed by David Mueller. (#406)
+
+*   ADDED: `GoogleV3` added support for lists in `components` param
+    which allows to specify multiple components with the same name.
+    Contributed by Pratheek Rebala. (#409)
+
+*   CHANGED: Updated links to Nominatim documentation.
+    Contributed by Sarah Hoffmann. (#403)
+
+*   CHANGED: `Yandex` now issues a deprecation warning when `lang`
+    parameter is specified in `__init__`. `lang` should be passed
+    to `geocode` and `reverse` instead. (#350)
+
+*   CHANGED: `format_string` param has been marked as deprecated
+    in all geocoders and will be removed in geopy 2.0.
+    See the new `Specifying Parameters Once` doc section for alternatives.
+
+*   FIXED: `IGNFrance` incorrectly processed empty results: `geocode`
+    has been raising an `IndexError`, `reverse` was returning an empty
+    list. Now they both return `None`. (#244)
+
+*   FIXED: `TomTom` geocoder has been raising `GeocoderInsufficientPrivileges`
+    exception for rate limiting errors instead of `GeocoderQuotaExceeded`.
+
+
+1.21.0
+------
+2020-02-02
+
+*   ADDED: `HERE` geocoder now supports the new API KEY authentication
+    method. The old one is marked as deprecated and now issues a warning.
+    Contributed by deeplook. (#388)
+
+*   ADDED: `Nominatim`-based geocoders: `featuretype` parameter
+    has been added to the `geocode` method.
+    Contributed by Sergio Martín Morillas. (#365)
+
+*   ADDED: `Nominatim`-based geocoders: `namedetails` parameter
+    has been added to the `geocode` method.
+    Contributed by enrique a. (#368)
+
+*   ADDED: `Pelias`: `language` parameter has been added
+    to the `geocode` and `reverse` methods.
+    Contributed by Armin Leuprecht. (#378)
+
+*   CHANGED: `Yandex` geocoder started to require API key for all requests
+    since September 2019, so a warning asking to specify a key has been
+    added which is issued when API key is missing.
+
+*   CHANGED (packaging): sdist now contains tests.
+
+*   FIXED: Updated link to `TomTom` Search API documentation.
+    Contributed by Przemek Malolepszy. (#362)
+
+*   FIXED: Occasional ``KeyError('city')`` in `Geolake`.
+    Contributed by Dmitrii K. (#373)
+
+
 1.20.0
 ------
 2019-05-26

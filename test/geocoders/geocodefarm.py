@@ -1,10 +1,11 @@
+from unittest.mock import patch
+
 import pytest
-from mock import patch
 
 from geopy import exc
 from geopy.geocoders import GeocodeFarm
 from geopy.point import Point
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.util import BaseTestGeocoder, env
 
 
 @pytest.mark.xfail(
@@ -13,100 +14,89 @@ from test.geocoders.util import GeocoderTestBase, env
         "geocodefarm service is unstable at times"
     )
 )
-class GeocodeFarmTestCase(GeocoderTestBase):
+class TestGeocodeFarm(BaseTestGeocoder):
 
     @classmethod
-    def setUpClass(cls):
-        cls.delta = 0.04
-        cls.geocoder = GeocodeFarm(
+    def make_geocoder(cls, **kwargs):
+        return GeocodeFarm(
             # None api_key will use free tier on GeocodeFarm.
             api_key=env.get('GEOCODEFARM_KEY'),
             timeout=10,
+            **kwargs
         )
 
-    def test_user_agent_custom(self):
+    async def test_user_agent_custom(self):
         geocoder = GeocodeFarm(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
-    def test_geocode(self):
-        """
-        GeocodeFarm.geocode
-        """
-        location = self.geocode_run(
+    async def test_geocode(self):
+        location = await self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
-        self.assertIn("chicago", location.address.lower())
+        assert "chicago" in location.address.lower()
 
-    def test_location_address(self):
-        self.geocode_run(
+    async def test_location_address(self):
+        await self.geocode_run(
             {"query": "moscow"},
             {"address": "Moscow, Russia",
              "latitude": 55.7558913503453, "longitude": 37.6172961632184}
         )
 
-    def test_reverse(self):
-        location = self.reverse_run(
+    async def test_reverse(self):
+        location = await self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
+            skiptest_on_failure=True,  # sometimes the result is empty
         )
-        self.assertIn("new york", location.address.lower())
+        assert "new york" in location.address.lower()
 
-    def test_authentication_failure(self):
-        """
-        GeocodeFarm authentication failure
-        """
-        self.geocoder = GeocodeFarm(api_key="invalid")
-        with self.assertRaises(exc.GeocoderAuthenticationFailure):
-            self.geocode_run(
-                {"query": '435 north michigan ave, chicago il 60611'},
-                {},
-                expect_failure=True,
-            )
+    async def test_authentication_failure(self):
+        async with self.inject_geocoder(GeocodeFarm(api_key="invalid")):
+            with pytest.raises(exc.GeocoderAuthenticationFailure):
+                await self.geocode_run(
+                    {"query": '435 north michigan ave, chicago il 60611'},
+                    {},
+                    expect_failure=True,
+                )
 
-    def test_quota_exceeded(self):
-        """
-        GeocodeFarm quota exceeded
-        """
+    async def test_quota_exceeded(self):
 
-        def mock_call_geocoder(*args, **kwargs):
-            return {
+        def mock_call_geocoder(url, callback, **kwargs):
+            return callback({
                 "geocoding_results": {
                     "STATUS": {
                         "access": "OVER_QUERY_LIMIT",
                         "status": "FAILED, ACCESS_DENIED"
                     }
                 }
-            }
+            })
 
-        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
-                self.assertRaises(exc.GeocoderQuotaExceeded):
-            self.geocoder.geocode('435 north michigan ave, chicago il 60611')
+        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder):
+            with pytest.raises(exc.GeocoderQuotaExceeded):
+                self.geocoder.geocode('435 north michigan ave, chicago il 60611')
 
-    def test_no_results(self):
-        self.geocode_run(
+    async def test_no_results(self):
+        await self.geocode_run(
             {"query": "gibberish kdjhsakdjh skjdhsakjdh"},
             {},
             expect_failure=True
         )
 
-    def test_unhandled_api_error(self):
-        """
-        GeocodeFarm unhandled error
-        """
+    async def test_unhandled_api_error(self):
 
-        def mock_call_geocoder(*args, **kwargs):
-            return {
+        def mock_call_geocoder(url, callback, **kwargs):
+            return callback({
                 "geocoding_results": {
                     "STATUS": {
                         "access": "BILL_PAST_DUE",
                         "status": "FAILED, ACCESS_DENIED"
                     }
                 }
-            }
+            })
 
-        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder), \
-                self.assertRaises(exc.GeocoderServiceError):
-            self.geocoder.geocode('435 north michigan ave, chicago il 60611')
+        with patch.object(self.geocoder, '_call_geocoder', mock_call_geocoder):
+            with pytest.raises(exc.GeocoderServiceError):
+                self.geocoder.geocode('435 north michigan ave, chicago il 60611')

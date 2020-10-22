@@ -14,7 +14,7 @@ geopy
     :alt: License
 
 
-geopy is a Python 2 and 3 client for several popular geocoding web
+geopy is a Python client for several popular geocoding web
 services.
 
 geopy makes it easy for Python developers to locate the coordinates of
@@ -26,13 +26,13 @@ geopy includes geocoder classes for the `OpenStreetMap Nominatim`_,
 The full list is available on the `Geocoders doc section`_.
 Geocoder classes are located in `geopy.geocoders`_.
 
-.. _OpenStreetMap Nominatim: https://wiki.openstreetmap.org/wiki/Nominatim
+.. _OpenStreetMap Nominatim: https://nominatim.org
 .. _Google Geocoding API (V3): https://developers.google.com/maps/documentation/geocoding/
 .. _Geocoders doc section: https://geopy.readthedocs.io/en/latest/#geocoders
 .. _geopy.geocoders: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
-geopy is tested against CPython (versions 2.7, 3.4, 3.5, 3.6, 3.7), PyPy, and
-PyPy3. geopy does not and will not support CPython 2.6.
+geopy is tested against CPython (versions 3.5, 3.6, 3.7, 3.8)
+and PyPy3. geopy 1.x line also supported CPython 2.7, 3.4 and PyPy2.
 
 © geopy contributors 2006-2018 (see AUTHORS) under the `MIT
 License <https://github.com/geopy/geopy/blob/master/LICENSE>`__.

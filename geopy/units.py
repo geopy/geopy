@@ -1,5 +1,8 @@
-"""
-Convert units.
+"""``geopy.units`` module provides utility functions for performing
+angle and distance unit conversions.
+
+Some shortly named aliases are provided for convenience (e.g.
+:func:`.km` is an alias for :func:`.kilometers`).
 """
 
 import math
@@ -9,7 +12,7 @@ import math
 
 def degrees(radians=0, arcminutes=0, arcseconds=0):
     """
-    TODO docs.
+    Convert angle to degrees.
     """
     deg = 0.
     if radians:
@@ -23,7 +26,7 @@ def degrees(radians=0, arcminutes=0, arcseconds=0):
 
 def radians(degrees=0, arcminutes=0, arcseconds=0):
     """
-    TODO docs.
+    Convert angle to radians.
     """
     if arcminutes:
         degrees += arcminutes / arcmin(degrees=1.)
@@ -34,7 +37,7 @@ def radians(degrees=0, arcminutes=0, arcseconds=0):
 
 def arcminutes(degrees=0, radians=0, arcseconds=0):
     """
-    TODO docs.
+    Convert angle to arcminutes.
     """
     if radians:
         degrees += math.degrees(radians)
@@ -45,7 +48,7 @@ def arcminutes(degrees=0, radians=0, arcseconds=0):
 
 def arcseconds(degrees=0, radians=0, arcminutes=0):
     """
-    TODO docs.
+    Convert angle to arcseconds.
     """
     if radians:
         degrees += math.degrees(radians)
@@ -58,7 +61,7 @@ def arcseconds(degrees=0, radians=0, arcminutes=0):
 
 def kilometers(meters=0, miles=0, feet=0, nautical=0):
     """
-    TODO docs.
+    Convert distance to kilometers.
     """
     ret = 0.
     if meters:
@@ -73,14 +76,14 @@ def kilometers(meters=0, miles=0, feet=0, nautical=0):
 
 def meters(kilometers=0, miles=0, feet=0, nautical=0):
     """
-    TODO docs.
+    Convert distance to meters.
     """
     return (kilometers + km(nautical=nautical, miles=miles, feet=feet)) * 1000
 
 
 def miles(kilometers=0, meters=0, feet=0, nautical=0):
     """
-    TODO docs.
+    Convert distance to miles.
     """
     ret = 0.
     if nautical:
@@ -95,7 +98,7 @@ def miles(kilometers=0, meters=0, feet=0, nautical=0):
 
 def feet(kilometers=0, meters=0, miles=0, nautical=0):
     """
-    TODO docs.
+    Convert distance to feet.
     """
     ret = 0.
     if nautical:
@@ -110,7 +113,7 @@ def feet(kilometers=0, meters=0, miles=0, nautical=0):
 
 def nautical(kilometers=0, meters=0, miles=0, feet=0):
     """
-    TODO docs.
+    Convert distance to nautical miles.
     """
     ret = 0.
     if feet:

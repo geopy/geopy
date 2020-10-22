@@ -1,6 +1,6 @@
-import warnings
+from functools import partial
+from urllib.parse import urlencode
 
-from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -16,10 +16,6 @@ class Pelias(Geocoder):
 
     See also :class:`geopy.geocoders.GeocodeEarth` which is a Pelias-based
     service provided by the developers of Pelias itself.
-
-    .. versionchanged:: 1.15.0
-       ``Mapzen`` geocoder has been renamed to ``Pelias``.
-
     """
 
     geocode_path = '/v1/search'
@@ -29,14 +25,13 @@ class Pelias(Geocoder):
             self,
             domain,
             api_key=None,
-            format_string=None,
-            boundary_rect=None,
-            country_bias=None,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             scheme=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. GeocodeEarth).
     ):
@@ -44,30 +39,6 @@ class Pelias(Geocoder):
         :param str domain: Specify a domain for Pelias API.
 
         :param str api_key: Pelias API key, optional.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-        :type boundary_rect: list or tuple of 2 items of :class:`geopy.point.Point`
-            or ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
-        :param boundary_rect: Coordinates to restrict search within.
-            Example: ``[Point(22, 180), Point(-22, -180)]``.
-
-            .. versionchanged:: 1.17.0
-                Previously boundary_rect could be a list of 4 strings or numbers
-                in the format of ``[longitude, latitude, longitude, latitude]``.
-                This format is now deprecated in favor of a list/tuple
-                of a pair of geopy Points and will be removed in geopy 2.0.
-
-            .. deprecated:: 1.19.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s `boundary_rect` instead.
-
-        :param str country_bias: Bias results to this country (ISO alpha-3).
-
-            .. deprecated:: 1.19.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s `country_bias` instead.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -85,35 +56,21 @@ class Pelias(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         """
-        super(Pelias, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
-        if country_bias is not None:
-            warnings.warn(
-                '`country_bias` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(country_bias=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=country_bias),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.country_bias = country_bias
-        if boundary_rect is not None:
-            warnings.warn(
-                '`boundary_rect` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(boundary_rect=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=boundary_rect),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.boundary_rect = boundary_rect
+
         self.api_key = api_key
         self.domain = domain.strip('/')
 
@@ -127,11 +84,12 @@ class Pelias(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
             country_bias=None,
-            language=False
+            language=None
     ):
         """
         Return a location point by address.
@@ -152,11 +110,7 @@ class Pelias(Geocoder):
         :param boundary_rect: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-            .. versionadded:: 1.19.0
-
         :param str country_bias: Bias results to this country (ISO alpha-3).
-
-            .. versionadded:: 1.19.0
 
         :param str language: Preferred language in which to return results.
             Either uses standard
@@ -167,28 +121,14 @@ class Pelias(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {'text': self.format_string % query}
+        params = {'text': query}
 
         if self.api_key:
             params.update({
                 'api_key': self.api_key
             })
 
-        if boundary_rect is None:
-            boundary_rect = self.boundary_rect
         if boundary_rect:
-            if len(boundary_rect) == 4:
-                warnings.warn(
-                    '%s `boundary_rect` format of '
-                    '`[longitude, latitude, longitude, latitude]` is now '
-                    'deprecated and will not be supported in geopy 2.0. '
-                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
-                    'instead.' % type(self).__name__,
-                    DeprecationWarning,
-                    stacklevel=2
-                )
-                lon1, lat1, lon2, lat2 = boundary_rect
-                boundary_rect = [[lat1, lon1], [lat2, lon2]]
             lon1, lat1, lon2, lat2 = self._format_bounding_box(
                 boundary_rect, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s").split(',')
             params['boundary.rect.min_lon'] = lon1
@@ -196,8 +136,6 @@ class Pelias(Geocoder):
             params['boundary.rect.max_lon'] = lon2
             params['boundary.rect.max_lat'] = lat2
 
-        if country_bias is None:
-            country_bias = self.country_bias
         if country_bias:
             params['boundary.country'] = country_bias
 
@@ -206,16 +144,16 @@ class Pelias(Geocoder):
 
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode_api: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=False
+            language=None
     ):
         """
         Return an address by location point.
@@ -261,13 +199,10 @@ class Pelias(Geocoder):
 
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def parse_code(feature):
-        # TODO make this a private API
+    def _parse_code(self, feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -281,6 +216,6 @@ class Pelias(Geocoder):
         if not len(features):
             return None
         if exactly_one:
-            return self.parse_code(features[0])
+            return self._parse_code(features[0])
         else:
-            return [self.parse_code(feature) for feature in features]
+            return [self._parse_code(feature) for feature in features]

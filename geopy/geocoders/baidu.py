@@ -1,6 +1,7 @@
 import hashlib
+from functools import partial
+from urllib.parse import quote_plus, urlencode
 
-from geopy.compat import quote_plus, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderQueryError,
@@ -20,21 +21,25 @@ class Baidu(Geocoder):
     Documentation at:
         http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
 
-    .. versionadded:: 1.0.0
+    .. attention::
+        Newly registered API keys will not work with v2 API,
+        use :class:`.BaiduV3` instead.
     """
 
     api_path = '/geocoder/v2/'
+    reverse_path = '/geocoder/v2/'
 
     def __init__(
             self,
             api_key,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
-            security_key=None,
+            adapter_factory=None,
+            security_key=None
     ):
         """
 
@@ -45,9 +50,6 @@ class Baidu(Geocoder):
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
 
-            .. versionchanged:: 1.14.0
-               Default scheme has been changed from ``http`` to ``https``.
-
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
 
@@ -57,39 +59,33 @@ class Baidu(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
 
         :param str security_key: The security key (SK) to calculate
             the SN parameter in request if authentication setting requires
             (http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix).
-
-            .. versionadded:: 1.15.0
         """
-        super(Baidu, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         self.api = '%s://api.map.baidu.com%s' % (self.scheme, self.api_path)
+        self.reverse_api = '%s://api.map.baidu.com%s' % (self.scheme, self.reverse_path)
         self.security_key = security_key
 
-    @staticmethod
-    def _format_components_param(components):
+    def _format_components_param(self, components):
         """
         Format the components dict to something Baidu understands.
         """
@@ -100,8 +96,9 @@ class Baidu(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -123,17 +120,16 @@ class Baidu(Geocoder):
         params = {
             'ak': self.api_key,
             'output': 'json',
-            'address': self.format_string % query,
+            'address': query,
         }
 
-        url = self._construct_url(params)
+        url = self._construct_url(self.api, self.api_path, params)
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
         """
         Return an address by location point.
 
@@ -144,8 +140,6 @@ class Baidu(Geocoder):
 
         :param bool exactly_one: Return one result or a list of results, if
             available. Baidu's API will always return at most one result.
-
-            .. versionadded:: 1.14.0
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -162,12 +156,11 @@ class Baidu(Geocoder):
             'location': self._coerce_point_to_string(query),
         }
 
-        url = self._construct_url(params)
+        url = self._construct_url(self.reverse_api, self.reverse_path, params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one=exactly_one
-        )
+        callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_reverse_json(self, page, exactly_one=True):
         """
@@ -214,8 +207,7 @@ class Baidu(Geocoder):
         else:
             return [parse_place(item) for item in place]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """
@@ -269,12 +261,23 @@ class Baidu(Geocoder):
         else:
             raise GeocoderQueryError('Unknown error. Status: %r' % status)
 
-    def _construct_url(self, params):
+    def _construct_url(self, url, path, params):
         query_string = urlencode(params)
         if self.security_key is None:
-            return "%s?%s" % (self.api, query_string)
+            return "%s?%s" % (url, query_string)
         else:
             # http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix
-            raw = "%s?%s%s" % (self.api_path, query_string, self.security_key)
+            raw = "%s?%s%s" % (path, query_string, self.security_key)
             sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
-            return "%s?%s&sn=%s" % (self.api, query_string, sn)
+            return "%s?%s&sn=%s" % (url, query_string, sn)
+
+
+class BaiduV3(Baidu):
+    """Geocoder using the Baidu Maps v3 API.
+
+    Documentation at:
+        http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
+    """
+
+    api_path = '/geocoding/v3/'
+    reverse_path = '/reverse_geocoding/v3/'

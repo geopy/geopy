@@ -1,4 +1,6 @@
-from geopy.compat import urlencode
+from functools import partial
+from urllib.parse import urlencode
+
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -18,12 +20,13 @@ class DataBC(Geocoder):
 
     def __init__(
             self,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
@@ -39,26 +42,22 @@ class DataBC(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
-        super(DataBC, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         domain = 'apps.gov.bc.ca'
         self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
@@ -66,11 +65,12 @@ class DataBC(Geocoder):
     def geocode(
             self,
             query,
+            *,
             max_results=25,
             set_back=0,
             location_descriptor='any',
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -99,7 +99,7 @@ class DataBC(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {'addressString': self.format_string % query}
+        params = {'addressString': query}
         if set_back != 0:
             params['setBack'] = set_back
         if location_descriptor not in ['any',
@@ -120,8 +120,10 @@ class DataBC(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        response = self._call_geocoder(url, timeout=timeout)
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
+    def _parse_json(self, response, exactly_one):
         # Success; convert from GeoJSON
         if not len(response['features']):
             return None
@@ -132,8 +134,7 @@ class DataBC(Geocoder):
             return geocoded[0]
         return geocoded
 
-    @staticmethod
-    def _parse_feature(feature):
+    def _parse_feature(self, feature):
         properties = feature['properties']
         coordinates = feature['geometry']['coordinates']
         return Location(

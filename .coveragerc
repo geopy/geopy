@@ -1,5 +1,7 @@
 [run]
-source = geopy
+source =
+    geopy
+    test
 
 [report]
 show_missing = True
