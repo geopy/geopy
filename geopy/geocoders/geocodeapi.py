@@ -31,5 +31,5 @@ class GeocodeAPI(Geocoder):
         :param dict proxies:
             See :attr:`geopy.geocoders.options.default_proxies`.
         """
-        super.__init__(timeout=timeout, proxies=proxies)
+        super().__init__(timeout=timeout, proxies=proxies)
         self.api_key = api_key
