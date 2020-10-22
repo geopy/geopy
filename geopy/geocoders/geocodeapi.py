@@ -2,8 +2,8 @@ from functools import partial
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import Geocoder, DEFAULT_SENTINEL
-
 from geopy.util import logger
+from geopy.location import Location
 
 from geopy.exc import (
     GeocoderAuthenticationFailure,
@@ -90,6 +90,8 @@ class GeocodeAPI(Geocoder):
     def _parse_feature(self, feature):
         latitude, longitude = self._get_coordinates(feature)
         place_name = self._get_place_name(feature)
+
+        return Location(place_name, (latitude, longitude), feature)
 
     def _get_place_name(self, feature):
         return feature.get('properties', {}).get('label')
