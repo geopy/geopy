@@ -160,6 +160,14 @@ DataBC
 
    .. automethod:: __init__
 
+GeocodeAPI
+----------
+
+.. autoclass:: geopy.geocoders.GeocodeAPI
+   :members:
+
+   .. automethod:: __init__
+
 GeocodeEarth
 ------------
 
