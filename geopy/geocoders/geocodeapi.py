@@ -76,6 +76,36 @@ class GeocodeAPI(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
+    def reverse(
+        self,
+        query,
+        *,
+        exactly_one=True,
+        timeout=DEFAULT_SENTINEL,
+    ):
+        """
+        Return an address by location point.
+
+        :param query: The coordinates for which you wish to obtain the
+            closest human-readable addresses.
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+        """
+        location = self._coerce_point_to_string(
+            query, output_format='point.lat=%(lat)s&point.lon=%(lon)s'
+        )
+        url = '{}?{}'.format(self.api_reverse, location)
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
+
     def _parse_json(self, response, exactly_one):
         if response is None or 'features' not in response:
             return None
