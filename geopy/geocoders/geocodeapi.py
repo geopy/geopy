@@ -1,4 +1,9 @@
+from functools import partial
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import Geocoder, DEFAULT_SENTINEL
+
+from geopy.util import logger
 
 from geopy.exc import (
     GeocoderAuthenticationFailure,
@@ -38,7 +43,33 @@ class GeocodeAPI(Geocoder):
             See :attr:`geopy.geocoders.options.default_proxies`.
         """
         super().__init__(timeout=timeout, proxies=proxies)
-        self.api_key = api_key
+
+        self.headers = {'apikey': api_key}
 
         self.api_geocode = self.base_api_url + self.geocode_path
         self.api_reverse = self.base_api_url + self.reverse_path
+
+    def geocode(
+        self,
+        query,
+        *,
+        exactly_one=True,
+        timeout=DEFAULT_SENTINEL,
+    ):
+        """
+        Return a location point by address.
+
+        :param str query: The address or query you wish to geocode.
+
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
+        """
+        params = '?text={}'.format(query)
+        url = self.api_geocode + params
+
+        logger.debug('%s.geocode: %s', self.__class__.__name__, url)
