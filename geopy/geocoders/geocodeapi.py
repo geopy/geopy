@@ -1,5 +1,11 @@
 from geopy.geocoders.base import Geocoder, DEFAULT_SENTINEL
 
+from geopy.exc import (
+    GeocoderAuthenticationFailure,
+    GeocoderNotFound,
+    GeocoderServiceError,
+)
+
 __all__ = ('GeocodeAPI',)
 
 
