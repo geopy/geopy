@@ -50,13 +50,13 @@ class TestGeocodeAPI(BaseTestGeocoder):
             expect_failure=True
         )
 
-    async def test_get_params(self):
+    async def test_get_params_geocode(self):
         geocoder = self.make_geocoder()
 
         text = '123 street'
         size = 35
         country = None
-        res = geocoder._get_params(text, size=size, country=country)
+        res = geocoder._get_params_geocode(text, size=size, country=country)
         params = '?text={}&size={}'.format(text, size)
         assert res == params
 
@@ -64,7 +64,7 @@ class TestGeocodeAPI(BaseTestGeocoder):
         geocoder = self.make_geocoder()
         text = '123 street'
         with pytest.raises(KeyError) as err:
-            geocoder._get_params(text, size=text, blah=text)
+            geocoder._get_additional_params(country=text, blah=text)
 
         assert 'Wrong parameter: blah' in str(err)
 

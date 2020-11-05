@@ -37,8 +37,6 @@ class GeocodeAPI(Geocoder):
         'rect_max_lon': '&boundary.rect.max_lon={}',
         'point_lat': '&focus.point.lat={}',
         'point_lon': '&focus.point.lon={}',
-        'reverse_point_lat': '&point.lat={}',
-        'reverse_point_lon': '&point.lon={}',
         'layers': '&layers={}',
     }
 
@@ -120,7 +118,7 @@ class GeocodeAPI(Geocoder):
 
         :param float point_lon: Longitude for prioritize around a point
         """
-        params = self._get_params(
+        params = self._get_params_geocode(
             query,
             size=size,
             country=country,
@@ -171,9 +169,14 @@ class GeocodeAPI(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
-    def _get_params(self, query, **kwargs):
-        params = '?text={}'.format(query)
+    def _get_params_geocode(self, query, **kwargs):
+        main_param = '?text={}'.format(query)
+        additional_params = self._get_additional_params(**kwargs)
+        if not additional_params:
+            return main_param
+        return main_param + ''.join(additional_params)
 
+    def _get_additional_params(self, **kwargs):
         additional_params = []
         for k, v in kwargs.items():
             if v is not None:
@@ -181,10 +184,7 @@ class GeocodeAPI(Geocoder):
                     additional_params.append(self._param_templates[k].format(v))
                 except KeyError:
                     raise KeyError('Wrong parameter: %s' % k)
-        if not additional_params:
-            return params
-
-        return params + ''.join(additional_params)
+        return additional_params
 
     def _parse_json(self, response, exactly_one):
         if response is None or 'features' not in response:
