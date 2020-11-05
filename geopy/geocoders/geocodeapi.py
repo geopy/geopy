@@ -25,6 +25,24 @@ class GeocodeAPI(Geocoder):
     geocode_path = 'search'
     reverse_path = 'reverse'
 
+    _param_templates = {
+        'query': '?text={}',
+        'size': '&size={}',
+        'country': '&boundary.country={}',
+        'circle_lat': '&boundary.circle.lat={}',
+        'circle_lon': '&boundary.circle.lon={}',
+        'circle_radius': '&boundary.circle.radius={}',
+        'rect_min_lat': '&boundary.rect.min_lat={}',
+        'rect_min_lon': '&boundary.rect.min_lon={}',
+        'rect_max_lat': '&boundary.rect.max_lat={}',
+        'rect_max_lon': '&boundary.rect.max_lon={}',
+        'point_lat': '&focus.point.lat={}',
+        'point_lon': '&focus.point.lon={}',
+        'reverse_point_lat': '&point.lat={}',
+        'reverse_point_lon': '&point.lon={}',
+        'layers': '&layers={}',
+    }
+
     def __init__(
         self,
         api_key,
