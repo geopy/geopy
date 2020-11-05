@@ -49,3 +49,11 @@ class TestGeocodeAPI(BaseTestGeocoder):
             {},
             expect_failure=True
         )
+
+    async def test_get_params(self):
+        text = '123 street'
+        size = 35
+        country = None
+        res = self.make_geocoder()._get_params(text=text, size=size, country=country)
+        params = '?text={}&size={}'.format(text, size)
+        assert res == params

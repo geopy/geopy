@@ -174,6 +174,9 @@ class GeocodeAPI(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
+    def _get_params(self, **kwargs):
+        return None
+
     def _parse_json(self, response, exactly_one):
         if response is None or 'features' not in response:
             return None
