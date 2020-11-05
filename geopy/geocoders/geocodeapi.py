@@ -120,40 +120,20 @@ class GeocodeAPI(Geocoder):
 
         :param float point_lon: Longitude for prioritize around a point
         """
-        params = '?text={}'.format(query)
-
-        if size is not None:
-            params += '&size={}'.format(size)
-
-        if country is not None:
-            params += '&boundary.country={}'.format(country)
-
-        if circle_lat is not None:
-            params += '&boundary.circle.lat{}'.format(circle_lat)
-
-        if circle_lon is not None:
-            params += '&boundary.circle.lon{}'.format(circle_lon)
-
-        if circle_radius is not None:
-            params += '&boundary.circle.radius={}'.format(circle_radius)
-
-        if rect_min_lat is not None:
-            params += '&boundary.rect.min_lat={}'.format(rect_min_lat)
-
-        if rect_min_lon is not None:
-            params += '&boundary.rect.min_lon={}'.format(rect_min_lon)
-
-        if rect_max_lat is not None:
-            params += '&boundary.rect.max_lat={}'.format(rect_max_lat)
-
-        if rect_max_lon is not None:
-            params += '&boundary.rect.max_lon={}'.format(rect_max_lon)
-
-        if point_lat is not None:
-            params += '&focus.point.lat={}'.format(point_lat)
-
-        if point_lon is not None:
-            params += '&focus.point.lon={}'.format(point_lon)
+        params = self._get_params(
+            query,
+            size=size,
+            country=country,
+            circle_lat=circle_lat,
+            circle_lon=circle_lon,
+            circle_radius=circle_radius,
+            rect_min_lat=rect_min_lat,
+            rect_min_lon=rect_min_lon,
+            rect_max_lat=rect_max_lat,
+            rect_max_lon=rect_max_lon,
+            point_lon=point_lon,
+            point_lat=point_lat,
+        )
 
         url = self.api_geocode + params
 
