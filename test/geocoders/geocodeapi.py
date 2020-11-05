@@ -42,3 +42,10 @@ class TestGeocodeAPI(BaseTestGeocoder):
                     {},
                     expect_failure=True,
                 )
+
+    async def test_no_results(self):
+        await self.geocode_run(
+            {"query": "gibberish kdjhsakdjh skjdhsakjdh"},
+            {},
+            expect_failure=True
+        )
