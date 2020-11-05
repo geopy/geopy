@@ -14,3 +14,10 @@ class TestGeocodeAPI(BaseTestGeocoder):
             {'latitude': 41.89037, 'longitude': -87.623192},
         )
         assert 'chicago' in location.address.lower()
+        
+    async def test_location_address(self):
+        await self.geocode_run(
+            {"query": "moscow"},
+            {"address": "Moscow, Russia",
+             "latitude": 55.7558913503453, "longitude": 37.6172961632184}
+        )
