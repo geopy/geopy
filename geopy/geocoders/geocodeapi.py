@@ -26,7 +26,6 @@ class GeocodeAPI(Geocoder):
     reverse_path = 'reverse'
 
     _param_templates = {
-        'query': '?text={}',
         'size': '&size={}',
         'country': '&boundary.country={}',
         'circle_lat': '&boundary.circle.lat={}',
@@ -192,8 +191,20 @@ class GeocodeAPI(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
-    def _get_params(self, **kwargs):
-        return None
+    def _get_params(self, query, **kwargs):
+        params = '?text={}'.format(query)
+
+        additional_params = []
+        for k, v in kwargs.items():
+            if v is not None:
+                try:
+                    additional_params.append(self._param_templates[k].format(v))
+                except KeyError:
+                    raise KeyError('Wrong parameter: %s' % k)
+        if not additional_params:
+            return params
+
+        return params + ''.join(additional_params)
 
     def _parse_json(self, response, exactly_one):
         if response is None or 'features' not in response:
