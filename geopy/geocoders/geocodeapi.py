@@ -60,6 +60,10 @@ class GeocodeAPI(Geocoder):
         circle_lat=None,
         circle_lon=None,
         circle_radius=None,
+        rect_min_lat=None,
+        rect_min_lon=None,
+        rect_max_lat=None,
+        rect_max_lon=None,
     ):
         """
         Return a location point by address.
@@ -84,6 +88,14 @@ class GeocodeAPI(Geocoder):
         :param float circle_lon: Longitude for limit search to radius
 
         :param int circle_radius: Radius around the coordinates circle_lat and circle_lon
+
+        :param float rect_min_lat: Minimum latitude for limit search to rectangle
+
+        :param float rect_min_lon: Minimum longitude for limit search to rectangle
+
+        :param float rect_max_lat: Maximum latitude for limit search to rectangle
+
+        :param float rect_max_lon: Maximum longitude for limit search to rectangle
         """
         params = '?text={}'.format(query)
 
@@ -101,6 +113,18 @@ class GeocodeAPI(Geocoder):
 
         if circle_radius is not None:
             params += '&boundary.circle.radius={}'.format(circle_radius)
+
+        if rect_min_lat is not None:
+            params += '&boundary.rect.min_lat={}'.format(rect_min_lat)
+
+        if rect_min_lon is not None:
+            params += '&boundary.rect.min_lon={}'.format(rect_min_lon)
+
+        if rect_max_lat is not None:
+            params += '&boundary.rect.max_lat={}'.format(rect_max_lat)
+
+        if rect_max_lon is not None:
+            params += '&boundary.rect.max_lon={}'.format(rect_max_lon)
 
         url = self.api_geocode + params
 
