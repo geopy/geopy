@@ -64,6 +64,8 @@ class GeocodeAPI(Geocoder):
         rect_min_lon=None,
         rect_max_lat=None,
         rect_max_lon=None,
+        point_lat=None,
+        point_lon=None,
     ):
         """
         Return a location point by address.
@@ -96,6 +98,10 @@ class GeocodeAPI(Geocoder):
         :param float rect_max_lat: Maximum latitude for limit search to rectangle
 
         :param float rect_max_lon: Maximum longitude for limit search to rectangle
+
+        :param float point_lat: Latitude for prioritize around a point
+
+        :param float point_lon: Longitude for prioritize around a point
         """
         params = '?text={}'.format(query)
 
@@ -125,6 +131,12 @@ class GeocodeAPI(Geocoder):
 
         if rect_max_lon is not None:
             params += '&boundary.rect.max_lon={}'.format(rect_max_lon)
+
+        if point_lat is not None:
+            params += '&focus.point.lat={}'.format(point_lat)
+
+        if point_lon is not None:
+            params += '&focus.point.lon={}'.format(point_lon)
 
         url = self.api_geocode + params
 
