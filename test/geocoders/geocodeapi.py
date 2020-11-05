@@ -1,3 +1,6 @@
+import pytest
+
+from geopy import exc
 from geopy.geocoders import GeocodeAPI
 from geopy.point import Point
 
@@ -30,3 +33,12 @@ class TestGeocodeAPI(BaseTestGeocoder):
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
         assert "new york" in location.address.lower()
+
+    async def test_authentication_failure(self):
+        async with self.inject_geocoder(GeocodeAPI(api_key="invalid")):
+            with pytest.raises(exc.GeocoderInsufficientPrivileges):
+                await self.geocode_run(
+                    {"query": '435 north michigan ave, chicago il 60611'},
+                    {},
+                    expect_failure=True,
+                )
