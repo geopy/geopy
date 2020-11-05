@@ -132,7 +132,7 @@ class GeocodeAPI(Geocoder):
         longitude = None
 
         if len(coordinates) == 2:
-            latitude = coordinates[0]
-            longitude = coordinates[1]
+            latitude = coordinates[1]
+            longitude = coordinates[0]
 
         return latitude, longitude
