@@ -111,6 +111,8 @@ class GeocodeAPI(Geocoder):
             return None
 
         features = response['features']
+        if len(features) == 0:
+            return None
 
         if exactly_one:
             return self._parse_feature(features[0])
