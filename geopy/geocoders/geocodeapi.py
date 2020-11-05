@@ -55,6 +55,11 @@ class GeocodeAPI(Geocoder):
         *,
         exactly_one=True,
         timeout=DEFAULT_SENTINEL,
+        size=None,
+        country=None,
+        circle_lat=None,
+        circle_lon=None,
+        circle_radius=None,
     ):
         """
         Return a location point by address.
@@ -68,8 +73,35 @@ class GeocodeAPI(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :param int size: Limits the number of results to be returned
+
+        :param str country: Limits the search to a list of specified countries.
+            Comma separated list of alpha-2 or alpha-3 ISO-3166 country code.
+
+        :param float circle_lat: Latitude for limit search to radius
+
+        :param float circle_lon: Longitude for limit search to radius
+
+        :param int circle_radius: Radius around the coordinates circle_lat and circle_lon
         """
         params = '?text={}'.format(query)
+
+        if size is not None:
+            params += '&size={}'.format(size)
+
+        if country is not None:
+            params += '&boundary.country={}'.format(country)
+
+        if circle_lat is not None:
+            params += '&boundary.circle.lat{}'.format(circle_lat)
+
+        if circle_lon is not None:
+            params += '&boundary.circle.lon{}'.format(circle_lon)
+
+        if circle_radius is not None:
+            params += '&boundary.circle.radius={}'.format(circle_radius)
+
         url = self.api_geocode + params
 
         logger.debug('%s.geocode: %s', self.__class__.__name__, url)
