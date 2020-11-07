@@ -145,6 +145,8 @@ class GeocodeAPI(Geocoder):
         *,
         exactly_one=True,
         timeout=DEFAULT_SENTINEL,
+        size=None,
+        layers=None,
     ):
         """
         Return an address by location point.
@@ -161,11 +163,15 @@ class GeocodeAPI(Geocoder):
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :param int size: Limits the number of results to be returned
+
+        :param str layers: Filter search to a particular location type, e.g. venue,
+            address, street, country, region, locality
+
         """
-        location = self._coerce_point_to_string(
-            query, output_format='point.lat=%(lat)s&point.lon=%(lon)s'
-        )
-        url = '{}?{}'.format(self.api_reverse, location)
+        params = self._get_params_reverse(query, size=size, layers=layers)
+        url = '{}?{}'.format(self.api_reverse, params)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
@@ -175,6 +181,15 @@ class GeocodeAPI(Geocoder):
         if not additional_params:
             return main_param
         return main_param + ''.join(additional_params)
+
+    def _get_params_reverse(self, query, **kwargs):
+        location = self._coerce_point_to_string(
+            query, output_format='point.lat=%(lat)s&point.lon=%(lon)s'
+        )
+        additional_params = self._get_additional_params(**kwargs)
+        if not additional_params:
+            return location
+        return location + ''.join(additional_params)
 
     def _get_additional_params(self, **kwargs):
         additional_params = []
