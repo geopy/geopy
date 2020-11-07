@@ -10,8 +10,7 @@ from test.geocoders.util import BaseTestGeocoder, env
 class TestGeocodeAPI(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):
-        # return GeocodeAPI(env.get('GEOCODEAPI_KEY'), **kwargs)
-        return GeocodeAPI('8e502d80-1f4e-11eb-8913-e723b130bf53', **kwargs)
+        return GeocodeAPI(env.get('GEOCODEAPI_KEY'), **kwargs)
 
     async def test_geocode(self):
         location = await self.geocode_run(
