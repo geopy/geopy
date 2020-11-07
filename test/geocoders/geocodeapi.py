@@ -7,6 +7,10 @@ from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
 
 
+@pytest.mark.skipif(
+    not bool(env.get('GEOCODEAPI_KEY')),
+    reason="No GEOCODEAPI_KEY env variable set"
+)
 class TestGeocodeAPI(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):
