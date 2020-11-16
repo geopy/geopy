@@ -205,7 +205,7 @@ class Nominatim(Geocoder):
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :param viewbox: Prefer this area to find search results. By default this is
-            treated as a hint, if you want to restrict results to this area, 
+            treated as a hint, if you want to restrict results to this area,
             specify ``bounded=True`` as well.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
