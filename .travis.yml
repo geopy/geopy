@@ -6,7 +6,8 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "3.9-dev"
+  - "3.9"
+  - "3.10-dev"
   - "pypy3"
 
 before_install:
@@ -28,7 +29,7 @@ script:
 
 jobs:
   allow_failures:
-    - python: "3.9-dev"
+    - python: "3.10-dev"
 
   include:
     - stage: lint
