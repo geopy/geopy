@@ -14,10 +14,6 @@ class Yandex(Geocoder):
 
     Documentation at:
         https://tech.yandex.com/maps/doc/geocoder/desc/concepts/input_params-docpage/
-
-    .. attention::
-        Since September 2019 Yandex requires each request to have an API key.
-        API keys can be created at https://developer.tech.yandex.ru/
     """
 
     api_path = '/1.x/'
