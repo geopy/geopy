@@ -2,7 +2,6 @@ import base64
 import collections.abc
 import hashlib
 import hmac
-import warnings
 from calendar import timegm
 from datetime import datetime
 from functools import partial
