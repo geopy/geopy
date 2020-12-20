@@ -26,13 +26,13 @@ class TestPhoton(BaseTestGeocoder):
 
     async def test_osm_tag(self):
         await self.geocode_run(
-            {"query": "Freedom", "osm_tag": "place"},
-            {"latitude": 44.3862491, "longitude": -88.290994},
+            {"query": "Freedom", "osm_tag": "tourism:artwork"},
+            {"latitude": 38.8898061, "longitude": -77.009088, "delta": 2.0},
         )
 
         await self.geocode_run(
-            {"query": "Freedom", "osm_tag": ["!place", "tourism"]},
-            {"latitude": 38.8898061, "longitude": -77.009088},
+            {"query": "Freedom", "osm_tag": ["!office", "place:hamlet"]},
+            {"latitude": 44.3862491, "longitude": -88.290994, "delta": 2.0},
         )
 
     async def test_unicode_name(self):
