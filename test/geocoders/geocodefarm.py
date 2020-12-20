@@ -39,11 +39,11 @@ class TestGeocodeFarm(BaseTestGeocoder):
         assert "chicago" in location.address.lower()
 
     async def test_location_address(self):
-        await self.geocode_run(
+        location = await self.geocode_run(
             {"query": "moscow"},
-            {"address": "Moscow, Russia",
-             "latitude": 55.7558913503453, "longitude": 37.6172961632184}
+            {"latitude": 55.755891, "longitude": 37.61729}
         )
+        assert "Moscow, Russia" in location.address  # 'Moscow, Russia, Russia'
 
     async def test_reverse(self):
         location = await self.reverse_run(
