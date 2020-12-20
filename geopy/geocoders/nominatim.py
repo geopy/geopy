@@ -374,6 +374,14 @@ class Nominatim(Geocoder):
     def _parse_json(self, places, exactly_one):
         if not places:
             return None
+
+        if isinstance(places, collections.abc.Mapping) and 'error' in places:
+            if places['error'] == 'Unable to geocode':
+                # no results in reverse
+                return None
+            else:
+                raise GeocoderQueryError(places['error'])
+
         if not isinstance(places, collections.abc.Sequence):
             places = [places]
         if exactly_one:

@@ -35,6 +35,13 @@ class BaseTestNominatim(BaseTestGeocoder):
             expect_failure=True,
         )
 
+    async def test_reverse_empty_result(self):
+        await self.reverse_run(
+            {"query": Point(0.05, -0.15)},
+            {},
+            expect_failure=True,
+        )
+
     async def test_limit(self):
         with pytest.raises(ValueError):  # non-positive limit
             await self.geocode_run(
