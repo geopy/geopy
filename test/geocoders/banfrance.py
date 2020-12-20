@@ -26,7 +26,7 @@ class TestBANFrance(BaseTestGeocoder):
             {"query": "48.154587,3.221237"},
             {"latitude": 48.154587, "longitude": 3.221237},
         )
-        assert "Rue des Fontaines" in location.address
+        assert "Collemiers" in location.address
 
     async def test_geocode_limit(self):
         result = await self.geocode_run(
