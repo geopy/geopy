@@ -52,6 +52,11 @@ class GoogleV3(Geocoder):
             Make sure to have both ``Geocoding API`` and ``Time Zone API``
             services enabled for this API key.
 
+            .. versionchanged:: 2.1
+               Previously a warning has been emitted when api_key was
+               not specified. Now a :class:`geopy.exc.ConfigurationError`
+               is raised.
+
         :param str domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.googleapis.com', but if you're
             geocoding address in the UK (for example), you may want to set it
