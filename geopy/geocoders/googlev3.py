@@ -23,9 +23,8 @@ class GoogleV3(Geocoder):
     Documentation at:
         https://developers.google.com/maps/documentation/geocoding/
 
-    .. attention::
-        Since July 2018 Google requires each request to have an API key.
-        See https://developers.google.com/maps/documentation/geocoding/usage-and-billing
+    Pricing details:
+        https://developers.google.com/maps/documentation/geocoding/usage-and-billing
     """
 
     api_path = '/maps/api/geocode/json'
@@ -49,8 +48,8 @@ class GoogleV3(Geocoder):
         """
 
         :param str api_key: The API key required by Google to perform
-            geocoding requests. API keys are managed through the Google APIs
-            console (https://code.google.com/apis/console).
+            geocoding requests, mandatory. API keys are managed through
+            the Google APIs console (https://code.google.com/apis/console).
             Make sure to have both ``Geocoding API`` and ``Time Zone API``
             services enabled for this API key.
 
@@ -104,12 +103,10 @@ class GoogleV3(Geocoder):
         self.secret_key = secret_key
 
         if not self.premier and not api_key:
-            warnings.warn(
+            raise ConfigurationError(
                 'Since July 2018 Google requires each request to have an API key. '
-                'Pass a valid `api_key` to GoogleV3 geocoder to hide this warning. '
-                'See https://developers.google.com/maps/documentation/geocoding/usage-and-billing',  # noqa
-                UserWarning,
-                stacklevel=2
+                'Pass a valid `api_key` to GoogleV3 geocoder to fix this error. '
+                'See https://developers.google.com/maps/documentation/geocoding/usage-and-billing'  # noqa
             )
 
         self.api_key = api_key

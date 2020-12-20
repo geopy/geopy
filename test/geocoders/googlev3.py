@@ -1,5 +1,4 @@
 import base64
-import warnings
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 
@@ -37,15 +36,12 @@ class TestGoogleV3(BaseTestGeocoder):
         with pytest.raises(exc.ConfigurationError):
             GoogleV3(api_key='mock', secret_key='a')
 
-    async def test_warning_with_no_api_key(self):
-        with warnings.catch_warnings(record=True) as w:
+    async def test_error_with_no_api_key(self):
+        with pytest.raises(exc.ConfigurationError):
             GoogleV3()
-        assert len(w) == 1
 
-    async def test_no_warning_with_no_api_key_but_using_premier(self):
-        with warnings.catch_warnings(record=True) as w:
-            GoogleV3(client_id='client_id', secret_key='secret_key')
-        assert len(w) == 0
+    async def test_no_error_with_no_api_key_but_using_premier(self):
+        GoogleV3(client_id='client_id', secret_key='secret_key')
 
     async def test_check_status(self):
         assert self.geocoder._check_status("ZERO_RESULTS") is None
