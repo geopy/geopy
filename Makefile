@@ -23,11 +23,14 @@ lint: lint-flake8 lint-isort
 format:
 	isort geopy test *.py
 
-.PHONY: test
-test:
-	# Run tests without Internet first. These are fast and help to avoid
-	# spending geocoders quota for test runs which would fail anyway.
+.PHONY: test-local
+test-local:
+	@# Run tests without Internet. These are fast and help to avoid
+	@# spending geocoders quota for test runs which would fail anyway.
 	python -m pytest --skip-tests-requiring-internet
+
+.PHONY: test
+test: test-local
 	# Run tests with Internet:
 	coverage run -m py.test
 	coverage report
