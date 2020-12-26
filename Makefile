@@ -16,12 +16,12 @@ develop: venv piplocal
 lint-flake8:
 	flake8
 lint-isort:
-	isort --check-only -rc geopy test *.py
+	isort --check-only geopy test *.py
 lint: lint-flake8 lint-isort
 
 .PHONY: format
 format:
-	isort -rc geopy test *.py
+	isort geopy test *.py
 
 .PHONY: test
 test:
