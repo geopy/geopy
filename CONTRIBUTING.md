@@ -2,12 +2,33 @@
 
 ## Reporting issues
 
-- Please note that the issue tracker is not for questions. Use Stack Overflow
-  instead. Make sure to tag your question with
-  [geopy](https://stackoverflow.com/questions/tagged/geopy) tag.
+If you caught an exception from geopy please try to Google the error first.
+There is a great chance that it has already been discussed somewhere
+and solutions have been provided (usually on GitHub or on Stack Overflow).
 
-- If possible, before submitting an issue report try to verify that the issue
-  haven't already been fixed and is not a duplicate.
+Before reporting an issue please ensure that you have tried
+to get the answer from the doc: https://geopy.readthedocs.io/.
+
+Keep in mind that if a specific geocoding service's API is not behaving
+correctly then it probably won't be helpful to report that issue
+here, see https://geopy.readthedocs.io/en/latest/#geopy-is-not-a-service
+
+The following resources are available for your input:
+
+1. Stack Overflow with [geopy tag](https://stackoverflow.com/questions/tagged/geopy).
+   There's a somewhat active community here so you will probably get
+   a solution quicker. And also there is a large amount of already
+   resolved questions which can help too! Just remember to put the `geopy`
+   tag if you'd decide to open a question.
+1. [GitHub Discussions](https://github.com/geopy/geopy/discussions) is
+   a good place to start if Stack Overflow didn't help or you have
+   some idea or a feature request you'd like to bring up, or if you
+   just have trouble and not sure you're doing everything right.
+   Solutions and helpful snippets/patterns are also very welcome here.
+1. [GitHub Issues](https://github.com/geopy/geopy/issues) should only
+   be used for definite bug reports and specific tasks. If you're not sure
+   whether your issue fits this then please start with Discussions
+   first.
 
 
 ## Submitting patches

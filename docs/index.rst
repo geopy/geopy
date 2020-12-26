@@ -8,8 +8,9 @@ Welcome to GeoPy's documentation!
 
 :Documentation: https://geopy.readthedocs.io/
 :Source Code: https://github.com/geopy/geopy
-:Issue Tracker: https://github.com/geopy/geopy/issues
 :Stack Overflow: https://stackoverflow.com/questions/tagged/geopy
+:Discussions: https://github.com/geopy/geopy/discussions
+:Issue Tracker: https://github.com/geopy/geopy/issues
 :PyPI: https://pypi.org/project/geopy/
 
 .. automodule:: geopy
