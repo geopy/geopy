@@ -45,7 +45,11 @@ If your PR remains unreviewed for a while, feel free to bug the maintainer.
 
 ### Running tests
 
-To run the full test suite:
+To quickly run the test suite without Internet access:
+
+    make test-local
+
+To run the full test suite (makes queries to the geocoding services):
 
     make test
 
@@ -58,7 +62,7 @@ For example:
 
     pytest test/geocoders/nominatim.py
 
-Before pushing your code, make sure that linting passes, otherwise Travis
+Before pushing your code, make sure that linting passes, otherwise a CI
 build would fail:
 
     make lint
@@ -70,21 +74,24 @@ Some geocoders require credentials (like API keys) for testing. They must
 remain secret, so if you need to test a code which requires them, you should
 obtain your own valid credentials.
 
-Travis CI builds for PRs from forks don't have access to these
-credentials to avoid the possibility of leaking the secrets by running
-untrusted code. This is a [Travis CI policy][travis_env]. It means that CI
-builds for PRs from forks won't test the code which require credentials.
-Such code should be tested locally. But it's acceptable to not test such code
-if obtaining the required credentials seems problematic: just leave a note
-so the maintainer would be aware that the code hasn't been tested.
-
-[travis_env]: https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
+Tests in CI from forks and PRs run in `test-local` mode only, i.e. no network
+requests are performed. Full test suite with network requests is run only
+for pushes to branches by maintainers. This
+helps to reduce load on the geocoding services and save some quotas associated
+with the credentials used by geopy. It means that PR builds won't actually test
+network requests. Code changing a geocoder should be tested locally.
+But it's acceptable to not test such code if obtaining the required credentials 
+seems problematic: just leave a note
+so the maintainers would be aware that the code hasn't been tested.
 
 You may wonder: why not commit captured data and run mocked tests?
 Because there are copyright constraints on the data returned by services.
+Another reason is that this data goes obsolete quite fast, and maintaining
+it is cumbersome.
 
-The credentials can be stored in a json format in a file called `.test_keys`
-located at the root of the project instead of env variables for convenience.
+To ease local testing the credentials can be stored in a json format
+in a file called `.test_keys` located at the root of the project
+instead of env variables.
 
 Example contents of `.test_keys`:
 

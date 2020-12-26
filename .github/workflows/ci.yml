@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  pull_request: {}
+  push: {}
+
+jobs:
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install tox tox-gh-actions
+    - run: tox -e lint
+
+  check-docs:
+    name: RST (README.rst + docs) syntax check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install tox tox-gh-actions
+    - run: tox -e rst
+
+  test_local:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: # &test-matrix
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9, 'pypy3']
+        experimental: [false]
+        include:
+          - python-version: '3.10-dev'
+            experimental: true
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install tox tox-gh-actions
+    - run: GEOPY_TOX_TARGET=test-local tox
+
+  test_full:
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: [lint, check-docs, test_local]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: # *test-matrix  https://github.community/t/support-for-yaml-anchors/16128
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9, 'pypy3']
+        experimental: [false]
+        include:
+          - python-version: '3.10-dev'
+            experimental: true
+      max-parallel: 2  # Reduce load on the geocoding services
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install tox tox-gh-actions
+    - run: tox
+      env:
+        # GitHub Actions cannot just pass all secrets as env vars :(
+        ALGOLIA_PLACES_API_KEY: ${{ secrets.ALGOLIA_PLACES_API_KEY }}
+        ALGOLIA_PLACES_APP_ID: ${{ secrets.ALGOLIA_PLACES_APP_ID }}
+        ARCGIS_PASSWORD: ${{ secrets.ARCGIS_PASSWORD }}
+        ARCGIS_REFERER: ${{ secrets.ARCGIS_REFERER }}
+        ARCGIS_USERNAME: ${{ secrets.ARCGIS_USERNAME }}
+        AZURE_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SUBSCRIPTION_KEY }}
+        BAIDU_KEY: ${{ secrets.BAIDU_KEY }}
+        BAIDU_KEY_REQUIRES_SK: ${{ secrets.BAIDU_KEY_REQUIRES_SK }}
+        BAIDU_SEC_KEY: ${{ secrets.BAIDU_SEC_KEY }}
+        BAIDU_V3_KEY: ${{ secrets.BAIDU_V3_KEY }}
+        BAIDU_V3_KEY_REQUIRES_SK: ${{ secrets.BAIDU_V3_KEY_REQUIRES_SK }}
+        BAIDU_V3_SEC_KEY: ${{ secrets.BAIDU_V3_SEC_KEY }}
+        BING_KEY: ${{ secrets.BING_KEY }}
+        GEOCODEEARTH_KEY: ${{ secrets.GEOCODEEARTH_KEY }}
+        GEOLAKE_KEY: ${{ secrets.GEOLAKE_KEY }}
+        GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
+        GOOGLE_KEY: ${{ secrets.GOOGLE_KEY }}
+        HERE_APIKEY: ${{ secrets.HERE_APIKEY }}
+        HERE_APP_CODE: ${{ secrets.HERE_APP_CODE }}
+        HERE_APP_ID: ${{ secrets.HERE_APP_ID }}
+        IGNFRANCE_KEY: ${{ secrets.IGNFRANCE_KEY }}
+        IGNFRANCE_REFERER: ${{ secrets.IGNFRANCE_REFERER }}
+        LIVESTREETS_AUTH_ID: ${{ secrets.LIVESTREETS_AUTH_ID }}
+        LIVESTREETS_AUTH_TOKEN: ${{ secrets.LIVESTREETS_AUTH_TOKEN }}
+        MAPBOX_KEY: ${{ secrets.MAPBOX_KEY }}
+        MAPQUEST_KEY: ${{ secrets.MAPQUEST_KEY }}
+        MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
+        OPENCAGE_KEY: ${{ secrets.OPENCAGE_KEY }}
+        OPENMAPQUEST_APIKEY: ${{ secrets.OPENMAPQUEST_APIKEY }}
+        PICKPOINT_KEY: ${{ secrets.PICKPOINT_KEY }}
+        TOMTOM_KEY: ${{ secrets.TOMTOM_KEY }}
+        WHAT3WORDS_KEY: ${{ secrets.WHAT3WORDS_KEY }}
+        YANDEX_KEY: ${{ secrets.YANDEX_KEY }}

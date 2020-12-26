@@ -14,20 +14,23 @@ develop: venv piplocal
 
 .PHONY: lint lint-flake8 lint-isort
 lint-flake8:
-	flake8
+	flake8 geopy test *.py
 lint-isort:
-	isort --check-only -rc geopy test *.py
+	isort --check-only geopy test *.py
 lint: lint-flake8 lint-isort
 
 .PHONY: format
 format:
-	isort -rc geopy test *.py
+	isort geopy test *.py
+
+.PHONY: test-local
+test-local:
+	@# Run tests without Internet. These are fast and help to avoid
+	@# spending geocoders quota for test runs which would fail anyway.
+	python -m pytest --skip-tests-requiring-internet
 
 .PHONY: test
-test:
-	# Run tests without Internet first. These are fast and help to avoid
-	# spending geocoders quota for test runs which would fail anyway.
-	python -m pytest --skip-tests-requiring-internet
+test: test-local
 	# Run tests with Internet:
 	coverage run -m py.test
 	coverage report

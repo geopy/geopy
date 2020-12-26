@@ -381,8 +381,8 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
            13487015.8381145492]]
         d = self.cls(ellipsoid='WGS-84')
         km = 1000
-        for l in testcases:
-            (lat1, lon1, azi1, lat2, lon2, azi2, s12) = l
+        for tup in testcases:
+            (lat1, lon1, azi1, lat2, lon2, azi2, s12) = tup
             p1, p2 = Point(lat1, lon1), Point(lat2, lon2)
             s12a = d.measure(p1, p2) * km
             self.assertAlmostEqual(s12a, s12, delta=1e-8)
