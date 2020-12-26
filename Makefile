@@ -14,7 +14,7 @@ develop: venv piplocal
 
 .PHONY: lint lint-flake8 lint-isort
 lint-flake8:
-	flake8
+	flake8 geopy test *.py
 lint-isort:
 	isort --check-only geopy test *.py
 lint: lint-flake8 lint-isort
