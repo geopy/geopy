@@ -62,7 +62,11 @@ error_wait_seconds = float(os.getenv('GEOPY_TEST_ERROR_WAIT_SECONDS', 3))
 no_retries_for_hosts = set(os.getenv('GEOPY_TEST_NO_RETRIES_FOR_HOSTS', '').split(','))
 default_adapter = load_adapter_cls(os.getenv('GEOPY_TEST_ADAPTER'))
 default_adapter_is_async = issubclass(default_adapter, BaseAsyncAdapter)
-retry_status_codes = (429,)
+retry_status_codes = (
+    403,  # Forbidden (probably due to a rate limit)
+    429,  # Too Many Requests (definitely a rate limit)
+    502,  # Bad Gateway
+)
 
 
 def pytest_report_header(config):
