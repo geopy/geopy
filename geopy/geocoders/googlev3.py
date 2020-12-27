@@ -47,14 +47,17 @@ class GoogleV3(Geocoder):
         """
 
         :param str api_key: The API key required by Google to perform
-            geocoding requests, mandatory. API keys are managed through
+            geocoding requests, mandatory (unless premier is used,
+            then both ``client_id`` and ``secret_key`` must be specified
+            instead).
+            API keys are managed through
             the Google APIs console (https://code.google.com/apis/console).
             Make sure to have both ``Geocoding API`` and ``Time Zone API``
             services enabled for this API key.
 
             .. versionchanged:: 2.1
-               Previously a warning has been emitted when api_key was
-               not specified. Now a :class:`geopy.exc.ConfigurationError`
+               Previously a warning has been emitted when neither ``api_key``
+               nor premier were specified. Now a :class:`geopy.exc.ConfigurationError`
                is raised.
 
         :param str domain: Should be the localized Google Maps domain to
