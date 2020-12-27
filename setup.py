@@ -41,7 +41,7 @@ EXTRAS_DEV_DOCS = [
     "readme_renderer",
     "sphinx",
     "sphinx-issues",
-    "sphinx_rtd_theme>=0.4.0",
+    "sphinx_rtd_theme>=0.5.0",
 ]
 
 setup(
