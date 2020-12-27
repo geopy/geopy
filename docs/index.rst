@@ -473,7 +473,7 @@ are still being made in minor releases, such as:
   coordinate values normalization, though it's not documented, and it was
   completely wrong for the latitudes outside the `[-90; 90]` range.
   So instead of using an incorrectly normalized value for latitude,
-  a :class:`ValueError` exception is now thrown (#294).
+  a :class:`ValueError` exception is now thrown (:issue:`294`).
 
 Features and usages being phased out are covered with deprecation :mod:`warnings`
 when possible. Make sure to run your python with the ``-Wd`` switch to see
