@@ -40,6 +40,7 @@ EXTRAS_DEV_TEST = [
 EXTRAS_DEV_DOCS = [
     "readme_renderer",
     "sphinx",
+    "sphinx-issues",
     "sphinx_rtd_theme>=0.4.0",
 ]
 
