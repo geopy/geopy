@@ -31,7 +31,22 @@ CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "selfsigned_ca.pem"
 # - Registry's Internet Settings section on Windows.
 WITH_SYSTEM_PROXIES = bool(getproxies())
 
-ADAPTERS = [RequestsAdapter, URLLibAdapter, AioHTTPAdapter]
+AVAILABLE_ADAPTERS = [URLLibAdapter]
+NOT_AVAILABLE_ADAPTERS = []
+
+try:
+    import requests  # noqa
+except ImportError:
+    NOT_AVAILABLE_ADAPTERS.append(RequestsAdapter)
+else:
+    AVAILABLE_ADAPTERS.append(RequestsAdapter)
+
+try:
+    import aiohttp  # noqa
+except ImportError:
+    NOT_AVAILABLE_ADAPTERS.append(AioHTTPAdapter)
+else:
+    AVAILABLE_ADAPTERS.append(AioHTTPAdapter)
 
 
 class DummyGeocoder(Geocoder):
@@ -110,7 +125,7 @@ def remote_website_http_404(remote_website_http):
     return urljoin(remote_website_http, "/404")
 
 
-@pytest.fixture(params=ADAPTERS, autouse=True)
+@pytest.fixture(params=AVAILABLE_ADAPTERS, autouse=True)
 def adapter_factory(request):
     adapter_factory = request.param
     with patch.object(
@@ -135,6 +150,17 @@ async def make_dummy_async_geocoder(**kwargs):
 
         geocoder.geocode = geocode
         await yield_(geocoder)
+
+
+@pytest.mark.parametrize("adapter_cls", NOT_AVAILABLE_ADAPTERS)
+async def test_not_available_adapters_raise(adapter_cls):
+    # Note: this test is uselessly parametrized with `adapter_factory`.
+    with patch.object(
+        geopy.geocoders.options, "default_adapter_factory", adapter_cls
+    ):
+        with pytest.raises(ImportError):
+            async with make_dummy_async_geocoder():
+                pass
 
 
 async def test_geocoder_constructor_uses_https_proxy(

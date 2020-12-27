@@ -365,7 +365,9 @@ class RequestsAdapter(BaseSyncAdapter):
     def __del__(self):
         # Cleanup keepalive connections when Geocoder (and, thus, Adapter)
         # instances are getting garbage-collected.
-        self.session.close()
+        session = getattr(self, "session", None)
+        if session is not None:
+            session.close()
 
     def get_text(self, url, *, timeout, headers):
         resp = self._request(url, timeout=timeout, headers=headers)
