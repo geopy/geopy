@@ -2,15 +2,12 @@ version := $(shell python -c 'from geopy import __version__; print(__version__)'
 
 .PHONY: venv
 venv:
-	[ -d .venv ] || virtualenv .venv --python=python3
-	. .venv/bin/activate
-
-.PHONY: piplocal
-piplocal:
-	pip install -e '.[dev]'
+	[ -d .venv ] || python3 -m venv .venv
+	# Activate: `. .venv/bin/activate`
 
 .PHONY: develop
-develop: venv piplocal
+develop:
+	pip install -e '.[dev]'
 
 .PHONY: lint lint-flake8 lint-isort
 lint-flake8:
