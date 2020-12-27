@@ -3,6 +3,47 @@
 Changelog
 =========
 
+.. _v2-1-0:
+
+2.1.0
+-----
+2020-12-TBD
+
+New Features
+~~~~~~~~~~~~
+
+- Add support for leading plus sign in the :class:`.Point` constructor.
+  Contributed by Azimjon Pulatov. (:issue:`448`)
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- :class:`.GoogleV3`: change missing ``api_key`` warning to an error. (:issue:`450`)
+
+Bugfixes
+~~~~~~~~
+
+- Fixed an undocumented breaking change in geopy 2.0.0, where
+  the :class:`.Distance` class has become abstract, thus it could
+  no longer be used for unit conversions. (:issue:`435`)
+- :class:`.Photon` incorrectly treated 0.0 coordinate as an empty response.
+  Contributed by Mateusz Konieczny. (:issue:`439`)
+- :class:`.Nominatim`: fix TypeError on empty ``reverse`` result. (:issue:`455`)
+
+
+Docs Improvements
+~~~~~~~~~~~~~~~~~
+
+- Add Python 3.9 to the list of supported versions.
+- :class:`.Bing`: change ``postalcode`` to ``postalCode``.
+  Contributed by zhongjun-ma. (:issue:`424`)
+- :class:`.Nominatim`: better describe what is returned in addressdetails.
+  Contributed by Mateusz Konieczny. (:issue:`429`)
+- :class:`.Nominatim`: better describe ``viewbox`` param behavior.
+  Contributed by Hannes. (:issue:`454`)
+- :class:`.Yandex`: remove attention block about requiring an API key.
+
+
 .. _v2-0-0:
 
 2.0.0
