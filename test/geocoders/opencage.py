@@ -1,5 +1,3 @@
-import pytest
-
 from geopy.geocoders import OpenCage
 from test.geocoders.util import BaseTestGeocoder, env
 
@@ -14,10 +12,6 @@ class TestUnitOpenCage:
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('OPENCAGE_KEY')),
-    reason="No OPENCAGE_KEY env variables set"
-)
 class TestOpenCage(BaseTestGeocoder):
 
     @classmethod

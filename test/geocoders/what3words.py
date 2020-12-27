@@ -24,10 +24,6 @@ class TestUnitWhat3Words:
         assert geocoder.scheme == 'https'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('WHAT3WORDS_KEY')),
-    reason="No WHAT3WORDS_KEY env variable set"
-)
 class TestWhat3Words(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):

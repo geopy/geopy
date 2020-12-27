@@ -182,10 +182,6 @@ class BaseTestHere(BaseTestGeocoder):
         assert len(res) == 5
 
 
-@pytest.mark.skipif(
-    not bool(env.get('HERE_APIKEY')),
-    reason="No HERE_APIKEY env variable set"
-)
 class TestHereApiKey(BaseTestHere):
 
     @classmethod
@@ -197,10 +193,6 @@ class TestHereApiKey(BaseTestHere):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('HERE_APP_ID') and env.get('HERE_APP_CODE')),
-    reason="No HERE_APP_ID or HERE_APP_CODE env variable set"
-)
 class TestHereLegacyAuth(BaseTestHere):
 
     @classmethod

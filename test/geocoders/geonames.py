@@ -19,10 +19,6 @@ class TestUnitGeoNames:
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('GEONAMES_USERNAME')),
-    reason="No GEONAMES_USERNAME env variable set"
-)
 class TestGeoNames(BaseTestGeocoder):
 
     delta = 0.04

@@ -11,17 +11,13 @@ from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
 
 
-@pytest.mark.skipif(
-    not bool(env['GOOGLE_KEY']),
-    reason="No GOOGLE_KEY env variable set"
-)
 class TestGoogleV3(BaseTestGeocoder):
     new_york_point = Point(40.75376406311989, -73.98489005863667)
     america_new_york = timezone("America/New_York")
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        return GoogleV3(api_key=env.get('GOOGLE_KEY'), **kwargs)
+        return GoogleV3(api_key=env['GOOGLE_KEY'], **kwargs)
 
     async def test_user_agent_custom(self):
         geocoder = GoogleV3(

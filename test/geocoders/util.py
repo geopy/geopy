@@ -1,7 +1,6 @@
 import json
 import os
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from unittest.mock import ANY, patch
 
 import pytest
@@ -11,12 +10,32 @@ from geopy import exc
 from geopy.adapters import BaseAsyncAdapter
 from geopy.location import Location
 
-env = defaultdict(lambda: None)
+_env = {}
 try:
     with open(".test_keys") as fp:
-        env.update(json.loads(fp.read()))
+        _env.update(json.loads(fp.read()))
 except IOError:
-    env.update(os.environ)
+    _env.update(os.environ)
+
+
+class SkipIfMissingEnv(dict):
+    def __init__(self, env):
+        super().__init__(env)
+        self.is_internet_access_allowed = None
+
+    def __getitem__(self, key):
+        assert self.is_internet_access_allowed is not None
+        if key not in self:
+            if self.is_internet_access_allowed:
+                pytest.skip("Missing geocoder credential: %s" % (key,))
+            else:
+                # Generate some dummy token. We won't perform a networking
+                # request anyways.
+                return "dummy"
+        return super().__getitem__(key)
+
+
+env = SkipIfMissingEnv(_env)
 
 
 class BaseTestGeocoder(ABC):
@@ -29,9 +48,11 @@ class BaseTestGeocoder(ABC):
 
     @pytest.fixture(scope='class', autouse=True)
     @async_generator
-    async def class_geocoder(_, request, patch_adapter):
+    async def class_geocoder(_, request, patch_adapter, is_internet_access_allowed):
         """Prepare a class-level Geocoder instance."""
         cls = request.cls
+        env.is_internet_access_allowed = is_internet_access_allowed
+
         geocoder = cls.make_geocoder()
         cls.geocoder = geocoder
 
@@ -64,7 +85,7 @@ class BaseTestGeocoder(ABC):
         assert self.geocoder is type(self).geocoder, (
             "Detected `self.geocoder` assignment. "
             "Please use `async with inject_geocoder(my_geocoder):` "
-            "instead, whish supports async adapters."
+            "instead, which supports async adapters."
         )
 
     @classmethod

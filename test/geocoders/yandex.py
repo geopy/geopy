@@ -5,15 +5,11 @@ from geopy.geocoders import Yandex
 from test.geocoders.util import BaseTestGeocoder, env
 
 
-@pytest.mark.skipif(
-    not bool(env['YANDEX_KEY']),
-    reason="No YANDEX_KEY env variable set"
-)
 class TestYandex(BaseTestGeocoder):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        return Yandex(api_key=env.get('YANDEX_KEY'), **kwargs)
+        return Yandex(api_key=env['YANDEX_KEY'], **kwargs)
 
     async def test_user_agent_custom(self):
         geocoder = Yandex(

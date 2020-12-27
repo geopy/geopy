@@ -8,8 +8,8 @@ class TestAlgoliaPlaces(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):
         return AlgoliaPlaces(
-            app_id=env.get('ALGOLIA_PLACES_APP_ID'),
-            api_key=env.get('ALGOLIA_PLACES_API_KEY'),
+            app_id=env['ALGOLIA_PLACES_APP_ID'],
+            api_key=env['ALGOLIA_PLACES_API_KEY'],
             timeout=3,
             **kwargs)
 

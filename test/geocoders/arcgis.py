@@ -93,12 +93,6 @@ class TestArcGIS(BaseTestGeocoder):
         )
 
 
-@pytest.mark.skipif(
-    not (env.get('ARCGIS_USERNAME') is not None
-         or env.get('ARCGIS_PASSWORD') is not None
-         or env.get('ARCGIS_REFERER') is not None),
-    reason="No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
-)
 class TestArcGISAuthenticated(BaseTestGeocoder):
 
     @classmethod
