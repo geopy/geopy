@@ -292,7 +292,7 @@ class BaseTestNominatim(BaseTestGeocoder):
         )
         assert 'namedetails' not in result.raw
 
-    def test_parse_geocode(self):
+    async def test_parse_geocode(self):
         queries = [
             {
                 'osm_id': 6101403370,
@@ -311,7 +311,7 @@ class BaseTestNominatim(BaseTestGeocoder):
         for index, query in enumerate(queries):
             assert result[index] == geocoder.parse_osm(query)
 
-    def test_lookup_api(self):
+    async def test_lookup_api(self):
         queries = [
             {
                 'osm_id': 6101403370,
