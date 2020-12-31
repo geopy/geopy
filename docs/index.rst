@@ -8,8 +8,9 @@ Welcome to GeoPy's documentation!
 
 :Documentation: https://geopy.readthedocs.io/
 :Source Code: https://github.com/geopy/geopy
-:Issue Tracker: https://github.com/geopy/geopy/issues
 :Stack Overflow: https://stackoverflow.com/questions/tagged/geopy
+:Discussions: https://github.com/geopy/geopy/discussions
+:Issue Tracker: https://github.com/geopy/geopy/issues
 :PyPI: https://pypi.org/project/geopy/
 
 .. automodule:: geopy
@@ -29,29 +30,19 @@ Installation
 
     pip install geopy
 
-geopy 2.0
-~~~~~~~~~
-
-geopy 2.0 will be released in 2020, presumably in Q1.
-Only Python `>=3.5` and `>=pypy3.5` will be supported.
-The 1.x branch will not receive any features after that, although
-critical bugfixes might be backported on request.
-
-Python 2.7 support in new releases is already being removed
-in many other scientific Python packages, such as `numpy` and `pandas`
-(see https://python3statement.org/),
-so this is a good time to get rid of the 2.7 burden for geopy as well.
-
-The last minor release of 1.x series will contain deprecation warnings
-for all of the breaking changes introduced in 2.0, thus make sure to
-check your code with warnings enabled (i.e. run python with the ``-Wd``
-switch) to ensure a smoother transition from 1.x to 2.0.
-
 Geocoders
 ~~~~~~~~~
 
 .. automodule:: geopy.geocoders
    :members: __doc__
+
+Accessing Geocoders
+-------------------
+
+The typical way of retrieving a geocoder class is to make an import
+from ``geopy.geocoders`` package::
+
+    from geopy.geocoders import Nominatim
 
 .. autofunction:: geopy.geocoders.get_geocoder_for_service
 
@@ -65,7 +56,7 @@ Default Options Object
 Usage with Pandas
 -----------------
 
-It's possible to geocode a pandas DataFrame with geopy, however,
+It is possible to geocode a pandas DataFrame with geopy, however,
 rate-limiting must be taken into account.
 
 A large number of DataFrame rows might produce a significant amount of
@@ -73,14 +64,14 @@ geocoding requests to a Geocoding service, which might be throttled
 by the service (e.g. by returning `Too Many Requests` 429 HTTP error
 or timing out).
 
-:class:`geopy.extra.rate_limiter.RateLimiter` class provides a convenient
+:mod:`geopy.extra.rate_limiter` classes provide a convenient
 wrapper, which can be used to automatically add delays between geocoding
 calls to reduce the load on the Geocoding service. Also it can retry
 failed requests and swallow errors for individual rows.
 
 If you're having the `Too Many Requests` error, you may try the following:
 
-- Use :class:`geopy.extra.rate_limiter.RateLimiter` with non-zero
+- Use :mod:`geopy.extra.rate_limiter` with non-zero
   ``min_delay_seconds``.
 - Try a different Geocoding service (please consult with their ToS first,
   as some services prohibit bulk geocoding).
@@ -88,7 +79,17 @@ If you're having the `Too Many Requests` error, you may try the following:
   higher quota.
 - Provision your own local copy of the Geocoding service (such as Nominatim).
 
+Rate Limiter
+++++++++++++
+
+.. automodule:: geopy.extra.rate_limiter
+   :members: __doc__
+
 .. autoclass:: geopy.extra.rate_limiter.RateLimiter
+
+   .. automethod:: __init__
+
+.. autoclass:: geopy.extra.rate_limiter.AsyncRateLimiter
 
    .. automethod:: __init__
 
@@ -337,9 +338,6 @@ Calculating Distance
 .. autoclass:: geopy.distance.geodesic
     :members: __init__
 
-.. autoclass:: geopy.distance.vincenty
-    :members: __init__
-
 .. autoclass:: geopy.distance.great_circle
     :members: __init__
 
@@ -350,10 +348,18 @@ Data
     :members: address, latitude, longitude, altitude, point, raw
 
 .. autoclass:: geopy.point.Point
-    :members: __new__, from_string, from_sequence, from_point
+    :members:
+
+    .. automethod:: __new__
 
 .. autoclass:: geopy.timezone.Timezone
     :members: pytz_timezone, raw
+
+Units Conversion
+~~~~~~~~~~~~~~~~
+
+.. automodule:: geopy.units
+    :members:
 
 Exceptions
 ~~~~~~~~~~
@@ -391,6 +397,45 @@ Exceptions
 .. autoclass:: geopy.exc.GeocoderNotFound
     :show-inheritance:
 
+Adapters
+~~~~~~~~
+
+.. automodule:: geopy.adapters
+    :members: __doc__
+
+Supported Adapters
+------------------
+
+.. autoclass:: geopy.adapters.RequestsAdapter
+    :show-inheritance:
+
+.. autoclass:: geopy.adapters.URLLibAdapter
+    :show-inheritance:
+
+.. autoclass:: geopy.adapters.AioHTTPAdapter
+    :show-inheritance:
+
+
+Base Classes
+------------
+
+.. autoclass:: geopy.adapters.AdapterHTTPError
+    :show-inheritance:
+
+    .. automethod:: __init__
+
+.. autoclass:: geopy.adapters.BaseAdapter
+    :members:
+
+    .. automethod:: __init__
+
+.. autoclass:: geopy.adapters.BaseSyncAdapter
+    :show-inheritance:
+    :members:
+
+.. autoclass:: geopy.adapters.BaseAsyncAdapter
+    :show-inheritance:
+    :members:
 
 Logging
 ~~~~~~~
@@ -415,12 +460,8 @@ are still being made in minor releases, such as:
 - Backwards-incompatible changes of the undocumented API. This shouldn't
   affect anyone, unless they extend geocoder classes or use undocumented
   features or monkey-patch anything. If you believe that something is
-  missing in geopy, please consider opening an issue or providing a patch
-  or a PR instead of hacking around geopy.
-
-- Geocoder classes which simply don't work (usually because their service
-  has been discontinued) might get removed. They don't work anyway, so
-  that's hardly a breaking change, right? :)
+  missing in geopy, please consider opening an issue or providing
+  a patch/PR instead of hacking around geopy.
 
 - Geocoding services sometimes introduce new APIs and deprecate the previous
   ones. We try to upgrade without breaking the geocoder's API interface,
@@ -428,12 +469,15 @@ are still being made in minor releases, such as:
   backwards-incompatible way.
 
 - Behavior for invalid input and peculiar edge cases might be altered.
-  For example, :class:`geopy.point.Point` instances did coordinate values
-  normalization, though it's not documented, and it was completely wrong
-  for the latitudes outside the `[-90; 90]` range. So instead of using an
-  incorrectly normalized value for latitude, an :class:`ValueError`
-  exception is now thrown (#294).
+  For example, :class:`geopy.point.Point` instances previously did
+  coordinate values normalization, though it's not documented, and it was
+  completely wrong for the latitudes outside the `[-90; 90]` range.
+  So instead of using an incorrectly normalized value for latitude,
+  a :class:`ValueError` exception is now thrown (:issue:`294`).
 
+Features and usages being phased out are covered with deprecation :mod:`warnings`
+when possible. Make sure to run your python with the ``-Wd`` switch to see
+if your code emits the warnings.
 
 To make the upgrade less painful, please read the changelog before upgrading.
 
@@ -441,10 +485,11 @@ To make the upgrade less painful, please read the changelog before upgrading.
 Changelog
 ~~~~~~~~~
 
+:doc:`Changelog for 2.x.x series <changelog_2xx>`.
+
 :doc:`Changelog for 1.x.x series <changelog_1xx>`.
 
-For changes in the 0.9 series, see the
-:doc:`0.9x changelog <changelog_09x>`.
+:doc:`Changelog for 0.9x series <changelog_09x>`.
 
 
 Indices and search

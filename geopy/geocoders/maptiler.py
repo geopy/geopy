@@ -1,4 +1,6 @@
-from geopy.compat import quote, string_compare, urlencode
+from functools import partial
+from urllib.parse import quote, urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.point import Point
@@ -12,8 +14,6 @@ class MapTiler(Geocoder):
 
     Documentation at:
         https://cloud.maptiler.com/geocoding/ (requires sign-up)
-
-    .. versionadded:: 1.22.0
     """
 
     api_path = '/geocoding/%(query)s.json'
@@ -21,23 +21,19 @@ class MapTiler(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='api.maptiler.com',
+            adapter_factory=None,
+            domain='api.maptiler.com'
     ):
         """
         :param str api_key: The API key required by Maptiler to perform
             geocoding requests. API keys are managed through Maptiler's account
             page (https://cloud.maptiler.com/account/keys).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -55,15 +51,20 @@ class MapTiler(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str domain: base api domain for Maptiler
         """
-        super(MapTiler, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         self.domain = domain.strip('/')
@@ -89,11 +90,12 @@ class MapTiler(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             proximity=None,
             language=None,
-            bbox=None,
+            bbox=None
     ):
         """
         Return a location point by address.
@@ -128,12 +130,12 @@ class MapTiler(Geocoder):
         """
         params = {'key': self.api_key}
 
-        query = self.format_string % query
+        query = query
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
 
-        if isinstance(language, string_compare):
+        if isinstance(language, str):
             language = [language]
         if language:
             params['language'] = ','.join(language)
@@ -146,16 +148,16 @@ class MapTiler(Geocoder):
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.
@@ -182,7 +184,7 @@ class MapTiler(Geocoder):
         """
         params = {'key': self.api_key}
 
-        if isinstance(language, string_compare):
+        if isinstance(language, str):
             language = [language]
         if language:
             params['language'] = ','.join(language)
@@ -192,6 +194,5 @@ class MapTiler(Geocoder):
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)

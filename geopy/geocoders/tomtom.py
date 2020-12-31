@@ -1,4 +1,7 @@
-from geopy.compat import quote, urlencode
+from functools import partial
+from urllib.parse import quote, urlencode
+
+from geopy.adapters import AdapterHTTPError
 from geopy.exc import GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -12,8 +15,6 @@ class TomTom(Geocoder):
 
     Documentation at:
         https://developer.tomtom.com/search-api/search-api-documentation
-
-    .. versionadded:: 1.15.0
     """
 
     geocode_path = '/search/2/geocode/%(query)s.json'
@@ -22,21 +23,17 @@ class TomTom(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            domain='api.tomtom.com',
+            adapter_factory=None,
+            domain='api.tomtom.com'
     ):
         """
         :param str api_key: TomTom API key.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -54,16 +51,21 @@ class TomTom(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         :param str domain: Domain where the target TomTom service
             is hosted.
         """
-        super(TomTom, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         self.api = "%s://%s%s" % (self.scheme, domain, self.geocode_path)
@@ -72,11 +74,12 @@ class TomTom(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             limit=None,
             typeahead=False,
-            language=None,
+            language=None
     ):
         """
         Return a location point by address.
@@ -107,7 +110,6 @@ class TomTom(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        query = self.format_string % query
         params = self._geocode_params(query)
         params['typeahead'] = self._boolean_value(typeahead)
 
@@ -123,17 +125,16 @@ class TomTom(Geocoder):
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
-            language=None,
+            language=None
     ):
         """
         Return an address by location point.
@@ -157,8 +158,6 @@ class TomTom(Geocoder):
             List of supported languages (case-insensitive):
             https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
 
-            .. versionadded:: 1.18.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -172,13 +171,10 @@ class TomTom(Geocoder):
         url = "?".join((self.api_reverse % dict(position=quoted_position),
                         urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+        callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-        return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
-
-    @staticmethod
-    def _boolean_value(bool_value):
+    def _boolean_value(self, bool_value):
         return 'true' if bool_value else 'false'
 
     def _geocode_params(self, formatted_query):
@@ -222,9 +218,10 @@ class TomTom(Geocoder):
         return Location(result['address']['freeformAddress'],
                         (latitude, longitude), result)
 
-    def _geocoder_exception_handler(
-            self, error, message, http_code=None, http_body=None
-    ):
-        if http_code is not None and http_body is not None:
-            if http_code >= 400 and "Developer Over Qps" in http_body:
-                raise GeocoderQuotaExceeded("Developer Over Qps")
+    def _geocoder_exception_handler(self, error):
+        if not isinstance(error, AdapterHTTPError):
+            return
+        if error.status_code is None or error.text is None:
+            return
+        if error.status_code >= 400 and "Developer Over Qps" in error.text:
+            raise GeocoderQuotaExceeded("Developer Over Qps") from error

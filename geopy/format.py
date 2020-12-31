@@ -1,17 +1,9 @@
-"""
-Formatting...
-"""
-
 from geopy import units
-from geopy.compat import py3k
-
-if py3k:
-    unichr = chr
 
 # Unicode characters for symbols that appear in coordinate strings.
-DEGREE = unichr(176)
-PRIME = unichr(8242)
-DOUBLE_PRIME = unichr(8243)
+DEGREE = chr(176)
+PRIME = chr(8242)
+DOUBLE_PRIME = chr(8243)
 ASCII_DEGREE = ''
 ASCII_PRIME = "'"
 ASCII_DOUBLE_PRIME = '"'

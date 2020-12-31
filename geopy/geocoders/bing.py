@@ -1,4 +1,7 @@
-from geopy.compat import quote, urlencode
+import collections.abc
+from functools import partial
+from urllib.parse import quote, urlencode
+
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
@@ -34,22 +37,18 @@ class Bing(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
         :param str api_key: Should be a valid Bing Maps API key
             (https://www.microsoft.com/en-us/maps/create-a-bing-maps-key).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -63,21 +62,22 @@ class Bing(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
-        super(Bing, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.api_key = api_key
         domain = 'dev.virtualearth.net'
@@ -87,6 +87,7 @@ class Bing(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             user_location=None,
             timeout=DEFAULT_SENTINEL,
@@ -101,7 +102,7 @@ class Bing(Geocoder):
 
             For a structured query, provide a dictionary whose keys
             are one of: `addressLine`, `locality` (city),
-            `adminDistrict` (state), `countryRegion`, or `postalcode`.
+            `adminDistrict` (state), `countryRegion`, or `postalCode`.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -118,23 +119,17 @@ class Bing(Geocoder):
         :param str culture: Affects the language of the response,
             must be a two-letter country code.
 
-            .. versionadded:: 1.4.0
-
         :param bool include_neighborhood: Sets whether to include the
             neighborhood field in the response.
-
-            .. versionadded:: 1.4.0
 
         :param bool include_country_code: Sets whether to include the
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
 
-            .. versionadded:: 1.4.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        if isinstance(query, dict):
+        if isinstance(query, collections.abc.Mapping):
             params = {
                 key: val
                 for key, val
@@ -144,7 +139,7 @@ class Bing(Geocoder):
             params['key'] = self.api_key
         else:
             params = {
-                'query': self.format_string % query,
+                'query': query,
                 'key': self.api_key
             }
         if user_location:
@@ -162,14 +157,13 @@ class Bing(Geocoder):
 
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             culture=None,
@@ -213,13 +207,10 @@ class Bing(Geocoder):
                         urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def _parse_json(doc, exactly_one=True):
+    def _parse_json(self, doc, exactly_one=True):
         """
         Parse a location name, latitude, and longitude from an JSON response.
         """

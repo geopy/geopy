@@ -1,4 +1,6 @@
-from geopy.compat import urlencode
+from functools import partial
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -11,8 +13,6 @@ class BANFrance(Geocoder):
 
     Documentation at:
         https://adresse.data.gouv.fr/api
-
-    .. versionadded:: 1.18.0
     """
 
     geocode_path = '/search'
@@ -20,23 +20,19 @@ class BANFrance(Geocoder):
 
     def __init__(
             self,
+            *,
             domain='api-adresse.data.gouv.fr',
-            format_string=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
         :param str domain: Currently it is ``'api-adresse.data.gouv.fr'``, can
             be changed for testing purposes.
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -54,14 +50,19 @@ class BANFrance(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         """
-        super(BANFrance, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         self.domain = domain.strip('/')
 
@@ -75,9 +76,10 @@ class BANFrance(Geocoder):
     def geocode(
             self,
             query,
+            *,
             limit=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -103,7 +105,7 @@ class BANFrance(Geocoder):
         """
 
         params = {
-            'q': self.format_string % query,
+            'q': query,
         }
 
         if limit is not None:
@@ -112,15 +114,15 @@ class BANFrance(Geocoder):
         url = "?".join((self.geocode_api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
@@ -155,12 +157,10 @@ class BANFrance(Geocoder):
 
         url = "?".join((self.reverse_api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def _parse_feature(feature):
+    def _parse_feature(self, feature):
         # Parse each resource.
         latitude = feature.get('geometry', {}).get('coordinates', [])[1]
         longitude = feature.get('geometry', {}).get('coordinates', [])[0]
@@ -168,7 +168,6 @@ class BANFrance(Geocoder):
 
         return Location(placename, (latitude, longitude), feature)
 
-    @classmethod
     def _parse_json(self, response, exactly_one):
         if response is None or 'features' not in response:
             return None

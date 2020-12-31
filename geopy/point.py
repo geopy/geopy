@@ -1,36 +1,34 @@
-# encoding: utf-8
 """
 :class:`.Point` data structure.
 """
 
-import collections
+import collections.abc
 import re
 import warnings
 from itertools import islice
-from math import fmod
+from math import fmod, isfinite
 
 from geopy import units, util
-from geopy.compat import isfinite, string_compare
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
 
 POINT_PATTERN = re.compile(r"""
     .*?
     (?P<latitude>
       (?P<latitude_direction_front>[NS])?[ ]*
-        (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+        (?P<latitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
         (?:(?P<latitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
         (?:(?P<latitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
         )?(?P<latitude_direction_back>[NS])?)
     %(SEP)s
     (?P<longitude>
       (?P<longitude_direction_front>[EW])?[ ]*
-      (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+      (?P<longitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
       (?:(?P<longitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
       (?:(?P<longitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
       )?(?P<longitude_direction_back>[EW])?)(?:
     %(SEP)s
       (?P<altitude>
-        (?P<altitude_distance>-?%(FLOAT)s)[ ]*
+        (?P<altitude_distance>[+-]?%(FLOAT)s)[ ]*
         (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
     \s*$
 """ % {
@@ -83,7 +81,7 @@ def _normalize_coordinates(latitude, longitude, altitude):
     return latitude, longitude, altitude
 
 
-class Point(object):
+class Point:
     """
     A geodetic point with latitude, longitude, and altitude.
 
@@ -99,7 +97,7 @@ class Point(object):
         >>> p1 = Point(41.5, -81, 0)
         >>> p2 = Point(latitude=41.5, longitude=-81)
 
-    With a sequence of 0 to 3 values (latitude, longitude, altitude)::
+    With a sequence of 2 to 3 values (latitude, longitude, altitude)::
 
         >>> p1 = Point([41.5, -81, 0])
         >>> p2 = Point((41.5, -81))
@@ -114,11 +112,12 @@ class Point(object):
 
     Give a string containing at least latitude and longitude::
 
-        >>> p1 = Point('41.5,-81.0')
-        >>> p2 = Point('41.5 N -81.0 W')
-        >>> p3 = Point('-41.5 S, 81.0 E, 2.5km')
-        >>> p4 = Point('23 26m 22s N 23 27m 30s E 21.0mi')
-        >>> p5 = Point('''3 26' 22" N 23 27' 30" E''')
+        >>> p = Point('41.5,-81.0')
+        >>> p = Point('+41.5 -81.0')
+        >>> p = Point('41.5 N -81.0 W')
+        >>> p = Point('-41.5 S, 81.0 E, 2.5km')
+        >>> p = Point('23 26m 22s N 23 27m 30s E 21.0mi')
+        >>> p = Point('''3 26' 22" N 23 27' 30" E''')
 
     Point values can be accessed by name or by index::
 
@@ -135,6 +134,17 @@ class Point(object):
 
         >>> latitude, longitude, altitude = p
 
+    Textual representations::
+
+        >>> p = Point(41.5, -81.0, 12.3)
+        >>> str(p)  # same as `p.format()`
+        '41 30m 0s N, 81 0m 0s W, 12.3km'
+        >>> p.format_unicode()
+        '41° 30′ 0″ N, 81° 0′ 0″ W, 12.3km'
+        >>> repr(p)
+        'Point(41.5, -81.0, 12.3)'
+        >>> repr(tuple(p))
+        '(41.5, -81.0, 12.3)'
     """
 
     __slots__ = ("latitude", "longitude", "altitude")
@@ -152,7 +162,7 @@ class Point(object):
             arg = latitude
             if isinstance(arg, Point):
                 return cls.from_point(arg)
-            elif isinstance(arg, string_compare):
+            elif isinstance(arg, str):
                 return cls.from_string(arg)
             else:
                 try:
@@ -165,19 +175,19 @@ class Point(object):
                     return cls.from_sequence(seq)
 
         if single_arg:
-            warnings.warn('A single number has been passed to the Point '
-                          'constructor. This is probably a mistake, because '
-                          'constructing a Point with just a latitude '
-                          'seems senseless. If this is exactly what was '
-                          'meant, then pass the zero longitude explicitly '
-                          'to get rid of this warning. '
-                          'In geopy 2.0 this will become an exception.',
-                          DeprecationWarning, stacklevel=2)
+            raise ValueError(
+                'A single number has been passed to the Point '
+                'constructor. This is probably a mistake, because '
+                'constructing a Point with just a latitude '
+                'seems senseless. If this is exactly what was '
+                'meant, then pass the zero longitude explicitly '
+                'to get rid of this error.'
+            )
 
         latitude, longitude, altitude = \
             _normalize_coordinates(latitude, longitude, altitude)
 
-        self = super(Point, cls).__new__(cls)
+        self = super().__new__(cls)
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
@@ -206,7 +216,19 @@ class Point(object):
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         """
-        Format decimal degrees (DD) to degrees minutes seconds (DMS)
+        Format decimal degrees (DD) to degrees minutes seconds (DMS)::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format()
+            '41 30m 0s N, 81 0m 0s W, 12.3km'
+            >>> p = Point(41.5, 0, 0)
+            >>> p.format()
+            '41 30m 0s N, 0 0m 0s E'
+
+        See also :meth:`.format_unicode`.
+
+        :param bool altitude: Whether to include ``altitude`` value.
+            By default it is automatically included if it is non-zero.
         """
         latitude = "%s %s" % (
             format_degrees(abs(self.latitude), symbols={
@@ -225,22 +247,48 @@ class Point(object):
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, string_compare):
+            if not isinstance(altitude, str):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
         return ", ".join(coordinates)
 
+    def format_unicode(self, altitude=None):
+        """
+        :meth:`.format` with pretty unicode chars for degrees,
+        minutes and seconds::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format_unicode()
+            '41° 30′ 0″ N, 81° 0′ 0″ W, 12.3km'
+
+        :param bool altitude: Whether to include ``altitude`` value.
+            By default it is automatically included if it is non-zero.
+        """
+        return self.format(
+            altitude, DEGREE, PRIME, DOUBLE_PRIME
+        )
+
     def format_decimal(self, altitude=None):
         """
-        Format decimal degrees with altitude
+        Format decimal degrees with altitude::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format_decimal()
+            '41.5, -81.0, 12.3km'
+            >>> p = Point(41.5, 0, 0)
+            >>> p.format_decimal()
+            '41.5, 0.0'
+
+        :param bool altitude: Whether to include ``altitude`` value.
+            By default it is automatically included if it is non-zero.
         """
         coordinates = [str(self.latitude), str(self.longitude)]
 
         if altitude is None:
             altitude = bool(self.altitude)
         if altitude:
-            if not isinstance(altitude, string_compare):
+            if not isinstance(altitude, str):
                 altitude = 'km'
             coordinates.append(self.format_altitude(altitude))
 
@@ -248,20 +296,25 @@ class Point(object):
 
     def format_altitude(self, unit='km'):
         """
-        Format altitude with unit
+        Format altitude with unit::
+
+            >>> p = Point(41.5, -81.0, 12.3)
+            >>> p.format_altitude()
+            '12.3km'
+            >>> p = Point(41.5, -81.0, 0)
+            >>> p.format_altitude()
+            '0.0km'
+
+        :param str unit: Resulting altitude unit. Supported units
+            are listed in :meth:`.from_string` doc.
         """
         return format_distance(self.altitude, unit=unit)
 
     def __str__(self):
         return self.format()
 
-    def __unicode__(self):
-        return self.format(
-            None, DEGREE, PRIME, DOUBLE_PRIME
-        )
-
     def __eq__(self, other):
-        if not isinstance(other, collections.Iterable):
+        if not isinstance(other, collections.abc.Iterable):
             return NotImplemented
         return tuple(self) == tuple(other)
 
@@ -271,7 +324,10 @@ class Point(object):
     @classmethod
     def parse_degrees(cls, degrees, arcminutes, arcseconds, direction=None):
         """
-        Parse degrees minutes seconds including direction (N, S, E, W)
+        Convert degrees, minutes, seconds and direction (N, S, E, W)
+        to a single degrees number.
+
+        :rtype: float
         """
         degrees = float(degrees)
         negative = degrees < 0
@@ -295,7 +351,18 @@ class Point(object):
     @classmethod
     def parse_altitude(cls, distance, unit):
         """
-        Parse altitude managing units conversion
+        Parse altitude managing units conversion::
+
+            >>> Point.parse_altitude(712, 'm')
+            0.712
+            >>> Point.parse_altitude(712, 'km')
+            712.0
+            >>> Point.parse_altitude(712, 'mi')
+            1145.852928
+
+        :param float distance: Numeric value of altitude.
+        :param str unit: ``distance`` unit. Supported units
+            are listed in :meth:`.from_string` doc.
         """
         if distance is not None:
             distance = float(distance)
@@ -394,7 +461,7 @@ class Point(object):
     @classmethod
     def from_sequence(cls, seq):
         """
-        Create and return a new ``Point`` instance from any iterable with 0 to
+        Create and return a new ``Point`` instance from any iterable with 2 to
         3 elements.  The elements, if present, must be latitude, longitude,
         and altitude, respectively.
         """

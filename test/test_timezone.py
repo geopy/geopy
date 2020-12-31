@@ -2,17 +2,23 @@ import datetime
 import pickle
 import unittest
 
-import pytz
-import pytz.tzinfo
+import pytest
 
-from geopy.compat import u
 from geopy.timezone import Timezone, from_fixed_gmt_offset, from_timezone_name
 
+try:
+    import pytz
+    import pytz.tzinfo
+    pytz_available = True
+except ImportError:
+    pytz_available = False
 
+
+@pytest.mark.skipif("not pytz_available")
 class TimezoneTestCase(unittest.TestCase):
 
     timezone_gmt_offset_hours = 3.0
-    timezone_name = u("Europe/Moscow")  # a DST-less timezone
+    timezone_name = "Europe/Moscow"  # a DST-less timezone
 
     def test_create_from_timezone_name(self):
         raw = dict(foo="bar")
@@ -36,7 +42,7 @@ class TimezoneTestCase(unittest.TestCase):
 
     def test_create_from_pytz_timezone(self):
         pytz_timezone = pytz.timezone(self.timezone_name)
-        tz = Timezone(pytz_timezone)
+        tz = Timezone(pytz_timezone, {})
         self.assertIs(tz.pytz_timezone, pytz_timezone)
 
     def test_string(self):

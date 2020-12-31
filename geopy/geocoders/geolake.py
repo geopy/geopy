@@ -1,4 +1,7 @@
-from geopy.compat import string_compare, urlencode
+import collections.abc
+from functools import partial
+from urllib.parse import urlencode
+
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import join_filter, logger
@@ -14,8 +17,6 @@ class Geolake(Geocoder):
 
     Terms of Service at:
         https://geolake.com/terms-of-use
-
-    .. versionadded:: 1.18.0
     """
 
     structured_query_params = {
@@ -34,20 +35,16 @@ class Geolake(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             domain='api.geolake.com',
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
 
         :param str api_key: The API key required by Geolake
             to perform geocoding requests. You can get your key here:
@@ -72,14 +69,19 @@ class Geolake(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
+
         """
-        super(Geolake, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
 
         self.api_key = api_key
@@ -89,9 +91,10 @@ class Geolake(Geocoder):
     def geocode(
             self,
             query,
+            *,
             country_codes=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -109,10 +112,6 @@ class Geolake(Geocoder):
             standard (e.g. ``FR``). Multiple countries can be specified with
             a Python list.
 
-            .. versionchanged:: 1.19.0
-                Previously only a Python list of countries could be specified.
-                Now a single country as a string can be specified as well.
-
         :type country_codes: str or list
 
         :param bool exactly_one: Return one result or a list of one result.
@@ -127,7 +126,7 @@ class Geolake(Geocoder):
 
         """
 
-        if isinstance(query, dict):
+        if isinstance(query, collections.abc.Mapping):
             params = {
                 key: val
                 for key, val
@@ -138,12 +137,12 @@ class Geolake(Geocoder):
         else:
             params = {
                 'api_key': self.api_key,
-                'q': self.format_string % query,
+                'q': query,
             }
 
         if not country_codes:
             country_codes = []
-        if isinstance(country_codes, string_compare):
+        if isinstance(country_codes, str):
             country_codes = [country_codes]
         if country_codes:
             params['countryCodes'] = ",".join(country_codes)
@@ -151,9 +150,8 @@ class Geolake(Geocoder):
         url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, page, exactly_one):
         """Returns location, (latitude, longitude) from json feed."""

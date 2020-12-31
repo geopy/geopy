@@ -1,7 +1,44 @@
 :orphan:
 
-Changelog
-=========
+Changelog of the 1.x series
+===========================
+
+1.23.0
+------
+2020-06-27
+
+This is the last feature release for the 1.x series, as geopy 2.0 has been
+released. The 1.x series will not receive any new features or bugfixes
+unless explicitly asked on the issue tracker.
+
+*   ADDED: `Units Conversion` docs section.
+
+*   ADDED: Docs now explicitly clarify that geocoding services
+    don't consider altitudes. (#165)
+
+*   ADDED: `Point.format_unicode` method. It was always present as
+    `__unicode__` magic for Python 2.7, and now it can be accessed
+    as a public method.
+
+*   ADDED: `geopy.__version_info__` tuple which can be used to dynamically
+    compare geopy version.
+
+*   ADDED: pytest `--skip-tests-requiring-internet` switch (might be useful
+    for downstream package maintainers). (#413)
+
+*   CHANGED: Points with different altitudes now emit a warning
+    in distance computations. In geopy 2.0 the warning would become
+    an exception. (#387)
+
+*   CHANGED: Improved `Point` docs: added missing public methods,
+    added more examples.
+
+*   CHANGED: `Nominatim` started emitting warnings for a number of sample
+    user agents mentioned in the docs, such as `specify_your_app_name_here`.
+
+*   FIXED: `IGNFrance` ignored proxies with username + password auth. (#289)
+
+
 1.22.0
 ------
 2020-05-11

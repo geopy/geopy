@@ -1,25 +1,42 @@
-
 import unittest
-import warnings
+from contextlib import ExitStack
+from unittest.mock import patch, sentinel
 
-from mock import patch, sentinel
+import pytest
 
-import geopy.compat
 import geopy.geocoders
+import geopy.geocoders.base
+from geopy.adapters import BaseAsyncAdapter, BaseSyncAdapter
 from geopy.exc import GeocoderNotFound, GeocoderQueryError
 from geopy.geocoders import GoogleV3, get_geocoder_for_service
-from geopy.geocoders.base import Geocoder
+from geopy.geocoders.base import Geocoder, _synchronized
 from geopy.point import Point
+
+
+class DummySyncAdapter(BaseSyncAdapter):
+    def get_json(self, *args, **kwargs):  # pragma: no cover
+        raise NotImplementedError
+
+    def get_text(self, *args, **kwargs):  # pragma: no cover
+        raise NotImplementedError
+
+
+class DummyAsyncAdapter(BaseAsyncAdapter):
+    async def get_json(self, *args, **kwargs):  # pragma: no cover
+        raise NotImplementedError
+
+    async def get_text(self, *args, **kwargs):  # pragma: no cover
+        raise NotImplementedError
 
 
 class GetGeocoderTestCase(unittest.TestCase):
 
     def test_get_geocoder_for_service(self):
-        self.assertEqual(get_geocoder_for_service("google"), GoogleV3)
-        self.assertEqual(get_geocoder_for_service("googlev3"), GoogleV3)
+        assert get_geocoder_for_service("google") == GoogleV3
+        assert get_geocoder_for_service("googlev3") == GoogleV3
 
     def test_get_geocoder_for_service_raises_for_unknown(self):
-        with self.assertRaises(GeocoderNotFound):
+        with pytest.raises(GeocoderNotFound):
             get_geocoder_for_service("")
 
 
@@ -35,6 +52,7 @@ class GeocoderTestCase(unittest.TestCase):
         proxies = {'https': '192.0.2.0'}
         user_agent = 'test app'
         ssl_context = sentinel.some_ssl_context
+        adapter = DummySyncAdapter(proxies=None, ssl_context=None)
 
         geocoder = Geocoder(
             scheme=scheme,
@@ -42,25 +60,17 @@ class GeocoderTestCase(unittest.TestCase):
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=lambda **kw: adapter,
         )
         for attr in ('scheme', 'timeout', 'proxies', 'ssl_context'):
-            self.assertEqual(locals()[attr], getattr(geocoder, attr))
-        self.assertEqual(user_agent, geocoder.headers['User-Agent'])
+            assert locals()[attr] == getattr(geocoder, attr)
+        assert user_agent == geocoder.headers['User-Agent']
+        assert adapter is geocoder.adapter
 
-    def test_deprecated_format_string(self):
-        format_string = '%s Los Angeles, CA USA'
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            geocoder = Geocoder(
-                format_string=format_string,
-            )
-            self.assertEqual(format_string, geocoder.format_string)
-            self.assertEqual(1, len(w))
-
+    @patch.object(geopy.geocoders.options, 'default_adapter_factory',
+                  DummySyncAdapter)
     def test_init_with_defaults(self):
         attr_to_option = {
-            'format_string': 'default_format_string',
             'scheme': 'default_scheme',
             'timeout': 'default_timeout',
             'proxies': 'default_proxies',
@@ -69,10 +79,15 @@ class GeocoderTestCase(unittest.TestCase):
 
         geocoder = Geocoder()
         for geocoder_attr, options_attr in attr_to_option.items():
-            self.assertEqual(getattr(geopy.geocoders.options, options_attr),
-                             getattr(geocoder, geocoder_attr))
-        self.assertEqual(geopy.geocoders.options.default_user_agent,
-                         geocoder.headers['User-Agent'])
+            assert (
+                getattr(geopy.geocoders.options, options_attr) ==
+                getattr(geocoder, geocoder_attr)
+            )
+        assert (
+            geopy.geocoders.options.default_user_agent ==
+            geocoder.headers['User-Agent']
+        )
+        assert DummySyncAdapter is type(geocoder.adapter)  # noqa
 
     @patch.object(geopy.geocoders.options, 'default_proxies', {'https': '192.0.2.0'})
     @patch.object(geopy.geocoders.options, 'default_timeout', 10)
@@ -80,109 +95,58 @@ class GeocoderTestCase(unittest.TestCase):
                   sentinel.some_ssl_context)
     def test_init_with_none_overrides_default(self):
         geocoder = Geocoder(proxies=None, timeout=None, ssl_context=None)
-        self.assertIsNone(geocoder.proxies)
-        self.assertIsNone(geocoder.timeout)
-        self.assertIsNone(geocoder.ssl_context)
+        assert geocoder.proxies is None
+        assert geocoder.timeout is None
+        assert geocoder.ssl_context is None
 
     @patch.object(geopy.geocoders.options, 'default_user_agent',
                   'mocked_user_agent/0.0.0')
     def test_user_agent_default(self):
         geocoder = Geocoder()
-        self.assertEqual(geocoder.headers['User-Agent'],
-                         'mocked_user_agent/0.0.0')
+        assert geocoder.headers['User-Agent'] == 'mocked_user_agent/0.0.0'
 
     def test_user_agent_custom(self):
         geocoder = Geocoder(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     @patch.object(geopy.geocoders.options, 'default_timeout', 12)
     def test_call_geocoder_timeout(self):
         url = 'spam://ham/eggs'
 
-        g = Geocoder()
-        self.assertEqual(g.timeout, 12)
+        g = Geocoder(adapter_factory=DummySyncAdapter)
+        assert g.timeout == 12
 
-        # Suppress another (unrelated) warning when running tests on an old Python.
-        with patch('geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT', True), \
-                patch.object(g, 'urlopen') as mock_urlopen:
-            g._call_geocoder(url, raw=True)
-            args, kwargs = mock_urlopen.call_args
-            self.assertEqual(kwargs['timeout'], 12)
+        with ExitStack() as stack:
+            mock_get_json = stack.enter_context(patch.object(g.adapter, 'get_json'))
 
-            g._call_geocoder(url, timeout=7, raw=True)
-            args, kwargs = mock_urlopen.call_args
-            self.assertEqual(kwargs['timeout'], 7)
+            g._call_geocoder(url, lambda res: res)
+            args, kwargs = mock_get_json.call_args
+            assert kwargs['timeout'] == 12
 
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter('always')
-                g._call_geocoder(url, timeout=None, raw=True)
-                args, kwargs = mock_urlopen.call_args
-                self.assertEqual(kwargs['timeout'], 12)
-                self.assertEqual(1, len(w))
+            g._call_geocoder(url, lambda res: res, timeout=7)
+            args, kwargs = mock_get_json.call_args
+            assert kwargs['timeout'] == 7
 
-    def test_ssl_context_for_old_python(self):
-        # Before (exclusive) 2.7.9 and 3.4.3.
+            g._call_geocoder(url, lambda res: res, timeout=None)
+            args, kwargs = mock_get_json.call_args
+            assert kwargs['timeout'] is None
 
-        # Keep the reference, because `geopy.compat.HTTPSHandler` will be
-        # mocked below.
-        orig_HTTPSHandler = geopy.compat.HTTPSHandler
-
-        class HTTPSHandlerStub(geopy.compat.HTTPSHandler):
-            def __init__(self):  # No `context` arg.
-                orig_HTTPSHandler.__init__(self)
-
-        if hasattr(geopy.compat, '__warningregistry__'):
-            # If running tests on an old Python, the warning we are going
-            # to test might have been already issued and recorded in
-            # the registry. Clean it up, so we could receive the warning again.
-            del geopy.compat.__warningregistry__
-
-        with patch('geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT',
-                   geopy.compat._is_urllib_context_supported(HTTPSHandlerStub)), \
-                patch('geopy.compat.HTTPSHandler', HTTPSHandlerStub), \
-                warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            self.assertFalse(geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT)
-
-            self.assertEqual(0, len(w))
-            Geocoder()
-            self.assertEqual(1, len(w))
-
-    def test_ssl_context_for_newer_python(self):
-        # From (inclusive) 2.7.9 and 3.4.3.
-
-        # Keep the reference, because `geopy.compat.HTTPSHandler` will be
-        # mocked below.
-        orig_HTTPSHandler = geopy.compat.HTTPSHandler
-
-        class HTTPSHandlerStub(geopy.compat.HTTPSHandler):
-            def __init__(self, context=None):
-                orig_HTTPSHandler.__init__(self)
-
-        if hasattr(geopy.compat, '__warningregistry__'):
-            # If running tests on an old Python, the warning we are going
-            # to test might have been already issued and recorded in
-            # the registry. Clean it up, so we could receive the warning again.
-            del geopy.compat.__warningregistry__
-
-        with patch('geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT',
-                   geopy.compat._is_urllib_context_supported(HTTPSHandlerStub)), \
-                patch('geopy.compat.HTTPSHandler', HTTPSHandlerStub), \
-                patch.object(HTTPSHandlerStub, '__init__', autospec=True,
-                             side_effect=HTTPSHandlerStub.__init__
-                             ) as mock_https_handler_init, \
-                warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            self.assertTrue(geopy.compat._URLLIB_SUPPORTS_SSL_CONTEXT)
+    def test_ssl_context(self):
+        with ExitStack() as stack:
+            mock_adapter = stack.enter_context(
+                patch.object(
+                    geopy.geocoders.base.options,
+                    'default_adapter_factory',
+                    return_value=DummySyncAdapter(proxies=None, ssl_context=None),
+                )
+            )
 
             for ssl_context in (None, sentinel.some_ssl_context):
-                mock_https_handler_init.reset_mock()
                 Geocoder(ssl_context=ssl_context)
-                args, kwargs = mock_https_handler_init.call_args
-                self.assertIs(kwargs['context'], ssl_context)
-            self.assertEqual(0, len(w))
+                args, kwargs = mock_adapter.call_args
+                assert kwargs['ssl_context'] is ssl_context
 
 
 class GeocoderPointCoercionTestCase(unittest.TestCase):
@@ -191,81 +155,176 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
     coordinates_address = "175 5th Avenue, NYC, USA"
 
     def setUp(self):
-        self.method = Geocoder._coerce_point_to_string
+        self.method = Geocoder()._coerce_point_to_string
 
     def test_point(self):
         latlon = self.method(Point(*self.coordinates))
-        self.assertEqual(latlon, self.coordinates_str)
+        assert latlon == self.coordinates_str
 
     def test_tuple_of_floats(self):
         latlon = self.method(self.coordinates)
-        self.assertEqual(latlon, self.coordinates_str)
+        assert latlon == self.coordinates_str
 
     def test_string(self):
         latlon = self.method(self.coordinates_str)
-        self.assertEqual(latlon, self.coordinates_str)
+        assert latlon == self.coordinates_str
 
     def test_string_is_trimmed(self):
         coordinates_str_spaces = "  %s  ,  %s  " % self.coordinates
         latlon = self.method(coordinates_str_spaces)
-        self.assertEqual(latlon, self.coordinates_str)
+        assert latlon == self.coordinates_str
 
     def test_output_format_is_respected(self):
         expected = "  %s  %s  " % self.coordinates[::-1]
         lonlat = self.method(self.coordinates_str, "  %(lon)s  %(lat)s  ")
-        self.assertEqual(lonlat, expected)
+        assert lonlat == expected
 
     def test_address(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            latlon = self.method(self.coordinates_address)
-            self.assertEqual(1, len(w))
-
-        self.assertEqual(latlon, self.coordinates_address)
+        with pytest.raises(ValueError):
+            self.method(self.coordinates_address)
 
 
 class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.method = Geocoder._format_bounding_box
+        self.method = Geocoder()._format_bounding_box
 
     def test_string_raises(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.method("5,5,5,5")
 
     def test_list_of_1_raises(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.method([5])
 
     # TODO maybe raise for `[5, 5]` too?
 
     def test_list_of_3_raises(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.method([5, 5, 5])
 
     def test_list_of_4_raises(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.method([5, 5, 5, 5])
 
     def test_list_of_5_raises(self):
-        with self.assertRaises(GeocoderQueryError):
+        with pytest.raises(GeocoderQueryError):
             self.method([5, 5, 5, 5, 5])
 
     def test_points(self):
         bbox = self.method([Point(50, 160), Point(30, 170)])
-        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+        assert bbox == "30.0,160.0,50.0,170.0"
 
     def test_lists(self):
         bbox = self.method([[50, 160], [30, 170]])
-        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+        assert bbox == "30.0,160.0,50.0,170.0"
         bbox = self.method([["50", "160"], ["30", "170"]])
-        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+        assert bbox == "30.0,160.0,50.0,170.0"
 
     def test_strings(self):
         bbox = self.method(["50, 160", "30,170"])
-        self.assertEqual(bbox, "30.0,160.0,50.0,170.0")
+        assert bbox == "30.0,160.0,50.0,170.0"
 
     def test_output_format(self):
         bbox = self.method([Point(50, 160), Point(30, 170)],
                            " %(lon2)s|%(lat2)s -- %(lat1)s|%(lon1)s ")
-        self.assertEqual(bbox, " 170.0|50.0 -- 30.0|160.0 ")
+        assert bbox == " 170.0|50.0 -- 30.0|160.0 "
+
+
+@pytest.mark.parametrize("adapter_factory", [DummySyncAdapter, DummyAsyncAdapter])
+async def test_synchronize_decorator_sync_simple(adapter_factory):
+    geocoder = Geocoder(adapter_factory=adapter_factory)
+    calls = []
+
+    @_synchronized
+    def f(self, one, *, two):
+        calls.append((one, two))
+        return 42
+
+    res = f(geocoder, 1, two=2)
+    if adapter_factory is DummyAsyncAdapter:
+        res = await res
+    assert 42 == res
+    assert calls == [(1, 2)]
+
+
+async def test_synchronize_decorator_async_simple():
+    geocoder = Geocoder(adapter_factory=DummyAsyncAdapter)
+    calls = []
+
+    @_synchronized
+    def f(self, one, *, two):
+        async def coro():
+            calls.append((one, two))
+            return 42
+        return coro()
+
+    assert 42 == await f(geocoder, 1, two=2)
+    assert calls == [(1, 2)]
+
+
+@pytest.mark.parametrize("adapter_factory", [DummySyncAdapter, DummyAsyncAdapter])
+async def test_synchronize_decorator_sync_exception(adapter_factory):
+    geocoder = Geocoder(adapter_factory=adapter_factory)
+
+    @_synchronized
+    def f(self, one, *, two):
+        raise RuntimeError("test")
+
+    with pytest.raises(RuntimeError):
+        res = f(geocoder, 1, two=2)
+        if adapter_factory is DummyAsyncAdapter:
+            await res
+
+
+async def test_synchronize_decorator_async_exception():
+    geocoder = Geocoder(adapter_factory=DummyAsyncAdapter)
+
+    @_synchronized
+    def f(self, one, *, two):
+        async def coro():
+            raise RuntimeError("test")
+        return coro()
+
+    with pytest.raises(RuntimeError):
+        await f(geocoder, 1, two=2)
+
+
+@pytest.mark.parametrize("adapter_factory", [DummySyncAdapter, DummyAsyncAdapter])
+async def test_synchronize_decorator_sync_reentrance(adapter_factory):
+    calls = []
+
+    class DummyGeocoder(Geocoder):
+        @_synchronized
+        def f(self, i=0):
+            calls.append(i)
+            if len(calls) < 5:
+                return self.f(i + 1)
+            return 42
+
+    geocoder = DummyGeocoder(adapter_factory=adapter_factory)
+
+    res = geocoder.f()
+    if adapter_factory is DummyAsyncAdapter:
+        res = await res
+    assert 42 == res
+    assert calls == list(range(5))
+
+
+async def test_synchronize_decorator_async_reentrance():
+    calls = []
+
+    class DummyGeocoder(Geocoder):
+        @_synchronized
+        def f(self, i=0):
+            async def coro():
+                calls.append(i)
+                if len(calls) < 5:
+                    return await self.f(i + 1)
+                return 42
+            return coro()
+
+    geocoder = DummyGeocoder(adapter_factory=DummyAsyncAdapter)
+
+    assert 42 == await geocoder.f()
+    assert calls == list(range(5))

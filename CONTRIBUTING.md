@@ -2,20 +2,38 @@
 
 ## Reporting issues
 
-- Please note that the issue tracker is not for questions. Use Stack Overflow
-  instead. Make sure to tag your question with
-  [geopy](https://stackoverflow.com/questions/tagged/geopy) tag.
+If you caught an exception from geopy please try to Google the error first.
+There is a great chance that it has already been discussed somewhere
+and solutions have been provided (usually on GitHub or on Stack Overflow).
 
-- If possible, before submitting an issue report try to verify that the issue
-  haven't already been fixed and is not a duplicate.
+Before reporting an issue please ensure that you have tried
+to get the answer from the doc: https://geopy.readthedocs.io/.
+
+Keep in mind that if a specific geocoding service's API is not behaving
+correctly then it probably won't be helpful to report that issue
+here, see https://geopy.readthedocs.io/en/latest/#geopy-is-not-a-service
+
+The following resources are available for your input:
+
+1. Stack Overflow with [geopy tag](https://stackoverflow.com/questions/tagged/geopy).
+   There's a somewhat active community here so you will probably get
+   a solution quicker. And also there is a large amount of already
+   resolved questions which can help too! Just remember to put the `geopy`
+   tag if you'd decide to open a question.
+1. [GitHub Discussions](https://github.com/geopy/geopy/discussions) is
+   a good place to start if Stack Overflow didn't help or you have
+   some idea or a feature request you'd like to bring up, or if you
+   just have trouble and not sure you're doing everything right.
+   Solutions and helpful snippets/patterns are also very welcome here.
+1. [GitHub Issues](https://github.com/geopy/geopy/issues) should only
+   be used for definite bug reports and specific tasks. If you're not sure
+   whether your issue fits this then please start with Discussions
+   first.
 
 
 ## Submitting patches
 
 If you contribute code to geopy, you agree to license your code under the MIT.
-
-geopy runs on both Python 2 and Python 3 on both the CPython and PyPy
-interpreters. You should handle any compatibility in `geopy/compat.py`.
 
 The new code should follow [PEP8](https://pep8.org/) coding style (except
 the line length limit, which is 90) and adhere to the style of 
@@ -48,7 +66,11 @@ If your PR remains unreviewed for a while, feel free to bug the maintainer.
 
 ### Running tests
 
-To run the full test suite:
+To quickly run the test suite without Internet access:
+
+    make test-local
+
+To run the full test suite (makes queries to the geocoding services):
 
     make test
 
@@ -61,7 +83,7 @@ For example:
 
     pytest test/geocoders/nominatim.py
 
-Before pushing your code, make sure that linting passes, otherwise Travis
+Before pushing your code, make sure that linting passes, otherwise a CI
 build would fail:
 
     make lint
@@ -73,21 +95,24 @@ Some geocoders require credentials (like API keys) for testing. They must
 remain secret, so if you need to test a code which requires them, you should
 obtain your own valid credentials.
 
-Travis CI builds for PRs from forks don't have access to these
-credentials to avoid the possibility of leaking the secrets by running
-untrusted code. This is a [Travis CI policy][travis_env]. It means that CI
-builds for PRs from forks won't test the code which require credentials.
-Such code should be tested locally. But it's acceptable to not test such code
-if obtaining the required credentials seems problematic: just leave a note
-so the maintainer would be aware that the code hasn't been tested.
-
-[travis_env]: https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings
+Tests in CI from forks and PRs run in `test-local` mode only, i.e. no network
+requests are performed. Full test suite with network requests is run only
+for pushes to branches by maintainers. This
+helps to reduce load on the geocoding services and save some quotas associated
+with the credentials used by geopy. It means that PR builds won't actually test
+network requests. Code changing a geocoder should be tested locally.
+But it's acceptable to not test such code if obtaining the required credentials 
+seems problematic: just leave a note
+so the maintainers would be aware that the code hasn't been tested.
 
 You may wonder: why not commit captured data and run mocked tests?
 Because there are copyright constraints on the data returned by services.
+Another reason is that this data goes obsolete quite fast, and maintaining
+it is cumbersome.
 
-The credentials can be stored in a json format in a file called `.test_keys`
-located at the root of the project instead of env variables for convenience.
+To ease local testing the credentials can be stored in a json format
+in a file called `.test_keys` located at the root of the project
+instead of env variables.
 
 Example contents of `.test_keys`:
 
@@ -119,7 +144,7 @@ A checklist for adding a new geocoder:
     `geopy/geocoders` package. Please look around to make sure that you're
     not reimplementing something that's already there! For example, if you're
     adding a Nominatim-based service, then your new geocoder class should
-    probably extend the `geopy.geocoders.osm.Nominatim` class.
+    probably extend the `geopy.geocoders.Nominatim` class.
 
 2.  Follow the instructions in the `geopy/geocoders/__init__.py` module for
     adding the required imports.

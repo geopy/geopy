@@ -1,31 +1,27 @@
+import asyncio
 import functools
-import json
-import warnings
-from socket import timeout as SocketTimeout
-from ssl import SSLError
+import inspect
+import threading
 
-from geopy.compat import (
-    HTTPError,
-    ProxyHandler,
-    Request,
-    URLError,
-    build_opener_with_context,
-    py3k,
-    string_compare,
+from geopy import compat
+from geopy.adapters import (
+    AdapterHTTPError,
+    BaseAsyncAdapter,
+    BaseSyncAdapter,
+    RequestsAdapter,
+    URLLibAdapter,
 )
 from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
-    GeocoderParseError,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
     GeocoderServiceError,
     GeocoderTimedOut,
-    GeocoderUnavailable,
 )
 from geopy.point import Point
-from geopy.util import __version__, decode_page, logger
+from geopy.util import __version__, logger
 
 __all__ = (
     "Geocoder",
@@ -34,8 +30,14 @@ __all__ = (
 
 _DEFAULT_USER_AGENT = "geopy/%s" % __version__
 
+_DEFAULT_ADAPTER_CLASS = next(
+    adapter_cls
+    for adapter_cls in (RequestsAdapter, URLLibAdapter,)
+    if adapter_cls.is_available
+)
 
-class options(object):
+
+class options:
     """The `options` object contains default configuration values for
     geocoders, e.g. `timeout` and `User-Agent`.
     Instead of passing a custom value to each geocoder individually, you can
@@ -59,16 +61,32 @@ class options(object):
         7
 
     Attributes:
-        default_format_string
-            String containing ``'%s'`` where the string to geocode should
-            be interpolated before querying the geocoder. Used by `geocode`
-            calls only. For example: ``'%s, Mountain View, CA'``.
+        default_adapter_factory
+            A callable which returns a :class:`geopy.adapters.BaseAdapter`
+            instance. Adapters are different implementations of HTTP clients.
+            See :mod:`geopy.adapters` for more info.
 
-            .. deprecated:: 1.22.0
-                ``format_string`` is deprecated in favor of more advanced
-                alternatives (see :ref:`Specifying Parameters Once
-                <specifying_parameters_once>`) and will be removed in
-                geopy 2.0.
+            This callable accepts two keyword args: ``proxies`` and ``ssl_context``.
+            A class might be specified as this callable as well.
+
+            Example::
+
+                import geopy.geocoders
+                geopy.geocoders.options.default_adapter_factory \
+= geopy.adapters.URLLibAdapter
+
+                geopy.geocoders.options.default_adapter_factory = (
+                    lambda proxies, ssl_context: MyAdapter(
+                        proxies=proxies, ssl_context=ssl_context, my_custom_arg=42
+                    )
+                )
+
+            If `requests <https://requests.readthedocs.io>`_ package is
+            installed, the default adapter is
+            :class:`geopy.adapters.RequestsAdapter`. Otherwise it is
+            :class:`geopy.adapters.URLLibAdapter`.
+
+            .. versionadded:: 2.0
 
         default_proxies
             Tunnel requests through HTTP proxy.
@@ -76,7 +94,7 @@ class options(object):
             By default the system proxies are respected (e.g.
             `HTTP_PROXY` and `HTTPS_PROXY` env vars or platform-specific
             proxy settings, such as macOS or Windows native
-            preferences -- see :class:`urllib.request.ProxyHandler` for
+            preferences -- see :func:`urllib.request.getproxies` for
             more details). The `proxies` value for using system proxies
             is ``None``.
 
@@ -110,10 +128,7 @@ class options(object):
               `proxies` dict.
 
             For more information, see
-            documentation on :class:`urllib.request.ProxyHandler`.
-
-            .. versionchanged:: 1.15.0
-               Added support for the string value.
+            documentation on :func:`urllib.request.getproxies`.
 
         default_scheme
             Use ``'https'`` or ``'http'`` as the API URL's scheme.
@@ -121,13 +136,7 @@ class options(object):
         default_ssl_context
             An :class:`ssl.SSLContext` instance with custom TLS
             verification settings. Pass ``None`` to use the interpreter's
-            defaults (starting from Python 2.7.9 and 3.4.3 that is to use
-            the system's trusted CA certificates; the older versions don't
-            support TLS verification completely).
-
-            For older versions of Python (before 2.7.9 and 3.4.3) this
-            argument is ignored, as `urlopen` doesn't accept an ssl
-            context there, and a warning is issued.
+            defaults (that is to use the system's trusted CA certificates).
 
             To use the CA bundle used by `requests` library::
 
@@ -153,17 +162,6 @@ class options(object):
             before raising a :class:`geopy.exc.GeocoderTimedOut` exception.
             Pass `None` to disable timeout.
 
-            .. note::
-               Currently ``None`` as a value is processed correctly only
-               for the ``geopy.geocoders.options.default_timeout`` option
-               value. ``timeout=None`` as a method argument (i.e.
-               ``geocoder.geocode(..., timeout=None)``) would be treated
-               as "use timeout, as set in
-               ``geopy.geocoders.options.default_timeout``", and
-               a deprecation warning would be raised.
-               In geopy 2.0 this will change, so that ``timeout=None``
-               would actually disable timeout.
-
         default_user_agent
             User-Agent header to send with the requests to geocoder API.
     """
@@ -179,7 +177,7 @@ class options(object):
     #
     # [1]: http://www.sphinx-doc.org/en/master/ext/autodoc.html#directive-autoattribute
     # [2]: https://github.com/rtfd/readthedocs.org/issues/855#issuecomment-261337038
-    default_format_string = '%s'
+    default_adapter_factory = _DEFAULT_ADAPTER_CLASS
     default_proxies = None
     default_scheme = 'https'
     default_ssl_context = None
@@ -208,29 +206,21 @@ ERROR_CODE_MAP = {
 }
 
 
-class Geocoder(object):
+class Geocoder:
     """
     Template object for geocoders.
     """
 
     def __init__(
             self,
-            format_string=None,
+            *,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
-        if format_string is not None or options.default_format_string != "%s":
-            warnings.warn(
-                '`format_string` is deprecated. Please pass the already '
-                'formatted queries to `geocode` instead. See '
-                '`Specifying Parameters Once` section in docs for more '
-                'details. In geopy 2.0 `format_string` will be removed.',
-                DeprecationWarning, stacklevel=3
-            )
-        self.format_string = format_string or options.default_format_string
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
             raise ConfigurationError(
@@ -244,47 +234,79 @@ class Geocoder(object):
         self.ssl_context = (ssl_context if ssl_context is not DEFAULT_SENTINEL
                             else options.default_ssl_context)
 
-        if isinstance(self.proxies, string_compare):
+        if isinstance(self.proxies, str):
             self.proxies = {'http': self.proxies, 'https': self.proxies}
 
-        # `ProxyHandler` should be present even when actually there're
-        # no proxies. `build_opener` contains it anyway. By specifying
-        # it here explicitly we can disable system proxies (i.e.
-        # from HTTP_PROXY env var) by setting `self.proxies` to `{}`.
-        # Otherwise, if we didn't specify ProxyHandler for empty
-        # `self.proxies` here, build_opener would have used one internally
-        # which could have unwillingly picked up the system proxies.
-        opener = build_opener_with_context(
-            self.ssl_context,
-            ProxyHandler(self.proxies),
+        if adapter_factory is None:
+            adapter_factory = options.default_adapter_factory
+        self.adapter = adapter_factory(
+            proxies=self.proxies,
+            ssl_context=self.ssl_context,
         )
-        self.urlopen = opener.open
+        if isinstance(self.adapter, BaseSyncAdapter):
+            self.__run_async = False
+        elif isinstance(self.adapter, BaseAsyncAdapter):
+            self.__run_async = True
+        else:
+            raise ConfigurationError(
+                "Adapter %r must extend either BaseSyncAdapter or BaseAsyncAdapter"
+                % (type(self.adapter),)
+            )
 
-    @staticmethod
-    def _coerce_point_to_string(point, output_format="%(lat)s,%(lon)s"):
+    def __enter__(self):
+        """Context manager for synchronous adapters. At exit all
+        open connections will be closed.
+
+        In synchronous mode context manager usage is not required,
+        and connections will be automatically closed by garbage collection.
+        """
+        if self.__run_async:
+            raise TypeError("`async with` must be used with async adapters")
+        res = self.adapter.__enter__()
+        assert res is self.adapter, "adapter's __enter__ must return `self`"
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.adapter.__exit__(exc_type, exc_val, exc_tb)
+
+    async def __aenter__(self):
+        """Context manager for asynchronous adapters. At exit all
+        open connections will be closed.
+
+        In asynchronous mode context manager usage is not required,
+        however, it is strongly advised to avoid warnings about
+        resources leaks.
+        """
+        if not self.__run_async:
+            raise TypeError("`async with` cannot be used with sync adapters")
+        res = await self.adapter.__aenter__()
+        assert res is self.adapter, "adapter's __enter__ must return `self`"
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.adapter.__aexit__(exc_type, exc_val, exc_tb)
+
+    def _coerce_point_to_string(self, point, output_format="%(lat)s,%(lon)s"):
         """
         Do the right thing on "point" input. For geocoders with reverse
         methods.
         """
-        try:
-            if not isinstance(point, Point):
-                point = Point(point)
-        except ValueError as e:
-            if isinstance(point, string_compare):
-                warnings.warn(
-                    'Unable to parse the string as Point: "%s". Using the value '
-                    'as-is for the query. In geopy 2.0 this will become an '
-                    'exception.' % str(e), DeprecationWarning, stacklevel=3
-                )
-                return point
-            raise
-        else:
-            # Altitude is silently dropped.
-            return output_format % dict(lat=point.latitude,
-                                        lon=point.longitude)
+        if not isinstance(point, Point):
+            point = Point(point)
 
-    @staticmethod
-    def _format_bounding_box(bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"):
+        # Altitude is silently dropped.
+        #
+        # Geocoding services (almost?) always consider only lat and lon
+        # in queries, so altitude doesn't affect the request.
+        # A non-zero altitude should not raise an exception
+        # though, because PoIs are assumed to span the whole
+        # altitude axis (i.e. not just the 0km plane).
+        return output_format % dict(lat=point.latitude,
+                                    lon=point.longitude)
+
+    def _format_bounding_box(
+        self, bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"
+    ):
         """
         Transform bounding box boundaries to a string matching
         `output_format` from the following formats:
@@ -304,9 +326,7 @@ class Geocoder(object):
                                     lat2=max(p1.latitude, p2.latitude),
                                     lon2=max(p1.longitude, p2.longitude))
 
-    def _geocoder_exception_handler(
-            self, error, message, http_code=None, http_body=None
-    ):
+    def _geocoder_exception_handler(self, error):
         """
         Geocoder-specific exceptions handler.
         Override if custom exceptions processing is needed.
@@ -318,129 +338,119 @@ class Geocoder(object):
     def _call_geocoder(
             self,
             url,
+            callback,
+            *,
             timeout=DEFAULT_SENTINEL,
-            raw=False,
-            requester=None,
-            deserializer=json.loads,
-            **kwargs
+            is_json=True,
+            headers=None
     ):
         """
         For a generated query URL, get the results.
         """
 
-        if requester:
-            req = url  # Don't construct an urllib's Request for a custom requester.
-
-            # `requester` might be anything which can issue an HTTP request.
-            # Assume that `requester` is a method of the `requests` library.
-            # Requests, however, doesn't accept SSL context in its HTTP
-            # request methods. A custom HTTP adapter has to be created for that.
-            # So the current usage is not directly compatible with `requests`.
-            requester = functools.partial(requester, context=self.ssl_context,
-                                          proxies=self.proxies,
-                                          headers=self.headers)
-        else:
-            if isinstance(url, Request):
-                # copy Request
-                headers = self.headers.copy()
-                headers.update(url.header_items())
-                req = Request(url=url.get_full_url(), headers=headers)
-            else:
-                req = Request(url=url, headers=self.headers)
-
-        requester = requester or self.urlopen
-
-        if timeout is None:
-            warnings.warn(
-                ('`timeout=None` has been passed to a geocoder call. Using '
-                 'default geocoder timeout. In geopy 2.0 the '
-                 'behavior will be different: None will mean "no timeout" '
-                 'instead of "default geocoder timeout". Pass '
-                 'geopy.geocoders.base.DEFAULT_SENTINEL instead of None '
-                 'to get rid of this warning.'), DeprecationWarning, stacklevel=3)
-            timeout = DEFAULT_SENTINEL
+        req_headers = self.headers.copy()
+        if headers:
+            req_headers.update(headers)
 
         timeout = (timeout if timeout is not DEFAULT_SENTINEL
                    else self.timeout)
 
         try:
-            page = requester(req, timeout=timeout, **kwargs)
-        except Exception as error:
-            message = (
-                str(error) if not py3k
-                else (
-                    str(error.args[0])
-                    if len(error.args)
-                    else str(error)
-                )
-            )
-            if isinstance(error, HTTPError):
-                http_code = error.getcode()
-                http_body = self._read_http_error_body(error)
-                if http_body:
-                    logger.info('Received an HTTP error (%s): %s', http_code, http_body,
-                                exc_info=False)
+            if is_json:
+                result = self.adapter.get_json(url, timeout=timeout, headers=req_headers)
             else:
-                http_code = None
-                http_body = None
-            self._geocoder_exception_handler(error, message, http_code, http_body)
-            if isinstance(error, HTTPError):
-                try:
-                    raise ERROR_CODE_MAP[http_code](message)
-                except KeyError:
-                    raise GeocoderServiceError(message)
-            elif isinstance(error, URLError):
-                if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
-                elif "unreachable" in message:
-                    raise GeocoderUnavailable('Service not available')
-            elif isinstance(error, SocketTimeout):
-                raise GeocoderTimedOut('Service timed out')
-            elif isinstance(error, SSLError):
-                if "timed out" in message:
-                    raise GeocoderTimedOut('Service timed out')
-            raise GeocoderServiceError(message)
+                result = self.adapter.get_text(url, timeout=timeout, headers=req_headers)
+            if self.__run_async:
+                async def fut():
+                    try:
+                        res = callback(await result)
+                        if inspect.isawaitable(res):
+                            res = await res
+                        return res
+                    except Exception as error:
+                        self._adapter_error_handler(error)
+                        raise
 
-        if hasattr(page, 'getcode'):
-            status_code = page.getcode()
-        elif hasattr(page, 'status_code'):
-            status_code = page.status_code
-        else:
-            status_code = None
-        if status_code in ERROR_CODE_MAP:
-            raise ERROR_CODE_MAP[page.status_code]("\n%s" % decode_page(page))
+                return fut()
+            else:
+                return callback(result)
+        except Exception as error:
+            self._adapter_error_handler(error)
+            raise
 
-        if raw:
-            return page
-
-        page = decode_page(page)
-
-        if deserializer is not None:
-            try:
-                return deserializer(page)
-            except ValueError:
-                raise GeocoderParseError(
-                    "Could not deserialize using deserializer:\n%s" % page
+    def _adapter_error_handler(self, error):
+        if isinstance(error, AdapterHTTPError):
+            if error.text:
+                logger.info(
+                    'Received an HTTP error (%s): %s',
+                    error.status_code,
+                    error.text,
+                    exc_info=False,
                 )
+            self._geocoder_exception_handler(error)
+            exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
+            raise exc_cls(str(error)) from error
         else:
-            return page
+            self._geocoder_exception_handler(error)
 
-    def _read_http_error_body(self, error):
-        try:
-            return decode_page(error)
-        except Exception:
-            logger.debug('Unable to fetch body for a non-successful HTTP response',
-                         exc_info=True)
-            return None
+    # def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    #     raise NotImplementedError()
 
-    def geocode(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
-        """
-        Implemented in subclasses.
-        """
-        raise NotImplementedError()
+    # def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
+    #     raise NotImplementedError()
 
-    def reverse(self, query, exactly_one=True, timeout=DEFAULT_SENTINEL):
-        """
-        Implemented in subclasses.
-        """
-        raise NotImplementedError()
+
+def _synchronized(func):
+    """A decorator for geocoder methods which makes the method always run
+    under a lock. The lock is reentrant.
+
+    This decorator transparently handles sync and async working modes.
+    """
+
+    sync_lock = threading.RLock()
+
+    def locked_sync(self, *args, **kwargs):
+        with sync_lock:
+            return func(self, *args, **kwargs)
+
+    # At the moment this decorator is evaluated we don't know if we
+    # will work in sync or async mode.
+    # But we shouldn't create the asyncio Lock in sync mode to avoid
+    # unwanted implicit loop initialization.
+    async_lock = None  # asyncio.Lock()
+    async_lock_task = None  # support reentrance
+
+    async def locked_async(self, *args, **kwargs):
+        nonlocal async_lock
+        nonlocal async_lock_task
+
+        if async_lock is None:
+            async_lock = asyncio.Lock()
+
+        if async_lock.locked():
+            assert async_lock_task is not None
+            if compat.current_task() is async_lock_task:
+                res = func(self, *args, **kwargs)
+                if inspect.isawaitable(res):
+                    res = await res
+                return res
+
+        async with async_lock:
+            async_lock_task = compat.current_task()
+            try:
+                res = func(self, *args, **kwargs)
+                if inspect.isawaitable(res):
+                    res = await res
+                return res
+            finally:
+                async_lock_task = None
+
+    @functools.wraps(func)
+    def f(self, *args, **kwargs):
+        run_async = isinstance(self.adapter, BaseAsyncAdapter)
+        if run_async:
+            return locked_async(self, *args, **kwargs)
+        else:
+            return locked_sync(self, *args, **kwargs)
+
+    return f

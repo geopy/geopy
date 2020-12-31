@@ -1,15 +1,9 @@
-import unittest
-
 from geopy.geocoders import GeocodeEarth
-from test.geocoders.pelias import BasePeliasTestCase
-from test.geocoders.util import GeocoderTestBase, env
+from test.geocoders.pelias import BaseTestPelias
+from test.geocoders.util import env
 
 
-@unittest.skipUnless(
-    bool(env['GEOCODEEARTH_KEY']),
-    "No GEOCODEEARTH_KEY env variable set"
-)
-class GeocodeEarthTestCase(BasePeliasTestCase, GeocoderTestBase):
+class TestGeocodeEarth(BaseTestPelias):
 
     @classmethod
     def make_geocoder(cls, **kwargs):

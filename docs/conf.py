@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # GeoPy documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 24 19:28:11 2013.
@@ -34,7 +33,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    'sphinx_issues',
 ]
+
+issues_github_path = "geopy/geopy"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

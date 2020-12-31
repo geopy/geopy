@@ -1,7 +1,8 @@
 import re
+from functools import partial
+from urllib.parse import urlencode
 
 from geopy import exc
-from geopy.compat import urlencode
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -14,11 +15,6 @@ class What3Words(Geocoder):
 
     Documentation at:
         https://docs.what3words.com/api/v2/
-
-    .. versionadded:: 1.5.0
-
-    .. versionchanged:: 1.15.0
-       API has been updated to v2.
     """
 
     multiple_word_re = re.compile(
@@ -31,30 +27,17 @@ class What3Words(Geocoder):
     def __init__(
             self,
             api_key,
-            format_string=None,
-            scheme='https',
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
         :param str api_key: Key provided by What3Words
             (https://accounts.what3words.com/register).
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. deprecated:: 1.22.0
-
-        :param str scheme: Must be ``https``.
-
-            .. deprecated:: 1.15.0
-               API v2 requires https. Don't use this parameter,
-               it's going to be removed in geopy 2.0.
-               Scheme other than ``https`` would result in a
-               :class:`geopy.exc.ConfigurationError` being thrown.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -65,27 +48,23 @@ class What3Words(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
         """
-        super(What3Words, self).__init__(
-            format_string=format_string,
-            # The `scheme` argument is present for the legacy reasons only.
-            # If a custom value has been passed, it should be validated.
-            # Otherwise use `https` instead of the `options.default_scheme`.
-            scheme=(scheme or 'https'),
+        super().__init__(
+            scheme='https',
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
-        if self.scheme != "https":
-            raise exc.ConfigurationError("What3Words now requires `https`.")
 
         self.api_key = api_key
         domain = 'api.what3words.com'
@@ -101,11 +80,14 @@ class What3Words(Geocoder):
         else:
             return True
 
-    def geocode(self,
-                query,
-                lang='en',
-                exactly_one=True,
-                timeout=DEFAULT_SENTINEL):
+    def geocode(
+            self,
+            query,
+            *,
+            lang='en',
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL
+    ):
 
         """
         Return a location point for a `3 words` query. If the `3 words` address
@@ -122,10 +104,6 @@ class What3Words(Geocoder):
             result for each `3 words` address, so this parameter is rather
             useless for this geocoder.
 
-            .. versionchanged:: 1.14.0
-               ``exactly_one=False`` now returns a list of a single location.
-               This option wasn't respected before.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -141,17 +119,15 @@ class What3Words(Geocoder):
             )
 
         params = {
-            'addr': self.format_string % query,
+            'addr': query,
             'lang': lang.lower(),
             'key': self.api_key,
         }
 
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one=exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, resources, exactly_one=True):
         """
@@ -192,8 +168,14 @@ class What3Words(Geocoder):
         else:
             return [location]
 
-    def reverse(self, query, lang='en', exactly_one=True,
-                timeout=DEFAULT_SENTINEL):
+    def reverse(
+            self,
+            query,
+            *,
+            lang='en',
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL
+    ):
         """
         Return a `3 words` address by location point. Each point on surface has
         a `3 words` address, so there's always a non-empty response.
@@ -210,10 +192,6 @@ class What3Words(Geocoder):
             available. Due to the address scheme there is always exactly one
             result for each `3 words` address, so this parameter is rather
             useless for this geocoder.
-
-            .. versionchanged:: 1.14.0
-               ``exactly_one=False`` now returns a list of a single location.
-               This option wasn't respected before.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -235,10 +213,8 @@ class What3Words(Geocoder):
         url = "?".join((self.reverse_api, urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_reverse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one=exactly_one
-        )
+        callback = partial(self._parse_reverse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_reverse_json(self, resources, exactly_one=True):
         """

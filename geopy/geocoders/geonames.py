@@ -1,8 +1,7 @@
-import warnings
+from functools import partial
+from urllib.parse import urlencode
 
-from geopy.compat import string_compare, urlencode
 from geopy.exc import (
-    ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
     GeocoderQueryError,
@@ -38,22 +37,16 @@ class GeoNames(Geocoder):
 
     def __init__(
             self,
-            country_bias=None,
-            username=None,
+            username,
+            *,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
-            scheme='http',
+            adapter_factory=None,
+            scheme='http'
     ):
         """
-        :param str country_bias: Records from the country_bias are listed first.
-            Two letter country code ISO-3166.
-
-            .. deprecated:: 1.19.0
-                This argument will be removed in geopy 2.0.
-                Use `geocode`'s `country_bias` instead.
 
         :param str username: GeoNames username, required. Sign up here:
             http://www.geonames.org/login
@@ -67,20 +60,14 @@ class GeoNames(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`. Note that
@@ -89,34 +76,17 @@ class GeoNames(Geocoder):
             :attr:`geopy.geocoders.options.default_scheme` is not respected.
             This parameter is present to make it possible to switch to
             `https` once GeoNames adds support for it.
-
-            .. versionadded:: 1.18.0
         """
-        super(GeoNames, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
-        if username is None:
-            raise ConfigurationError(
-                'No username given, required for api access.  If you do not '
-                'have a GeoNames username, sign up here: '
-                'http://www.geonames.org/login'
-            )
         self.username = username
-        if country_bias is not None:
-            warnings.warn(
-                '`country_bias` argument of the %(cls)s.__init__ '
-                'is deprecated and will be removed in geopy 2.0. Use '
-                '%(cls)s.geocode(country_bias=%(value)r) instead.'
-                % dict(cls=type(self).__name__, value=country_bias),
-                DeprecationWarning,
-                stacklevel=2
-            )
-        self.country_bias = country_bias
+
         domain = 'api.geonames.org'
         self.api = (
             "%s://%s%s" % (self.scheme, domain, self.geocode_path)
@@ -134,10 +104,11 @@ class GeoNames(Geocoder):
     def geocode(
             self,
             query,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             country=None,
-            country_bias=None,
+            country_bias=None
     ):
         """
         Return a location point by address.
@@ -155,32 +126,25 @@ class GeoNames(Geocoder):
         :param country: Limit records to the specified countries.
             Two letter country code ISO-3166 (e.g. ``FR``). Might be
             a single string or a list of strings.
-
-            .. versionadded:: 1.19.0
-
         :type country: str or list
 
         :param str country_bias: Records from the country_bias are listed first.
             Two letter country code ISO-3166.
 
-            .. versionadded:: 1.19.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
         params = [
-            ('q', self.format_string % query),
+            ('q', query),
             ('username', self.username),
         ]
 
-        if country_bias is None:
-            country_bias = self.country_bias
         if country_bias:
             params.append(('countryBias', country_bias))
 
         if not country:
             country = []
-        if isinstance(country, string_compare):
+        if isinstance(country, str):
             country = [country]
         for country_item in country:
             params.append(('country', country_item))
@@ -189,24 +153,21 @@ class GeoNames(Geocoder):
             params.append(('maxRows', 1))
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one,
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
-            exactly_one=DEFAULT_SENTINEL,
+            *,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             feature_code=None,
             lang=None,
-            find_nearby_type='findNearbyPlaceName',
+            find_nearby_type='findNearbyPlaceName'
     ):
         """
         Return an address by location point.
-
-            .. versionadded:: 1.2.0
 
         :param query: The coordinates for which you wish to obtain the
             closest human-readable addresses.
@@ -216,12 +177,6 @@ class GeoNames(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -229,14 +184,10 @@ class GeoNames(Geocoder):
 
         :param str feature_code: A GeoNames feature code
 
-            .. versionadded:: 1.18.0
-
         :param str lang: language of the returned ``name`` element (the pseudo
             language code 'local' will return it in local language)
             Full list of supported languages can be found here:
             https://www.geonames.org/countries/
-
-            .. versionadded:: 1.18.0
 
         :param str find_nearby_type: A flag to switch between different
             GeoNames API endpoints. The default value is ``findNearbyPlaceName``
@@ -244,19 +195,10 @@ class GeoNames(Geocoder):
             implemented option is ``findNearby`` which returns
             the closest toponym for the lat/lng query.
 
-            .. versionadded:: 1.18.0
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         try:
             lat, lng = self._coerce_point_to_string(query).split(',')
@@ -292,10 +234,8 @@ class GeoNames(Geocoder):
             )
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout),
-            exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _reverse_find_nearby_params(self, lat, lng, feature_code):
         params = {
@@ -317,15 +257,13 @@ class GeoNames(Geocoder):
             params['lang'] = lang
         return params
 
-    def reverse_timezone(self, query, timeout=DEFAULT_SENTINEL):
+    def reverse_timezone(self, query, *, timeout=DEFAULT_SENTINEL):
         """
         Find the timezone for a point in `query`.
 
         GeoNames always returns a timezone: if the point being queried
         doesn't have an assigned Olson timezone id, a ``pytz.FixedOffset``
         timezone is used to produce the :class:`geopy.timezone.Timezone`.
-
-        .. versionadded:: 1.18.0
 
         :param query: The coordinates for which you want a timezone.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
@@ -354,9 +292,7 @@ class GeoNames(Geocoder):
         url = "?".join((self.api_timezone, urlencode(params)))
 
         logger.debug("%s.reverse_timezone: %s", self.__class__.__name__, url)
-        return self._parse_json_timezone(
-            self._call_geocoder(url, timeout=timeout)
-        )
+        return self._call_geocoder(url, self._parse_json_timezone, timeout=timeout)
 
     def _raise_for_error(self, body):
         err = body.get('status')

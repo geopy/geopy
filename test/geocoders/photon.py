@@ -1,101 +1,81 @@
-# coding: utf8
-from __future__ import unicode_literals
-
 from geopy.geocoders import Photon
 from geopy.point import Point
-from test.geocoders.util import GeocoderTestBase
+from test.geocoders.util import BaseTestGeocoder
 
 
-class PhotonTestCase(GeocoderTestBase):
+class TestPhoton(BaseTestGeocoder):
+    known_country_de = "Frankreich"
+    known_country_fr = "France"
 
     @classmethod
-    def setUpClass(cls):
-        cls.geocoder = Photon()
-        cls.known_country_de = "Frankreich"
-        cls.known_country_fr = "France"
+    def make_geocoder(cls, **kwargs):
+        return Photon(**kwargs)
 
-    def test_user_agent_custom(self):
+    async def test_user_agent_custom(self):
         geocoder = Photon(
             user_agent='my_user_agent/1.0'
         )
-        self.assertEqual(geocoder.headers['User-Agent'], 'my_user_agent/1.0')
+        assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
-    def test_geocode(self):
-        """
-        Photon.geocode
-        """
-        location = self.geocode_run(
+    async def test_geocode(self):
+        location = await self.geocode_run(
             {"query": "14 rue pelisson villeurbanne"},
             {"latitude": 45.7733963, "longitude": 4.88612369},
         )
-        self.assertIn("France", location.address)
+        assert "France" in location.address
 
-    def test_osm_tag(self):
-        """
-        Photon.geocode osm_tag
-        """
-        self.geocode_run(
-            {"query": "Freedom", "osm_tag": "place"},
-            {"latitude": 44.3862491, "longitude": -88.290994},
+    async def test_osm_tag(self):
+        await self.geocode_run(
+            {"query": "Freedom", "osm_tag": "tourism:artwork"},
+            {"latitude": 38.8898061, "longitude": -77.009088, "delta": 2.0},
         )
 
-        self.geocode_run(
-            {"query": "Freedom", "osm_tag": ["!place", "tourism"]},
-            {"latitude": 38.8898061, "longitude": -77.009088},
+        await self.geocode_run(
+            {"query": "Freedom", "osm_tag": ["!office", "place:hamlet"]},
+            {"latitude": 44.3862491, "longitude": -88.290994, "delta": 2.0},
         )
 
-    def test_unicode_name(self):
-        """
-        Photon.geocode unicode
-        """
-        self.geocode_run(
+    async def test_unicode_name(self):
+        await self.geocode_run(
             {"query": "\u6545\u5bab"},
             {"latitude": 39.916, "longitude": 116.390},
         )
 
-    def test_reverse(self):
-        result = self.reverse_run(
+    async def test_reverse(self):
+        result = await self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},
             {"latitude": 45.7733105, "longitude": 4.8869339}
         )
-        self.assertIn("France", result.address)
+        assert "France" in result.address
 
-    def test_geocode_language_parameter(self):
-        """
-        Photon.geocode using `language`
-        """
-        result_geocode = self.geocode_run(
+    async def test_geocode_language_parameter(self):
+        result_geocode = await self.geocode_run(
             {"query": self.known_country_fr, "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_geocode.raw['properties']['country'],
+        assert (
+            result_geocode.raw['properties']['country'] ==
             self.known_country_de
         )
 
-    def test_reverse_language_parameter(self):
-        """
-        Photon.reverse using `language`
-        """
+    async def test_reverse_language_parameter(self):
 
-        result_reverse_it = self.reverse_run(
+        result_reverse_it = await self.reverse_run(
             {"query": "45.7733105, 4.8869339",
-             "exactly_one": True,
              "language": "de"},
             {},
         )
-        self.assertEqual(
-            result_reverse_it.raw['properties']['country'],
+        assert (
+            result_reverse_it.raw['properties']['country'] ==
             self.known_country_de
         )
 
-        result_reverse_fr = self.reverse_run(
+        result_reverse_fr = await self.reverse_run(
             {"query": "45.7733105, 4.8869339",
-             "exactly_one": True,
              "language": "fr"},
             {},
         )
-        self.assertEqual(
-            result_reverse_fr.raw['properties']['country'],
+        assert (
+            result_reverse_fr.raw['properties']['country'] ==
             self.known_country_fr
         )

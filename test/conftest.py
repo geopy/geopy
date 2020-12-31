@@ -1,31 +1,123 @@
+import asyncio
 import atexit
+import contextlib
+import importlib
+import inspect
 import os
 from collections import defaultdict
-from statistics import mean
+from functools import partial
+from statistics import mean, median
 from time import sleep
 from timeit import default_timer
+from unittest.mock import patch
+from urllib.parse import urlparse
 
 import pytest
-import six
-from six.moves.urllib.parse import urlparse
+
+import geopy.geocoders
+from geopy.adapters import AdapterHTTPError, BaseAsyncAdapter, BaseSyncAdapter
+from geopy.geocoders.base import _DEFAULT_ADAPTER_CLASS
+
+# pytest-aiohttp calls `inspect.isasyncgenfunction` to detect
+# async generators in fixtures.
+# To support Python 3.5 we use `async_generator` library.
+# However:
+# - Since Python 3.6 there is a native implementation of
+#   `inspect.isasyncgenfunction`, but it returns False
+#   for `async_generator`'s functions.
+# - The stock `async_generator.isasyncgenfunction` doesn't detect
+#   generators wrapped in `@pytest.fixture`.
+#
+# Thus we resort to monkey-patching it (for now).
+if getattr(inspect, "isasyncgenfunction", None) is not None:
+    # >=py36
+    original_isasyncgenfunction = inspect.isasyncgenfunction
+else:
+    # ==py35
+    original_isasyncgenfunction = lambda func: False  # noqa
+
+
+def isasyncgenfunction(obj):
+    if original_isasyncgenfunction(obj):
+        return True
+    # Detect async_generator function, possibly wrapped in `@pytest.fixture`:
+    # See https://github.com/python-trio/async_generator/blob/v1.10/async_generator/_impl.py#L451-L455  # noqa
+    return bool(getattr(obj, "_async_gen_function", None))
+
+
+inspect.isasyncgenfunction = isasyncgenfunction
+
+
+def load_adapter_cls(adapter_ref):
+    actual_adapter_class = _DEFAULT_ADAPTER_CLASS
+    if adapter_ref:
+        module_s, cls_s = adapter_ref.rsplit(".", 1)
+        module = importlib.import_module(module_s)
+        actual_adapter_class = getattr(module, cls_s)
+    return actual_adapter_class
+
 
 max_retries = int(os.getenv('GEOPY_TEST_RETRIES', 2))
 error_wait_seconds = float(os.getenv('GEOPY_TEST_ERROR_WAIT_SECONDS', 3))
 no_retries_for_hosts = set(os.getenv('GEOPY_TEST_NO_RETRIES_FOR_HOSTS', '').split(','))
-retry_status_codes = (429,)
-
-if six.PY3:
-    http_handler_do_open = 'urllib.request.HTTPHandler.do_open'
-    https_handler_do_open = 'urllib.request.HTTPSHandler.do_open'
-    from urllib.request import HTTPHandler, HTTPSHandler
-else:
-    http_handler_do_open = 'urllib2.HTTPHandler.do_open'
-    https_handler_do_open = 'urllib2.HTTPSHandler.do_open'
-    from urllib2 import HTTPHandler, HTTPSHandler
+default_adapter = load_adapter_cls(os.getenv('GEOPY_TEST_ADAPTER'))
+default_adapter_is_async = issubclass(default_adapter, BaseAsyncAdapter)
+retry_status_codes = (
+    403,  # Forbidden (probably due to a rate limit)
+    429,  # Too Many Requests (definitely a rate limit)
+    502,  # Bad Gateway
+)
 
 
-def netloc_from_req(req):  # urllib request
-    return urlparse(req.get_full_url()).netloc
+def pytest_report_header(config):
+    internet_access = "allowed" if _is_internet_access_allowed(config) else "disabled"
+    adapter_type = "async" if default_adapter_is_async else "sync"
+    return (
+        "geopy:\n"
+        "    internet access: %s\n"
+        "    adapter: %r\n"
+        "    adapter type: %s"
+        % (internet_access, default_adapter, adapter_type)
+    )
+
+
+def pytest_addoption(parser):
+    # This option will probably be used in downstream packages,
+    # thus it should be considered a public interface.
+    parser.addoption(
+        "--skip-tests-requiring-internet",
+        action="store_true",
+        help="Skip tests requiring Internet access.",
+    )
+
+
+def _is_internet_access_allowed(config):
+    return not config.getoption("--skip-tests-requiring-internet")
+
+
+@pytest.fixture(scope='session')
+def is_internet_access_allowed(request):
+    return _is_internet_access_allowed(request.config)
+
+
+@pytest.fixture
+def skip_if_internet_access_is_not_allowed(is_internet_access_allowed):
+    # Used in test_adapters.py, which doesn't use the injected adapter below.
+    if not is_internet_access_allowed:
+        pytest.skip("Skipping a test requiring Internet access")
+
+
+@pytest.fixture(autouse=True, scope="session")
+def loop():
+    # Geocoder instances have class scope, so the event loop
+    # should have session scope.
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop
+
+
+def netloc_from_url(url):
+    return urlparse(url).netloc
 
 
 def pretty_dict_format(heading, dict_to_format,
@@ -46,43 +138,51 @@ def pretty_dict_format(heading, dict_to_format,
     return '\n'.join(s)
 
 
-class RequestsMonitor(object):
-    """RequestsMonitor holds statistics of urllib requests."""
+class RequestsMonitor:
+    """RequestsMonitor holds statistics of Adapter requests."""
 
     def __init__(self):
         self.host_stats = defaultdict(lambda: dict(count=0, retries=0, times=[]))
 
-    def record_request(self, req):
-        hostname = netloc_from_req(req)
+    def record_request(self, url):
+        hostname = netloc_from_url(url)
         self.host_stats[hostname]['count'] += 1
 
-    def record_retry(self, req):
-        hostname = netloc_from_req(req)
+    def record_retry(self, url):
+        hostname = netloc_from_url(url)
         self.host_stats[hostname]['retries'] += 1
 
-    def record_response(self, req, resp, seconds_elapsed):
-        hostname = netloc_from_req(req)
-        self.host_stats[hostname]['times'].append(seconds_elapsed)
+    @contextlib.contextmanager
+    def record_response(self, url):
+        start = default_timer()
+        try:
+            yield
+        finally:
+            end = default_timer()
+            hostname = netloc_from_url(url)
+            self.host_stats[hostname]['times'].append(end - start)
 
     def __str__(self):
         def value_mapper(v):
             tv = v['times']
-            times_format = "min:%5.2fs, max:%5.2fs, mean:%5.2fs, total:%5.2fs"
+            times_format = (
+                "min:%5.2fs, median:%5.2fs, max:%5.2fs, mean:%5.2fs, total:%5.2fs"
+            )
             if tv:
                 # min/max require a non-empty sequence.
-                times = times_format % (min(tv), max(tv), mean(tv), sum(tv))
+                times = times_format % (min(tv), median(tv), max(tv), mean(tv), sum(tv))
             else:
                 nan = float("nan")
-                times = times_format % (nan, nan, nan, 0)
+                times = times_format % (nan, nan, nan, nan, 0)
 
             count = "count:%3d" % v['count']
             retries = "retries:%3d" % v['retries'] if v['retries'] else ""
             return "; ".join(s for s in (count, times, retries) if s)
 
         legend = (
-            "count -- number of requests (excluding retries); "
-            "min, max, mean, total -- request duration statistics "
-            "(excluding failed requests); retries -- number of retries."
+            "count – number of requests (excluding retries); "
+            "min, median, max, mean, total – request duration statistics "
+            "(excluding failed requests); retries – number of retries."
         )
         return pretty_dict_format('Request statistics per hostname',
                                   self.host_stats,
@@ -107,69 +207,150 @@ def print_requests_monitor_report(requests_monitor):
     atexit.register(report)
 
 
-@pytest.fixture(autouse=True)
-def patch_urllib(monkeypatch, requests_monitor):
+@pytest.fixture(autouse=True, scope='session')
+def patch_adapter(requests_monitor, is_internet_access_allowed):
     """
-    Patch urllib to provide the following features:
+    Patch the default Adapter to provide the following features:
         - Retry failed requests. Makes test runs more stable.
         - Track statistics with RequestsMonitor.
-
-    Retries could have been implemented differently:
-        - In test.geocoders.util.GeocoderTestBase._make_request. The issue
-          is that proxy tests use raw urlopen on the proxy server side,
-          which will not be covered by _make_request.
-        - With pytest plugins, such as pytest-rerunfailures. This
-          might be a good alternative, however, they don't distinguish
-          between network and test logic failures (the latter shouldn't
-          be re-run).
+        - Skip tests requiring Internet access when Internet access is not allowed.
     """
 
-    def mock_factory(do_open):
-        def wrapped_do_open(self, conn, req, *args, **kwargs):
-            requests_monitor.record_request(req)
+    if default_adapter_is_async:
 
-            retries = max_retries
-            netloc = netloc_from_req(req)
-            is_proxied = req.host != netloc
+        class AdapterProxy(BaseAdapterProxy, BaseAsyncAdapter):
+            async def __aenter__(self):
+                assert await self.adapter.__aenter__() is self.adapter
+                return self
 
-            if is_proxied or netloc in no_retries_for_hosts:
-                # XXX If there's a system proxy enabled, the failed requests
-                # won't be retried at all because of this check.
-                # We need to disable retries for proxies in order to
-                # not retry requests to the local proxy server set up in
-                # tests/proxy_server.py, which breaks request counters
-                # in tests/test_proxy.py.
-                # Perhaps we could also check that `req.host` points
-                # to localhost?
-                retries = 0
+            async def __aexit__(self, exc_type, exc_val, exc_tb):
+                return await self.adapter.__aexit__(exc_type, exc_val, exc_tb)
 
-            for i in range(retries + 1):
-                try:
-                    start = default_timer()
-                    resp = do_open(self, conn, req, *args, **kwargs)
-                    end = default_timer()
+            async def _wrapped_get(self, url, do_request):
+                res = None
+                gen = self._retries(url)
+                while True:
+                    try:
+                        next(gen)
+                    except StopIteration:
+                        break
+                    assert res is None
+                    try:
+                        res = await do_request()
+                    except Exception as e:
+                        error_wait_seconds = gen.throw(e)
+                        await asyncio.sleep(error_wait_seconds)
+                    else:
+                        assert gen.send(res) is None
+                assert res is not None
+                return res
 
-                    if i == retries or resp.getcode() not in retry_status_codes:
-                        # Note: we shouldn't blindly retry on any >=400 code,
-                        # because some of them are actually expected in tests
-                        # (like input validation verification).
+    else:
 
-                        # TODO Retry failures with the 200 code?
-                        # Some geocoders return failures with 200 code
-                        # (like GoogleV3 for Quota Exceeded).
-                        # Should we detect this somehow to restart such requests?
-                        requests_monitor.record_response(req, resp, end - start)
-                        return resp
-                except:  # noqa
-                    if i == retries:
-                        raise
-                requests_monitor.record_retry(req)
-                sleep(error_wait_seconds)
-            raise RuntimeError("Should not have been reached")
+        class AdapterProxy(BaseAdapterProxy, BaseSyncAdapter):
+            def _wrapped_get(self, url, do_request):
+                res = None
+                gen = self._retries(url)
+                while True:
+                    try:
+                        next(gen)
+                    except StopIteration:
+                        break
+                    assert res is None
+                    try:
+                        res = do_request()
+                    except Exception as e:
+                        error_wait_seconds = gen.throw(e)
+                        sleep(error_wait_seconds)
+                    else:
+                        assert gen.send(res) is None
+                assert res is not None
+                return res
 
-        return wrapped_do_open
+    # In order to take advantage of Keep-Alives in tests, the actual Adapter
+    # should be persisted between the test runs, so this fixture must be
+    # in the "session" scope.
+    adapter_factory = partial(
+        AdapterProxy,
+        adapter_factory=default_adapter,
+        requests_monitor=requests_monitor,
+        is_internet_access_allowed=is_internet_access_allowed,
+    )
+    with patch.object(
+        geopy.geocoders.options, "default_adapter_factory", adapter_factory
+    ):
+        yield
 
-    original_http_do_open = HTTPHandler.do_open
-    original_https_do_open = HTTPSHandler.do_open
-    monkeypatch.setattr(http_handler_do_open, mock_factory(original_http_do_open))
-    monkeypatch.setattr(https_handler_do_open, mock_factory(original_https_do_open))
+
+class BaseAdapterProxy:
+    def __init__(
+        self,
+        *,
+        proxies,
+        ssl_context,
+        adapter_factory,
+        requests_monitor,
+        is_internet_access_allowed
+    ):
+        self.adapter = adapter_factory(
+            proxies=proxies,
+            ssl_context=ssl_context,
+        )
+        self.requests_monitor = requests_monitor
+        self.is_internet_access_allowed = is_internet_access_allowed
+
+    def get_json(self, url, *, timeout, headers):
+        return self._wrapped_get(
+            url,
+            partial(self.adapter.get_json, url, timeout=timeout, headers=headers),
+        )
+
+    def get_text(self, url, *, timeout, headers):
+        return self._wrapped_get(
+            url,
+            partial(self.adapter.get_text, url, timeout=timeout, headers=headers),
+        )
+
+    def _retries(self, url):
+        if not self.is_internet_access_allowed:
+            # Assume that *all* geocoders require Internet access
+            pytest.skip("Skipping a test requiring Internet access")
+
+        self.requests_monitor.record_request(url)
+
+        netloc = netloc_from_url(url)
+        retries = max_retries
+
+        if netloc in no_retries_for_hosts:
+            retries = 0
+
+        for i in range(retries + 1):
+            try:
+                with self.requests_monitor.record_response(url):
+                    yield
+            except AdapterHTTPError as error:
+                if i == retries or error.status_code not in retry_status_codes:
+                    # Note: we shouldn't blindly retry on any >=400 code,
+                    # because some of them are actually expected in tests
+                    # (like input validation verification).
+
+                    # TODO Retry failures with the 200 code?
+                    # Some geocoders return failures with 200 code
+                    # (like GoogleV3 for Quota Exceeded).
+                    # Should we detect this somehow to restart such requests?
+                    #
+                    # Re-raise -- don't retry this request
+                    raise
+                else:
+                    # Swallow the error and retry the request
+                    pass
+            except Exception:
+                if i == retries:
+                    raise
+            else:
+                yield None
+                return
+
+            self.requests_monitor.record_retry(url)
+            yield error_wait_seconds
+        raise RuntimeError("Should not have been reached")

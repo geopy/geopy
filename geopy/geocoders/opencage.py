@@ -1,6 +1,6 @@
-import warnings
+from functools import partial
+from urllib.parse import urlencode
 
-from geopy.compat import string_compare, urlencode
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -14,8 +14,6 @@ class OpenCage(Geocoder):
 
     Documentation at:
         https://opencagedata.com/api
-
-    .. versionadded:: 1.1.0
     """
 
     api_path = '/geocode/v1/json'
@@ -23,13 +21,14 @@ class OpenCage(Geocoder):
     def __init__(
             self,
             api_key,
+            *,
             domain='api.opencagedata.com',
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
+            adapter_factory=None
     ):
         """
 
@@ -52,29 +51,22 @@ class OpenCage(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
+            .. versionadded:: 2.0
         """
-        super(OpenCage, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
 
         self.api_key = api_key
@@ -84,11 +76,12 @@ class OpenCage(Geocoder):
     def geocode(
             self,
             query,
+            *,
             bounds=None,
             country=None,
             language=None,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
@@ -109,22 +102,10 @@ class OpenCage(Geocoder):
             coordinate points -- corners of a bounding box.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-            .. versionchanged:: 1.17.0
-                Previously the only supported format for bounds was a
-                string of ``"longitude,latitude,longitude,latitude"``.
-                This format is now deprecated in favor of a list/tuple
-                of a pair of geopy Points and will be removed in geopy 2.0.
-
         :param country: Restricts the results to the specified
             country or countries. The country code is a 2 character code as
             defined by the ISO 3166-1 Alpha 2 standard (e.g. ``fr``).
             Might be a Python list of strings.
-
-            .. versionchanged:: 1.19.0
-                This parameter didn't seem to be respected previously.
-                Also, previously only a single string could be specified.
-                Now a Python list of individual countries is supported.
-
         :type country: str or list
 
         :param bool exactly_one: Return one result or a list of results, if
@@ -141,21 +122,9 @@ class OpenCage(Geocoder):
         """
         params = {
             'key': self.api_key,
-            'q': self.format_string % query,
+            'q': query,
         }
         if bounds:
-            if isinstance(bounds, string_compare):
-                warnings.warn(
-                    'OpenCage `bounds` format of '
-                    '`"longitude,latitude,longitude,latitude"` is now '
-                    'deprecated and will not be supported in geopy 2.0. '
-                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
-                    'instead.',
-                    DeprecationWarning,
-                    stacklevel=2
-                )
-                lon1, lat1, lon2, lat2 = bounds.split(',')
-                bounds = [[lat1, lon1], [lat2, lon2]]
             params['bounds'] = self._format_bounding_box(
                 bounds, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
         if language:
@@ -163,7 +132,7 @@ class OpenCage(Geocoder):
 
         if not country:
             country = []
-        if isinstance(country, string_compare):
+        if isinstance(country, str):
             country = [country]
         if country:
             params['countrycode'] = ",".join(country)
@@ -171,16 +140,16 @@ class OpenCage(Geocoder):
         url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
+            *,
             language=None,
-            exactly_one=DEFAULT_SENTINEL,
-            timeout=DEFAULT_SENTINEL,
+            exactly_one=True,
+            timeout=DEFAULT_SENTINEL
     ):
         """
         Return an address by location point.
@@ -195,12 +164,6 @@ class OpenCage(Geocoder):
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
-
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
@@ -210,13 +173,6 @@ class OpenCage(Geocoder):
             ``exactly_one=False``.
 
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         params = {
             'key': self.api_key,
@@ -227,9 +183,8 @@ class OpenCage(Geocoder):
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, page, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
@@ -251,8 +206,7 @@ class OpenCage(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

@@ -1,12 +1,12 @@
 import base64
+import collections.abc
 import hashlib
 import hmac
-import warnings
 from calendar import timegm
 from datetime import datetime
-from numbers import Number
+from functools import partial
+from urllib.parse import urlencode
 
-from geopy.compat import urlencode
 from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -22,9 +22,8 @@ class GoogleV3(Geocoder):
     Documentation at:
         https://developers.google.com/maps/documentation/geocoding/
 
-    .. attention::
-        Since July 2018 Google requires each request to have an API key.
-        See https://developers.google.com/maps/documentation/geocoding/usage-and-billing
+    Pricing details:
+        https://developers.google.com/maps/documentation/geocoding/usage-and-billing
     """
 
     api_path = '/maps/api/geocode/json'
@@ -33,6 +32,7 @@ class GoogleV3(Geocoder):
     def __init__(
             self,
             api_key=None,
+            *,
             domain='maps.googleapis.com',
             scheme=None,
             client_id=None,
@@ -40,17 +40,25 @@ class GoogleV3(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
-            format_string=None,
             ssl_context=DEFAULT_SENTINEL,
-            channel='',
+            adapter_factory=None,
+            channel=''
     ):
         """
 
         :param str api_key: The API key required by Google to perform
-            geocoding requests. API keys are managed through the Google APIs
-            console (https://code.google.com/apis/console).
+            geocoding requests, mandatory (unless premier is used,
+            then both ``client_id`` and ``secret_key`` must be specified
+            instead).
+            API keys are managed through
+            the Google APIs console (https://code.google.com/apis/console).
             Make sure to have both ``Geocoding API`` and ``Time Zone API``
             services enabled for this API key.
+
+            .. versionchanged:: 2.1
+               Previously a warning has been emitted when neither ``api_key``
+               nor premier were specified. Now a :class:`geopy.exc.ConfigurationError`
+               is raised.
 
         :param str domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.googleapis.com', but if you're
@@ -73,32 +81,24 @@ class GoogleV3(Geocoder):
         :param str user_agent:
             See :attr:`geopy.geocoders.options.default_user_agent`.
 
-            .. versionadded:: 1.12.0
-
-        :param str format_string:
-            See :attr:`geopy.geocoders.options.default_format_string`.
-
-            .. versionadded:: 1.14.0
-
-            .. deprecated:: 1.22.0
-
         :type ssl_context: :class:`ssl.SSLContext`
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-            .. versionadded:: 1.14.0
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+            .. versionadded:: 2.0
 
         :param str channel: If using premier, the channel identifier.
-
-            .. versionadded:: 1.12.0
         """
-        super(GoogleV3, self).__init__(
-            format_string=format_string,
+        super().__init__(
             scheme=scheme,
             timeout=timeout,
             proxies=proxies,
             user_agent=user_agent,
             ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
         )
         if client_id and not secret_key:
             raise ConfigurationError('Must provide secret_key with client_id.')
@@ -110,12 +110,10 @@ class GoogleV3(Geocoder):
         self.secret_key = secret_key
 
         if not self.premier and not api_key:
-            warnings.warn(
+            raise ConfigurationError(
                 'Since July 2018 Google requires each request to have an API key. '
-                'Pass a valid `api_key` to GoogleV3 geocoder to hide this warning. '
-                'See https://developers.google.com/maps/documentation/geocoding/usage-and-billing',  # noqa
-                UserWarning,
-                stacklevel=2
+                'Pass a valid `api_key` to GoogleV3 geocoder to fix this error. '
+                'See https://developers.google.com/maps/documentation/geocoding/usage-and-billing'  # noqa
             )
 
         self.api_key = api_key
@@ -149,16 +147,18 @@ class GoogleV3(Geocoder):
             self.scheme, self.domain, path, signature
         )
 
-    @staticmethod
-    def _format_components_param(components):
+    def _format_components_param(self, components):
         """
         Format the components dict to something Google understands.
         """
         component_items = []
 
-        if isinstance(components, dict):
+        if isinstance(components, collections.abc.Mapping):
             component_items = components.items()
-        elif isinstance(components, list):
+        elif (
+            isinstance(components, collections.abc.Sequence)
+            and not isinstance(components, (str, bytes))
+        ):
             component_items = components
         else:
             raise ValueError(
@@ -171,6 +171,7 @@ class GoogleV3(Geocoder):
     def geocode(
             self,
             query=None,
+            *,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             bounds=None,
@@ -178,7 +179,7 @@ class GoogleV3(Geocoder):
             components=None,
             place_id=None,
             language=None,
-            sensor=False,
+            sensor=False
     ):
         """
         Return a location point by address.
@@ -188,9 +189,6 @@ class GoogleV3(Geocoder):
 
                 >>> g.geocode(components={"city": "Paris", "country": "FR"})
                 Location(France, (46.227638, 2.213749, 0.0))
-
-            .. versionchanged:: 1.14.0
-               Now ``query`` is optional if ``components`` param is set.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -206,12 +204,6 @@ class GoogleV3(Geocoder):
             to bias geocode results more prominently.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
-            .. versionchanged:: 1.17.0
-                Previously the only supported format for bounds was a
-                list like ``[latitude, longitude, latitude, longitude]``.
-                This format is now deprecated in favor of a list/tuple
-                of a pair of geopy Points and will be removed in geopy 2.0.
-
         :param str region: The region code, specified as a ccTLD
             ("top-level domain") two-character value.
 
@@ -225,15 +217,10 @@ class GoogleV3(Geocoder):
 
                 >>> [('administrative_area', 'VA'), ('administrative_area', 'Arlington')]
 
-            .. versionchanged:: 1.22.0
-                Added support for a list of tuples.
-
         :param str place_id: Retrieve a Location using a Place ID.
             Cannot be not used with ``query`` or ``bounds`` parameters.
 
                 >>> g.geocode(place_id='ChIJOcfP0Iq2j4ARDrXUa7ZWs34')
-
-            .. versionadded:: 1.19.0
 
         :param str language: The language in which to return results.
 
@@ -255,7 +242,7 @@ class GoogleV3(Geocoder):
             params['place_id'] = place_id
 
         if query is not None:
-            params['address'] = self.format_string % query
+            params['address'] = query
 
         if query is None and place_id is None and not components:
             raise ValueError('Either `query` or `components` or `place_id` '
@@ -264,18 +251,6 @@ class GoogleV3(Geocoder):
         if self.api_key:
             params['key'] = self.api_key
         if bounds:
-            if len(bounds) == 4:
-                warnings.warn(
-                    'GoogleV3 `bounds` format of '
-                    '`[latitude, longitude, latitude, longitude]` is now '
-                    'deprecated and will not be supported in geopy 2.0. '
-                    'Use `[Point(latitude, longitude), Point(latitude, longitude)]` '
-                    'instead.',
-                    DeprecationWarning,
-                    stacklevel=2
-                )
-                lat1, lon1, lat2, lon2 = bounds
-                bounds = [[lat1, lon1], [lat2, lon2]]
             params['bounds'] = self._format_bounding_box(
                 bounds, "%(lat1)s,%(lon1)s|%(lat2)s,%(lon2)s")
         if region:
@@ -291,17 +266,17 @@ class GoogleV3(Geocoder):
             url = "?".join((self.api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
     def reverse(
             self,
             query,
-            exactly_one=DEFAULT_SENTINEL,
+            *,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             language=None,
-            sensor=False,
+            sensor=False
     ):
         """
         Return an address by location point.
@@ -313,12 +288,6 @@ class GoogleV3(Geocoder):
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
-
-            .. versionchanged:: 1.14.0
-               Default value for ``exactly_one`` was ``False``, which differs
-               from the conventional default across geopy. Please always pass
-               this argument explicitly, otherwise you would get a warning.
-               In geopy 2.0 the default value will become ``True``.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -333,13 +302,6 @@ class GoogleV3(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        if exactly_one is DEFAULT_SENTINEL:
-            warnings.warn('%s.reverse: default value for `exactly_one` '
-                          'argument will become True in geopy 2.0. '
-                          'Specify `exactly_one=False` as the argument '
-                          'explicitly to get rid of this warning.' % type(self).__name__,
-                          DeprecationWarning, stacklevel=2)
-            exactly_one = False
 
         params = {
             'latlng': self._coerce_point_to_string(query),
@@ -356,71 +318,15 @@ class GoogleV3(Geocoder):
             url = self._get_signed_url(params)
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
-        return self._parse_json(
-            self._call_geocoder(url, timeout=timeout), exactly_one
-        )
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
 
-    def timezone(self, location, at_time=None, timeout=DEFAULT_SENTINEL):
-        """
-        Find the timezone a `location` was in for a specified `at_time`,
-        and return a pytz timezone object.
-
-        .. versionadded:: 1.2.0
-
-        .. deprecated:: 1.18.0
-           Use :meth:`GoogleV3.reverse_timezone` instead. This method
-           will be removed in geopy 2.0.
-
-        .. versionchanged:: 1.18.1
-           Previously a :class:`KeyError` was raised for a point without
-           an assigned Olson timezone id (e.g. for Antarctica).
-           Now this method returns None for such requests.
-
-        :param location: The coordinates for which you want a timezone.
-        :type location: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
-
-        :param at_time: The time at which you want the timezone of this
-            location. This is optional, and defaults to the time that the
-            function is called in UTC. Timezone-aware datetimes are correctly
-            handled and naive datetimes are silently treated as UTC.
-
-            .. versionchanged:: 1.18.0
-               Previously this parameter accepted raw unix timestamp as
-               int or float. This is now deprecated in favor of datetimes
-               and support for numbers will be removed in geopy 2.0.
-
-        :type at_time: :class:`datetime.datetime` or None
-
-        :param int timeout: Time, in seconds, to wait for the geocoding service
-            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
-            exception. Set this only if you wish to override, on this call
-            only, the value set during the geocoder's initialization.
-
-        :rtype: ``None`` or pytz timezone. See :func:`pytz.timezone`.
-        """
-
-        warnings.warn('%(cls)s.timezone method is deprecated in favor of '
-                      '%(cls)s.reverse_timezone, which returns geopy.Timezone '
-                      'object containing pytz timezone and a raw response '
-                      'instead of just pytz timezone. This method will '
-                      'be removed in geopy 2.0.' % dict(cls=type(self).__name__),
-                      DeprecationWarning, stacklevel=2)
-        timezone = self.reverse_timezone(location, at_time, timeout)
-        if timezone is None:
-            return None
-        return timezone.pytz_timezone
-
-    def reverse_timezone(self, query, at_time=None, timeout=DEFAULT_SENTINEL):
+    def reverse_timezone(self, query, *, at_time=None, timeout=DEFAULT_SENTINEL):
         """
         Find the timezone a point in `query` was in for a specified `at_time`.
 
-        .. versionadded:: 1.18.0
-
-        .. versionchanged:: 1.18.1
-           Previously a :class:`KeyError` was raised for a point without
-           an assigned Olson timezone id (e.g. for Antarctica).
-           Now this method returns None for such requests.
+        `None` will be returned for points without an assigned
+        Olson timezone id (e.g. for Antarctica).
 
         :param query: The coordinates for which you want a timezone.
         :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
@@ -454,9 +360,7 @@ class GoogleV3(Geocoder):
         url = "?".join((self.tz_api, urlencode(params)))
 
         logger.debug("%s.reverse_timezone: %s", self.__class__.__name__, url)
-        return self._parse_json_timezone(
-            self._call_geocoder(url, timeout=timeout)
-        )
+        return self._call_geocoder(url, self._parse_json_timezone, timeout=timeout)
 
     def _parse_json_timezone(self, response):
         status = response.get('status')
@@ -475,15 +379,6 @@ class GoogleV3(Geocoder):
     def _normalize_timezone_at_time(self, at_time):
         if at_time is None:
             timestamp = timegm(datetime.utcnow().utctimetuple())
-        elif isinstance(at_time, Number):
-            warnings.warn(
-                'Support for `at_time` as int/float is deprecated '
-                'and will be removed in geopy 2.0. '
-                'Pass a `datetime.datetime` instance instead.',
-                DeprecationWarning,
-                stacklevel=3
-            )
-            timestamp = at_time
         elif isinstance(at_time, datetime):
             # Naive datetimes are silently treated as UTC.
             # Timezone-aware datetimes are handled correctly.
@@ -514,8 +409,7 @@ class GoogleV3(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    @staticmethod
-    def _check_status(status):
+    def _check_status(self, status):
         """
         Validates error statuses.
         """

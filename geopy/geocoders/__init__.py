@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Each geolocation service you might use, such as Google Maps, Bing Maps, or
 Nominatim, has its own class in ``geopy.geocoders`` abstracting the service's
@@ -125,13 +124,13 @@ implementations for many different services in a single package.
 Therefore:
 
 1. Different services have different Terms of Use, quotas, pricing,
-   geodatabases and so on. For example, :class:`geopy.geocoders.Nominatim`
+   geodatabases and so on. For example, :class:`.Nominatim`
    is free, but provides low request limits. If you need to make more queries,
    consider using another (probably paid) service, such as
-   :class:`geopy.geocoders.OpenMapQuest` or :class:`geopy.geocoders.PickPoint`
+   :class:`.OpenMapQuest` or :class:`.PickPoint`
    (these two are commercial providers of Nominatim, so they should
    have the same data and APIs). Or, if you are ready to wait, you can try
-   :class:`geopy.extra.rate_limiter.RateLimiter`.
+   :mod:`geopy.extra.rate_limiter`.
 
 2. geopy cannot be responsible for the geocoding services' databases.
    If you have issues with some queries which the service cannot fulfill,
@@ -142,6 +141,34 @@ Therefore:
 
 If you face any problem with your current geocoding service provider, you can
 always try a different one.
+
+.. _async_mode:
+
+Async Mode
+~~~~~~~~~~
+
+By default geopy geocoders are synchronous (i.e. they use an Adapter
+based on :class:`.BaseSyncAdapter`).
+
+All geocoders can be used with asyncio by simply switching to an
+Adapter based on :class:`.BaseAsyncAdapter` (like :class:`.AioHTTPAdapter`).
+
+Example::
+
+    from geopy.adapters import AioHTTPAdapter
+    from geopy.geocoders import Nominatim
+
+    async with Nominatim(
+        user_agent="specify_your_app_name_here",
+        adapter_factory=AioHTTPAdapter,
+    ) as geolocator:
+        location = await geolocator.geocode("175 5th Avenue NYC")
+        print(location.address)
+
+Basically the usage is the same as in synchronous mode, except that
+all geocoder calls should be used with ``await``, and the geocoder
+instance should be created by ``async with``. The context manager is optional,
+however, it is strongly advised to use it to avoid resources leaks.
 
 """
 
@@ -177,10 +204,10 @@ __all__ = (
     "MapBox",
     "MapQuest",
     "MapTiler",
+    "Nominatim",
     "OpenCage",
     "OpenMapQuest",
     "PickPoint",
-    "Nominatim",
     "Pelias",
     "Photon",
     "LiveAddress",
@@ -209,9 +236,9 @@ from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.maptiler import MapTiler
+from geopy.geocoders.nominatim import Nominatim
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
-from geopy.geocoders.osm import Nominatim
 from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
@@ -240,10 +267,10 @@ SERVICE_TO_GEOCODER = {
     "mapbox": MapBox,
     "mapquest": MapQuest,
     "maptiler": MapTiler,
+    "nominatim": Nominatim,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
-    "nominatim": Nominatim,
     "pelias": Pelias,
     "photon": Photon,
     "liveaddress": LiveAddress,
@@ -259,10 +286,28 @@ def get_geocoder_for_service(service):
 
     >>> from geopy.geocoders import get_geocoder_for_service
     >>> get_geocoder_for_service("nominatim")
-    geopy.geocoders.osm.Nominatim
+    geopy.geocoders.nominatim.Nominatim
 
     If the string given is not recognized, a
     :class:`geopy.exc.GeocoderNotFound` exception is raised.
+
+    Given that almost all of the geocoders provide the ``geocode``
+    method it could be used to make basic queries based entirely
+    on user input::
+
+        from geopy.geocoders import get_geocoder_for_service
+
+        def geocode(geocoder, config, query):
+            cls = get_geocoder_for_service(geocoder)
+            geolocator = cls(**config)
+            location = geolocator.geocode(query)
+            return location.address
+
+        >>> geocode("nominatim", dict(user_agent="specify_your_app_name_here"), \
+"london")
+        'London, Greater London, England, SW1A 2DX, United Kingdom'
+        >>> geocode("photon", dict(), "london")
+        'London, SW1A 2DX, London, England, United Kingdom'
 
     """
     try:

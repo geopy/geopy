@@ -1,24 +1,44 @@
-
 import json
 import os
-import unittest
-from collections import defaultdict
+from abc import ABC, abstractmethod
+from unittest.mock import ANY, patch
+
+import pytest
+from async_generator import async_generator, asynccontextmanager, yield_
 
 from geopy import exc
+from geopy.adapters import BaseAsyncAdapter
 from geopy.location import Location
 
-env = defaultdict(lambda: None)
+_env = {}
 try:
     with open(".test_keys") as fp:
-        env.update(json.loads(fp.read()))
+        _env.update(json.loads(fp.read()))
 except IOError:
-    env.update(os.environ)
+    _env.update(os.environ)
 
 
-EMPTY = object()
+class SkipIfMissingEnv(dict):
+    def __init__(self, env):
+        super().__init__(env)
+        self.is_internet_access_allowed = None
+
+    def __getitem__(self, key):
+        assert self.is_internet_access_allowed is not None
+        if key not in self:
+            if self.is_internet_access_allowed:
+                pytest.skip("Missing geocoder credential: %s" % (key,))
+            else:
+                # Generate some dummy token. We won't perform a networking
+                # request anyways.
+                return "dummy"
+        return super().__getitem__(key)
 
 
-class GeocoderTestBase(unittest.TestCase):
+env = SkipIfMissingEnv(_env)
+
+
+class BaseTestGeocoder(ABC):
     """
     Base for geocoder-specific test cases.
     """
@@ -26,119 +46,149 @@ class GeocoderTestBase(unittest.TestCase):
     geocoder = None
     delta = 0.5
 
-    def tearDown(self):
-        # Typically geocoder instance is created in the setUpClass
-        # method and is assigned to the TestCase as a class attribute.
-        #
-        # Individual test methods might assign a custom instance of
-        # geocoder to the `self.geocoder` instance attribute, which
-        # will shadow the class's `geocoder` attribute, used by
-        # the `geocode_run`/`reverse_run` methods.
-        #
-        # The code below cleans up the possibly assigned instance
-        # attribute.
-        try:
-            del self.geocoder
-        except AttributeError:
-            pass
+    @pytest.fixture(scope='class', autouse=True)
+    @async_generator
+    async def class_geocoder(_, request, patch_adapter, is_internet_access_allowed):
+        """Prepare a class-level Geocoder instance."""
+        cls = request.cls
+        env.is_internet_access_allowed = is_internet_access_allowed
 
-    def geocode_run(self, payload, expected, expect_failure=False,
-                    skiptest_on_failure=False):
+        geocoder = cls.make_geocoder()
+        cls.geocoder = geocoder
+
+        run_async = isinstance(geocoder.adapter, BaseAsyncAdapter)
+        if run_async:
+            async with geocoder:
+                await yield_(geocoder)
+        else:
+            await yield_(geocoder)
+
+    @classmethod
+    @asynccontextmanager
+    @async_generator
+    async def inject_geocoder(cls, geocoder):
+        """An async context manager allowing to inject a custom
+        geocoder instance in a single test method which will
+        be used by the `geocode_run`/`reverse_run` methods.
+        """
+        with patch.object(cls, 'geocoder', geocoder):
+            run_async = isinstance(geocoder.adapter, BaseAsyncAdapter)
+            if run_async:
+                async with geocoder:
+                    await yield_(geocoder)
+            else:
+                await yield_(geocoder)
+
+    @pytest.fixture(autouse=True)
+    def ensure_no_geocoder_assignment(self):
+        yield
+        assert self.geocoder is type(self).geocoder, (
+            "Detected `self.geocoder` assignment. "
+            "Please use `async with inject_geocoder(my_geocoder):` "
+            "instead, which supports async adapters."
+        )
+
+    @classmethod
+    @abstractmethod
+    def make_geocoder(cls, **kwargs):  # pragma: no cover
+        pass
+
+    async def geocode_run(
+        self, payload, expected, expect_failure=False,
+        skiptest_on_failure=False
+    ):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
         """
         cls = type(self)
-        result = self._make_request(self.geocoder.geocode, **payload)
+        result = await self._make_request(self.geocoder, 'geocode', **payload)
         if result is None:
             if expect_failure:
                 return
             elif skiptest_on_failure:
-                self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
+                pytest.skip('%s: Skipping test due to empty result' % cls.__name__)
             else:
-                self.fail('%s: No result found' % cls.__name__)
+                pytest.fail('%s: No result found' % cls.__name__)
         if result == []:
-            self.fail('%s returned an empty list instead of None' % cls.__name__)
+            pytest.fail('%s returned an empty list instead of None' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
 
-    def reverse_run(self, payload, expected, expect_failure=False,
-                    skiptest_on_failure=False):
+    async def reverse_run(
+        self, payload, expected, expect_failure=False,
+        skiptest_on_failure=False
+    ):
         """
         Calls geocoder.reverse(**payload), then checks against `expected`.
         """
         cls = type(self)
-        result = self._make_request(self.geocoder.reverse, **payload)
+        result = await self._make_request(self.geocoder, 'reverse', **payload)
         if result is None:
             if expect_failure:
                 return
             elif skiptest_on_failure:
-                self.skipTest('%s: Skipping test due to empty result' % cls.__name__)
+                pytest.skip('%s: Skipping test due to empty result' % cls.__name__)
             else:
-                self.fail('%s: No result found' % cls.__name__)
+                pytest.fail('%s: No result found' % cls.__name__)
         if result == []:
-            self.fail('%s returned an empty list instead of None' % cls.__name__)
+            pytest.fail('%s returned an empty list instead of None' % cls.__name__)
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
 
-    @classmethod
-    def _make_request(cls, call, *args, **kwargs):
-        """
-        Handles remote service errors.
-        """
+    async def reverse_timezone_run(self, payload, expected):
+        timezone = await self._make_request(
+            self.geocoder, 'reverse_timezone', **payload)
+        if expected is None:
+            assert timezone is None
+        else:
+            assert timezone.pytz_timezone == expected
+
+        return timezone
+
+    async def _make_request(self, geocoder, method, *args, **kwargs):
+        cls = type(self)
+        call = getattr(geocoder, method)
+        run_async = isinstance(geocoder.adapter, BaseAsyncAdapter)
         try:
-            result = call(*args, **kwargs)
+            if run_async:
+                result = await call(*args, **kwargs)
+            else:
+                result = call(*args, **kwargs)
         except exc.GeocoderQuotaExceeded:
-            raise unittest.SkipTest("%s: Quota exceeded" % cls.__name__)
+            pytest.skip("%s: Quota exceeded" % cls.__name__)
         except exc.GeocoderTimedOut:
-            raise unittest.SkipTest("%s: Service timed out" % cls.__name__)
+            pytest.skip("%s: Service timed out" % cls.__name__)
         except exc.GeocoderUnavailable:
-            raise unittest.SkipTest("%s: Service unavailable" % cls.__name__)
+            pytest.skip("%s: Service unavailable" % cls.__name__)
         return result
 
     def _verify_request(
             self,
             result,
-            latitude=EMPTY,
-            longitude=EMPTY,
-            address=EMPTY,
+            latitude=ANY,
+            longitude=ANY,
+            address=ANY,
             exactly_one=True,
             delta=None,
     ):
-        """
-        Verifies that result matches the kwargs given.
-        """
         if exactly_one:
-            self.assertIsInstance(result, Location)
+            assert isinstance(result, Location)
         else:
-            self.assertIsInstance(result, list)
+            assert isinstance(result, list)
 
         item = result if exactly_one else result[0]
         delta = delta or self.delta
-        exceptions = []
 
-        if latitude is not EMPTY:
-            try:
-                self.assertAlmostEqual(
-                    item.latitude, latitude, delta=delta,
-                    msg="latitude differs",
-                )
-            except AssertionError as e:
-                exceptions.append(e)
-        if longitude is not EMPTY:
-            try:
-                self.assertAlmostEqual(
-                    item.longitude, longitude, delta=delta,
-                    msg="longitude differs",
-                )
-            except AssertionError as e:
-                exceptions.append(e)
-        if address is not EMPTY:
-            try:
-                self.assertEqual(item.address, address,
-                                 msg="address differs")
-            except AssertionError as e:
-                exceptions.append(e)
-
-        self.assertFalse(exceptions)
+        expected = (
+            pytest.approx(latitude, abs=delta) if latitude is not ANY else ANY,
+            pytest.approx(longitude, abs=delta) if longitude is not ANY else ANY,
+            address,
+        )
+        received = (
+            item.latitude,
+            item.longitude,
+            item.address,
+        )
+        assert received == expected
