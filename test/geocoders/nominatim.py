@@ -307,7 +307,7 @@ class BaseTestNominatim(BaseTestGeocoder):
             'N6101403370',
             'W148332300'
         ]
-        geocoder = self.make_geocoder(user_agent=None)
+        geocoder = self.make_geocoder()
         for index, query in enumerate(queries):
             assert result[index] == geocoder.parse_osm(query)
 
@@ -334,13 +334,13 @@ class BaseTestNominatim(BaseTestGeocoder):
             }
         ]
 
-        geocoder = self.make_geocoder(user_agent=None)
+        geocoder = self.make_geocoder()
         response = geocoder.lookup(queries)
         for location in response:
             location_result = list(
                 filter(lambda place:
-                       place.get('osm_id') == location.osm_id
-                       and place.get('osm_type') == location.osm_type,
+                       place.get('osm_id') == location.raw.get('osm_id')
+                       and place.get('osm_type') == location.raw.get('osm_type'),
                        result)
             )
             assert len(location_result) > 0
