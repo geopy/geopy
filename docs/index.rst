@@ -179,6 +179,14 @@ GeocodeFarm
 
    .. automethod:: __init__
 
+Geocodio
+--------
+
+.. autoclass:: geopy.geocoders.Geocodio
+   :members:
+
+   .. automethod:: __init__
+
 Geolake
 --------
 

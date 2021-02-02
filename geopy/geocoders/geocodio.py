@@ -88,23 +88,40 @@ class Geocodio(Geocoder):
         string as a ``query`` argument or individual address components using the
         ``street``, ``city``, ``state``, ``postal_code``, and ``country`` arguments.
 
-        :param str query:
+        :param str query: The address or query you wish to geocode. You must either
+            provide this argument or a valid combination of ``street``, ``city``,
+            ``state``, and ``postal_code`` and you may not provide those arguments if
+            also providing ``query``.
 
-        :param int limit:
+        :param int limit: The maximum number of matches to return. This will be reset
+            to 1 if ``exactly_one`` is ``True``.
 
-        :param bool exactly_one:
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
 
-        :param int timeout:
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
-        :param str street:
+        :param str street: The street address to geocode. If providing this argument
+            you must provide at least one of ``city``, ``state``, or ``postal_code``, and
+            you must *not* provide a ``query`` argument.
 
-        :param str city:
+        :param str city: The city of the address to geocode. If providing this argument
+            you must *not* provide a ``query`` argument.
 
-        :param str state:
+        :param str state: The state of the address to geocode. If providing this argument
+            you must *not* provide a ``query`` argument.
 
-        :param str postal_code:
+        :param str postal_code: The postal code of the address to geocode. If providing
+            this argument you must *not* provide a ``query`` argument.
 
-        :param str country:
+        :param str country: The country of the address to geocode. If providing this
+            argument you must *not* provide a ``query`` argument.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         if query is not None and \
                 any(p is not None for p in (city, state, postal_code, country)):
@@ -147,13 +164,22 @@ class Geocodio(Geocoder):
     ):
         """Return an address by location point.
 
-        :param str query:
+        :param str query: The coordinates for which you wish to obtain the
+            closest human-readable addresses
 
-        :param bool exactly_one:
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
 
-        :param int timeout:
+        :param int timeout: Time, in seconds, to wait for the geocoding service
+            to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
+            exception. Set this only if you wish to override, on this call
+            only, the value set during the geocoder's initialization.
 
-        :param int limit:
+        :param int limit: The maximum number of matches to return. This will be reset
+            to 1 if ``exactly_one`` is ``True``.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
         params = {
             'q': self._coerce_point_to_string(query),
