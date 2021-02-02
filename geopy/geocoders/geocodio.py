@@ -137,6 +137,39 @@ class Geocodio(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
+    def reverse(
+        self,
+        query,
+        *,
+        exactly_one=True,
+        timeout=DEFAULT_SENTINEL,
+        limit=None
+    ):
+        """Return an address by location point.
+
+        :param str query:
+
+        :param bool exactly_one:
+
+        :param int timeout:
+
+        :param int limit:
+        """
+        params = {
+            'q': self._coerce_point_to_string(query),
+            'api_key': self.api_key
+        }
+        if limit is not None:
+            params['limit'] = limit
+
+        api = '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
+
+        url = "?".join((api, urlencode(params)))
+
+        logger.debug("%s.reverse: %s", self.__class__.__name__, url)
+        callback = partial(self._parse_json, exactly_one=exactly_one)
+        return self._call_geocoder(url, callback, timeout=timeout)
+
     @staticmethod
     def _parse_json(page, exactly_one=True):
         """Returns location, (latitude, longitude) from json feed."""
