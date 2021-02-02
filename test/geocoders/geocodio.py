@@ -20,9 +20,41 @@ class TestGeocodio(BaseTestGeocoder):
         with pytest.raises(exc.ConfigurationError):
             self.make_geocoder(api_key=None)
 
+    async def test_error_with_query_and_street(self):
+        with pytest.raises(exc.GeocoderQueryError):
+            await self.geocode_run(
+                {
+                    'query': '435 north michigan ave, chicago il 60611 usa',
+                    'street': '435 north michigan ave'
+                },
+                {},
+                expect_failure=True
+            )
+
+    async def test_error_with_only_street(self):
+        with pytest.raises(exc.GeocoderQueryError):
+            await self.geocode_run(
+                {
+                    'street': '435 north michigan ave'
+                },
+                {},
+                expect_failure=True
+            )
+
     async def test_geocode(self):
         await self.geocode_run(
             {"query": "435 north michigan ave, chicago il 60611 usa"},
+            {"latitude": 41.89037, "longitude": -87.623192},
+        )
+
+    async def test_geocode_from_components(self):
+        await self.geocode_run(
+            {
+                "street": "435 north michigan ave",
+                "city": "chicago",
+                "state": "IL",
+                "postal_code": "60611"
+            },
             {"latitude": 41.89037, "longitude": -87.623192},
         )
 

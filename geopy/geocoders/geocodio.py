@@ -37,13 +37,11 @@ class Geocodio(Geocoder):
         adapter_factory=None,
     ):
         """
-
         :param str api_key:
+            A valid Geocod.io API key. (https://dash.geocod.io/apikey/create)
+
+        :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
-
-        :param str client_id: If using premier, the account client id.
-
-        :param str secret_key: If using premier, the account secret key.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
@@ -60,8 +58,6 @@ class Geocodio(Geocoder):
 
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
-
-            .. versionadded:: 2.0
         """
         super().__init__(
             scheme=scheme,
@@ -82,15 +78,58 @@ class Geocodio(Geocoder):
         limit=None,
         exactly_one=True,
         timeout=DEFAULT_SENTINEL,
+        street=None,
+        city=None,
+        state=None,
+        postal_code=None,
+        country=None,
     ):
+        """Return a location point by address. You may either provide a single address
+        string as a ``query`` argument or individual address components using the
+        ``street``, ``city``, ``state``, ``postal_code``, and ``country`` arguments.
+
+        :param str query:
+
+        :param int limit:
+
+        :param bool exactly_one:
+
+        :param int timeout:
+
+        :param str street:
+
+        :param str city:
+
+        :param str state:
+
+        :param str postal_code:
+
+        :param str country:
+        """
+        if query is not None and \
+                any(p is not None for p in (city, state, postal_code, country)):
+            raise GeocoderQueryError('Address component must not be provided if '
+                                     'query argument is used.')
+        if street is not None and \
+                not any(p is not None for p in (city, state, postal_code)):
+            raise GeocoderQueryError('If street is provided must also provide city, '
+                                     'state, and/or postal_code.')
+
         api = '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
 
         params = dict(
+            api_key=self.api_key,
             q=query,
-            api_key=self.api_key
+            street=street,
+            city=city,
+            state=state,
+            postal_code=postal_code,
+            country=country,
+            limit=limit
         )
-        if limit is not None:
-            params['limit'] = limit
+        params = {
+            k: v for k, v in params.items() if v is not None
+        }
 
         url = "?".join((api, urlencode(params)))
 
