@@ -34,7 +34,7 @@ class Geocodio(Geocoder):
         proxies=DEFAULT_SENTINEL,
         user_agent=None,
         ssl_context=DEFAULT_SENTINEL,
-        adapter_factory=None,
+        adapter_factory=None
     ):
         """
         :param str api_key:
@@ -82,7 +82,7 @@ class Geocodio(Geocoder):
         city=None,
         state=None,
         postal_code=None,
-        country=None,
+        country=None
     ):
         """Return a location point by address. You may either provide a single address
         string as a ``query`` argument or individual address components using the
