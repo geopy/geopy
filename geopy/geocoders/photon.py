@@ -141,7 +141,7 @@ class Photon(Geocoder):
         if bbox:
             params['bbox'] = self._format_bounding_box(
                 bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
-            
+
         if osm_tag:
             if isinstance(osm_tag, str):
                 params['osm_tag'] = [osm_tag]

@@ -37,7 +37,7 @@ class TestPhoton(BaseTestGeocoder):
 
     async def test_bbox(self):
         await self.geocode_run(
-            {"query": "Marbach", "bbox": [(50.16, 10.67),(50.17, 10.68)]},
+            {"query": "Marbach", "bbox": [(50.16, 10.67), (50.17, 10.68)]},
             {"latitude": 50.1667628, "longitude": 10.6786321, "delta": 2.0},
         )
 
