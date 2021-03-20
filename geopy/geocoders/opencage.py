@@ -80,6 +80,7 @@ class OpenCage(Geocoder):
             bounds=None,
             country=None,
             language=None,
+            annotations=True,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL
     ):
@@ -87,11 +88,6 @@ class OpenCage(Geocoder):
         Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
-
-        :param str language: an IETF format language code (such as `es`
-            for Spanish or pt-BR for Brazilian Portuguese); if this is
-            omitted a code of `en` (English) will be assumed by the remote
-            service.
 
         :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -108,6 +104,17 @@ class OpenCage(Geocoder):
             Might be a Python list of strings.
         :type country: str or list
 
+        :param str language: an IETF format language code (such as `es`
+            for Spanish or pt-BR for Brazilian Portuguese); if this is
+            omitted a code of `en` (English) will be assumed by the remote
+            service.
+
+        :param bool annotations: Enable
+            `annotations <https://opencagedata.com/api#annotations>`_
+            data, which can be accessed via :attr:`.Location.raw`.
+            Set to False if you don't need it to gain a little performance
+            win.
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
@@ -123,8 +130,9 @@ class OpenCage(Geocoder):
         params = {
             'key': self.api_key,
             'q': query,
-            'no_annotations': 1,
         }
+        if not annotations:
+            params['no_annotations'] = 1
         if bounds:
             params['bounds'] = self._format_bounding_box(
                 bounds, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
