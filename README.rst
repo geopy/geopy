@@ -91,7 +91,8 @@ Geopy can calculate geodesic distance between two points using the
 with a default of the geodesic distance available as the function
 `geopy.distance.distance`.
 
-Here's an example usage of the geodesic distance, taking pair of :code:`(lat, lon)` tuples:
+Here's an example usage of the geodesic distance, taking pair
+of :code:`(lat, lon)` tuples:
 
 .. code:: pycon
 
