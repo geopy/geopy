@@ -310,6 +310,14 @@ TomTom
 
    .. automethod:: __init__
 
+USCensus
+--------
+
+.. autoclass:: geopy.geocoders.USCensus
+   :members:
+
+   .. automethod:: __init__
+
 What3Words
 ----------
 
