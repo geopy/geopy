@@ -123,6 +123,7 @@ class OpenCage(Geocoder):
         params = {
             'key': self.api_key,
             'q': query,
+            'no_annotations': 1,
         }
         if bounds:
             params['bounds'] = self._format_bounding_box(
