@@ -318,6 +318,14 @@ What3Words
 
    .. automethod:: __init__
 
+What3WordsV3
+------------
+
+.. autoclass:: geopy.geocoders.What3WordsV3
+   :members:
+
+   .. automethod:: __init__
+
 Yandex
 ------
 

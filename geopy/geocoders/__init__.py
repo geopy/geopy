@@ -243,8 +243,7 @@ from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.tomtom import TomTom
-from geopy.geocoders.what3words import What3Words
-from geopy.geocoders.what3wordsv3 import What3WordsV3
+from geopy.geocoders.what3words import What3Words, What3WordsV3
 from geopy.geocoders.yandex import Yandex
 
 SERVICE_TO_GEOCODER = {
