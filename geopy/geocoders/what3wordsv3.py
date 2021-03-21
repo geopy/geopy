@@ -130,7 +130,7 @@ class What3WordsV3(Geocoder):
         JSON response.
         """
 
-        error = resources.get('error', None)
+        error = resources.get('error')
 
         if error is not None:
             # https://developer.what3words.com/public-api/docs#error-handling
@@ -182,7 +182,7 @@ class What3WordsV3(Geocoder):
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param str lang: two character language codes as supported by the
-            API (https://docs.what3words.com/api/v2/#lang).
+            API (https://developer.what3words.com/public-api/docs#available-languages).
 
         :param bool exactly_one: Return one result or a list of results, if
             available. Due to the address scheme there is always exactly one
