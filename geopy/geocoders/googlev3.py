@@ -410,13 +410,11 @@ class GoogleV3(Geocoder):
             return [parse_place(place) for place in places]
 
     def _check_status(self, status):
-        """
-        Validates error statuses.
-        """
+        # https://developers.google.com/maps/documentation/geocoding/overview#StatusCodes
         if status == 'ZERO_RESULTS':
             # When there are no results, just return.
             return
-        if status == 'OVER_QUERY_LIMIT':
+        if status in ('OVER_QUERY_LIMIT', 'OVER_DAILY_LIMIT'):
             raise GeocoderQuotaExceeded(
                 'The given key has gone over the requests limit in the 24'
                 ' hour period or has submitted too many requests in too'
