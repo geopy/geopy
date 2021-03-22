@@ -7,7 +7,7 @@ from geopy.exc import (
     ConfigurationError,
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
-    GeocoderQuotaExceeded,
+    GeocoderRateLimited,
     GeocoderServiceError,
     GeocoderUnavailable,
 )
@@ -333,7 +333,7 @@ class Here(Geocoder):
             elif status_code == 403:
                 raise GeocoderInsufficientPrivileges(err)
             elif status_code == 429:
-                raise GeocoderQuotaExceeded(err)
+                raise GeocoderRateLimited(err)
             elif status_code == 503:
                 raise GeocoderUnavailable(err)
             else:
