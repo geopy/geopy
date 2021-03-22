@@ -394,6 +394,9 @@ Exceptions
 .. autoclass:: geopy.exc.GeocoderQuotaExceeded
     :show-inheritance:
 
+.. autoclass:: geopy.exc.GeocoderRateLimited
+    :show-inheritance:
+
 .. autoclass:: geopy.exc.GeocoderAuthenticationFailure
     :show-inheritance:
 

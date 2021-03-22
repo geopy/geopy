@@ -17,6 +17,7 @@ from geopy.exc import (
     GeocoderInsufficientPrivileges,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
+    GeocoderRateLimited,
     GeocoderServiceError,
     GeocoderTimedOut,
 )
@@ -199,7 +200,7 @@ ERROR_CODE_MAP = {
     412: GeocoderQueryError,
     413: GeocoderQueryError,
     414: GeocoderQueryError,
-    429: GeocoderQuotaExceeded,
+    429: GeocoderRateLimited,
     502: GeocoderServiceError,
     503: GeocoderTimedOut,
     504: GeocoderTimedOut
@@ -389,7 +390,14 @@ class Geocoder:
                 )
             self._geocoder_exception_handler(error)
             exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
-            raise exc_cls(str(error)) from error
+            if issubclass(exc_cls, GeocoderRateLimited):
+                try:
+                    retry_after = float(error.headers['retry-after']) or None
+                except Exception:
+                    retry_after = None
+                raise exc_cls(str(error), retry_after=retry_after) from error
+            else:
+                raise exc_cls(str(error)) from error
         else:
             self._geocoder_exception_handler(error)
 

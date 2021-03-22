@@ -42,6 +42,24 @@ class GeocoderQuotaExceeded(GeocoderServiceError):
     """
 
 
+class GeocoderRateLimited(GeocoderQuotaExceeded):
+    """
+    The remote geocoding service has rate-limited the request.
+    Retrying later might help.
+
+    Exception of this type has a ``retry_after`` attribute,
+    which contains amount of time (in seconds) the service
+    has asked to wait. Might be ``None`` if there were no such
+    data in response.
+
+    .. versionadded:: 2.2
+    """
+
+    def __init__(self, message, *, retry_after=None):
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
 class GeocoderAuthenticationFailure(GeocoderServiceError):
     """
     The remote geocoding service rejected the API key or account
