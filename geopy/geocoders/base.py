@@ -198,6 +198,7 @@ ERROR_CODE_MAP = {
     402: GeocoderQuotaExceeded,
     403: GeocoderInsufficientPrivileges,
     407: GeocoderAuthenticationFailure,
+    408: GeocoderTimedOut,
     412: GeocoderQueryError,
     413: GeocoderQueryError,
     414: GeocoderQueryError,
