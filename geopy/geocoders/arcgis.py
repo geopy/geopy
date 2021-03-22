@@ -1,4 +1,5 @@
 import json
+import collections.abc
 from functools import partial
 from time import time
 from urllib.parse import urlencode
@@ -16,7 +17,6 @@ __all__ = ("ArcGIS", )
 
 DEFAULT_WKID = 4326
 
-
 class ArcGIS(Geocoder):
     """Geocoder using the ERSI ArcGIS API.
 
@@ -25,6 +25,30 @@ class ArcGIS(Geocoder):
     """
 
     _TOKEN_EXPIRED = 498
+
+    structured_query_params = {
+        'address',
+        'address2',
+        'address3',
+        'neighborhood',
+        'city',
+        'subregion',
+        'region',
+        'postal',
+        'postalExt',
+        'countryCode',
+        'magicKey',
+        'searchExtent',
+        'location',
+        'category',
+        'outSR',
+        'forStorage',
+        'matchOutOfRange',
+        'locationType',
+        'langCode',
+        'sourceCountry',
+        'preferredLabelValues',
+    }
 
     auth_path = '/sharing/generateToken'
     geocode_path = '/arcgis/rest/services/World/GeocodeServer/findAddressCandidates'
@@ -159,7 +183,16 @@ class ArcGIS(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {'singleLine': query, 'f': 'json'}
+        if isinstance(query, collections.abc.Mapping):
+            params = {
+                key: val
+                for key, val
+                in query.items()
+                if key in self.structured_query_params
+            }
+            params['f'] = 'json'
+        else:
+            params = {'singleLine': query, 'f': 'json'}
         if exactly_one:
             params['maxLocations'] = 1
         if out_fields is not None:
