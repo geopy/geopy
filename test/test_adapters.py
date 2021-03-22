@@ -336,6 +336,11 @@ async def test_adapter_exception_for_non_200_response(remote_website_http_404, t
         assert isinstance(excinfo.value.__cause__, AdapterHTTPError)
         assert isinstance(excinfo.value.__cause__, IOError)
 
+        adapter_http_error = excinfo.value.__cause__
+        assert adapter_http_error.status_code == 404
+        assert adapter_http_error.headers['x-test-header'] == 'hello'
+        assert adapter_http_error.text == 'Not found'
+
 
 async def test_system_proxies_are_respected_by_default(
     inject_proxy_to_system_env,
