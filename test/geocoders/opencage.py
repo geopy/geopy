@@ -89,7 +89,7 @@ class TestOpenCage(BaseTestGeocoder):
         )
         assert 'annotations' not in location.raw
 
-    async def test_payment_required_error(self):
+    async def test_payment_required_error(self, disable_adapter_retries):
         async with self.inject_geocoder(OpenCage(api_key=self.testing_tokens[402])):
             with pytest.raises(GeocoderQuotaExceeded) as cm:
                 await self.geocode_run(
@@ -99,7 +99,7 @@ class TestOpenCage(BaseTestGeocoder):
             # urllib: HTTP Error 402: Payment Required
             # others: Non-successful status code 402
 
-    async def test_api_key_disabled_error(self):
+    async def test_api_key_disabled_error(self, disable_adapter_retries):
         async with self.inject_geocoder(OpenCage(api_key=self.testing_tokens[403])):
             with pytest.raises(GeocoderInsufficientPrivileges) as cm:
                 await self.geocode_run(
@@ -109,7 +109,7 @@ class TestOpenCage(BaseTestGeocoder):
             # urllib: HTTP Error 403: Forbidden
             # others: Non-successful status code 403
 
-    async def test_rate_limited_error(self):
+    async def test_rate_limited_error(self, disable_adapter_retries):
         async with self.inject_geocoder(OpenCage(api_key=self.testing_tokens[429])):
             with pytest.raises(GeocoderRateLimited) as cm:
                 await self.geocode_run(
