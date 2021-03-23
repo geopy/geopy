@@ -23,7 +23,7 @@ from geopy.exc import (
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
 
-CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "selfsigned_ca.pem")
+CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "..", "selfsigned_ca.pem")
 
 # Are system proxies set? System proxies are set in:
 # - Environment variables (HTTP_PROXY/HTTPS_PROXY) on Unix;

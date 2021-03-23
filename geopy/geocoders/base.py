@@ -10,6 +10,7 @@ from geopy.adapters import (
     BaseSyncAdapter,
     RequestsAdapter,
     URLLibAdapter,
+    get_retry_after,
 )
 from geopy.exc import (
     ConfigurationError,
@@ -391,11 +392,9 @@ class Geocoder:
             self._geocoder_exception_handler(error)
             exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
             if issubclass(exc_cls, GeocoderRateLimited):
-                try:
-                    retry_after = float(error.headers['retry-after']) or None
-                except Exception:
-                    retry_after = None
-                raise exc_cls(str(error), retry_after=retry_after) from error
+                raise exc_cls(
+                    str(error), retry_after=get_retry_after(error.headers)
+                ) from error
             else:
                 raise exc_cls(str(error)) from error
         else:

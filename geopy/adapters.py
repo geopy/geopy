@@ -16,7 +16,9 @@ HTTP client settings.
 import abc
 import asyncio
 import contextlib
+import email
 import json
+import time
 import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
@@ -84,6 +86,45 @@ class AdapterHTTPError(IOError):
         self.headers = headers
         self.text = text
         super().__init__(message)
+
+
+def get_retry_after(headers):
+    """Return Retry-After header value in seconds.
+
+    .. versionadded:: 2.2
+    """
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
+    # https://github.com/urllib3/urllib3/blob/1.26.4/src/urllib3/util/retry.py#L376
+
+    try:
+        retry_after = headers['retry-after']
+    except KeyError:
+        return None
+
+    if not retry_after:  # None, ''
+        return None
+
+    retry_after = retry_after.strip()
+
+    # RFC7231 section-7.1.3:
+    # Retry-After = HTTP-date / delay-seconds
+
+    try:
+        # Retry-After: 120
+        seconds = int(retry_after)
+    except ValueError:
+        # Retry-After: Fri, 31 Dec 1999 23:59:59 GMT
+        retry_date_tuple = email.utils.parsedate_tz(retry_after)
+        if retry_date_tuple is None:
+            logger.warning('Invalid Retry-After header: %s', retry_after)
+            return None
+        retry_date = email.utils.mktime_tz(retry_date_tuple)
+        seconds = retry_date - time.time()
+
+    if seconds < 0:
+        seconds = 0
+
+    return seconds
 
 
 class BaseAdapter(abc.ABC):
