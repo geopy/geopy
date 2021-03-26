@@ -10,8 +10,7 @@ class TestGeocodio(BaseTestGeocoder):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        api_key = kwargs.pop('api_key') if 'api_key' in kwargs else env['GEOCODIO_KEY']
-        return Geocodio(api_key=api_key, **kwargs)
+        return Geocodio(api_key=env['GEOCODIO_KEY'], **kwargs)
 
     async def test_user_agent_custom(self):
         geocoder = self.make_geocoder(user_agent='my_user_agent/1.0')
