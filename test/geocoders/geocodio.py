@@ -18,8 +18,8 @@ class TestGeocodio(BaseTestGeocoder):
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
     async def test_error_with_no_api_key(self):
-        with pytest.raises(exc.ConfigurationError):
-            self.make_geocoder(api_key=None)
+        with pytest.raises(TypeError):
+            Geocodio()
 
     async def test_error_with_query_and_street(self):
         with pytest.raises(exc.GeocoderQueryError):

@@ -27,7 +27,7 @@ class Geocodio(Geocoder):
 
     def __init__(
         self,
-        api_key=None,
+        api_key,
         *,
         scheme=None,
         timeout=DEFAULT_SENTINEL,
@@ -67,8 +67,6 @@ class Geocodio(Geocoder):
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
         )
-        if api_key is None:
-            raise ConfigurationError('Must provide an api_key.')
         self.api_key = api_key
 
     def geocode(
