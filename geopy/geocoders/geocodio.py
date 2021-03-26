@@ -2,7 +2,7 @@ import json
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
+from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -194,8 +194,7 @@ class Geocodio(Geocoder):
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
-    @staticmethod
-    def _parse_json(page, exactly_one=True):
+    def _parse_json(self, page, exactly_one=True):
         """Returns location, (latitude, longitude) from json feed."""
 
         places = page.get('results', [])
