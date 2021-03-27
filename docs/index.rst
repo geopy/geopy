@@ -178,6 +178,14 @@ GeocodeFarm
    This class has been removed, because the service is too unreliable.
    See :issue:`445`.
 
+Geocodio
+--------
+
+.. autoclass:: geopy.geocoders.Geocodio
+   :members:
+
+   .. automethod:: __init__
+
 Geolake
 --------
 
