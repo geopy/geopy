@@ -23,7 +23,7 @@ from geopy.exc import (
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
 
-CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "selfsigned_ca.pem")
+CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "..", "selfsigned_ca.pem")
 
 # Are system proxies set? System proxies are set in:
 # - Environment variables (HTTP_PROXY/HTTPS_PROXY) on Unix;
@@ -335,6 +335,11 @@ async def test_adapter_exception_for_non_200_response(remote_website_http_404, t
         assert isinstance(excinfo.value, GeocoderServiceError)
         assert isinstance(excinfo.value.__cause__, AdapterHTTPError)
         assert isinstance(excinfo.value.__cause__, IOError)
+
+        adapter_http_error = excinfo.value.__cause__
+        assert adapter_http_error.status_code == 404
+        assert adapter_http_error.headers['x-test-header'] == 'hello'
+        assert adapter_http_error.text == 'Not found'
 
 
 async def test_system_proxies_are_respected_by_default(

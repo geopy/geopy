@@ -1,8 +1,8 @@
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.exc import GeocoderServiceError
+from geopy.geocoders.base import DEFAULT_SENTINEL, ERROR_CODE_MAP, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
@@ -216,24 +216,10 @@ class OpenCage(Geocoder):
             return [parse_place(place) for place in places]
 
     def _check_status(self, status):
-        """
-        Validates error statuses.
-        """
         status_code = status['code']
-        if status_code == 429:
-            # Rate limit exceeded
-            raise GeocoderQuotaExceeded(
-                'The given key has gone over the requests limit in the 24'
-                ' hour period or has submitted too many requests in too'
-                ' short a period of time.'
-            )
+        message = status['message']
         if status_code == 200:
-            # When there are no results, just return.
             return
-
-        if status_code == 403:
-            raise GeocoderQueryError(
-                'Your request was denied.'
-            )
-        else:
-            raise GeocoderQueryError('Unknown error.')
+        # https://opencagedata.com/api#codes
+        exc_cls = ERROR_CODE_MAP.get(status_code, GeocoderServiceError)
+        raise exc_cls(message)

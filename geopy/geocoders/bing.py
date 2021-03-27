@@ -5,7 +5,7 @@ from urllib.parse import quote, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
-    GeocoderQuotaExceeded,
+    GeocoderRateLimited,
     GeocoderServiceError,
     GeocoderUnavailable,
 )
@@ -222,7 +222,7 @@ class Bing(Geocoder):
             elif status_code == 403:
                 raise GeocoderInsufficientPrivileges(err)
             elif status_code == 429:
-                raise GeocoderQuotaExceeded(err)
+                raise GeocoderRateLimited(err)
             elif status_code == 503:
                 raise GeocoderUnavailable(err)
             else:
