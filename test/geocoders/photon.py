@@ -35,6 +35,17 @@ class TestPhoton(BaseTestGeocoder):
             {"latitude": 44.3862491, "longitude": -88.290994, "delta": 2.0},
         )
 
+    async def test_bbox(self):
+        await self.geocode_run(
+            {"query": "moscow"},
+            {"latitude": 55.7504461, "longitude": 37.6174943},
+        )
+        await self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "bbox": [[50.1, -130.1], [44.1, -100.9]]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
+
     async def test_unicode_name(self):
         await self.geocode_run(
             {"query": "\u6545\u5bab"},

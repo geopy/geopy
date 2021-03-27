@@ -426,8 +426,6 @@ class IGNFrance(Geocoder):
             for key, value in iter(el.items()):
                 if value is not None:
                     place[key] = value.text
-                    if value.text is None:
-                        place[key] = None
                 else:
                     place[key] = None
 

@@ -61,3 +61,16 @@ class TestOpenCage(BaseTestGeocoder):
              "country": ['cn', 'tr']},
             {"latitude": 40.2317, "longitude": 32.6839},
         )
+
+    async def test_geocode_annotations(self):
+        location = await self.geocode_run(
+            {"query": "london"},
+            {"latitude": 51.5073219, "longitude": -0.1276474},
+        )
+        assert location.raw['annotations']
+
+        location = await self.geocode_run(
+            {"query": "london", "annotations": False},
+            {"latitude": 51.5073219, "longitude": -0.1276474},
+        )
+        assert 'annotations' not in location.raw

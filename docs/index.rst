@@ -174,10 +174,9 @@ GeocodeEarth
 GeocodeFarm
 -----------
 
-.. autoclass:: geopy.geocoders.GeocodeFarm
-   :members:
-
-   .. automethod:: __init__
+.. versionchanged:: 2.2
+   This class has been removed, because the service is too unreliable.
+   See :issue:`445`.
 
 Geocodio
 --------
@@ -323,6 +322,14 @@ What3Words
 ----------
 
 .. autoclass:: geopy.geocoders.What3Words
+   :members:
+
+   .. automethod:: __init__
+
+What3WordsV3
+------------
+
+.. autoclass:: geopy.geocoders.What3WordsV3
    :members:
 
    .. automethod:: __init__

@@ -38,7 +38,8 @@ most globally accurate.  geopy includes a few other models in the
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
                   }
 
-Here are examples of ``distance.distance`` usage::
+Here are examples of ``distance.distance`` usage, taking pair
+of :code:`(lat, lon)` tuples::
 
     >>> from geopy import distance
     >>> newport_ri = (41.49008, -71.312796)
