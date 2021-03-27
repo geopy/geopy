@@ -83,6 +83,8 @@ jobs:
     - run: tox
       env:
         # GitHub Actions cannot just pass all secrets as env vars :(
+        #
+        # Please preserve alphabetical order.
         ALGOLIA_PLACES_API_KEY: ${{ secrets.ALGOLIA_PLACES_API_KEY }}
         ALGOLIA_PLACES_APP_ID: ${{ secrets.ALGOLIA_PLACES_APP_ID }}
         ARCGIS_PASSWORD: ${{ secrets.ARCGIS_PASSWORD }}

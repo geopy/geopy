@@ -169,6 +169,9 @@ A checklist for adding a new geocoder:
     ([Building docs](#building-docs) section above) to make sure that you've
     done them right!
 
+7.  If your tests use credentials, add their names to
+    the end of the `.github/workflows/ci.yml` file.
+
 That's all!
 
 ### Improving a geocoder
