@@ -69,6 +69,13 @@ class TestGeocodio(BaseTestGeocoder):
         assert str(excinfo.value) == 'Could not geocode address. ' \
                                      'Postal code or city required.'
 
+    async def test_geocode_many_results(self):
+        result = await self.geocode_run(
+            {"query": "Springfield", "exactly_one": False},
+            {}
+        )
+        assert len(result) > 1
+
     async def test_reverse(self):
         location = await self.reverse_run(
             {"query": Point(40.75376406311989, -73.98489005863667)},

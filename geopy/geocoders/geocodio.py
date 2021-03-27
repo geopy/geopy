@@ -130,7 +130,8 @@ class Geocodio(Geocoder):
             raise GeocoderQueryError('If street is provided must also provide city, '
                                      'state, and/or postal_code.')
 
-        api = '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
+        if exactly_one:
+            limit = 1
 
         params = dict(
             api_key=self.api_key,
@@ -146,6 +147,7 @@ class Geocodio(Geocoder):
             k: v for k, v in params.items() if v is not None
         }
 
+        api = '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
         url = "?".join((api, urlencode(params)))
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -183,11 +185,12 @@ class Geocodio(Geocoder):
             'q': self._coerce_point_to_string(query),
             'api_key': self.api_key
         }
+        if exactly_one:
+            limit = 1
         if limit is not None:
             params['limit'] = limit
 
         api = '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
-
         url = "?".join((api, urlencode(params)))
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
