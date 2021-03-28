@@ -33,14 +33,6 @@ class TestAlgoliaPlaces(BaseTestGeocoder):
         )
         assert 'A272' in location.address
 
-    async def test_reverse_no_result(self):
-        await self.reverse_run(
-            # North Atlantic Ocean
-            {'query': (35.173809, -37.485351)},
-            {},
-            expect_failure=True
-        )
-
     async def test_explicit_type(self):
         location = await self.geocode_run(
             {'query': 'Madrid', 'type': 'city', 'language': 'en'},
