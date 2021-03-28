@@ -60,7 +60,7 @@ class TestAlgoliaPlaces(BaseTestGeocoder):
         assert "Madrid" in location.address
 
     async def test_countries_no_result(self):
-        countries = ["NO", "IT"]
+        countries = ["UA", "RU"]
         await self.geocode_run(
             {'query': 'Madrid', 'language': 'en',
              'countries': countries},
