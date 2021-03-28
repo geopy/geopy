@@ -2,6 +2,8 @@ import importlib
 import inspect
 import pkgutil
 
+import docutils.core
+import docutils.utils
 import pytest
 
 import geopy.geocoders
@@ -44,6 +46,53 @@ def assert_no_varargs(sig):
         "Geocoders must not have any (*args) or (**kwargs). "
         "See CONTRIBUTING.md for explanation."
     )
+
+
+def assert_rst(sig, doc, allowed_rtypes=(None,)):
+    # Parse RST from the docstring and generate an XML tree:
+    doctree = docutils.core.publish_doctree(
+        doc,
+        settings_overrides={
+            "report_level": docutils.utils.Reporter.SEVERE_LEVEL + 1,
+        },
+    ).asdom()
+
+    def get_all_text(node):
+        if node.nodeType == node.TEXT_NODE:
+            return node.data
+        else:
+            text_string = ""
+            for child_node in node.childNodes:
+                if child_node.nodeName == "system_message":
+                    # skip warnings/errors
+                    continue
+                if child_node.nodeName == "literal":
+                    tmpl = "``%s``"
+                else:
+                    tmpl = "%s"
+                text_string += tmpl % (get_all_text(child_node),)
+            return text_string
+
+    documented_rtype = None
+    documented_params = []
+    for field in doctree.getElementsByTagName("field"):
+        field_name = get_all_text(field.getElementsByTagName("field_name")[0])
+        if field_name == "rtype":
+            assert documented_rtype is None, "There must be single :rtype: directive"
+            field_body = get_all_text(field.getElementsByTagName("field_body")[0])
+            assert field_body, ":rtype: directive must have a value"
+            documented_rtype = field_body.replace("\n", " ")
+        if field_name.startswith("param"):
+            param_name = field_name.split(" ")[-1]
+            documented_params.append(param_name)
+
+    method_params = list(sig.parameters.keys())[1:]  # skip `self`
+
+    assert method_params == documented_params, (
+        "Actual method params set or order doesn't match the documented "
+        ":param ...: directives in the docstring."
+    )
+    assert documented_rtype in allowed_rtypes
 
 
 def test_all_geocoders_are_exported_from_package():
@@ -111,6 +160,8 @@ def test_init_method_signature(geocoder_cls):
     assert sig_adapter_factory.kind == inspect.Parameter.KEYWORD_ONLY
     assert sig_adapter_factory.default is None
 
+    assert_rst(sig, method.__doc__)
+
 
 @pytest.mark.parametrize("geocoder_cls", geocoder_classes)
 def test_geocode_method_signature(geocoder_cls):
@@ -139,6 +190,17 @@ def test_geocode_method_signature(geocoder_cls):
     # kwargs must contain `timeout`:
     sig_timeout = sig.parameters["timeout"]
     assert sig_timeout.default is DEFAULT_SENTINEL, "`timeout` must be DEFAULT_SENTINEL"
+
+    assert_rst(
+        sig,
+        method.__doc__,
+        allowed_rtypes=[
+            ":class:`geopy.location.Location` or a list of them, "
+            "if ``exactly_one=False``.",  # what3words
+            "``None``, :class:`geopy.location.Location` or a list of them, "
+            "if ``exactly_one=False``.",
+        ],
+    )
 
 
 @pytest.mark.parametrize(
@@ -172,6 +234,17 @@ def test_reverse_method_signature(geocoder_cls):
     sig_timeout = sig.parameters["timeout"]
     assert sig_timeout.default is DEFAULT_SENTINEL, "`timeout` must be DEFAULT_SENTINEL"
 
+    assert_rst(
+        sig,
+        method.__doc__,
+        allowed_rtypes=[
+            ":class:`geopy.location.Location` or a list of them, "  # what3words
+            "if ``exactly_one=False``.",
+            "``None``, :class:`geopy.location.Location` or a list of them, "
+            "if ``exactly_one=False``.",
+        ],
+    )
+
 
 @pytest.mark.parametrize(
     "geocoder_cls",
@@ -198,6 +271,15 @@ def test_reverse_timezone_method_signature(geocoder_cls):
     # kwargs must contain `timeout`:
     sig_timeout = sig.parameters["timeout"]
     assert sig_timeout.default is DEFAULT_SENTINEL, "`timeout` must be DEFAULT_SENTINEL"
+
+    assert_rst(
+        sig,
+        method.__doc__,
+        allowed_rtypes=[
+            ":class:`geopy.timezone.Timezone`.",
+            "``None`` or :class:`geopy.timezone.Timezone`.",
+        ],
+    )
 
 
 @pytest.mark.parametrize("geocoder_cls", geocoder_classes)

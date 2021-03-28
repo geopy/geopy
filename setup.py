@@ -35,6 +35,7 @@ EXTRAS_DEV_TEST = [
     "coverage",
     "pytest-aiohttp",  # for `async def` tests
     "pytest>=3.10",
+    "sphinx",  # `docutils` from sphinx is used in tests
 ]
 
 EXTRAS_DEV_DOCS = [
@@ -58,10 +59,12 @@ setup(
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        "dev": (EXTRAS_DEV_TESTFILES_COMMON +
-                EXTRAS_DEV_LINT +
-                EXTRAS_DEV_TEST +
-                EXTRAS_DEV_DOCS),
+        "dev": sorted(set(
+            EXTRAS_DEV_TESTFILES_COMMON +
+            EXTRAS_DEV_LINT +
+            EXTRAS_DEV_TEST +
+            EXTRAS_DEV_DOCS
+        )),
         "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_LINT),
         "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
