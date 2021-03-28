@@ -109,10 +109,11 @@ class BaseTestGeocoder(ABC):
             skiptest_on_errors=skiptest_on_errors,
             **payload,
         )
+        if expect_failure:
+            assert result is None
+            return
         if result is None:
-            if expect_failure:
-                return
-            elif skiptest_on_failure:
+            if skiptest_on_failure:
                 pytest.skip('%s: Skipping test due to empty result' % cls.__name__)
             else:
                 pytest.fail('%s: No result found' % cls.__name__)
@@ -138,10 +139,11 @@ class BaseTestGeocoder(ABC):
             skiptest_on_errors=skiptest_on_errors,
             **payload,
         )
+        if expect_failure:
+            assert result is None
+            return
         if result is None:
-            if expect_failure:
-                return
-            elif skiptest_on_failure:
+            if skiptest_on_failure:
                 pytest.skip('%s: Skipping test due to empty result' % cls.__name__)
             else:
                 pytest.fail('%s: No result found' % cls.__name__)
