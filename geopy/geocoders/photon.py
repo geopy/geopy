@@ -11,7 +11,7 @@ __all__ = ("Photon", )
 
 class Photon(Geocoder):
     """Geocoder using Photon geocoding service (data based on OpenStreetMap
-    and service provided by Komoot on https://photon.komoot.de).
+    and service provided by Komoot on https://photon.komoot.io).
 
     Documentation at:
         https://github.com/komoot/photon
@@ -29,7 +29,7 @@ class Photon(Geocoder):
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
-            domain='photon.komoot.de',
+            domain='photon.komoot.io',
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             adapter_factory=None
@@ -46,7 +46,7 @@ class Photon(Geocoder):
             See :attr:`geopy.geocoders.options.default_proxies`.
 
         :param str domain: Should be the localized Photon domain to
-            connect to. The default is ``'photon.komoot.de'``, but you
+            connect to. The default is ``'photon.komoot.io'``, but you
             can change it to a domain of your own.
 
         :param str user_agent:
