@@ -343,7 +343,7 @@ class GoogleV3(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :rtype: ``None`` or :class:`geopy.timezone.Timezone`
+        :rtype: ``None`` or :class:`geopy.timezone.Timezone`.
         """
         ensure_pytz_is_installed()
 

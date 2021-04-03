@@ -35,13 +35,6 @@ class TestMapQuest(BaseTestGeocoder):
             expect_failure=True,
         )
 
-    async def test_geocode_empty(self):
-        await self.geocode_run(
-            {'query': 'sldkfhdskjfhsdkhgflaskjgf'},
-            {},
-            expect_failure=True,
-        )
-
     async def test_geocode_bbox(self):
         await self.geocode_run(
             {
