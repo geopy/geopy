@@ -98,11 +98,12 @@ class Bing(Geocoder):
         """
         Return a location point by address.
 
-        :param str query: The address or query you wish to geocode.
+        :param query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
             are one of: `addressLine`, `locality` (city),
             `adminDistrict` (state), `countryRegion`, or `postalCode`.
+        :type query: str or dict
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

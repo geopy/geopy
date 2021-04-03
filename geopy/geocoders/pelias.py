@@ -94,8 +94,7 @@ class Pelias(Geocoder):
         """
         Return a location point by address.
 
-        :param str query: The address, query or structured query to geocode
-            you wish to geocode.
+        :param str query: The address or query you wish to geocode.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.

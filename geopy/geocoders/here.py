@@ -156,11 +156,12 @@ class Here(Geocoder):
         A list of all parameters of the pure REST API is available here:
         https://developer.here.com/documentation/geocoder/topics/resource-geocode.html
 
-        :param str query: The address or query you wish to geocode.
+        :param query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
             are one of: `city`, `county`, `district`, `country`, `state`,
             `street`, `housenumber`, or `postalcode`.
+        :type query: str or dict
 
         :param bbox: A type of spatial filter, limits the search for any other attributes
             in the request. Specified by two coordinate (lat/lon)
