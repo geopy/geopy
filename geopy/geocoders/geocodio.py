@@ -2,6 +2,7 @@ import json
 from functools import partial
 from urllib.parse import urlencode
 
+from geopy.adapters import AdapterHTTPError
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
@@ -222,22 +223,25 @@ class Geocodio(Geocoder):
         ``403`` status code for exceeded quotas instead of the ``429`` code mapped in
         :const:`~geopy.geocoders.base.ERROR_CODE_MAP`
         """
+        if not isinstance(error, AdapterHTTPError):
+            return
+        if error.status_code is None or error.text is None:
+            return
         if error.status_code == 422:
             error_message = self._get_error_message(error)
-            raise GeocoderQueryError(error_message)
+            raise GeocoderQueryError(error_message) from error
         if error.status_code == 403:
             error_message = self._get_error_message(error)
             quota_exceeded_snippet = "You can't make this request as it is " \
                                      "above your daily maximum."
             if quota_exceeded_snippet in error_message:
-                raise GeocoderQuotaExceeded(error_message)
+                raise GeocoderQuotaExceeded(error_message) from error
 
-    @staticmethod
-    def _get_error_message(error):
+    def _get_error_message(self, error):
         """Try to extract an error message from the 'error' property of a JSON response.
         """
         try:
             error_message = json.loads(error.text).get('error')
         except json.JSONDecodeError:
             error_message = None
-        return error_message or 'There was an unknown issue with the query.'
+        return error_message or error.text
