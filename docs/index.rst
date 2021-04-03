@@ -218,6 +218,14 @@ HERE
 
    .. automethod:: __init__
 
+HEREv7
+------
+
+.. autoclass:: geopy.geocoders.HereV7
+   :members:
+
+   .. automethod:: __init__
+
 IGNFrance
 ---------
 

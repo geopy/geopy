@@ -23,6 +23,10 @@ class Here(Geocoder):
 
     Documentation at:
         https://developer.here.com/documentation/geocoder/
+
+    .. attention::
+        This class uses a v6 API which is in maintenance mode.
+        Consider using the newer :class:`.HereV7` class.
     """
 
     structured_query_params = {

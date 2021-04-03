@@ -1,15 +1,10 @@
+import json
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import (
-    ConfigurationError,
-    GeocoderAuthenticationFailure,
-    GeocoderInsufficientPrivileges,
-    GeocoderQuotaExceeded,
-    GeocoderServiceError,
-    GeocoderUnavailable,
-)
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.adapters import AdapterHTTPError
+from geopy.exc import GeocoderQueryError, GeocoderServiceError
+from geopy.geocoders.base import DEFAULT_SENTINEL, ERROR_CODE_MAP, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
@@ -24,20 +19,17 @@ class HereV7(Geocoder):
 
     Terms of Service at:
         https://legal.here.com/en-gb/terms
-
-    ..attention::
-        If you need to use the v6 API, use :class: `.HERE` instead.
     """
 
     structured_query_params = {
+        'country',
+        'state',
+        'county',
+        'city',
+        'district',
         'street',
         'houseNumber',
         'postalCode',
-        'city',
-        'district',
-        'county',
-        'state',
-        'country'
     }
 
     geocode_path = '/v1/geocode'
@@ -45,8 +37,8 @@ class HereV7(Geocoder):
 
     def __init__(
             self,
+            apikey,
             *,
-            apikey=None,
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
@@ -57,8 +49,8 @@ class HereV7(Geocoder):
         """
 
         :param str apikey: Should be a valid HERE Maps apikey.
-            More authentication details are available at
-            https://developer.here.com/authenticationpage.
+            A project can be created at
+            https://developer.here.com/projects.
 
         :param str scheme:
             See :attr:`geopy.geocoders.options.default_scheme`.
@@ -90,10 +82,6 @@ class HereV7(Geocoder):
 
         domain = "search.hereapi.com"
 
-        if not apikey:
-            raise ConfigurationError(
-                "HEREv7 geocoder requires authentication, `apikey` must be set"
-            )
         self.apikey = apikey
         self.api = "%s://geocode.%s%s" % (self.scheme, domain, self.geocode_path)
         self.reverse_api = (
@@ -102,110 +90,94 @@ class HereV7(Geocoder):
 
     def geocode(
         self,
-        query,
+        query=None,
         *,
         components=None,
         at=None,
-        country=None,
+        countries=None,
         language=None,
+        limit=None,
         exactly_one=True,
-        maxresults=None,
         timeout=DEFAULT_SENTINEL
     ):
         """
         Return a location point by address.
 
-        :param query: The address or query you wish to geocode.
+        :param str query: The address or query you wish to geocode. Optional,
+            if ``components`` param is set.
 
-            For a structured query, provide a dictionary whose keys are one of:
-            `street`, `houseNumber`, `postalCode`, `city`, `district`
-            `county`, `state`, `country`.
-
-            You can specify a free-text query with conditional parameters
-            by specifying a string in this param and a dict in the components
-            parameter.
-
-        :param dict components: Components to generate a qualified query.
-
-            Provide a dictionary whose keys are one of: `street`, `houseNumber`,
-            `postalCode`, `city`, `district`, `county`, `state`, `country`.
+        :param dict components: A structured query. Can be used along with
+            the free-text ``query``. Should be a dictionary whose keys
+            are one of:
+            `country`, `state`, `county`, `city`, `district`, `street`,
+            `houseNumber`, `postalCode`.
 
         :param at: The center of the search context.
-
         :type at: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
-        :type circle: list or tuple of 2 items: one :class:`geopy.point.Point` or
-            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"`` and a numeric
-            value representing the radius of the circle.
-
-            Only one of either circle, bbox or country can be provided.
-
-        :param country: A list of country codes specified in `ISO 3166-1 alpha-3` format.
+        :param list countries: A list of country codes specified in
+            `ISO 3166-1 alpha-3 <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3>`_
+            format, e.g. ``['USA', 'CAN']``.
             This is a hard filter.
 
-            Only one of either country, circle or bbox can be provided.
+        :param str language: Affects the language of the response,
+            must be a BCP 47 compliant language code, e.g. ``en-US``.
+
+        :param int limit: Defines the maximum number of items in the
+            response structure. If not provided and there are multiple results
+            the HERE API will return 20 results by default. This will be reset
+            to one if ``exactly_one`` is True.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
-
-        :param int maxresults: Defines the maximum number of items in the
-            response structure. If not provided and there are multiple results
-            the HERE API will return 10 results by default. This will be reset
-            to one if ``exactly_one`` is True.
-
-        :param str language: Affects the language of the response,
-            must be a RFC 4647 language code, e.g. 'en-US'.
-
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
+
+        :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
+            ``exactly_one=False``.
         """
-        params = {}
+        params = {
+            'apiKey': self.apikey,
+        }
 
-        def create_structured_query(d):
-            components = [
-                "{}={}".format(key, val)
-                for key, val
-                in d.items() if key in self.structured_query_params
-            ]
-            if components:
-                return ';'.join(components)
-            else:
-                return None
-
-        if isinstance(query, dict):
-            params['qq'] = create_structured_query(query)
-        else:
+        if query:
             params['q'] = query
 
-        if components and isinstance(components, dict):
-            params['qq'] = create_structured_query(components)
-
-        if country:
-            if isinstance(country, list):
-                country_str = ','.join(country)
-            else:
-                country_str = country
-
-            params['in'] = 'countryCode:' + country_str
+        if components:
+            parts = [
+                "{}={}".format(key, val)
+                for key, val
+                in components.items()
+                if key in self.structured_query_params
+            ]
+            if not parts:
+                raise GeocoderQueryError("`components` dict must not be empty")
+            for pair in parts:
+                if ';' in pair:
+                    raise GeocoderQueryError(
+                        "';' must not be used in values of the structured query. "
+                        "Offending pair: {!r}".format(pair)
+                    )
+            params['qq'] = ';'.join(parts)
 
         if at:
             point = self._coerce_point_to_string(at, output_format="%(lat)s,%(lon)s")
             params['at'] = point
 
-        if maxresults:
-            params['limit'] = maxresults
-
-        if exactly_one:
-            params['limit'] = 1
+        if countries:
+            params['in'] = 'countryCode:' + ','.join(countries)
 
         if language:
             params['lang'] = language
 
-        params['apiKey'] = self.apikey
+        if limit:
+            params['limit'] = limit
+        if exactly_one:
+            params['limit'] = 1
 
         url = "?".join((self.api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
@@ -216,9 +188,9 @@ class HereV7(Geocoder):
             self,
             query,
             *,
-            exactly_one=True,
-            maxresults=None,
             language=None,
+            limit=None,
+            exactly_one=True,
             timeout=DEFAULT_SENTINEL
     ):
         """
@@ -229,16 +201,14 @@ class HereV7(Geocoder):
         :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
             longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
+        :param str language: Affects the language of the response,
+            must be a BCP 47 compliant language code, e.g. ``en-US``.
+
+        :param int limit: Maximum number of results to be returned.
+            This will be reset to one if ``exactly_one`` is True.
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
-
-        :param int maxresults: Defines the maximum number of items in the
-            response structure. If not provided and there are multiple results
-            the HERE API will return 10 results by default. This will be reset
-            to one if ``exactly_one`` is True.
-
-        :param str language: Affects the language of the response,
-            must be a RFC 4647 language code, e.g. 'en-US'.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
@@ -248,19 +218,19 @@ class HereV7(Geocoder):
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        point = self._coerce_point_to_string(query, output_format="%(lat)s,%(lon)s")
 
         params = {
-            'at': point,
-            'apiKey': self.apikey
+            'at': self._coerce_point_to_string(query, output_format="%(lat)s,%(lon)s"),
+            'apiKey': self.apikey,
         }
 
-        if maxresults:
-            params['limit'] = min(maxresults, 100)
-        if exactly_one:
-            params['limit'] = 1
         if language:
             params['lang'] = language
+
+        if limit:
+            params['limit'] = limit
+        if exactly_one:
+            params['limit'] = 1
 
         url = "%s?%s" % (self.reverse_api, urlencode(params))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
@@ -268,28 +238,7 @@ class HereV7(Geocoder):
         return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, doc, exactly_one=True):
-        """
-        Parse a location name, latitude, and longitude from an JSON response.
-        """
-        status_code = doc.get("statusCode", 200)
-        if status_code != 200:
-            err = doc.get('title') or doc.get('error_description')
-            if status_code == 401:
-                raise GeocoderAuthenticationFailure(err)
-            elif status_code == 403:
-                raise GeocoderInsufficientPrivileges(err)
-            elif status_code == 429:
-                raise GeocoderQuotaExceeded(err)
-            elif status_code == 503:
-                raise GeocoderUnavailable(err)
-            else:
-                raise GeocoderServiceError(err)
-
-        try:
-            resources = doc['items']
-        except IndexError:
-            resources = None
-
+        resources = doc['items']
         if not resources:
             return None
 
@@ -297,8 +246,6 @@ class HereV7(Geocoder):
             """
             Parse each return object.
             """
-            # stripchars = ", \n"
-
             location = resource['title']
             position = resource['position']
 
@@ -310,3 +257,19 @@ class HereV7(Geocoder):
             return parse_resource(resources[0])
         else:
             return [parse_resource(resource) for resource in resources]
+
+    def _geocoder_exception_handler(self, error):
+        if not isinstance(error, AdapterHTTPError):
+            return
+        if error.status_code is None or error.text is None:
+            return
+        try:
+            body = json.loads(error.text)
+        except ValueError:
+            message = error.text
+        else:
+            # `title`: https://developer.here.com/documentation/geocoding-search-api/api-reference-swagger.html  # noqa
+            # `error_description`: returned for queries without apiKey.
+            message = body.get('title') or body.get('error_description') or error.text
+        exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
+        raise exc_cls(message) from error
