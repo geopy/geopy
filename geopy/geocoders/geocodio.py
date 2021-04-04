@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 from geopy.adapters import AdapterHTTPError
 from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.geocoders.base import DEFAULT_SENTINEL, NONE_RESULT, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
@@ -212,6 +212,11 @@ class Geocodio(Geocoder):
             return
         if error.status_code == 422:
             error_message = self._get_error_message(error)
+            if (
+                'could not geocode address' in error_message.lower()
+                and 'postal code or city required' in error_message.lower()
+            ):
+                return NONE_RESULT
             raise GeocoderQueryError(error_message) from error
         if error.status_code == 403:
             error_message = self._get_error_message(error)
