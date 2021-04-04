@@ -183,6 +183,8 @@ class Geocodio(Geocoder):
         """Returns location, (latitude, longitude) from json feed."""
 
         places = page.get('results', [])
+        if not places:
+            return None
 
         def parse_place(place):
             """Get the location, lat, lng from a single json place."""

@@ -55,3 +55,11 @@ class TestGeocodio(BaseTestGeocoder):
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
         assert "new york" in location.address.lower()
+
+    async def test_reverse_no_result(self):
+        await self.reverse_run(
+            # North Atlantic Ocean
+            {"query": (35.173809, -37.485351)},
+            {},
+            expect_failure=True,
+        )
