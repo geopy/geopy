@@ -1,3 +1,4 @@
+import collections.abc
 import json
 from functools import partial
 from urllib.parse import urlencode
@@ -21,6 +22,14 @@ class Geocodio(Geocoder):
         https://www.geocod.io/pricing/
 
     """
+
+    structured_query_params = {
+        'street',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+    }
 
     domain = 'api.geocod.io'
     geocode_path = '/v1.6/geocode'
@@ -72,25 +81,21 @@ class Geocodio(Geocoder):
 
     def geocode(
         self,
-        query=None,
+        query,
         *,
         limit=None,
         exactly_one=True,
-        timeout=DEFAULT_SENTINEL,
-        street=None,
-        city=None,
-        state=None,
-        postal_code=None,
-        country=None
+        timeout=DEFAULT_SENTINEL
     ):
-        """Return a location point by address. You may either provide a single address
-        string as a ``query`` argument or individual address components using the
-        ``street``, ``city``, ``state``, ``postal_code``, and ``country`` arguments.
+        """
+        Return a location point by address.
 
-        :param str query: The address or query you wish to geocode. You must either
-            provide this argument or a valid combination of ``street``, ``city``,
-            ``state``, and ``postal_code`` and you may not provide those arguments if
-            also providing ``query``.
+        :param query: The address, query or a structured query
+            you wish to geocode.
+
+            For a structured query, provide a dictionary whose keys
+            are one of: `street`, `city`, `state`, `postal_code` or `country`.
+        :type query: dict or str
 
         :param int limit: The maximum number of matches to return. This will be reset
             to 1 if ``exactly_one`` is ``True``.
@@ -103,50 +108,26 @@ class Geocodio(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param str street: The street address to geocode. If providing this argument
-            you must provide at least one of ``city``, ``state``, or ``postal_code``, and
-            you must *not* provide a ``query`` argument.
-
-        :param str city: The city of the address to geocode. If providing this argument
-            you must *not* provide a ``query`` argument.
-
-        :param str state: The state of the address to geocode. If providing this argument
-            you must *not* provide a ``query`` argument.
-
-        :param str postal_code: The postal code of the address to geocode. If providing
-            this argument you must *not* provide a ``query`` argument.
-
-        :param str country: The country of the address to geocode. If providing this
-            argument you must *not* provide a ``query`` argument.
-
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        if query is not None and \
-                any(p is not None for p in (city, state, postal_code, country)):
-            raise GeocoderQueryError('Address component must not be provided if '
-                                     'query argument is used.')
-        if street is not None and \
-                not any(p is not None for p in (city, state, postal_code)):
-            raise GeocoderQueryError('If street is provided must also provide city, '
-                                     'state, and/or postal_code.')
 
+        if isinstance(query, collections.abc.Mapping):
+            params = {
+                key: val
+                for key, val
+                in query.items()
+                if key in self.structured_query_params
+            }
+        else:
+            params = {'q': query}
+
+        params['api_key'] = self.api_key
+
+        if limit:
+            params['limit'] = limit
         if exactly_one:
-            limit = 1
-
-        params = dict(
-            api_key=self.api_key,
-            q=query,
-            street=street,
-            city=city,
-            state=state,
-            postal_code=postal_code,
-            country=country,
-            limit=limit
-        )
-        params = {
-            k: v for k, v in params.items() if v is not None
-        }
+            params['limit'] = 1
 
         api = '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
         url = "?".join((api, urlencode(params)))
@@ -242,6 +223,6 @@ class Geocodio(Geocoder):
         """
         try:
             error_message = json.loads(error.text).get('error')
-        except json.JSONDecodeError:
+        except ValueError:
             error_message = None
         return error_message or error.text
