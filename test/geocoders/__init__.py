@@ -11,6 +11,7 @@ from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 
 skip_modules = [
     "geopy.geocoders.base",  # doesn't contain actual geocoders
+    "geopy.geocoders.googlev3",  # deprecated
     "geopy.geocoders.osm",  # deprecated
 ]
 
