@@ -14,6 +14,11 @@ class OpenCage(Geocoder):
 
     Documentation at:
         https://opencagedata.com/api
+
+    .. versionchanged:: 2.2
+        Improved error handling by using the default errors map
+        (e.g. to raise :class:`.exc.GeocoderQuotaExceeded` instead of
+        :class:`.exc.GeocoderQueryError` for HTTP 402 error)
     """
 
     api_path = '/geocode/v1/json'

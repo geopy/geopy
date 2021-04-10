@@ -18,6 +18,10 @@ class Photon(Geocoder):
 
     Photon/Komoot geocoder aims to let you `search as you type with
     OpenStreetMap`. No API Key is needed by this platform.
+
+    .. versionchanged:: 2.2
+        Changed default domain from ``photon.komoot.de``
+        to ``photon.komoot.io``.
     """
 
     geocode_path = '/api'
