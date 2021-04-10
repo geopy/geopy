@@ -25,7 +25,7 @@ def _check_query(query):
 
 
 class What3Words(Geocoder):
-    """What3Words geocoder (legacy V2 API).
+    """What3Words geocoder using the legacy V2 API.
 
     Documentation at:
         https://docs.what3words.com/api/v2/
@@ -228,7 +228,7 @@ class What3Words(Geocoder):
 
 
 class What3WordsV3(Geocoder):
-    """What3Words geocoder (the current V3 API).
+    """What3Words geocoder using the V3 API.
 
     Documentation at:
         https://developer.what3words.com/public-api/docs
