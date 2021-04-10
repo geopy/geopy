@@ -232,7 +232,7 @@ from geopy.geocoders.geocodeearth import GeocodeEarth
 from geopy.geocoders.geocodio import Geocodio
 from geopy.geocoders.geolake import Geolake
 from geopy.geocoders.geonames import GeoNames
-from geopy.geocoders.googlev3 import GoogleV3
+from geopy.geocoders.google import GoogleV3
 from geopy.geocoders.here import Here, HereV7
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
