@@ -74,6 +74,7 @@ def assert_rst(sig, doc, allowed_rtypes=(None,)):
             return text_string
 
     documented_rtype = None
+    documented_types = {}
     documented_params = []
     for field in doctree.getElementsByTagName("field"):
         field_name = get_all_text(field.getElementsByTagName("field_name")[0])
@@ -82,15 +83,30 @@ def assert_rst(sig, doc, allowed_rtypes=(None,)):
             field_body = get_all_text(field.getElementsByTagName("field_body")[0])
             assert field_body, ":rtype: directive must have a value"
             documented_rtype = field_body.replace("\n", " ")
+        if field_name.startswith("type"):
+            parts = field_name.split(" ")  # ['type', 'ssl_context']
+            param_name = parts[-1]
+            assert param_name not in documented_types, "Duplicate `type` definition"
+            field_body = get_all_text(field.getElementsByTagName("field_body")[0])
+            documented_types[param_name] = field_body
         if field_name.startswith("param"):
-            param_name = field_name.split(" ")[-1]
+            parts = field_name.split(" ")  # ['param', 'str', 'query']
+            param_name = parts[-1]
             documented_params.append(param_name)
+            if len(parts) == 3:
+                assert param_name not in documented_types, "Duplicate `type` definition"
+                documented_types[param_name] = parts[1]
 
     method_params = list(sig.parameters.keys())[1:]  # skip `self`
 
     assert method_params == documented_params, (
         "Actual method params set or order doesn't match the documented "
         ":param ...: directives in the docstring."
+    )
+    missing_types = set(documented_params) - documented_types.keys()
+    assert not missing_types, "Not all params have types"
+    assert set(documented_types.keys()) == set(documented_params), (
+        "There are extraneous :type: directives"
     )
     assert documented_rtype in allowed_rtypes
 

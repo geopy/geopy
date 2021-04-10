@@ -98,7 +98,10 @@ class Photon(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param location_bias: The coordinates to used as location bias.
+        :param location_bias: The coordinates to use as location bias.
+        :type location_bias: :class:`geopy.point.Point`, list or tuple of
+            ``(latitude, longitude)``, or string
+            as ``"%(latitude)s, %(longitude)s"``.
 
         :param str language: Preferred language in which to return results.
 
