@@ -54,6 +54,12 @@ Code Improvements
 - Changed default exception type for HTTP code 408: now it is raised as
   :class:`.exc.GeocoderTimedOut` instead of a more
   generic :class:`.exc.GeocoderServiceError`. (:issue:`479`)
+- :mod:`geopy.exc`: extend more specific built-in exceptions where appropriate:
+  classes :class:`.ConfigurationError`, :class:`.GeocoderQueryError`,
+  :class:`.GeocoderNotFound` now extend :class:`ValueError`;
+  :class:`.GeocoderRateLimited` and :class:`.GeocoderUnavailable`
+  extend :class:`IOError`;
+  :class:`.GeocoderTimedOut` extends :class:`TimeoutError`. (:issue:`484`)
 
 Docs Improvements
 ~~~~~~~~~~~~~~~~~
