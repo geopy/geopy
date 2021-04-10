@@ -77,10 +77,9 @@ class AdapterHTTPError(IOError):
         :param int status_code: HTTP status code.
         :param dict headers: HTTP response readers. A mapping object
             with lowercased or case-insensitive keys.
-        :param str text: HTTP body text.
 
-        .. versionchanged:: 2.2
-           Added ``headers``.
+            .. versionadded:: 2.2
+        :param str text: HTTP body text.
         """
         self.status_code = status_code
         self.headers = headers
