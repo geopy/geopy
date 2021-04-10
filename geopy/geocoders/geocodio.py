@@ -21,6 +21,7 @@ class Geocodio(Geocoder):
     Pricing details:
         https://www.geocod.io/pricing/
 
+    .. versionadded:: 2.2
     """
 
     structured_query_params = {

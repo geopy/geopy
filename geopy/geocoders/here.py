@@ -391,6 +391,8 @@ class HereV7(Geocoder):
 
     Terms of Service at:
         https://legal.here.com/en-gb/terms
+
+    .. versionadded:: 2.2
     """
 
     structured_query_params = {

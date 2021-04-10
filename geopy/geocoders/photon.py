@@ -116,6 +116,8 @@ class Photon(Geocoder):
         :param bbox: The bounding box of the viewport within which
             to bias geocode results more prominently.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
+
+            .. versionadded:: 2.2
         :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 

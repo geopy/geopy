@@ -115,6 +115,8 @@ class OpenCage(Geocoder):
             Set to False if you don't need it to gain a little performance
             win.
 
+            .. versionadded:: 2.2
+
         :param bool exactly_one: Return one result or a list of results, if
             available.
 
