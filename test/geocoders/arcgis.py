@@ -86,8 +86,8 @@ class TestArcGIS(BaseTestGeocoder):
 
     async def test_reverse_no_result(self):
         await self.reverse_run(
-            # North Atlantic Ocean
-            {"query": (35.173809, -37.485351)},
+            # Antarctica
+            {"query": (-84.172382, 45.9873073)},
             {},
             expect_failure=True
         )
