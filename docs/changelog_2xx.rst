@@ -68,6 +68,8 @@ Docs Improvements
   Contributed by Mateusz Konieczny. (:issue:`476`)
 - Added tests for geocoders' signatures (to ensure that all parameters
   are documented) and fixed docstrings which didn't pass them. (:issue:`480`)
+- Added docs for :class:`.Distance` class
+  and :meth:`.Distance.destination` method (:issue:`473`)
 
 
 .. _v2-1-0:
