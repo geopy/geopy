@@ -354,15 +354,18 @@ Calculating Distance
 ~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: geopy.distance
-    :members: __doc__
+   :members: __doc__
 
 .. autofunction:: geopy.distance.lonlat
 
+.. autoclass:: geopy.distance.Distance
+   :members: __init__, destination
+
 .. autoclass:: geopy.distance.geodesic
-    :members: __init__
+   :show-inheritance:
 
 .. autoclass:: geopy.distance.great_circle
-    :members: __init__
+   :show-inheritance:
 
 Data
 ~~~~
