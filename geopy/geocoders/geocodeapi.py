@@ -1,3 +1,5 @@
+import collections.abc
+
 from functools import partial
 from urllib.parse import urlencode
 
@@ -26,19 +28,17 @@ class GeocodeAPI(Geocoder):
     geocode_path = "search"
     reverse_path = "reverse"
 
-    _param_templates = {
-        "size": "&size={}",
-        "country": "&boundary.country={}",
-        "circle_lat": "&boundary.circle.lat={}",
-        "circle_lon": "&boundary.circle.lon={}",
-        "circle_radius": "&boundary.circle.radius={}",
-        "rect_min_lat": "&boundary.rect.min_lat={}",
-        "rect_min_lon": "&boundary.rect.min_lon={}",
-        "rect_max_lat": "&boundary.rect.max_lat={}",
-        "rect_max_lon": "&boundary.rect.max_lon={}",
-        "point_lat": "&focus.point.lat={}",
-        "point_lon": "&focus.point.lon={}",
-        "layers": "&layers={}",
+    structured_query_params = {
+        "size",
+        "boundary.country",
+        "boundary.circle.lat",
+        "boundary.circle.lon",
+        "boundary.circle.radius",
+        "boundary.rect.min_lat",
+        "boundary.rect.min_lon",
+        "boundary.rect.max_lat",
+        "boundary.rect.max_lon",
+        "layers",
     }
 
     def __init__(
@@ -95,8 +95,7 @@ class GeocodeAPI(Geocoder):
         rect_min_lon=None,
         rect_max_lat=None,
         rect_max_lon=None,
-        point_lat=None,
-        point_lon=None,
+        point=None,
     ):
         """
         Return a location point by address.
@@ -130,27 +129,46 @@ class GeocodeAPI(Geocoder):
 
         :param float rect_max_lon: Maximum longitude for limit search to rectangle
 
-        :param float point_lat: Latitude for prioritize around a point
+        :type point: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
-        :param float point_lon: Longitude for prioritize around a point
+        :param point: Prefer this area to find search results. By default this is
+            treated as a hint, if you want to restrict results to this area,
+            specify ``bounded=True`` as well.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
         """
-        params = self._get_params_geocode(
-            query,
-            size=size,
-            country=country,
-            circle_lat=circle_lat,
-            circle_lon=circle_lon,
-            circle_radius=circle_radius,
-            rect_min_lat=rect_min_lat,
-            rect_min_lon=rect_min_lon,
-            rect_max_lat=rect_max_lat,
-            rect_max_lon=rect_max_lon,
-            point_lon=point_lon,
-            point_lat=point_lat,
-        )
 
-        url = self.api_geocode + params
+        if isinstance(query, collections.abc.Mapping):
+            params = {
+                key: val
+                for key, val in query.items()
+                if key in self.structured_query_params
+            }
+        else:
+            params = {"text": query}
+        if size:
+            params["size"] = size
+        if country:
+            params["boundary.country"] = country
+        if circle_lat:
+            params["boundary.circle.lat"] = circle_lat
+        if circle_lon:
+            params["boundary.circle.lon"] = circle_lon
+        if circle_radius:
+            params["boundary.circle.radius"] = circle_radius
+        if rect_min_lat:
+            params["boundary.rect.min_lat"] = rect_min_lat
+        if rect_min_lon:
+            params["boundary.rect.min_lon"] = rect_min_lon
+        if rect_max_lat:
+            params["boundary.rect.max_lat"] = rect_max_lat
+        if rect_max_lon:
+            params["boundary.rect.max_lon"] = rect_max_lon
+        if point:
+            params["point_lon"] = point.longitude
+            params["point_lat"] = point.latitude
 
+        url = "?".join((self.api_geocode, urlencode(params)))
         headers = {"apikey": self.api_key}
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
