@@ -11,7 +11,7 @@ from geopy.exc import (
     GeocoderServiceError,
 )
 
-__all__ = ('GeocodeAPI',)
+__all__ = ("GeocodeAPI",)
 
 
 class GeocodeAPI(Geocoder):
@@ -21,23 +21,24 @@ class GeocodeAPI(Geocoder):
         https://geocodeapi.io/documentation/
 
     """
-    base_api_url = 'https://app.geocodeapi.io/api/v1/'
-    geocode_path = 'search'
-    reverse_path = 'reverse'
+
+    base_api_url = "https://app.geocodeapi.io/api/v1/"
+    geocode_path = "search"
+    reverse_path = "reverse"
 
     _param_templates = {
-        'size': '&size={}',
-        'country': '&boundary.country={}',
-        'circle_lat': '&boundary.circle.lat={}',
-        'circle_lon': '&boundary.circle.lon={}',
-        'circle_radius': '&boundary.circle.radius={}',
-        'rect_min_lat': '&boundary.rect.min_lat={}',
-        'rect_min_lon': '&boundary.rect.min_lon={}',
-        'rect_max_lat': '&boundary.rect.max_lat={}',
-        'rect_max_lon': '&boundary.rect.max_lon={}',
-        'point_lat': '&focus.point.lat={}',
-        'point_lon': '&focus.point.lon={}',
-        'layers': '&layers={}',
+        "size": "&size={}",
+        "country": "&boundary.country={}",
+        "circle_lat": "&boundary.circle.lat={}",
+        "circle_lon": "&boundary.circle.lon={}",
+        "circle_radius": "&boundary.circle.radius={}",
+        "rect_min_lat": "&boundary.rect.min_lat={}",
+        "rect_min_lon": "&boundary.rect.min_lon={}",
+        "rect_max_lat": "&boundary.rect.max_lat={}",
+        "rect_max_lon": "&boundary.rect.max_lon={}",
+        "point_lat": "&focus.point.lat={}",
+        "point_lon": "&focus.point.lon={}",
+        "layers": "&layers={}",
     }
 
     def __init__(
@@ -48,7 +49,7 @@ class GeocodeAPI(Geocoder):
         proxies=DEFAULT_SENTINEL,
     ):
         """
-        :param str api_key: The API key required by GeocodeFarm
+        :param str api_key: The API key required by GeocodeAPI
             to perform geocoding requests.
 
         :param int timeout:
@@ -59,7 +60,7 @@ class GeocodeAPI(Geocoder):
         """
         super().__init__(timeout=timeout, proxies=proxies)
 
-        self.headers = {'apikey': api_key}
+        self.headers = {"apikey": api_key}
 
         self.api_geocode = self.base_api_url + self.geocode_path
         self.api_reverse = self.base_api_url + self.reverse_path
@@ -135,7 +136,7 @@ class GeocodeAPI(Geocoder):
 
         url = self.api_geocode + params
 
-        logger.debug('%s.geocode: %s', self.__class__.__name__, url)
+        logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
@@ -171,25 +172,25 @@ class GeocodeAPI(Geocoder):
 
         """
         params = self._get_params_reverse(query, size=size, layers=layers)
-        url = '{}?{}'.format(self.api_reverse, params)
+        url = "{}?{}".format(self.api_reverse, params)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
 
     def _get_params_geocode(self, query, **kwargs):
-        main_param = '?text={}'.format(query)
+        main_param = "?text={}".format(query)
         additional_params = self._get_additional_params(**kwargs)
         if not additional_params:
             return main_param
-        return main_param + ''.join(additional_params)
+        return main_param + "".join(additional_params)
 
     def _get_params_reverse(self, query, **kwargs):
         location = self._coerce_point_to_string(
-            query, output_format='point.lat=%(lat)s&point.lon=%(lon)s'
+            query, output_format="point.lat=%(lat)s&point.lon=%(lon)s"
         )
         additional_params = self._get_additional_params(**kwargs)
         if not additional_params:
             return location
-        return location + ''.join(additional_params)
+        return location + "".join(additional_params)
 
     def _get_additional_params(self, **kwargs):
         additional_params = []
@@ -198,14 +199,14 @@ class GeocodeAPI(Geocoder):
                 try:
                     additional_params.append(self._param_templates[k].format(v))
                 except KeyError:
-                    raise KeyError('Wrong parameter: %s' % k)
+                    raise KeyError("Wrong parameter: %s" % k)
         return additional_params
 
     def _parse_json(self, response, exactly_one):
-        if response is None or 'features' not in response:
+        if response is None or "features" not in response:
             return None
 
-        features = response['features']
+        features = response["features"]
         if len(features) == 0:
             return None
 
@@ -221,10 +222,10 @@ class GeocodeAPI(Geocoder):
         return Location(place_name, (latitude, longitude), feature)
 
     def _get_place_name(self, feature):
-        return feature.get('properties', {}).get('label')
+        return feature.get("properties", {}).get("label")
 
     def _get_coordinates(self, feature):
-        coordinates = feature.get('geometry', {}).get('coordinates', [])
+        coordinates = feature.get("geometry", {}).get("coordinates", [])
         latitude = None
         longitude = None
 
