@@ -39,7 +39,7 @@ class GeocodeAPI(Geocoder):
         self,
         api_key,
         *,
-        sheme=None,
+        scheme=None,
         timeout=DEFAULT_SENTINEL,
         proxies=DEFAULT_SENTINEL,
         user_agent=None,
@@ -73,6 +73,7 @@ class GeocodeAPI(Geocoder):
             user_agent=user_agent,
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
+            scheme=scheme,
         )
 
         self.api_key = api_key
