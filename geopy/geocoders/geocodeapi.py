@@ -165,8 +165,8 @@ class GeocodeAPI(Geocoder):
         if rect_max_lon:
             params["boundary.rect.max_lon"] = rect_max_lon
         if point:
-            params["point_lon"] = point.longitude
-            params["point_lat"] = point.latitude
+            params["focus.point.lon"] = point.longitude
+            params["focus.point.lat"] = point.latitude
 
         url = "?".join((self.api_geocode, urlencode(params)))
         headers = {"apikey": self.api_key}
@@ -207,36 +207,20 @@ class GeocodeAPI(Geocoder):
 
         """
         headers = {"apikey": self.api_key}
-        params = self._get_params_reverse(query, size=size, layers=layers)
-        url = "{}?{}".format(self.api_reverse, params)
+        # params = self._coerce_point_to_string(
+        #     query, output_format="point.lat=%(lat)s&point.lon=%(lon)s"
+        # )
+        params = {
+            "point.lat": query.latitude,
+            "point.lon": query.longitude,
+        }
+        if size:
+            params["size"] = size
+        if layers:
+            params["layers"] = layers
+        url = "?".join((self.api_reverse, urlencode(params)))
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout, headers=headers)
-
-    def _get_params_geocode(self, query, **kwargs):
-        main_param = "?text={}".format(query)
-        additional_params = self._get_additional_params(**kwargs)
-        if not additional_params:
-            return main_param
-        return main_param + "".join(additional_params)
-
-    def _get_params_reverse(self, query, **kwargs):
-        location = self._coerce_point_to_string(
-            query, output_format="point.lat=%(lat)s&point.lon=%(lon)s"
-        )
-        additional_params = self._get_additional_params(**kwargs)
-        if not additional_params:
-            return location
-        return location + "".join(additional_params)
-
-    def _get_additional_params(self, **kwargs):
-        additional_params = []
-        for k, v in kwargs.items():
-            if v is not None:
-                try:
-                    additional_params.append(self._param_templates[k].format(v))
-                except KeyError:
-                    raise KeyError("Wrong parameter: %s" % k)
-        return additional_params
 
     def _parse_json(self, response, exactly_one):
         if response is None or "features" not in response:
