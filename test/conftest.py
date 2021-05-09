@@ -4,6 +4,7 @@ import contextlib
 import importlib
 import inspect
 import os
+import types
 from collections import defaultdict
 from functools import partial
 from statistics import mean, median
@@ -62,7 +63,11 @@ error_wait_seconds = float(os.getenv('GEOPY_TEST_ERROR_WAIT_SECONDS', 3))
 no_retries_for_hosts = set(os.getenv('GEOPY_TEST_NO_RETRIES_FOR_HOSTS', '').split(','))
 default_adapter = load_adapter_cls(os.getenv('GEOPY_TEST_ADAPTER'))
 default_adapter_is_async = issubclass(default_adapter, BaseAsyncAdapter)
-retry_status_codes = (429,)
+retry_status_codes = (
+    403,  # Forbidden (probably due to a rate limit)
+    429,  # Too Many Requests (definitely a rate limit)
+    502,  # Bad Gateway
+)
 
 
 def pytest_report_header(config):
@@ -203,8 +208,22 @@ def print_requests_monitor_report(requests_monitor):
     atexit.register(report)
 
 
+@pytest.fixture(scope='session')
+def retries_enabled_session():
+    return types.SimpleNamespace(value=True)
+
+
+@pytest.fixture
+def disable_adapter_retries(retries_enabled_session):
+    retries_enabled_session.value = False
+    yield
+    retries_enabled_session.value = True
+
+
 @pytest.fixture(autouse=True, scope='session')
-def patch_adapter(requests_monitor, is_internet_access_allowed):
+def patch_adapter(
+    requests_monitor, retries_enabled_session, is_internet_access_allowed
+):
     """
     Patch the default Adapter to provide the following features:
         - Retry failed requests. Makes test runs more stable.
@@ -270,6 +289,7 @@ def patch_adapter(requests_monitor, is_internet_access_allowed):
         AdapterProxy,
         adapter_factory=default_adapter,
         requests_monitor=requests_monitor,
+        retries_enabled_session=retries_enabled_session,
         is_internet_access_allowed=is_internet_access_allowed,
     )
     with patch.object(
@@ -286,6 +306,7 @@ class BaseAdapterProxy:
         ssl_context,
         adapter_factory,
         requests_monitor,
+        retries_enabled_session,
         is_internet_access_allowed
     ):
         self.adapter = adapter_factory(
@@ -293,6 +314,7 @@ class BaseAdapterProxy:
             ssl_context=ssl_context,
         )
         self.requests_monitor = requests_monitor
+        self.retries_enabled_session = retries_enabled_session
         self.is_internet_access_allowed = is_internet_access_allowed
 
     def get_json(self, url, *, timeout, headers):
@@ -325,6 +347,9 @@ class BaseAdapterProxy:
                 with self.requests_monitor.record_response(url):
                     yield
             except AdapterHTTPError as error:
+                if not self.retries_enabled_session.value:
+                    raise
+
                 if i == retries or error.status_code not in retry_status_codes:
                     # Note: we shouldn't blindly retry on any >=400 code,
                     # because some of them are actually expected in tests

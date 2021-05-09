@@ -25,12 +25,19 @@ class BaseTestNominatim(BaseTestGeocoder):
     async def test_unicode_name(self):
         await self.geocode_run(
             {"query": "\u6545\u5bab \u5317\u4eac"},
-            {"latitude": 39.916, "longitude": 116.390},
+            {"latitude": 39.916, "longitude": 116.390, "delta": 1.0},
         )
 
     async def test_geocode_empty_result(self):
         await self.geocode_run(
             {"query": "dsadjkasdjasd"},
+            {},
+            expect_failure=True,
+        )
+
+    async def test_reverse_empty_result(self):
+        await self.reverse_run(
+            {"query": Point(0.05, -0.15)},
             {},
             expect_failure=True,
         )

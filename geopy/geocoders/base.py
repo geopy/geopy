@@ -10,6 +10,7 @@ from geopy.adapters import (
     BaseSyncAdapter,
     RequestsAdapter,
     URLLibAdapter,
+    get_retry_after,
 )
 from geopy.exc import (
     ConfigurationError,
@@ -17,6 +18,7 @@ from geopy.exc import (
     GeocoderInsufficientPrivileges,
     GeocoderQueryError,
     GeocoderQuotaExceeded,
+    GeocoderRateLimited,
     GeocoderServiceError,
     GeocoderTimedOut,
 )
@@ -196,14 +198,17 @@ ERROR_CODE_MAP = {
     402: GeocoderQuotaExceeded,
     403: GeocoderInsufficientPrivileges,
     407: GeocoderAuthenticationFailure,
+    408: GeocoderTimedOut,
     412: GeocoderQueryError,
     413: GeocoderQueryError,
     414: GeocoderQueryError,
-    429: GeocoderQuotaExceeded,
+    429: GeocoderRateLimited,
     502: GeocoderServiceError,
     503: GeocoderTimedOut,
     504: GeocoderTimedOut
 }
+
+NONE_RESULT = object()  # special return value for `_geocoder_exception_handler`
 
 
 class Geocoder:
@@ -332,6 +337,9 @@ class Geocoder:
         Override if custom exceptions processing is needed.
         For example, raising an appropriate GeocoderQuotaExceeded on non-200
         response with a textual message in the body about the exceeded quota.
+
+        Return `NONE_RESULT` to have the geocoding call return `None` (meaning
+        empty result).
         """
         pass
 
@@ -368,14 +376,18 @@ class Geocoder:
                             res = await res
                         return res
                     except Exception as error:
-                        self._adapter_error_handler(error)
+                        res = self._adapter_error_handler(error)
+                        if res is NONE_RESULT:
+                            return None
                         raise
 
                 return fut()
             else:
                 return callback(result)
         except Exception as error:
-            self._adapter_error_handler(error)
+            res = self._adapter_error_handler(error)
+            if res is NONE_RESULT:
+                return None
             raise
 
     def _adapter_error_handler(self, error):
@@ -387,11 +399,20 @@ class Geocoder:
                     error.text,
                     exc_info=False,
                 )
-            self._geocoder_exception_handler(error)
+            res = self._geocoder_exception_handler(error)
+            if res is NONE_RESULT:
+                return NONE_RESULT
             exc_cls = ERROR_CODE_MAP.get(error.status_code, GeocoderServiceError)
-            raise exc_cls(str(error)) from error
+            if issubclass(exc_cls, GeocoderRateLimited):
+                raise exc_cls(
+                    str(error), retry_after=get_retry_after(error.headers)
+                ) from error
+            else:
+                raise exc_cls(str(error)) from error
         else:
-            self._geocoder_exception_handler(error)
+            res = self._geocoder_exception_handler(error)
+            if res is NONE_RESULT:
+                return NONE_RESULT
 
     # def geocode(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
     #     raise NotImplementedError()

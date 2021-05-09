@@ -1,12 +1,17 @@
 import uuid
 
 import pytest
-import pytz
 
 from geopy import Point
 from geopy.exc import GeocoderAuthenticationFailure, GeocoderQueryError
 from geopy.geocoders import GeoNames
 from test.geocoders.util import BaseTestGeocoder, env
+
+try:
+    import pytz
+    pytz_available = True
+except ImportError:
+    pytz_available = False
 
 
 class TestUnitGeoNames:
@@ -19,10 +24,6 @@ class TestUnitGeoNames:
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('GEONAMES_USERNAME')),
-    reason="No GEONAMES_USERNAME env variable set"
-)
 class TestGeoNames(BaseTestGeocoder):
 
     delta = 0.04
@@ -142,6 +143,7 @@ class TestGeoNames(BaseTestGeocoder):
                 {},
             )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_reverse_timezone(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         america_new_york = pytz.timezone("America/New_York")
@@ -152,6 +154,7 @@ class TestGeoNames(BaseTestGeocoder):
         )
         assert timezone.raw['countryCode'] == 'US'
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_reverse_timezone_unknown(self):
         await self.reverse_timezone_run(
             # Geonames doesn't return `timezoneId` for Antarctica,
@@ -201,6 +204,7 @@ class TestGeoNamesInvalidAccount(BaseTestGeocoder):
                 expect_failure=True,
             )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_reverse_timezone(self):
         with pytest.raises(GeocoderAuthenticationFailure):
             await self.reverse_timezone_run(

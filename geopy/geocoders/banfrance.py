@@ -91,13 +91,13 @@ class BANFrance(Geocoder):
             results the BAN API will return 5 results by default.
             This will be reset to one if ``exactly_one`` is True.
 
+        :param bool exactly_one: Return one result or a list of results, if
+            available.
+
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
-
-        :param bool exactly_one: Return one result or a list of results, if
-            available.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.

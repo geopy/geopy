@@ -1,16 +1,10 @@
 import warnings
 
-import pytest
-
 from geopy.geocoders import PickPoint
 from test.geocoders.nominatim import BaseTestNominatim
 from test.geocoders.util import env
 
 
-@pytest.mark.skipif(
-    not env['PICKPOINT_KEY'],
-    reason="No PICKPOINT_KEY env variable set"
-)
 class TestPickPoint(BaseTestNominatim):
 
     @classmethod

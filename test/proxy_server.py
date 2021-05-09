@@ -247,6 +247,7 @@ class HttpServerThread(threading.Thread):
                 else:
                     self.send_response(404)
                     self.send_header('Connection', 'close')
+                    self.send_header('X-test-header', 'hello')
                     self.end_headers()
                     self.wfile.write(b"Not found")
                 self.connection.close()

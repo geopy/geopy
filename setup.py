@@ -27,20 +27,22 @@ EXTRAS_DEV_TESTFILES_COMMON = [
 ]
 
 EXTRAS_DEV_LINT = [
-    "flake8>=3.6.0,<3.7.0",
-    "isort>=4.3.4,<4.4.0",
+    "flake8>=3.8.0,<3.9.0",
+    "isort>=5.6.0,<5.7.0",
 ]
 
 EXTRAS_DEV_TEST = [
     "coverage",
     "pytest-aiohttp",  # for `async def` tests
     "pytest>=3.10",
+    "sphinx",  # `docutils` from sphinx is used in tests
 ]
 
 EXTRAS_DEV_DOCS = [
     "readme_renderer",
     "sphinx",
-    "sphinx_rtd_theme>=0.4.0",
+    "sphinx-issues",
+    "sphinx_rtd_theme>=0.5.0",
 ]
 
 setup(
@@ -57,10 +59,12 @@ setup(
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        "dev": (EXTRAS_DEV_TESTFILES_COMMON +
-                EXTRAS_DEV_LINT +
-                EXTRAS_DEV_TEST +
-                EXTRAS_DEV_DOCS),
+        "dev": sorted(set(
+            EXTRAS_DEV_TESTFILES_COMMON +
+            EXTRAS_DEV_LINT +
+            EXTRAS_DEV_TEST +
+            EXTRAS_DEV_DOCS
+        )),
         "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON +
                      EXTRAS_DEV_LINT),
         "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
@@ -97,6 +101,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ]

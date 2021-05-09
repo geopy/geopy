@@ -5,10 +5,6 @@ from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
 
 
-@pytest.mark.skipif(
-    not bool(env.get('MAPBOX_KEY')),
-    reason="No MAPBOX_KEY env variable set"
-)
 class TestMapBox(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):

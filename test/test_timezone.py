@@ -2,12 +2,19 @@ import datetime
 import pickle
 import unittest
 
-import pytz
-import pytz.tzinfo
+import pytest
 
 from geopy.timezone import Timezone, from_fixed_gmt_offset, from_timezone_name
 
+try:
+    import pytz
+    import pytz.tzinfo
+    pytz_available = True
+except ImportError:
+    pytz_available = False
 
+
+@pytest.mark.skipif("not pytz_available")
 class TimezoneTestCase(unittest.TestCase):
 
     timezone_gmt_offset_hours = 3.0

@@ -5,7 +5,7 @@ from urllib.parse import quote, urlencode
 from geopy.exc import (
     GeocoderAuthenticationFailure,
     GeocoderInsufficientPrivileges,
-    GeocoderQuotaExceeded,
+    GeocoderRateLimited,
     GeocoderServiceError,
     GeocoderUnavailable,
 )
@@ -98,11 +98,12 @@ class Bing(Geocoder):
         """
         Return a location point by address.
 
-        :param str query: The address or query you wish to geocode.
+        :param query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
             are one of: `addressLine`, `locality` (city),
             `adminDistrict` (state), `countryRegion`, or `postalCode`.
+        :type query: str or dict
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -222,7 +223,7 @@ class Bing(Geocoder):
             elif status_code == 403:
                 raise GeocoderInsufficientPrivileges(err)
             elif status_code == 429:
-                raise GeocoderQuotaExceeded(err)
+                raise GeocoderRateLimited(err)
             elif status_code == 503:
                 raise GeocoderUnavailable(err)
             else:

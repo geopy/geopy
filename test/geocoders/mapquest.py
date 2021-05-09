@@ -1,14 +1,8 @@
-import pytest
-
 from geopy.geocoders import MapQuest
 from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
 
 
-@pytest.mark.skipif(
-    not bool(env.get('MAPQUEST_KEY')),
-    reason="No MAPQUEST_KEY env variable set"
-)
 class TestMapQuest(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):
@@ -37,13 +31,6 @@ class TestMapQuest(BaseTestGeocoder):
     async def test_zero_results(self):
         await self.geocode_run(
             {"query": ''},
-            {},
-            expect_failure=True,
-        )
-
-    async def test_geocode_empty(self):
-        await self.geocode_run(
-            {'query': 'sldkfhdskjfhsdkhgflaskjgf'},
             {},
             expect_failure=True,
         )

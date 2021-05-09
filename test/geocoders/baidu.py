@@ -42,10 +42,6 @@ class BaseTestBaidu(BaseTestGeocoder):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('BAIDU_KEY')),
-    reason="No BAIDU_KEY env variable set"
-)
 class TestBaidu(BaseTestBaidu):
 
     @classmethod
@@ -63,10 +59,6 @@ class TestBaidu(BaseTestBaidu):
             assert str(exc_info.value) == 'Invalid AK'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('BAIDU_KEY_REQUIRES_SK') and env.get('BAIDU_SEC_KEY')),
-    reason="BAIDU_KEY_REQUIRES_SK and BAIDU_SEC_KEY env variables not set"
-)
 class TestBaiduSK(BaseTestBaidu):
 
     @classmethod
@@ -89,10 +81,6 @@ class TestBaiduSK(BaseTestBaidu):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('BAIDU_V3_KEY')),
-    reason="No BAIDU_V3_KEY env variable set"
-)
 class TestBaiduV3(TestBaidu):
 
     @classmethod
@@ -104,10 +92,6 @@ class TestBaiduV3(TestBaidu):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('BAIDU_V3_KEY_REQUIRES_SK') and env.get('BAIDU_V3_SEC_KEY')),
-    reason="BAIDU_V3_KEY_REQUIRES_SK and BAIDU_V3_SEC_KEY env variables not set"
-)
 class TestBaiduV3SK(TestBaiduSK):
 
     @classmethod

@@ -1,5 +1,10 @@
 import pytest
 
+from geopy.exc import (
+    GeocoderInsufficientPrivileges,
+    GeocoderQuotaExceeded,
+    GeocoderRateLimited,
+)
 from geopy.geocoders import OpenCage
 from test.geocoders.util import BaseTestGeocoder, env
 
@@ -14,11 +19,14 @@ class TestUnitOpenCage:
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('OPENCAGE_KEY')),
-    reason="No OPENCAGE_KEY env variables set"
-)
 class TestOpenCage(BaseTestGeocoder):
+
+    testing_tokens = {
+        # https://opencagedata.com/api#testingkeys
+        402: "4372eff77b8343cebfc843eb4da4ddc4",
+        403: "2e10e5e828262eb243ec0b54681d699a",
+        429: "d6d0f0065f4348a4bdfe4587ba02714b",
+    }
 
     @classmethod
     def make_geocoder(cls, **kwargs):
@@ -67,3 +75,46 @@ class TestOpenCage(BaseTestGeocoder):
              "country": ['cn', 'tr']},
             {"latitude": 40.2317, "longitude": 32.6839},
         )
+
+    async def test_geocode_annotations(self):
+        location = await self.geocode_run(
+            {"query": "london"},
+            {"latitude": 51.5073219, "longitude": -0.1276474},
+        )
+        assert location.raw['annotations']
+
+        location = await self.geocode_run(
+            {"query": "london", "annotations": False},
+            {"latitude": 51.5073219, "longitude": -0.1276474},
+        )
+        assert 'annotations' not in location.raw
+
+    async def test_payment_required_error(self, disable_adapter_retries):
+        async with self.inject_geocoder(OpenCage(api_key=self.testing_tokens[402])):
+            with pytest.raises(GeocoderQuotaExceeded) as cm:
+                await self.geocode_run(
+                    {"query": "london"}, {}, skiptest_on_errors=False
+                )
+            assert cm.type is GeocoderQuotaExceeded
+            # urllib: HTTP Error 402: Payment Required
+            # others: Non-successful status code 402
+
+    async def test_api_key_disabled_error(self, disable_adapter_retries):
+        async with self.inject_geocoder(OpenCage(api_key=self.testing_tokens[403])):
+            with pytest.raises(GeocoderInsufficientPrivileges) as cm:
+                await self.geocode_run(
+                    {"query": "london"}, {}, skiptest_on_errors=False
+                )
+            assert cm.type is GeocoderInsufficientPrivileges
+            # urllib: HTTP Error 403: Forbidden
+            # others: Non-successful status code 403
+
+    async def test_rate_limited_error(self, disable_adapter_retries):
+        async with self.inject_geocoder(OpenCage(api_key=self.testing_tokens[429])):
+            with pytest.raises(GeocoderRateLimited) as cm:
+                await self.geocode_run(
+                    {"query": "london"}, {}, skiptest_on_errors=False
+                )
+            assert cm.type is GeocoderRateLimited
+            # urllib: HTTP Error 429: Too Many Requests
+            # others: Non-successful status code 429

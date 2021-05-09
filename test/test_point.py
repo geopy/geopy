@@ -60,6 +60,8 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(Point("41.5;-81.0"), (41.5, -81.0, 0.0))
         self.assertEqual(Point("41.5,-81.0"), (41.5, -81.0, 0.0))
         self.assertEqual(Point("41.5 -81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("+41.5 -81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("+41.5 +81.0"), (41.5, 81.0, 0.0))
         self.assertEqual(Point("41.5 N -81.0 W"), (41.5, 81.0, 0.0))
         self.assertEqual(Point("-41.5 S;81.0 E"), (41.5, 81.0, 0.0))
         self.assertEqual(Point("23 26m 22s N 23 27m 30s E"),

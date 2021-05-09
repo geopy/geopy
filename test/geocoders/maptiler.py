@@ -5,10 +5,6 @@ from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
 
 
-@pytest.mark.skipif(
-    not bool(env.get('MAPTILER_KEY')),
-    reason="No MAPTILER_KEY env variable set"
-)
 class TestMapTiler(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):

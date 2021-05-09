@@ -1,5 +1,3 @@
-import pytest
-
 from geopy.geocoders import Pelias
 from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
@@ -63,13 +61,12 @@ class BaseTestPelias(BaseTestGeocoder):
         assert result_reverse_en.raw['properties']['country'] == "Austria"
 
 
-@pytest.mark.skipif(
-    not bool(env.get('PELIAS_DOMAIN')),
-    reason="No PELIAS_DOMAIN env variable set"
-)
 class TestPelias(BaseTestPelias):
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        return Pelias(env.get('PELIAS_DOMAIN'), api_key=env.get('PELIAS_KEY'),
-                      **kwargs)
+        return Pelias(
+            env['PELIAS_DOMAIN'],
+            api_key=env['PELIAS_KEY'],
+            **kwargs,
+        )

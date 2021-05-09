@@ -1,8 +1,8 @@
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import GeocoderQueryError, GeocoderQuotaExceeded
-from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
+from geopy.exc import GeocoderServiceError
+from geopy.geocoders.base import DEFAULT_SENTINEL, ERROR_CODE_MAP, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
@@ -14,6 +14,11 @@ class OpenCage(Geocoder):
 
     Documentation at:
         https://opencagedata.com/api
+
+    .. versionchanged:: 2.2
+        Improved error handling by using the default errors map
+        (e.g. to raise :class:`.exc.GeocoderQuotaExceeded` instead of
+        :class:`.exc.GeocoderQueryError` for HTTP 402 error)
     """
 
     api_path = '/geocode/v1/json'
@@ -80,6 +85,7 @@ class OpenCage(Geocoder):
             bounds=None,
             country=None,
             language=None,
+            annotations=True,
             exactly_one=True,
             timeout=DEFAULT_SENTINEL
     ):
@@ -87,11 +93,6 @@ class OpenCage(Geocoder):
         Return a location point by address.
 
         :param str query: The address or query you wish to geocode.
-
-        :param str language: an IETF format language code (such as `es`
-            for Spanish or pt-BR for Brazilian Portuguese); if this is
-            omitted a code of `en` (English) will be assumed by the remote
-            service.
 
         :type bounds: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
@@ -107,6 +108,19 @@ class OpenCage(Geocoder):
             defined by the ISO 3166-1 Alpha 2 standard (e.g. ``fr``).
             Might be a Python list of strings.
         :type country: str or list
+
+        :param str language: an IETF format language code (such as `es`
+            for Spanish or pt-BR for Brazilian Portuguese); if this is
+            omitted a code of `en` (English) will be assumed by the remote
+            service.
+
+        :param bool annotations: Enable
+            `annotations <https://opencagedata.com/api#annotations>`_
+            data, which can be accessed via :attr:`.Location.raw`.
+            Set to False if you don't need it to gain a little performance
+            win.
+
+            .. versionadded:: 2.2
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -124,6 +138,8 @@ class OpenCage(Geocoder):
             'key': self.api_key,
             'q': query,
         }
+        if not annotations:
+            params['no_annotations'] = 1
         if bounds:
             params['bounds'] = self._format_bounding_box(
                 bounds, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
@@ -207,24 +223,10 @@ class OpenCage(Geocoder):
             return [parse_place(place) for place in places]
 
     def _check_status(self, status):
-        """
-        Validates error statuses.
-        """
         status_code = status['code']
-        if status_code == 429:
-            # Rate limit exceeded
-            raise GeocoderQuotaExceeded(
-                'The given key has gone over the requests limit in the 24'
-                ' hour period or has submitted too many requests in too'
-                ' short a period of time.'
-            )
+        message = status['message']
         if status_code == 200:
-            # When there are no results, just return.
             return
-
-        if status_code == 403:
-            raise GeocoderQueryError(
-                'Your request was denied.'
-            )
-        else:
-            raise GeocoderQueryError('Unknown error.')
+        # https://opencagedata.com/api#codes
+        exc_cls = ERROR_CODE_MAP.get(status_code, GeocoderServiceError)
+        raise exc_cls(message)

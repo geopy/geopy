@@ -1,28 +1,27 @@
 import base64
-import warnings
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 
 import pytest
-from pytz import timezone
 
 from geopy import exc
 from geopy.geocoders import GoogleV3
 from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
 
+try:
+    import pytz
+    pytz_available = True
+except ImportError:
+    pytz_available = False
 
-@pytest.mark.skipif(
-    not bool(env['GOOGLE_KEY']),
-    reason="No GOOGLE_KEY env variable set"
-)
+
 class TestGoogleV3(BaseTestGeocoder):
     new_york_point = Point(40.75376406311989, -73.98489005863667)
-    america_new_york = timezone("America/New_York")
 
     @classmethod
     def make_geocoder(cls, **kwargs):
-        return GoogleV3(api_key=env.get('GOOGLE_KEY'), **kwargs)
+        return GoogleV3(api_key=env['GOOGLE_KEY'], **kwargs)
 
     async def test_user_agent_custom(self):
         geocoder = GoogleV3(
@@ -37,15 +36,12 @@ class TestGoogleV3(BaseTestGeocoder):
         with pytest.raises(exc.ConfigurationError):
             GoogleV3(api_key='mock', secret_key='a')
 
-    async def test_warning_with_no_api_key(self):
-        with warnings.catch_warnings(record=True) as w:
+    async def test_error_with_no_api_key(self):
+        with pytest.raises(exc.ConfigurationError):
             GoogleV3()
-        assert len(w) == 1
 
-    async def test_no_warning_with_no_api_key_but_using_premier(self):
-        with warnings.catch_warnings(record=True) as w:
-            GoogleV3(client_id='client_id', secret_key='secret_key')
-        assert len(w) == 0
+    async def test_no_error_with_no_api_key_but_using_premier(self):
+        GoogleV3(client_id='client_id', secret_key='secret_key')
 
     async def test_check_status(self):
         assert self.geocoder._check_status("ZERO_RESULTS") is None
@@ -211,13 +207,15 @@ class TestGoogleV3(BaseTestGeocoder):
                 expect_failure=True,
             )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_timezone_datetime(self):
         await self.reverse_timezone_run(
             {"query": self.new_york_point,
              "at_time": datetime.utcfromtimestamp(0)},
-            self.america_new_york,
+            pytz.timezone("America/New_York"),
         )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_timezone_at_time_normalization(self):
         utc_naive_dt = datetime(2010, 1, 1, 0, 0, 0)
         utc_timestamp = 1262304000
@@ -229,31 +227,35 @@ class TestGoogleV3(BaseTestGeocoder):
             utc_timestamp < self.geocoder._normalize_timezone_at_time(None)
         )
 
-        tz = timezone("Etc/GMT-2")
+        tz = pytz.timezone("Etc/GMT-2")
         local_aware_dt = tz.localize(datetime(2010, 1, 1, 2, 0, 0))
         assert(
             utc_timestamp == self.geocoder._normalize_timezone_at_time(local_aware_dt)
         )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_timezone_integer_raises(self):
         # In geopy 1.x `at_time` could be an integer -- a unix timestamp.
         # This is an error since geopy 2.0.
         with pytest.raises(exc.GeocoderQueryError):
             await self.reverse_timezone_run(
                 {"query": self.new_york_point, "at_time": 0},
-                self.america_new_york,
+                pytz.timezone("America/New_York"),
             )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_timezone_no_date(self):
         await self.reverse_timezone_run(
             {"query": self.new_york_point},
-            self.america_new_york,
+            pytz.timezone("America/New_York"),
         )
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_timezone_invalid_at_time(self):
         with pytest.raises(exc.GeocoderQueryError):
             self.geocoder.reverse_timezone(self.new_york_point, at_time="eek")
 
+    @pytest.mark.skipif("not pytz_available")
     async def test_reverse_timezone_unknown(self):
         await self.reverse_timezone_run(
             # Google doesn't return a timezone for Antarctica.

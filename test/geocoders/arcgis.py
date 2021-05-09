@@ -86,19 +86,13 @@ class TestArcGIS(BaseTestGeocoder):
 
     async def test_reverse_no_result(self):
         await self.reverse_run(
-            # North Atlantic Ocean
-            {"query": (35.173809, -37.485351)},
+            # Antarctica
+            {"query": (-84.172382, 45.9873073)},
             {},
             expect_failure=True
         )
 
 
-@pytest.mark.skipif(
-    not (env.get('ARCGIS_USERNAME') is not None
-         or env.get('ARCGIS_PASSWORD') is not None
-         or env.get('ARCGIS_REFERER') is not None),
-    reason="No ARCGIS_USERNAME or ARCGIS_PASSWORD or ARCGIS_REFERER env variable set"
-)
 class TestArcGISAuthenticated(BaseTestGeocoder):
 
     @classmethod
