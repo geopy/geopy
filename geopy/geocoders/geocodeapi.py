@@ -45,18 +45,35 @@ class GeocodeAPI(Geocoder):
         self,
         api_key,
         *,
+        sheme=None,
         timeout=DEFAULT_SENTINEL,
         proxies=DEFAULT_SENTINEL,
+        user_agent=None,
+        ssl_context=DEFAULT_SENTINEL,
+        adapter_factory=None,
     ):
         """
         :param str api_key: The API key required by GeocodeAPI
             to perform geocoding requests.
+
+        :param str scheme:
+            See :attr:`geopy.geocoders.options.default_scheme`.
 
         :param int timeout:
             See :attr:`geopy.geocoders.options.default_timeout`.
 
         :param dict proxies:
             See :attr:`geopy.geocoders.options.default_proxies`.
+
+        :param str user_agent:
+            See :attr:`geopy.geocoders.options.default_user_agent`.
+
+        :type ssl_context: :class:`ssl.SSLContext`
+        :param ssl_context:
+            See :attr:`geopy.geocoders.options.default_ssl_context`.
+
+        :param callable adapter_factory:
+            See :attr:`geopy.geocoders.options.default_adapter_factory`.
         """
         super().__init__(timeout=timeout, proxies=proxies)
 
