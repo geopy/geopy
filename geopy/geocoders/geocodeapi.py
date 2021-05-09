@@ -67,7 +67,13 @@ class GeocodeAPI(Geocoder):
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
         """
-        super().__init__(timeout=timeout, proxies=proxies)
+        super().__init__(
+            timeout=timeout,
+            proxies=proxies,
+            user_agent=user_agent,
+            ssl_context=ssl_context,
+            adapter_factory=adapter_factory,
+        )
 
         self.api_key = api_key
 
