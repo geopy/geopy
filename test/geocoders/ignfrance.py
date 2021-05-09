@@ -216,10 +216,6 @@ class BaseTestIGNFrance(BaseTestGeocoder):
         assert coordinates_couples_radius.issubset(coordinates_couples)
 
 
-@pytest.mark.skipif(
-    not bool(env.get('IGNFRANCE_KEY') and env.get('IGNFRANCE_REFERER')),
-    reason="No IGNFRANCE_KEY or IGNFRANCE_REFERER env variable set"
-)
 class TestIGNFranceApiKeyAuth(BaseTestIGNFrance):
 
     @classmethod
@@ -231,12 +227,6 @@ class TestIGNFranceApiKeyAuth(BaseTestIGNFrance):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('IGNFRANCE_USERNAME_KEY') and env.get('IGNFRANCE_USERNAME')
-             and env.get('IGNFRANCE_PASSWORD')),
-    reason="No IGNFRANCE_USERNAME_KEY or IGNFRANCE_USERNAME "
-    "or IGNFRANCE_PASSWORD env variable set"
-)
 class TestIGNFranceUsernameAuth(BaseTestIGNFrance):
 
     @classmethod
@@ -250,12 +240,6 @@ class TestIGNFranceUsernameAuth(BaseTestIGNFrance):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('IGNFRANCE_USERNAME_KEY') and env.get('IGNFRANCE_USERNAME')
-             and env.get('IGNFRANCE_PASSWORD')),
-    reason="No IGNFRANCE_USERNAME_KEY or IGNFRANCE_USERNAME "
-    "or IGNFRANCE_PASSWORD env variable set"
-)
 class TestIGNFranceUsernameAuthProxy(BaseTestGeocoder):
     proxy_timeout = 5
 

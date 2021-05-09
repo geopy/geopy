@@ -1,5 +1,3 @@
-import pytest
-
 from geopy.geocoders import Geolake
 from test.geocoders.util import BaseTestGeocoder, env
 
@@ -14,10 +12,6 @@ class TestUnitGeolake:
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('GEOLAKE_KEY')),
-    reason="No GEOLAKE_KEY env variables set"
-)
 class TestGeolake(BaseTestGeocoder):
 
     @classmethod

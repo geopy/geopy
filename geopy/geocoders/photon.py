@@ -11,13 +11,17 @@ __all__ = ("Photon", )
 
 class Photon(Geocoder):
     """Geocoder using Photon geocoding service (data based on OpenStreetMap
-    and service provided by Komoot on https://photon.komoot.de).
+    and service provided by Komoot on https://photon.komoot.io).
 
     Documentation at:
         https://github.com/komoot/photon
 
     Photon/Komoot geocoder aims to let you `search as you type with
     OpenStreetMap`. No API Key is needed by this platform.
+
+    .. versionchanged:: 2.2
+        Changed default domain from ``photon.komoot.de``
+        to ``photon.komoot.io``.
     """
 
     geocode_path = '/api'
@@ -29,7 +33,7 @@ class Photon(Geocoder):
             scheme=None,
             timeout=DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
-            domain='photon.komoot.de',
+            domain='photon.komoot.io',
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             adapter_factory=None
@@ -46,7 +50,7 @@ class Photon(Geocoder):
             See :attr:`geopy.geocoders.options.default_proxies`.
 
         :param str domain: Should be the localized Photon domain to
-            connect to. The default is ``'photon.komoot.de'``, but you
+            connect to. The default is ``'photon.komoot.io'``, but you
             can change it to a domain of your own.
 
         :param str user_agent:
@@ -82,7 +86,8 @@ class Photon(Geocoder):
             location_bias=None,
             language=False,
             limit=None,
-            osm_tag=None
+            osm_tag=None,
+            bbox=None
     ):
         """
         Return a location point by address.
@@ -97,7 +102,10 @@ class Photon(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param location_bias: The coordinates to used as location bias.
+        :param location_bias: The coordinates to use as location bias.
+        :type location_bias: :class:`geopy.point.Point`, list or tuple of
+            ``(latitude, longitude)``, or string
+            as ``"%(latitude)s, %(longitude)s"``.
 
         :param str language: Preferred language in which to return results.
 
@@ -108,6 +116,14 @@ class Photon(Geocoder):
             or value, str as ``'key:value'`` or list/set of str if multiple
             filters are required as ``['key:!val', '!key', ':!value']``.
         :type osm_tag: str or list or set
+
+        :param bbox: The bounding box of the viewport within which
+            to bias geocode results more prominently.
+            Example: ``[Point(22, 180), Point(-22, -180)]``.
+
+            .. versionadded:: 2.2
+        :type bbox: list or tuple of 2 items of :class:`geopy.point.Point` or
+            ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -130,6 +146,11 @@ class Photon(Geocoder):
             except ValueError:
                 raise ValueError(("Location bias must be a"
                                   " coordinate pair or Point"))
+
+        if bbox:
+            params['bbox'] = self._format_bounding_box(
+                bbox, "%(lon1)s,%(lat1)s,%(lon2)s,%(lat2)s")
+
         if osm_tag:
             if isinstance(osm_tag, str):
                 params['osm_tag'] = [osm_tag]

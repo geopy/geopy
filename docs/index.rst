@@ -8,8 +8,9 @@ Welcome to GeoPy's documentation!
 
 :Documentation: https://geopy.readthedocs.io/
 :Source Code: https://github.com/geopy/geopy
-:Issue Tracker: https://github.com/geopy/geopy/issues
 :Stack Overflow: https://stackoverflow.com/questions/tagged/geopy
+:Discussions: https://github.com/geopy/geopy/discussions
+:Issue Tracker: https://github.com/geopy/geopy/issues
 :PyPI: https://pypi.org/project/geopy/
 
 .. automodule:: geopy
@@ -181,7 +182,14 @@ GeocodeEarth
 GeocodeFarm
 -----------
 
-.. autoclass:: geopy.geocoders.GeocodeFarm
+.. versionchanged:: 2.2
+   This class has been removed, because the service is too unreliable.
+   See :issue:`445`.
+
+Geocodio
+--------
+
+.. autoclass:: geopy.geocoders.Geocodio
    :members:
 
    .. automethod:: __init__
@@ -214,6 +222,14 @@ HERE
 ----
 
 .. autoclass:: geopy.geocoders.Here
+   :members:
+
+   .. automethod:: __init__
+
+HEREv7
+------
+
+.. autoclass:: geopy.geocoders.HereV7
    :members:
 
    .. automethod:: __init__
@@ -326,6 +342,14 @@ What3Words
 
    .. automethod:: __init__
 
+What3WordsV3
+------------
+
+.. autoclass:: geopy.geocoders.What3WordsV3
+   :members:
+
+   .. automethod:: __init__
+
 Yandex
 ------
 
@@ -338,15 +362,18 @@ Calculating Distance
 ~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: geopy.distance
-    :members: __doc__
+   :members: __doc__
 
 .. autofunction:: geopy.distance.lonlat
 
+.. autoclass:: geopy.distance.Distance
+   :members: __init__, destination
+
 .. autoclass:: geopy.distance.geodesic
-    :members: __init__
+   :show-inheritance:
 
 .. autoclass:: geopy.distance.great_circle
-    :members: __init__
+   :show-inheritance:
 
 Data
 ~~~~
@@ -384,6 +411,9 @@ Exceptions
     :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderQuotaExceeded
+    :show-inheritance:
+
+.. autoclass:: geopy.exc.GeocoderRateLimited
     :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderAuthenticationFailure
@@ -480,7 +510,7 @@ are still being made in minor releases, such as:
   coordinate values normalization, though it's not documented, and it was
   completely wrong for the latitudes outside the `[-90; 90]` range.
   So instead of using an incorrectly normalized value for latitude,
-  a :class:`ValueError` exception is now thrown (#294).
+  a :class:`ValueError` exception is now thrown (:issue:`294`).
 
 Features and usages being phased out are covered with deprecation :mod:`warnings`
 when possible. Make sure to run your python with the ``-Wd`` switch to see

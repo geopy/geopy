@@ -1,0 +1,24 @@
+blank_issues_enabled: true  # default
+contact_links:
+- name: 🙏 Stack Overflow
+  url: https://stackoverflow.com/questions/tagged/geopy
+  about: |
+    If you have a usage question or an error rather than a specific
+    bug report, Stack Overflow might be the better place for that.
+    There's a somewhat active community here so you will probably get
+    a solution quicker. And also there is a large amount of already
+    resolved questions which can help too! Just remember to put the `geopy`
+    tag if you'd decide to open a question.
+- name: 💬 Discussions
+  url: https://github.com/geopy/geopy/discussions
+  about: |
+    GitHub Discussions is
+    a good place to start if Stack Overflow didn't help or you have
+    some idea or a feature request you'd like to bring up, or if you
+    just have trouble and not sure you're doing everything right.
+    Solutions and helpful snippets/patterns are also very welcome here.
+- name: 📝 Contributing policy
+  url: https://github.com/geopy/geopy/blob/master/CONTRIBUTING.md
+  about: |
+    See CONTRIBUTING.md for more details on how issues and PRs
+    are handled in geopy.

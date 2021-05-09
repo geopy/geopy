@@ -16,7 +16,9 @@ HTTP client settings.
 import abc
 import asyncio
 import contextlib
+import email
 import json
+import time
 import warnings
 from socket import timeout as SocketTimeout
 from ssl import SSLError
@@ -68,16 +70,60 @@ class AdapterHTTPError(IOError):
 
     """
 
-    def __init__(self, message, *, status_code, text):
+    def __init__(self, message, *, status_code, headers, text):
         """
 
         :param str message: Standard exception message.
-        :param int status_code: HTTP status code
-        :param str text: HTTP body text
+        :param int status_code: HTTP status code.
+        :param dict headers: HTTP response readers. A mapping object
+            with lowercased or case-insensitive keys.
+
+            .. versionadded:: 2.2
+        :param str text: HTTP body text.
         """
         self.status_code = status_code
+        self.headers = headers
         self.text = text
         super().__init__(message)
+
+
+def get_retry_after(headers):
+    """Return Retry-After header value in seconds.
+
+    .. versionadded:: 2.2
+    """
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
+    # https://github.com/urllib3/urllib3/blob/1.26.4/src/urllib3/util/retry.py#L376
+
+    try:
+        retry_after = headers['retry-after']
+    except KeyError:
+        return None
+
+    if not retry_after:  # None, ''
+        return None
+
+    retry_after = retry_after.strip()
+
+    # RFC7231 section-7.1.3:
+    # Retry-After = HTTP-date / delay-seconds
+
+    try:
+        # Retry-After: 120
+        seconds = int(retry_after)
+    except ValueError:
+        # Retry-After: Fri, 31 Dec 1999 23:59:59 GMT
+        retry_date_tuple = email.utils.parsedate_tz(retry_after)
+        if retry_date_tuple is None:
+            logger.warning('Invalid Retry-After header: %s', retry_after)
+            return None
+        retry_date = email.utils.mktime_tz(retry_date_tuple)
+        seconds = retry_date - time.time()
+
+    if seconds < 0:
+        seconds = 0
+
+    return seconds
 
 
 class BaseAdapter(abc.ABC):
@@ -253,8 +299,17 @@ class URLLibAdapter(BaseSyncAdapter):
             message = str(error.args[0]) if len(error.args) else str(error)
             if isinstance(error, HTTPError):
                 code = error.getcode()
+                response_headers = {
+                    name.lower(): value
+                    for name, value in error.headers.items()
+                }
                 body = self._read_http_error_body(error)
-                raise AdapterHTTPError(message, status_code=code, text=body)
+                raise AdapterHTTPError(
+                    message,
+                    status_code=code,
+                    headers=response_headers,
+                    text=body,
+                )
             elif isinstance(error, URLError):
                 if "timed out" in message:
                     raise GeocoderTimedOut("Service timed out")
@@ -270,9 +325,15 @@ class URLLibAdapter(BaseSyncAdapter):
             text = self._decode_page(page)
             status_code = page.getcode()
             if status_code >= 400:
+                response_headers = {
+                    name.lower(): value
+                    for name, value in page.headers.items()
+                }
                 raise AdapterHTTPError(
                     "Non-successful status code %s" % status_code,
-                    status_code=status_code, text=text
+                    status_code=status_code,
+                    headers=response_headers,
+                    text=text,
                 )
 
         return text
@@ -365,7 +426,9 @@ class RequestsAdapter(BaseSyncAdapter):
     def __del__(self):
         # Cleanup keepalive connections when Geocoder (and, thus, Adapter)
         # instances are getting garbage-collected.
-        self.session.close()
+        session = getattr(self, "session", None)
+        if session is not None:
+            session.close()
 
     def get_text(self, url, *, timeout, headers):
         resp = self._request(url, timeout=timeout, headers=headers)
@@ -403,6 +466,7 @@ class RequestsAdapter(BaseSyncAdapter):
                 raise AdapterHTTPError(
                     "Non-successful status code %s" % resp.status_code,
                     status_code=resp.status_code,
+                    headers=resp.headers,
                     text=resp.text,
                 )
 
@@ -488,6 +552,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
             raise AdapterHTTPError(
                 "Non-successful status code %s" % resp.status,
                 status_code=resp.status,
+                headers=resp.headers,
                 text=await resp.text(),
             )
 

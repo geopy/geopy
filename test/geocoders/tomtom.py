@@ -1,5 +1,3 @@
-import pytest
-
 from geopy.geocoders import TomTom
 from test.geocoders.util import BaseTestGeocoder, env
 
@@ -44,10 +42,6 @@ class BaseTestTomTom(BaseTestGeocoder):
         )
 
 
-@pytest.mark.skipif(
-    not bool(env.get('TOMTOM_KEY')),
-    reason="No TOMTOM_KEY env variable set"
-)
 class TestTomTom(BaseTestTomTom):
 
     @classmethod

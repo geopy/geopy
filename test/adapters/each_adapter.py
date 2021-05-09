@@ -23,7 +23,7 @@ from geopy.exc import (
 from geopy.geocoders.base import Geocoder
 from test.proxy_server import HttpServerThread, ProxyServerThread
 
-CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "selfsigned_ca.pem")
+CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "..", "selfsigned_ca.pem")
 
 # Are system proxies set? System proxies are set in:
 # - Environment variables (HTTP_PROXY/HTTPS_PROXY) on Unix;
@@ -31,7 +31,22 @@ CERT_SELFSIGNED_CA = os.path.join(os.path.dirname(__file__), "selfsigned_ca.pem"
 # - Registry's Internet Settings section on Windows.
 WITH_SYSTEM_PROXIES = bool(getproxies())
 
-ADAPTERS = [RequestsAdapter, URLLibAdapter, AioHTTPAdapter]
+AVAILABLE_ADAPTERS = [URLLibAdapter]
+NOT_AVAILABLE_ADAPTERS = []
+
+try:
+    import requests  # noqa
+except ImportError:
+    NOT_AVAILABLE_ADAPTERS.append(RequestsAdapter)
+else:
+    AVAILABLE_ADAPTERS.append(RequestsAdapter)
+
+try:
+    import aiohttp  # noqa
+except ImportError:
+    NOT_AVAILABLE_ADAPTERS.append(AioHTTPAdapter)
+else:
+    AVAILABLE_ADAPTERS.append(AioHTTPAdapter)
 
 
 class DummyGeocoder(Geocoder):
@@ -110,7 +125,7 @@ def remote_website_http_404(remote_website_http):
     return urljoin(remote_website_http, "/404")
 
 
-@pytest.fixture(params=ADAPTERS, autouse=True)
+@pytest.fixture(params=AVAILABLE_ADAPTERS, autouse=True)
 def adapter_factory(request):
     adapter_factory = request.param
     with patch.object(
@@ -135,6 +150,17 @@ async def make_dummy_async_geocoder(**kwargs):
 
         geocoder.geocode = geocode
         await yield_(geocoder)
+
+
+@pytest.mark.parametrize("adapter_cls", NOT_AVAILABLE_ADAPTERS)
+async def test_not_available_adapters_raise(adapter_cls):
+    # Note: this test is uselessly parametrized with `adapter_factory`.
+    with patch.object(
+        geopy.geocoders.options, "default_adapter_factory", adapter_cls
+    ):
+        with pytest.raises(ImportError):
+            async with make_dummy_async_geocoder():
+                pass
 
 
 async def test_geocoder_constructor_uses_https_proxy(
@@ -309,6 +335,11 @@ async def test_adapter_exception_for_non_200_response(remote_website_http_404, t
         assert isinstance(excinfo.value, GeocoderServiceError)
         assert isinstance(excinfo.value.__cause__, AdapterHTTPError)
         assert isinstance(excinfo.value.__cause__, IOError)
+
+        adapter_http_error = excinfo.value.__cause__
+        assert adapter_http_error.status_code == 404
+        assert adapter_http_error.headers['x-test-header'] == 'hello'
+        assert adapter_http_error.text == 'Not found'
 
 
 async def test_system_proxies_are_respected_by_default(

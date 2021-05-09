@@ -12,7 +12,7 @@ from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
 
-__all__ = ("Baidu", )
+__all__ = ("Baidu", "BaiduV3")
 
 
 class Baidu(Geocoder):

@@ -1,5 +1,3 @@
-import pytest
-
 from geopy.geocoders import Bing
 from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
@@ -15,10 +13,6 @@ class TestUnitBing:
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
 
-@pytest.mark.skipif(
-    not bool(env.get('BING_KEY')),
-    reason="No BING_KEY env variable set"
-)
 class TestBing(BaseTestGeocoder):
 
     @classmethod

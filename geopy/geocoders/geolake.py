@@ -99,11 +99,12 @@ class Geolake(Geocoder):
         """
         Return a location point by address.
 
-        :param str query: The address or query you wish to geocode.
+        :param query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
             are one of: `country`, `state`, `city`, `zipcode`, `street`, `address`,
             `houseNumber` or `subNumber`.
+        :type query: str or dict
 
         :param country_codes: Provides the geocoder with a list
             of country codes that the query may reside in. This value will

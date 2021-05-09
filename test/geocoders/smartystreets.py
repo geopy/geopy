@@ -1,7 +1,5 @@
 from unittest.mock import patch
 
-import pytest
-
 import geopy.geocoders
 from geopy.geocoders import LiveAddress
 from test.geocoders.util import BaseTestGeocoder, env
@@ -25,10 +23,6 @@ class TestUnitLiveAddress:
         assert geocoder.scheme == 'https'
 
 
-@pytest.mark.skipif(
-    not (env.get('LIVESTREETS_AUTH_ID') and env.get('LIVESTREETS_AUTH_TOKEN')),
-    reason="No LIVESTREETS_AUTH_ID AND LIVESTREETS_AUTH_TOKEN env variables set"
-)
 class TestLiveAddress(BaseTestGeocoder):
 
     @classmethod

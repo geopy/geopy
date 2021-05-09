@@ -204,11 +204,13 @@ class Nominatim(Geocoder):
         :type viewbox: list or tuple of 2 items of :class:`geopy.point.Point` or
             ``(latitude, longitude)`` or ``"%(latitude)s, %(longitude)s"``.
 
-        :param viewbox: Coordinates to restrict search within.
+        :param viewbox: Prefer this area to find search results. By default this is
+            treated as a hint, if you want to restrict results to this area,
+            specify ``bounded=True`` as well.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
         :param bool bounded: Restrict the results to only items contained
-            within the bounding view_box.
+            within the bounding ``viewbox``.
 
         :param str featuretype: If present, restrict results to certain type of features.
             Allowed values: `country`, `state`, `city`, `settlement`.
@@ -372,6 +374,14 @@ class Nominatim(Geocoder):
     def _parse_json(self, places, exactly_one):
         if not places:
             return None
+
+        if isinstance(places, collections.abc.Mapping) and 'error' in places:
+            if places['error'] == 'Unable to geocode':
+                # no results in reverse
+                return None
+            else:
+                raise GeocoderQueryError(places['error'])
+
         if not isinstance(places, collections.abc.Sequence):
             places = [places]
         if exactly_one:

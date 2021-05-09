@@ -15,20 +15,20 @@ POINT_PATTERN = re.compile(r"""
     .*?
     (?P<latitude>
       (?P<latitude_direction_front>[NS])?[ ]*
-        (?P<latitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+        (?P<latitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
         (?:(?P<latitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
         (?:(?P<latitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
         )?(?P<latitude_direction_back>[NS])?)
     %(SEP)s
     (?P<longitude>
       (?P<longitude_direction_front>[EW])?[ ]*
-      (?P<longitude_degrees>-?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
+      (?P<longitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
       (?:(?P<longitude_arcminutes>%(FLOAT)s)[%(PRIME)s'm][ ]*)?
       (?:(?P<longitude_arcseconds>%(FLOAT)s)[%(DOUBLE_PRIME)s"s][ ]*)?
       )?(?P<longitude_direction_back>[EW])?)(?:
     %(SEP)s
       (?P<altitude>
-        (?P<altitude_distance>-?%(FLOAT)s)[ ]*
+        (?P<altitude_distance>[+-]?%(FLOAT)s)[ ]*
         (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
     \s*$
 """ % {
@@ -112,11 +112,12 @@ class Point:
 
     Give a string containing at least latitude and longitude::
 
-        >>> p1 = Point('41.5,-81.0')
-        >>> p2 = Point('41.5 N -81.0 W')
-        >>> p3 = Point('-41.5 S, 81.0 E, 2.5km')
-        >>> p4 = Point('23 26m 22s N 23 27m 30s E 21.0mi')
-        >>> p5 = Point('''3 26' 22" N 23 27' 30" E''')
+        >>> p = Point('41.5,-81.0')
+        >>> p = Point('+41.5 -81.0')
+        >>> p = Point('41.5 N -81.0 W')
+        >>> p = Point('-41.5 S, 81.0 E, 2.5km')
+        >>> p = Point('23 26m 22s N 23 27m 30s E 21.0mi')
+        >>> p = Point('''3 26' 22" N 23 27' 30" E''')
 
     Point values can be accessed by name or by index::
 

@@ -143,7 +143,7 @@ class AlgoliaPlaces(Geocoder):
             around the geolocation of the user found via his IP address.
             This is true by default.
 
-        :param around_radius: Radius in meters to search around the
+        :param int around_radius: Radius in meters to search around the
             latitude/longitude. Otherwise a default radius is
             automatically computed given the area density.
 
