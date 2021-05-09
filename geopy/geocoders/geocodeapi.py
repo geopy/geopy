@@ -1,5 +1,4 @@
 import collections.abc
-
 from functools import partial
 from urllib.parse import urlencode
 
