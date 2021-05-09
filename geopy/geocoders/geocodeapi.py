@@ -72,12 +72,10 @@ class GeocodeAPI(Geocoder):
         :param ssl_context:
             See :attr:`geopy.geocoders.options.default_ssl_context`.
 
-        :param callable adapter_factory:
-            See :attr:`geopy.geocoders.options.default_adapter_factory`.
         """
         super().__init__(timeout=timeout, proxies=proxies)
 
-        self.headers = {"apikey": api_key}
+        self.api_key = api_key
 
         self.api_geocode = self.base_api_url + self.geocode_path
         self.api_reverse = self.base_api_url + self.reverse_path
@@ -153,9 +151,11 @@ class GeocodeAPI(Geocoder):
 
         url = self.api_geocode + params
 
+        headers = {"apikey": self.api_key}
+
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
-        return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
+        return self._call_geocoder(url, callback, timeout=timeout, headers=headers)
 
     def reverse(
         self,
@@ -188,10 +188,11 @@ class GeocodeAPI(Geocoder):
             address, street, country, region, locality
 
         """
+        headers = {"apikey": self.api_key}
         params = self._get_params_reverse(query, size=size, layers=layers)
         url = "{}?{}".format(self.api_reverse, params)
         callback = partial(self._parse_json, exactly_one=exactly_one)
-        return self._call_geocoder(url, callback, timeout=timeout, headers=self.headers)
+        return self._call_geocoder(url, callback, timeout=timeout, headers=headers)
 
     def _get_params_geocode(self, query, **kwargs):
         main_param = "?text={}".format(query)
