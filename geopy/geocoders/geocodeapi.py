@@ -7,12 +7,6 @@ from geopy.geocoders.base import Geocoder, DEFAULT_SENTINEL
 from geopy.util import logger
 from geopy.location import Location
 
-from geopy.exc import (
-    GeocoderAuthenticationFailure,
-    GeocoderNotFound,
-    GeocoderServiceError,
-)
-
 __all__ = ("GeocodeAPI",)
 
 
@@ -207,9 +201,6 @@ class GeocodeAPI(Geocoder):
 
         """
         headers = {"apikey": self.api_key}
-        # params = self._coerce_point_to_string(
-        #     query, output_format="point.lat=%(lat)s&point.lon=%(lon)s"
-        # )
         params = {
             "point.lat": query.latitude,
             "point.lon": query.longitude,
