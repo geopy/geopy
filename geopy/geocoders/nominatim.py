@@ -364,27 +364,36 @@ class Nominatim(Geocoder):
         return self._call_geocoder(url, callback, timeout=timeout)
 
     def parse_osm(self, osm):
-        """Convert osm dictionary to string
+        """Format osm dictionary to string
+
         - Input:
             {
                 'osm_id': '6101403370',
                 'osm_type': 'node'  # node, way or relation
             }
+
         - Output:
             'N6101403370'
+
         :param osm: dictionary with the keys osm_id and osm_type
+        :type osm: dict
         :return: string
         """
+
         osm_id = osm.get('osm_id')
+        osm_type = osm.get('osm_type')
+
+        if not osm_type or not osm_id:
+            raise ValueError("Osm type or id not found")
+
         """Get the first letter of osm_type and capitalize it, eg:
             - osm_type='relation' -> R
             - osm_type='node' -> N
             - osm_type='way' -> W
         """
-        osm_type = osm.get('osm_type')
-        if not osm_type or not osm_id:
-            raise ValueError("Osm type or id not found")
+        
         osm_type = osm_type[0].capitalize()
+
         return '{osm_type}{osm_id}'.format(osm_type=osm_type, osm_id=osm_id)
 
     def lookup(self, osm_ids, timeout=DEFAULT_SENTINEL, addressdetails=False,
@@ -411,6 +420,7 @@ class Nominatim(Geocoder):
             .. versionadded:: 1.0.0
         :return: List of dictionaries
         """
+
         params = {
             # Output format of the request
             'format': 'json',
@@ -422,6 +432,7 @@ class Nominatim(Geocoder):
             'namedetails': 1 if namedetails else 0,
             'accept-language': language if language else ''
         }
+
         url = self._construct_url(self.lookup_api, params)
         callback = partial(self._parse_json, exactly_one=False)
         return self._call_geocoder(url, callback, timeout=timeout)
