@@ -91,7 +91,8 @@ Geopy can calculate geodesic distance between two points using the
 with a default of the geodesic distance available as the function
 `geopy.distance.distance`.
 
-Here's an example usage of the geodesic distance:
+Here's an example usage of the geodesic distance, taking pair
+of :code:`(lat, lon)` tuples:
 
 .. code:: pycon
 
@@ -101,7 +102,7 @@ Here's an example usage of the geodesic distance:
     >>> print(geodesic(newport_ri, cleveland_oh).miles)
     538.390445368
 
-Using great-circle distance:
+Using great-circle distance, also taking pair of :code:`(lat, lon)` tuples:
 
 .. code:: pycon
 

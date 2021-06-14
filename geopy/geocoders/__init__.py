@@ -195,11 +195,12 @@ __all__ = (
     "Bing",
     "DataBC",
     "GeocodeEarth",
-    "GeocodeFarm",
+    "Geocodio",
     "GeoNames",
     "GoogleV3",
     "Geolake",
     "Here",
+    "HereV7",
     "IGNFrance",
     "MapBox",
     "MapQuest",
@@ -213,6 +214,7 @@ __all__ = (
     "LiveAddress",
     "TomTom",
     "What3Words",
+    "What3WordsV3",
     "Yandex",
 )
 
@@ -227,11 +229,11 @@ from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
 from geopy.geocoders.geocodeearth import GeocodeEarth
-from geopy.geocoders.geocodefarm import GeocodeFarm
+from geopy.geocoders.geocodio import Geocodio
 from geopy.geocoders.geolake import Geolake
 from geopy.geocoders.geonames import GeoNames
-from geopy.geocoders.googlev3 import GoogleV3
-from geopy.geocoders.here import Here
+from geopy.geocoders.google import GoogleV3
+from geopy.geocoders.here import Here, HereV7
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.mapquest import MapQuest
@@ -244,7 +246,7 @@ from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
 from geopy.geocoders.tomtom import TomTom
-from geopy.geocoders.what3words import What3Words
+from geopy.geocoders.what3words import What3Words, What3WordsV3
 from geopy.geocoders.yandex import Yandex
 
 SERVICE_TO_GEOCODER = {
@@ -257,12 +259,13 @@ SERVICE_TO_GEOCODER = {
     "bing": Bing,
     "databc": DataBC,
     "geocodeearth": GeocodeEarth,
-    "geocodefarm": GeocodeFarm,
+    "geocodio": Geocodio,
     "geonames": GeoNames,
     "google": GoogleV3,
     "googlev3": GoogleV3,
     "geolake": Geolake,
     "here": Here,
+    "herev7": HereV7,
     "ignfrance": IGNFrance,
     "mapbox": MapBox,
     "mapquest": MapQuest,
@@ -276,6 +279,7 @@ SERVICE_TO_GEOCODER = {
     "liveaddress": LiveAddress,
     "tomtom": TomTom,
     "what3words": What3Words,
+    "what3wordsv3": What3WordsV3,
     "yandex": Yandex,
 }
 

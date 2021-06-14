@@ -38,7 +38,8 @@ most globally accurate.  geopy includes a few other models in the
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
                   }
 
-Here are examples of ``distance.distance`` usage::
+Here are examples of ``distance.distance`` usage, taking pair
+of :code:`(lat, lon)` tuples::
 
     >>> from geopy import distance
     >>> newport_ri = (41.49008, -71.312796)
@@ -112,7 +113,7 @@ a suitable approximation::
     1.359986705262199
 
 An attempt to calculate distances between points with different altitudes
-would result in a ``ValueError`` exception.
+would result in a :class:`ValueError` exception.
 
 """
 from math import asin, atan2, cos, sin, sqrt
@@ -187,8 +188,83 @@ def _ensure_same_altitude(a, b):
 
 
 class Distance:
+    """
+    Base class for other distance algorithms. Represents a distance.
+
+    Can be used for units conversion::
+
+        >>> from geopy.distance import Distance
+        >>> Distance(miles=10).km
+        16.09344
+
+    Distance instances have all *distance* properties from :mod:`geopy.units`,
+    e.g.: ``km``, ``m``, ``meters``, ``miles`` and so on.
+
+    Distance instances are immutable.
+
+    They support comparison::
+
+        >>> from geopy.distance import Distance
+        >>> Distance(kilometers=2) == Distance(meters=2000)
+        True
+        >>> Distance(kilometers=2) > Distance(miles=1)
+        True
+
+    String representation::
+
+        >>> from geopy.distance import Distance
+        >>> repr(Distance(kilometers=2))
+        'Distance(2.0)'
+        >>> str(Distance(kilometers=2))
+        '2.0 km'
+        >>> repr(Distance(miles=2))
+        'Distance(3.218688)'
+        >>> str(Distance(miles=2))
+        '3.218688 km'
+
+    Arithmetics::
+
+        >>> from geopy.distance import Distance
+        >>> -Distance(miles=2)
+        Distance(-3.218688)
+        >>> Distance(miles=2) + Distance(kilometers=1)
+        Distance(4.218688)
+        >>> Distance(miles=2) - Distance(kilometers=1)
+        Distance(2.218688)
+        >>> Distance(kilometers=6) * 5
+        Distance(30.0)
+        >>> Distance(kilometers=6) / 5
+        Distance(1.2)
+    """
 
     def __init__(self, *args, **kwargs):
+        """
+        There are 3 ways to create a distance:
+
+        - From kilometers::
+
+            >>> from geopy.distance import Distance
+            >>> Distance(1.42)
+            Distance(1.42)
+
+        - From units::
+
+            >>> from geopy.distance import Distance
+            >>> Distance(kilometers=1.42)
+            Distance(1.42)
+            >>> Distance(miles=1)
+            Distance(1.609344)
+
+        - From points (for non-abstract distances only),
+          calculated as a sum of distances between all points::
+
+            >>> from geopy.distance import geodesic
+            >>> geodesic((40, 160), (40.1, 160.1))
+            Distance(14.003702498106215)
+            >>> geodesic((40, 160), (40.1, 160.1), (40.2, 160.2))
+            Distance(27.999954644813478)
+        """
+
         kilometers = kwargs.pop('kilometers', 0)
         if len(args) == 1:
             # if we only get one argument we assume
@@ -236,6 +312,40 @@ class Distance:
     __bool__ = __nonzero__
 
     def measure(self, a, b):
+        # Intentionally not documented, because this method is not supposed
+        # to be used directly.
+        raise NotImplementedError("Distance is an abstract class")
+
+    def destination(self, point, bearing, distance=None):
+        """
+        Calculate destination point using a starting point, bearing
+        and a distance. This method works for non-abstract distances only.
+
+        Example: a point 10 miles east from ``(34, 148)``::
+
+            >>> import geopy.distance
+            >>> geopy.distance.distance(miles=10).destination((34, 148), bearing=90)
+            Point(33.99987666492774, 148.17419994321995, 0.0)
+
+        :param point: Starting point.
+        :type point: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
+        :param float bearing: Bearing in degrees: 0 -- North, 90 -- East,
+            180 -- South, 270 or -90 -- West.
+
+        :param distance: Distance, can be used to override
+            this instance::
+
+                >>> from geopy.distance import distance, Distance
+                >>> distance(miles=10).destination((34, 148), bearing=90, \
+distance=Distance(100))
+                Point(33.995238229104764, 149.08238904409637, 0.0)
+
+        :type distance: :class:`.Distance`
+
+        :rtype: :class:`geopy.point.Point`
+        """
         raise NotImplementedError("Distance is an abstract class")
 
     def __repr__(self):  # pragma: no cover
@@ -269,6 +379,14 @@ class Distance:
         return self.__cmp__(other) <= 0
 
     @property
+    def feet(self):
+        return units.feet(kilometers=self.kilometers)
+
+    @property
+    def ft(self):
+        return self.feet
+
+    @property
     def kilometers(self):
         return self.__kilometers
 
@@ -277,28 +395,20 @@ class Distance:
         return self.kilometers
 
     @property
-    def meters(self):
-        return units.meters(kilometers=self.kilometers)
-
-    @property
     def m(self):
         return self.meters
 
     @property
-    def miles(self):
-        return units.miles(kilometers=self.kilometers)
+    def meters(self):
+        return units.meters(kilometers=self.kilometers)
 
     @property
     def mi(self):
         return self.miles
 
     @property
-    def feet(self):
-        return units.feet(kilometers=self.kilometers)
-
-    @property
-    def ft(self):
-        return self.feet
+    def miles(self):
+        return units.miles(kilometers=self.kilometers)
 
     @property
     def nautical(self):
@@ -311,7 +421,7 @@ class Distance:
 
 class great_circle(Distance):
     """
-    Use spherical geometry to calculate the surface distance between two
+    Use spherical geometry to calculate the surface distance between
     points.
 
     Set which radius of the earth to use by specifying a ``radius`` keyword
@@ -353,9 +463,6 @@ class great_circle(Distance):
         return self.RADIUS * d
 
     def destination(self, point, bearing, distance=None):
-        """
-        TODO docs.
-        """
         point = Point(point)
         lat1 = units.radians(degrees=point.latitude)
         lng1 = units.radians(degrees=point.longitude)
@@ -386,7 +493,7 @@ GreatCircleDistance = great_circle
 
 class geodesic(Distance):
     """
-    Calculate the geodesic distance between two points.
+    Calculate the geodesic distance between points.
 
     Set which ellipsoidal model of the earth to use by specifying an
     ``ellipsoid`` keyword argument. The default is 'WGS-84', which is the
@@ -406,19 +513,15 @@ class geodesic(Distance):
 
     """
 
-    ellipsoid_key = None
-    ELLIPSOID = None
-    geod = None
-
     def __init__(self, *args, **kwargs):
+        self.ellipsoid_key = None
+        self.ELLIPSOID = None
+        self.geod = None
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         major, minor, f = self.ELLIPSOID
         super().__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
-        """
-        Change the ellipsoid used in the calculation.
-        """
         if isinstance(ellipsoid, str):
             try:
                 self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
@@ -431,7 +534,6 @@ class geodesic(Distance):
             self.ELLIPSOID = ellipsoid
             self.ellipsoid_key = None
 
-    # Call geographiclib routines for measure and destination
     def measure(self, a, b):
         a, b = Point(a), Point(b)
         _ensure_same_altitude(a, b)
@@ -449,9 +551,6 @@ class geodesic(Distance):
         return s12
 
     def destination(self, point, bearing, distance=None):
-        """
-        TODO docs.
-        """
         point = Point(point)
         lat1 = point.latitude
         lon1 = point.longitude

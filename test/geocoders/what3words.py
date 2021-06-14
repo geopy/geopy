@@ -4,7 +4,8 @@ import pytest
 
 import geopy.exc
 import geopy.geocoders
-from geopy.geocoders import What3Words
+from geopy.geocoders import What3Words, What3WordsV3
+from geopy.geocoders.what3words import _check_query
 from test.geocoders.util import BaseTestGeocoder, env
 
 
@@ -23,16 +24,18 @@ class TestUnitWhat3Words:
         geocoder = What3Words(api_key=self.dummy_api_key)
         assert geocoder.scheme == 'https'
 
-
-class TestWhat3Words(BaseTestGeocoder):
-    @classmethod
-    def make_geocoder(cls, **kwargs):
-        return What3Words(
-            env['WHAT3WORDS_KEY'],
-            timeout=3,
-            **kwargs
+    def test_check_query(self):
+        result_check_threeword_query = _check_query(
+            "\u0066\u0061\u0068\u0072\u0070\u0072"
+            "\u0065\u0069\u0073\u002e\u006c\u00fc"
+            "\u0067\u006e\u0065\u0072\u002e\u006b"
+            "\u0075\u0074\u0073\u0063\u0068\u0065"
         )
 
+        assert result_check_threeword_query
+
+
+class BaseTestWhat3Words(BaseTestGeocoder):
     async def test_geocode(self):
         await self.geocode_run(
             {"query": "piped.gains.jangle"},
@@ -75,18 +78,34 @@ class TestWhat3Words(BaseTestGeocoder):
             {"address": "piped.gains.jangle"},
         )
 
-    async def test_result_language(self):
+    async def test_reverse_language(self):
+        await self.reverse_run(
+            {"query": (53.037611, 11.565012), "lang": "en", "exactly_one": False},
+            {"address": "piped.gains.jangle"},
+        )
+
+
+class TestWhat3Words(BaseTestWhat3Words):
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return What3Words(
+            env['WHAT3WORDS_KEY'],
+            timeout=3,
+            **kwargs
+        )
+
+    async def test_geocode_language(self):
         await self.geocode_run(
             {"query": "piped.gains.jangle", "lang": 'DE'},
             {"address": 'fortschrittliche.voll.schnitt'},
         )
 
-    async def test_check_query(self):
-        result_check_threeword_query = self.geocoder._check_query(
-            "\u0066\u0061\u0068\u0072\u0070\u0072"
-            "\u0065\u0069\u0073\u002e\u006c\u00fc"
-            "\u0067\u006e\u0065\u0072\u002e\u006b"
-            "\u0075\u0074\u0073\u0063\u0068\u0065"
-        )
 
-        assert result_check_threeword_query
+class TestWhat3WordsV3(BaseTestWhat3Words):
+    @classmethod
+    def make_geocoder(cls, **kwargs):
+        return What3WordsV3(
+            env['WHAT3WORDS_KEY'],
+            timeout=3,
+            **kwargs
+        )

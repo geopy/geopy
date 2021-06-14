@@ -9,7 +9,7 @@ class GeopyError(Exception):
     """
 
 
-class ConfigurationError(GeopyError):
+class ConfigurationError(GeopyError, ValueError):
     """
     When instantiating a geocoder, the arguments given were invalid. See
     the documentation of each geocoder's ``__init__`` for more details.
@@ -27,7 +27,7 @@ class GeocoderServiceError(GeopyError):
     """
 
 
-class GeocoderQueryError(GeocoderServiceError):
+class GeocoderQueryError(GeocoderServiceError, ValueError):
     """
     Either geopy detected input that would cause a request to fail,
     or a request was made and the remote geocoding service responded
@@ -40,6 +40,24 @@ class GeocoderQuotaExceeded(GeocoderServiceError):
     The remote geocoding service refused to fulfill the request
     because the client has used its quota.
     """
+
+
+class GeocoderRateLimited(GeocoderQuotaExceeded, IOError):
+    """
+    The remote geocoding service has rate-limited the request.
+    Retrying later might help.
+
+    Exception of this type has a ``retry_after`` attribute,
+    which contains amount of time (in seconds) the service
+    has asked to wait. Might be ``None`` if there were no such
+    data in response.
+
+    .. versionadded:: 2.2
+    """
+
+    def __init__(self, message, *, retry_after=None):
+        super().__init__(message)
+        self.retry_after = retry_after
 
 
 class GeocoderAuthenticationFailure(GeocoderServiceError):
@@ -56,7 +74,7 @@ class GeocoderInsufficientPrivileges(GeocoderServiceError):
     """
 
 
-class GeocoderTimedOut(GeocoderServiceError):
+class GeocoderTimedOut(GeocoderServiceError, TimeoutError):
     """
     The call to the geocoding service was aborted because no response
     has been received within the ``timeout`` argument of either
@@ -66,7 +84,7 @@ class GeocoderTimedOut(GeocoderServiceError):
     """
 
 
-class GeocoderUnavailable(GeocoderServiceError):
+class GeocoderUnavailable(GeocoderServiceError, IOError):
     """
     Either it was not possible to establish a connection to the remote
     geocoding service, or the service responded with a code indicating
@@ -81,7 +99,7 @@ class GeocoderParseError(GeocoderServiceError):
     """
 
 
-class GeocoderNotFound(GeopyError):
+class GeocoderNotFound(GeopyError, ValueError):
     """
     Caller requested the geocoder matching a string, e.g.,
     ``"google"`` > ``GoogleV3``, but no geocoder could be found.

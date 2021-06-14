@@ -174,7 +174,14 @@ GeocodeEarth
 GeocodeFarm
 -----------
 
-.. autoclass:: geopy.geocoders.GeocodeFarm
+.. versionchanged:: 2.2
+   This class has been removed, because the service is too unreliable.
+   See :issue:`445`.
+
+Geocodio
+--------
+
+.. autoclass:: geopy.geocoders.Geocodio
    :members:
 
    .. automethod:: __init__
@@ -207,6 +214,14 @@ HERE
 ----
 
 .. autoclass:: geopy.geocoders.Here
+   :members:
+
+   .. automethod:: __init__
+
+HEREv7
+------
+
+.. autoclass:: geopy.geocoders.HereV7
    :members:
 
    .. automethod:: __init__
@@ -319,6 +334,14 @@ What3Words
 
    .. automethod:: __init__
 
+What3WordsV3
+------------
+
+.. autoclass:: geopy.geocoders.What3WordsV3
+   :members:
+
+   .. automethod:: __init__
+
 Yandex
 ------
 
@@ -331,15 +354,18 @@ Calculating Distance
 ~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: geopy.distance
-    :members: __doc__
+   :members: __doc__
 
 .. autofunction:: geopy.distance.lonlat
 
+.. autoclass:: geopy.distance.Distance
+   :members: __init__, destination
+
 .. autoclass:: geopy.distance.geodesic
-    :members: __init__
+   :show-inheritance:
 
 .. autoclass:: geopy.distance.great_circle
-    :members: __init__
+   :show-inheritance:
 
 Data
 ~~~~
@@ -377,6 +403,9 @@ Exceptions
     :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderQuotaExceeded
+    :show-inheritance:
+
+.. autoclass:: geopy.exc.GeocoderRateLimited
     :show-inheritance:
 
 .. autoclass:: geopy.exc.GeocoderAuthenticationFailure

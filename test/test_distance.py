@@ -54,6 +54,17 @@ class CommonDistanceComputationCases:
         self.assertAlmostEqual(destination.latitude, -90, 0)
         self.assertAlmostEqual(destination.longitude, 0)
 
+    def test_destination_bearing_east(self):
+        distance = self.cls(kilometers=100)
+        for EAST in (90, 90 + 360, -360+90):
+            p = distance.destination(Point(0, 160), bearing=EAST)
+            self.assertAlmostEqual(p.latitude, 0)
+            self.assertAlmostEqual(p.longitude, 160.8993, delta=1e-3)
+
+            p = distance.destination(Point(60, 160), bearing=EAST)
+            self.assertAlmostEqual(p.latitude, 59.9878, delta=1e-3)
+            self.assertAlmostEqual(p.longitude, 161.79, delta=1e-2)
+
     def test_should_recognize_equivalence_of_pos_and_neg_180_longitude(self):
         distance1 = self.cls((0, -180), (0, 180)).kilometers
         distance2 = self.cls((0, 180), (0, -180)).kilometers
@@ -301,12 +312,6 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
                                         unittest.TestCase):
 
     cls = GeodesicDistance
-
-    def setUp(self):
-        self.original_ellipsoid = self.cls.ELLIPSOID
-
-    def tearDown(self):
-        self.cls.ELLIPSOID = self.original_ellipsoid
 
     def test_different_altitudes_error(self):
         with self.assertRaises(ValueError):

@@ -3,6 +3,75 @@
 Changelog
 =========
 
+.. _v2-2-0:
+
+2.2.0
+-----
+2021-04-TBD
+
+New Features
+~~~~~~~~~~~~
+
+- :class:`.OpenCage`: added ``annotations`` param.
+  Contributed by mtmail. (:issue:`464`)
+- :class:`.Photon`: added ``bbox`` param.
+  Contributed by Holger Bruch. (:issue:`472`)
+- New geocoder: :class:`.Geocodio`.
+  Contributed by Jon Duckworth. (:issue:`468`)
+- New geocoder: :class:`.HereV7`.
+  Contributed by Pratheek Rebala. (:issue:`433`)
+- New geocoder: :class:`.What3WordsV3`.
+  Contributed by Saïd Tezel. (:issue:`444`)
+- New error class: :class:`.exc.GeocoderRateLimited`. This error extends
+  :class:`.exc.GeocoderQuotaExceeded` and is now raised instead of it
+  for HTTP 422 error code. (:issue:`479`)
+- :class:`.AdapterHTTPError`: added ``headers`` attribute. (:issue:`479`)
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- Removed GeocodeFarm class: the service is very unstable. (:issue:`445`)
+
+Deprecations
+~~~~~~~~~~~~
+
+- :class:`.GoogleV3` has been moved from ``geopy.geocoders.googlev3`` module
+  to ``geopy.geocoders.google``. The old module is still present for
+  backwards compatibility, but it will be removed in geopy 3. (:issue:`483`)
+
+Bugfixes
+~~~~~~~~
+
+- :class:`.OpenCage`: improved error handling by using the default errors map
+  (e.g. to raise :class:`.exc.GeocoderQuotaExceeded` instead of
+  :class:`.exc.GeocoderQueryError` for HTTP 402 error). (:issue:`479`)
+
+Code Improvements
+~~~~~~~~~~~~~~~~~
+
+- :class:`.Photon`: updated domain. Contributed by yrafalin. (:issue:`481`)
+- :class:`.IGNFrance`: removed redundant check. Contributed by Miltos. (:issue:`469`)
+- Changed default exception type for HTTP code 408: now it is raised as
+  :class:`.exc.GeocoderTimedOut` instead of a more
+  generic :class:`.exc.GeocoderServiceError`. (:issue:`479`)
+- :mod:`geopy.exc`: extend more specific built-in exceptions where appropriate:
+  classes :class:`.ConfigurationError`, :class:`.GeocoderQueryError`,
+  :class:`.GeocoderNotFound` now extend :class:`ValueError`;
+  :class:`.GeocoderRateLimited` and :class:`.GeocoderUnavailable`
+  extend :class:`IOError`;
+  :class:`.GeocoderTimedOut` extends :class:`TimeoutError`. (:issue:`484`)
+
+Docs Improvements
+~~~~~~~~~~~~~~~~~
+
+- Be more explicit in lat lon ordering.
+  Contributed by Mateusz Konieczny. (:issue:`476`)
+- Added tests for geocoders' signatures (to ensure that all parameters
+  are documented) and fixed docstrings which didn't pass them. (:issue:`480`)
+- Added docs for :class:`.Distance` class
+  and :meth:`.Distance.destination` method (:issue:`473`)
+
+
 .. _v2-1-0:
 
 2.1.0
