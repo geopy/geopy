@@ -293,6 +293,10 @@ class BaseTestNominatim(BaseTestGeocoder):
         assert 'namedetails' not in result.raw
 
     async def test_parse_geocode(self):
+        
+        geocoder = self.make_geocoder()
+
+        # Check correct format and order of the queries
         queries = [
             {
                 'osm_id': 6101403370,
@@ -303,14 +307,33 @@ class BaseTestNominatim(BaseTestGeocoder):
                 'osm_type': 'way'
             }
         ]
+
         result = [
             'N6101403370',
             'W148332300'
         ]
-        geocoder = self.make_geocoder()
+
         for index, query in enumerate(queries):
             assert result[index] == geocoder.parse_osm(query)
-
+        
+        # Value error raised if osm_type is not present
+        with pytest.raises(ValueError):
+            result = geocoder.parse_osm({
+                'osm_id': 6101403370,
+                'osm_type': ''
+            })
+        
+        # Value error raised if osm_id is not present
+        with pytest.raises(ValueError):
+            result = geocoder.parse_osm({
+                'osm_id': None,
+                'osm_type': 'way'
+            })
+        
+        # Value error raised if is an empty dictionary
+        with pytest.raises(ValueError):
+            result = geocoder.parse_osm({})
+        
     async def test_lookup_api(self):
         queries = [
             {
