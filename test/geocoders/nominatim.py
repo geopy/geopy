@@ -253,30 +253,34 @@ class BaseTestNominatim(BaseTestGeocoder):
             {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
         )
 
-    async def test_featuretype_param(self):
-        await self.geocode_run(
-            {"query": "mexico",
-             "featuretype": 'country'},
-            {"latitude": 22.5000485, "longitude": -100.0000375, "delta": 5.0},
-        )
-
-        await self.geocode_run(
-            {"query": "mexico",
-             "featuretype": 'state', "country_codes": "US"},
-            {"latitude": 34.5708167, "longitude": -105.993007, "delta": 2.0},
-        )
-
-        await self.geocode_run(
-            {"query": "mexico",
-             "featuretype": 'city'},
-            {"latitude": 19.4326009, "longitude": -99.1333416, "delta": 2.0},
-        )
-
-        await self.geocode_run(
-            {"query": "georgia",
-             "featuretype": 'settlement'},
-            {"latitude": 32.3293809, "longitude": -83.1137366, "delta": 2.0},
-        )
+    @pytest.mark.parametrize(
+        "payload, expected",
+        [
+            pytest.param(
+                {"query": "mexico", "featuretype": 'country'},
+                {"latitude": 22.5000485, "longitude": -100.0000375, "delta": 5.0},
+                id="country",
+            ),
+            pytest.param(
+                {"query": "mexico", "featuretype": 'state', "country_codes": "US"},
+                {"latitude": 34.5708167, "longitude": -105.993007, "delta": 2.0},
+                id="state",
+            ),
+            pytest.param(
+                {"query": "mexico", "featuretype": 'city'},
+                {"latitude": 19.4326009, "longitude": -99.1333416, "delta": 2.0},
+                id="city",
+                marks=pytest.mark.xfail(reason='nominatim responds incorrectly here'),
+            ),
+            pytest.param(
+                {"query": "georgia", "featuretype": 'settlement'},
+                {"latitude": 32.3293809, "longitude": -83.1137366, "delta": 2.0},
+                id="settlement",
+            ),
+        ]
+    )
+    async def test_featuretype_param(self, payload, expected):
+        await self.geocode_run(payload, expected)
 
     async def test_namedetails(self):
         query = "Kyoto, Japan"

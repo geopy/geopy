@@ -64,7 +64,7 @@ class TestBing(BaseTestGeocoder):
 
     async def test_user_location(self):
         pennsylvania = (40.98327, -74.96064)
-        colorado = (40.1602849999851, -105.102491162672)
+        colorado = (40.160, -87.784)
 
         pennsylvania_bias = (40.922351, -75.096562)
         colorado_bias = (39.914231, -105.070104)
@@ -72,7 +72,7 @@ class TestBing(BaseTestGeocoder):
                                (colorado, colorado_bias)):
             await self.geocode_run(
                 {"query": "20 Main Street", "user_location": Point(bias)},
-                {"latitude": expected[0], "longitude": expected[1]},
+                {"latitude": expected[0], "longitude": expected[1], "delta": 3.0},
             )
 
     async def test_optional_params(self):
