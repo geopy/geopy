@@ -3,8 +3,8 @@ from decimal import Decimal
 
 NUMBER_TYPES = (int, float, Decimal)
 
-__version__ = "2.1.0"
-__version_info__ = (2, 1, 0)
+__version__ = "2.2.0"
+__version_info__ = (2, 2, 0)
 
 logger = logging.getLogger('geopy')
 
