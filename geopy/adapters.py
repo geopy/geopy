@@ -428,7 +428,16 @@ class RequestsAdapter(BaseSyncAdapter):
         # instances are getting garbage-collected.
         session = getattr(self, "session", None)
         if session is not None:
-            session.close()
+            try:
+                session.close()
+            except TypeError:
+                # It's possible for the close method to try to fetch a
+                # non-existent old_pool in urllib3 with a misleading state
+                # ultimately due to stdlib queue/threading behaviour.
+                # Since the error arises from a non-existent pool
+                # (TypeError: 'NoneType' object is not callable)
+                # it's safe to ignore this error
+                pass
 
     def get_text(self, url, *, timeout, headers):
         resp = self._request(url, timeout=timeout, headers=headers)
