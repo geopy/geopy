@@ -187,6 +187,7 @@ __all__ = (
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
     "AlgoliaPlaces",
+    "AmazonLocationServices",
     "ArcGIS",
     "AzureMaps",
     "Baidu",
@@ -221,6 +222,7 @@ __all__ = (
 
 from geopy.exc import GeocoderNotFound
 from geopy.geocoders.algolia import AlgoliaPlaces
+from geopy.geocoders.amazonlocationservices import AmazonLocationServices
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu, BaiduV3
@@ -251,6 +253,7 @@ from geopy.geocoders.yandex import Yandex
 
 SERVICE_TO_GEOCODER = {
     "algolia": AlgoliaPlaces,
+    "amazonlocationservices": AmazonLocationServices,
     "arcgis": ArcGIS,
     "azure": AzureMaps,
     "baidu": Baidu,
@@ -318,6 +321,6 @@ def get_geocoder_for_service(service):
         return SERVICE_TO_GEOCODER[service.lower()]
     except KeyError:
         raise GeocoderNotFound(
-            "Unknown geocoder '%s'; options are: %s" %
-            (service, SERVICE_TO_GEOCODER.keys())
+            "Unknown geocoder '%s'; options are: %s"
+            % (service, SERVICE_TO_GEOCODER.keys())
         )

@@ -19,7 +19,7 @@ if sys.version_info < (3, 5):
 from geopy import __version__ as version  # noqa  # isort:skip
 
 INSTALL_REQUIRES = [
-    'geographiclib<2,>=1.49',
+    "geographiclib<2,>=1.49",
 ]
 
 EXTRAS_DEV_TESTFILES_COMMON = [
@@ -45,30 +45,34 @@ EXTRAS_DEV_DOCS = [
     "sphinx_rtd_theme>=0.5.0",
 ]
 
+EXTRAS_FEATURE_AWS = [
+    "boto3>=1.18.42",
+]
+
 setup(
-    name='geopy',
+    name="geopy",
     version=version,
-    description='Python Geocoding Toolbox',
-    long_description=open('README.rst').read(),
-    maintainer='Kostya Esmukov',
-    maintainer_email='kostya@esmukov.ru',
-    url='https://github.com/geopy/geopy',
-    download_url=(
-        'https://github.com/geopy/geopy/archive/%s.tar.gz' % version
-    ),
+    description="Python Geocoding Toolbox",
+    long_description=open("README.rst").read(),
+    maintainer="Kostya Esmukov",
+    maintainer_email="kostya@esmukov.ru",
+    url="https://github.com/geopy/geopy",
+    download_url=("https://github.com/geopy/geopy/archive/%s.tar.gz" % version),
     packages=find_packages(exclude=["*test*"]),
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        "dev": sorted(set(
-            EXTRAS_DEV_TESTFILES_COMMON +
-            EXTRAS_DEV_LINT +
-            EXTRAS_DEV_TEST +
-            EXTRAS_DEV_DOCS
-        )),
-        "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON +
-                     EXTRAS_DEV_LINT),
-        "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
-                     EXTRAS_DEV_TEST),
+        "aws": [EXTRAS_FEATURE_AWS],
+        "dev": sorted(
+            set(
+                EXTRAS_DEV_TESTFILES_COMMON
+                + EXTRAS_DEV_LINT
+                + EXTRAS_DEV_TEST
+                + EXTRAS_DEV_DOCS
+                + EXTRAS_FEATURE_AWS
+            )
+        ),
+        "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON + EXTRAS_DEV_LINT),
+        "dev-test": (EXTRAS_DEV_TESTFILES_COMMON + EXTRAS_DEV_TEST),
         "dev-docs": EXTRAS_DEV_DOCS,
         "aiohttp": ["aiohttp"],
         "requests": [
@@ -76,15 +80,14 @@ setup(
             # ^^^ earlier versions would work, but a custom ssl
             # context would silently have system certificates be loaded as
             # trusted: https://github.com/urllib3/urllib3/pull/1566
-
             "requests>=2.16.2",
             # ^^^ earlier versions would work, but they use an older
             # vendored version of urllib3 (see note above)
         ],
         "timezone": ["pytz"],
     },
-    license='MIT',
-    keywords='geocode geocoding gis geographical maps earth distance',
+    license="MIT",
+    keywords="geocode geocoding gis geographical maps earth distance",
     python_requires=">=3.5",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -104,5 +107,5 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
-    ]
+    ],
 )
