@@ -78,6 +78,12 @@ class TestArcGIS(BaseTestGeocoder):
             {"latitude": 40.75376406311989, "longitude": -73.98489005863667},
         )
 
+    async def test_reverse_long_label_address(self):
+        await self.reverse_run(
+            {"query": (35.173809, -37.485351)},
+            {"address": "Atlantic Ocean"},
+        )
+
     async def test_reverse_no_result(self):
         await self.reverse_run(
             # Antarctica

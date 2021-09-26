@@ -239,10 +239,15 @@ class ArcGIS(Geocoder):
                 except (KeyError, IndexError):
                     pass
             raise GeocoderServiceError(str(response['error']))
-        address = (
-            "%(Address)s, %(City)s, %(Region)s %(Postal)s,"
-            " %(CountryCode)s" % response['address']
-        )
+
+        if response['address'].get('Address'):
+            address = (
+                "%(Address)s, %(City)s, %(Region)s %(Postal)s,"
+                " %(CountryCode)s" % response['address']
+            )
+        else:
+            address = response['address']['LongLabel']
+
         location = Location(
             address,
             (response['location']['y'], response['location']['x']),
