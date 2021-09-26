@@ -84,14 +84,6 @@ class TestArcGIS(BaseTestGeocoder):
             {"address": "Atlantic Ocean"},
         )
 
-    async def test_reverse_no_result(self):
-        await self.reverse_run(
-            # Antarctica
-            {"query": (-84.172382, 45.9873073)},
-            {},
-            expect_failure=True
-        )
-
 
 class TestArcGISAuthenticated(BaseTestGeocoder):
 
