@@ -32,7 +32,7 @@ class TestGeoNames(BaseTestGeocoder):
     def make_geocoder(cls, **kwargs):
         return GeoNames(username=env['GEONAMES_USERNAME'], **kwargs)
 
-    async def test_unicode_name(self):
+    async def test_geocode(self):
         await self.geocode_run(
             {"query": "Mount Everest, Nepal"},
             {"latitude": 27.987, "longitude": 86.925},

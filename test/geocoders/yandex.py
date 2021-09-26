@@ -18,7 +18,7 @@ class TestYandex(BaseTestGeocoder):
         )
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
 
-    async def test_unicode_name(self):
+    async def test_geocode(self):
         await self.geocode_run(
             {"query": "площадь Ленина Донецк"},
             {"latitude": 48.002104, "longitude": 37.805186},

@@ -28,12 +28,6 @@ class TestBing(BaseTestGeocoder):
             {"latitude": 41.890, "longitude": -87.624},
         )
 
-    async def test_unicode_name(self):
-        await self.geocode_run(
-            {"query": "\u043c\u043e\u0441\u043a\u0432\u0430"},
-            {"latitude": 55.756, "longitude": 37.615},
-        )
-
     async def test_reverse_point(self):
         await self.reverse_run(
             {"query": Point(40.753898, -73.985071)},

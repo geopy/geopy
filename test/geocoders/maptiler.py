@@ -16,12 +16,6 @@ class TestMapTiler(BaseTestGeocoder):
             {"latitude": 41.890, "longitude": -87.624},
         )
 
-    async def test_unicode_name(self):
-        await self.geocode_run(
-            {"query": "Stadelhoferstrasse 8, 8001 Z\u00fcrich"},
-            {"latitude": 47.36649, "longitude": 8.54855},
-        )
-
     async def test_reverse(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         location = await self.reverse_run(

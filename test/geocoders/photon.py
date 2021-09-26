@@ -46,12 +46,6 @@ class TestPhoton(BaseTestGeocoder):
             {"latitude": 46.7323875, "longitude": -117.0001651},
         )
 
-    async def test_unicode_name(self):
-        await self.geocode_run(
-            {"query": "\u6545\u5bab"},
-            {"latitude": 39.916, "longitude": 116.390},
-        )
-
     async def test_reverse(self):
         result = await self.reverse_run(
             {"query": Point(45.7733105, 4.8869339)},

@@ -16,12 +16,6 @@ class TestMapBox(BaseTestGeocoder):
             {"latitude": 41.890, "longitude": -87.624},
         )
 
-    async def test_unicode_name(self):
-        await self.geocode_run(
-            {"query": "\u6545\u5bab"},
-            {"latitude": 39.916, "longitude": 116.390},
-        )
-
     async def test_reverse(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         location = await self.reverse_run(

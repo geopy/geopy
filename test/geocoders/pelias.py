@@ -14,8 +14,6 @@ class BaseTestPelias(BaseTestGeocoder):
             {"query": "435 north michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
-
-    async def test_unicode_name(self):
         await self.geocode_run(
             {"query": "san josé california"},
             {"latitude": 37.33939, "longitude": -121.89496},

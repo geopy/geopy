@@ -23,12 +23,6 @@ class TestDataBC(BaseTestGeocoder):
             {"latitude": 49.321, "longitude": -124.337},
         )
 
-    async def test_unicode_name(self):
-        await self.geocode_run(
-            {"query": "Barri\u00e8re"},
-            {"latitude": 51.179, "longitude": -120.123},
-        )
-
     async def test_multiple_results(self):
         res = await self.geocode_run(
             {"query": "1st St", "exactly_one": False},

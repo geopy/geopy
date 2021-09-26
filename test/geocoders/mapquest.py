@@ -14,12 +14,6 @@ class TestMapQuest(BaseTestGeocoder):
             {"latitude": 41.89036, "longitude": -87.624043},
         )
 
-    async def test_unicode_name(self):
-        await self.geocode_run(
-            {"query": "\u6545\u5bab"},
-            {"latitude": 25.0968, "longitude": 121.54714, "delta": 5.0},
-        )
-
     async def test_reverse(self):
         new_york_point = Point(40.75376406311989, -73.98489005863667)
         location = await self.reverse_run(
