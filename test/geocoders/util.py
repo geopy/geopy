@@ -97,7 +97,7 @@ class BaseTestGeocoder(ABC):
         self, payload, expected,
         *,
         skiptest_on_errors=True,
-        expect_failure=False,
+        expect_failure=False
     ):
         """
         Calls geocoder.geocode(**payload), then checks against `expected`.
@@ -123,7 +123,7 @@ class BaseTestGeocoder(ABC):
         self, payload, expected,
         *,
         skiptest_on_errors=True,
-        expect_failure=False,
+        expect_failure=False
     ):
         """
         Calls geocoder.reverse(**payload), then checks against `expected`.
