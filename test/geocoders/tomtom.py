@@ -12,10 +12,10 @@ class BaseTestTomTom(BaseTestGeocoder):
 
     async def test_geocode(self):
         location = await self.geocode_run(
-            {'query': 'москва'},
+            {'query': 'moscow'},
             {'latitude': 55.75587, 'longitude': 37.61768},
         )
-        assert 'Москва' in location.address
+        assert 'Moscow' in location.address
 
     async def test_reverse(self):
         location = await self.reverse_run(
