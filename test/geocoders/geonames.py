@@ -36,14 +36,12 @@ class TestGeoNames(BaseTestGeocoder):
         await self.geocode_run(
             {"query": "Mount Everest, Nepal"},
             {"latitude": 27.987, "longitude": 86.925},
-            skiptest_on_failure=True,  # sometimes the result is empty
         )
 
     async def test_query_urlencoding(self):
         location = await self.geocode_run(
             {"query": "Ry\u016b\u014d"},
             {"latitude": 35.65, "longitude": 138.5},
-            skiptest_on_failure=True,  # sometimes the result is empty
         )
         assert "Ry\u016b\u014d" in location.address
 
