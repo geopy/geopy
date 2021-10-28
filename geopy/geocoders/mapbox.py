@@ -16,7 +16,7 @@ class MapBox(Geocoder):
         https://www.mapbox.com/api-documentation/
     """
 
-    api_path = '/geocoding/v5/mapbox.places/%(query)s.json/'
+    api_path = '/geocoding/v5/%(endpoint)s/%(query)s.json/'
 
     def __init__(
             self,
@@ -28,7 +28,8 @@ class MapBox(Geocoder):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             adapter_factory=None,
-            domain='api.mapbox.com'
+            domain='api.mapbox.com',
+            endpoint='mapbox.places'
     ):
         """
         :param str api_key: The API key required by Mapbox to perform
@@ -57,6 +58,10 @@ class MapBox(Geocoder):
             .. versionadded:: 2.0
 
         :param str domain: base api domain for mapbox
+
+        :param str endpoint: The geocoding API endpoint to be called. Endpoints differ in
+            their allowed usage. See available endpoints in the mapbox documentation
+            (https://docs.mapbox.com/api/search/geocoding/#endpoints).
         """
         super().__init__(
             scheme=scheme,
@@ -68,6 +73,7 @@ class MapBox(Geocoder):
         )
         self.api_key = api_key
         self.domain = domain.strip('/')
+        self.endpoint = endpoint
         self.api = "%s://%s%s" % (self.scheme, self.domain, self.api_path)
 
     def _parse_json(self, json, exactly_one=True):
@@ -148,7 +154,7 @@ class MapBox(Geocoder):
             params['proximity'] = "%s,%s" % (p.longitude, p.latitude)
 
         quoted_query = quote(query.encode('utf-8'))
-        url = "?".join((self.api % dict(query=quoted_query),
+        url = "?".join((self.api % dict(endpoint=self.endpoint, query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
@@ -185,7 +191,7 @@ class MapBox(Geocoder):
 
         point = self._coerce_point_to_string(query, "%(lon)s,%(lat)s")
         quoted_query = quote(point.encode('utf-8'))
-        url = "?".join((self.api % dict(query=quoted_query),
+        url = "?".join((self.api % dict(endpoint=self.endpoint, query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
