@@ -82,3 +82,11 @@ class TestMapBox(BaseTestGeocoder):
             {},
         )
         assert len(list_result) >= 3
+
+    async def test_geocode_language(self):
+        res = await self.geocode_run(
+            {"query": "Frankfurt", "language": "DE"},
+            {}
+        )
+
+        assert "Frankfurt am Main, Hessen, Deutschland" in res.address
