@@ -5,7 +5,7 @@ __all__ = ("GeocodeEarth", )
 
 
 class GeocodeEarth(Pelias):
-    """geocode.earth, a Pelias-based service provided by the developers
+    """Geocode Earth, a Pelias-based service provided by the developers
     of Pelias itself.
     """
 
