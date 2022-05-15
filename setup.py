@@ -19,7 +19,7 @@ if sys.version_info < (3, 5):
 from geopy import __version__ as version  # noqa  # isort:skip
 
 INSTALL_REQUIRES = [
-    'geographiclib<2,>=1.49',
+    'geographiclib<3,>=1.49',
 ]
 
 EXTRAS_DEV_TESTFILES_COMMON = [
