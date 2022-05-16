@@ -1,5 +1,4 @@
 import pytest
-from async_generator import async_generator, yield_
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders import IGNFrance
@@ -254,14 +253,13 @@ class TestIGNFranceUsernameAuthProxy(BaseTestGeocoder):
         )
 
     @pytest.fixture(scope='class', autouse=True)
-    @async_generator
     async def start_proxy(_, request, class_geocoder):
         cls = request.cls
         cls.proxy_server = ProxyServerThread(timeout=cls.proxy_timeout)
         cls.proxy_server.start()
         cls.proxy_url = cls.proxy_server.get_proxy_url()
         async with cls.inject_geocoder(cls.make_geocoder(proxies=cls.proxy_url)):
-            await yield_()
+            yield
         cls.proxy_server.stop()
         cls.proxy_server.join()
 

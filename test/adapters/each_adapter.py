@@ -1,3 +1,4 @@
+import contextlib
 import os
 import ssl
 from unittest.mock import patch
@@ -5,7 +6,6 @@ from urllib.parse import urljoin
 from urllib.request import getproxies, urlopen
 
 import pytest
-from async_generator import async_generator, asynccontextmanager, yield_
 
 import geopy.geocoders
 from geopy.adapters import (
@@ -134,14 +134,13 @@ def adapter_factory(request):
         yield adapter_factory
 
 
-@asynccontextmanager
-@async_generator
+@contextlib.asynccontextmanager
 async def make_dummy_async_geocoder(**kwargs):
     geocoder = DummyGeocoder(**kwargs)
     run_async = isinstance(geocoder.adapter, BaseAsyncAdapter)
     if run_async:
         async with geocoder:
-            await yield_(geocoder)
+            yield geocoder
     else:
         orig_geocode = geocoder.geocode
 
@@ -149,7 +148,7 @@ async def make_dummy_async_geocoder(**kwargs):
             return orig_geocode(*args, **kwargs)
 
         geocoder.geocode = geocode
-        await yield_(geocoder)
+        yield geocoder
 
 
 @pytest.mark.parametrize("adapter_cls", NOT_AVAILABLE_ADAPTERS)
