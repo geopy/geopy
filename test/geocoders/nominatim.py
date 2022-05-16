@@ -237,14 +237,14 @@ class BaseTestNominatim(BaseTestGeocoder):
         await self.geocode_run(
             {"query": "kazan",
              "country_codes": 'tr'},
-            {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
+            {"latitude": 40.2317, "longitude": 38.0, "delta": 15},
         )
 
     async def test_country_codes_list(self):
         await self.geocode_run(
             {"query": "kazan",
              "country_codes": ['cn', 'tr']},
-            {"latitude": 40.2317, "longitude": 32.6839, "delta": 2},
+            {"latitude": 40.2317, "longitude": 38.0, "delta": 15},
         )
 
     @pytest.mark.parametrize(
@@ -259,12 +259,12 @@ class BaseTestNominatim(BaseTestGeocoder):
                 {"query": "mexico", "featuretype": 'state', "country_codes": "US"},
                 {"latitude": 34.5708167, "longitude": -105.993007, "delta": 2.0},
                 id="state",
+                marks=pytest.mark.xfail(reason='nominatim responds incorrectly here'),
             ),
             pytest.param(
                 {"query": "mexico", "featuretype": 'city'},
                 {"latitude": 19.4326009, "longitude": -99.1333416, "delta": 2.0},
                 id="city",
-                marks=pytest.mark.xfail(reason='nominatim responds incorrectly here'),
             ),
             pytest.param(
                 {"query": "georgia", "featuretype": 'settlement'},
