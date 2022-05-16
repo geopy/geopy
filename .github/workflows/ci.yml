@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # &test-matrix
-        python-version: [3.6, 3.7, 3.8, 3.9, 'pypy3']
+        python-version: [3.7, 3.8, 3.9, 'pypy-3.7']
         experimental: [false]
         include:
           - python-version: '3.10-dev'
@@ -64,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # *test-matrix  https://github.community/t/support-for-yaml-anchors/16128
-        python-version: [3.6, 3.7, 3.8, 3.9, 'pypy3']
+        python-version: [3.7, 3.8, 3.9, 'pypy-3.7']
         experimental: [false]
         include:
           - python-version: '3.10-dev'
