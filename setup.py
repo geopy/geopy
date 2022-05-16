@@ -18,7 +18,7 @@ EXTRAS_DEV_LINT = [
 
 EXTRAS_DEV_TEST = [
     "coverage",
-    "pytest-aiohttp",  # for `async def` tests
+    "pytest-asyncio>=0.17",
     "pytest>=3.10",
     "sphinx",  # `docutils` from sphinx is used in tests
 ]
