@@ -28,7 +28,8 @@ class MapBox(Geocoder):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             adapter_factory=None,
-            domain='api.mapbox.com'
+            domain='api.mapbox.com',
+            referer=None
     ):
         """
         :param str api_key: The API key required by Mapbox to perform
@@ -57,6 +58,9 @@ class MapBox(Geocoder):
             .. versionadded:: 2.0
 
         :param str domain: base api domain for mapbox
+
+        :param str referer: The URL used to satisfy the URL restriction of
+            mapbox tokens.
         """
         super().__init__(
             scheme=scheme,
@@ -69,6 +73,8 @@ class MapBox(Geocoder):
         self.api_key = api_key
         self.domain = domain.strip('/')
         self.api = "%s://%s%s" % (self.scheme, self.domain, self.api_path)
+        if referer:
+            self.headers['Referer'] = referer
 
     def _parse_json(self, json, exactly_one=True):
         '''Returns location, (latitude, longitude) from json feed.'''
