@@ -161,8 +161,19 @@ class CommonMathematicalOperatorCases:
         with self.assertRaises(TypeError):
             self.cls(1.0) * self.cls(2.0)
 
+    def test_should_not_be_able_to_divide_floats_by_distances(self):
+        with self.assertRaises(TypeError):
+            1 / self.cls(2.0)
+        with self.assertRaises(TypeError):
+            1 // self.cls(2.0)
+
     def test_should_be_able_to_divide_distances_by_distances(self):
         ratio = self.cls(4.0) / self.cls(2.0)
+        self.assertIsInstance(ratio, float)
+        self.assertAlmostEqual(ratio, 2.0)
+
+    def test_should_be_able_to_floor_divide_distances_by_distances(self):
+        ratio = self.cls(4.0) // self.cls(2.0)
         self.assertIsInstance(ratio, float)
         self.assertAlmostEqual(ratio, 2.0)
 
@@ -170,6 +181,11 @@ class CommonMathematicalOperatorCases:
         divided_distance = self.cls(4.0) / 2.0
         self.assertIsInstance(divided_distance, self.cls)
         self.assertAlmostEqual(divided_distance.kilometers, 2.0)
+
+    def test_should_be_able_to_floor_divide_distances(self):
+        divided_distance = self.cls(4.0) // 3
+        self.assertIsInstance(divided_distance, self.cls)
+        self.assertAlmostEqual(divided_distance.kilometers, 1.0)
 
     def test_should_be_able_to_take_absolute_value_of_distances(self):
         self.assertAlmostEqual(abs(self.cls(-1.0)).kilometers, 1.0)

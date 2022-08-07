@@ -301,6 +301,12 @@ class Distance:
         else:
             return self.__class__(self.kilometers / other)
 
+    def __floordiv__(self, other):
+        if isinstance(other, Distance):
+            return self.kilometers // other.kilometers
+        else:
+            return self.__class__(self.kilometers // other)
+
     def __abs__(self):
         return self.__class__(abs(self.kilometers))
 
