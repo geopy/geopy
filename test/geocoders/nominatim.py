@@ -69,6 +69,13 @@ class BaseTestNominatim(BaseTestGeocoder):
         )
         assert "New York" in location.address
 
+    async def test_reverse_near_zero(self):
+        location = await self.reverse_run(
+            {"query": Point(31.0, -1.0e-5)},
+            {"latitude": 32.3096365, "longitude": 0.2450916, "delta": 3}
+        )
+        assert "El Bayadh" in location.address
+
     async def test_structured_query(self):
         await self.geocode_run(
             {"query": {"country": "us", "city": "moscow",

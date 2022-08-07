@@ -183,6 +183,10 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
         with pytest.raises(ValueError):
             self.method(self.coordinates_address)
 
+    def test_near_zero(self):
+        latlon = self.method(Point(50.0, -1.0e-5))
+        assert latlon == "50.0,-0.0000100"
+
 
 class GeocoderFormatBoundingBoxTestCase(unittest.TestCase):
 

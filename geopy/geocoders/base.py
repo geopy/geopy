@@ -306,8 +306,8 @@ class Geocoder:
         # A non-zero altitude should not raise an exception
         # though, because PoIs are assumed to span the whole
         # altitude axis (i.e. not just the 0km plane).
-        return output_format % dict(lat=point.latitude,
-                                    lon=point.longitude)
+        return output_format % dict(lat=_format_coordinate(point.latitude),
+                                    lon=_format_coordinate(point.longitude))
 
     def _format_bounding_box(
         self, bbox, output_format="%(lat1)s,%(lon1)s,%(lat2)s,%(lon2)s"
@@ -419,6 +419,12 @@ class Geocoder:
 
     # def reverse(self, query, *, exactly_one=True, timeout=DEFAULT_SENTINEL):
     #     raise NotImplementedError()
+
+
+def _format_coordinate(coordinate):
+    if abs(coordinate) >= 1:
+        return coordinate  # use the default arbitrary precision scientific notation
+    return f"{coordinate:.7f}"
 
 
 def _synchronized(func):
