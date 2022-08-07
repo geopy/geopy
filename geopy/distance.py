@@ -295,21 +295,17 @@ class Distance:
     def __mul__(self, other):
         return self.__class__(self.kilometers * other)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if isinstance(other, Distance):
             return self.kilometers / other.kilometers
         else:
             return self.__class__(self.kilometers / other)
 
-    __truediv__ = __div__
-
     def __abs__(self):
         return self.__class__(abs(self.kilometers))
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.kilometers)
-
-    __bool__ = __nonzero__
 
     def measure(self, a, b):
         # Intentionally not documented, because this method is not supposed
