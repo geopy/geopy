@@ -297,6 +297,84 @@ class BaseTestNominatim(BaseTestGeocoder):
         )
         assert 'namedetails' not in result.raw
 
+    async def test_parse_geocode(self):
+        
+        geocoder = self.make_geocoder()
+
+        # Check correct format and order of the queries
+        queries = [
+            {
+                'osm_id': 6101403370,
+                'osm_type': 'node'
+            },
+            {
+                'osm_id': 148332300,
+                'osm_type': 'way'
+            }
+        ]
+
+        result = [
+            'N6101403370',
+            'W148332300'
+        ]
+
+        for index, query in enumerate(queries):
+            assert result[index] == geocoder.parse_osm(query)
+        
+        # Value error raised if osm_type is not present
+        with pytest.raises(ValueError):
+            result = geocoder.parse_osm({
+                'osm_id': 6101403370,
+                'osm_type': ''
+            })
+        
+        # Value error raised if osm_id is not present
+        with pytest.raises(ValueError):
+            result = geocoder.parse_osm({
+                'osm_id': None,
+                'osm_type': 'way'
+            })
+        
+        # Value error raised if is an empty dictionary
+        with pytest.raises(ValueError):
+            result = geocoder.parse_osm({})
+        
+    async def test_lookup_api(self):
+        queries = [
+            {
+                'osm_id': 6101403370,
+                'osm_type': 'node'
+            },
+            {
+                'osm_id': 148332300,
+                'osm_type': 'way'
+            }
+        ]
+        # Make sure the content is returned from the API
+        result = [
+            {
+                'osm_id': 6101403370,
+                'osm_type': 'node'
+            },
+            {
+                'osm_id': 148332300,
+                'osm_type': 'way'
+            }
+        ]
+
+        geocoder = self.make_geocoder()
+        response = geocoder.lookup(queries)
+        for location in response:
+            location_result = list(
+                filter(lambda place:
+                       place.get('osm_id') == location.raw.get('osm_id')
+                       and place.get('osm_type') == location.raw.get('osm_type'),
+                       result)
+            )
+            assert len(location_result) > 0
+            location_result = location_result[0]
+            assert location_result is not None
+
     async def test_reverse_zoom_parameter(self):
         query = "40.689253199999996, -74.04454817144321"
         result_reverse = await self.reverse_run(
