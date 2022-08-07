@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 from geopy import __version__ as version
 
 INSTALL_REQUIRES = [
-    'geographiclib<3,>=1.49',
+    'geographiclib<3,>=1.52',
 ]
 
 EXTRAS_DEV_TESTFILES_COMMON = [
