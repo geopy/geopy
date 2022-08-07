@@ -416,3 +416,12 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
             p = d.destination(p2, azi2, -s12/km)
             self.assertAlmostEqual(p.latitude, p1.latitude, delta=1e-13)
             self.assertAlmostEqual(p.longitude, p1.longitude, delta=1e-12)
+
+
+def test_distance_hashing():
+    d1 = Distance(1.0)
+    d2 = GreatCircleDistance(1.0)
+    d3 = GeodesicDistance(1.0)
+    assert d1 == d2 == d3
+    assert hash(d1) == hash(d2) == hash(d3)
+    assert len({d1, d2, d3}) == 1

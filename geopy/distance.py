@@ -375,6 +375,9 @@ distance=Distance(100))
         else:
             return cmp(self.kilometers, other)
 
+    def __hash__(self):
+        return hash(self.kilometers)
+
     def __eq__(self, other):
         return self.__cmp__(other) == 0
 
