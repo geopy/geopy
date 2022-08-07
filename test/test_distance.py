@@ -144,6 +144,8 @@ class CommonMathematicalOperatorCases:
     def test_should_not_allow_adding_with_objects_that_arent_distances(self):
         with self.assertRaises(TypeError):
             self.cls(1.0) + 5
+        with self.assertRaises(TypeError):
+            5 + self.cls(1.0)
 
     def test_should_be_able_to_negate_distances(self):
         distance = self.cls(1.0)
@@ -155,7 +157,8 @@ class CommonMathematicalOperatorCases:
         self.assertAlmostEqual(subtracted.kilometers, 1)
 
     def test_should_be_able_to_multiply_distances_by_floats(self):
-        self.assertAlmostEqual((self.cls(2.0) * 2.0).kilometers, 4.0)
+        self.assertAlmostEqual((self.cls(2.0) * 2.5).kilometers, 5.0)
+        self.assertAlmostEqual((2.5 * self.cls(2.0)).kilometers, 5.0)
 
     def test_should_not_be_able_to_multiply_distances_by_distances(self):
         with self.assertRaises(TypeError):

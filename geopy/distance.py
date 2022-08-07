@@ -293,7 +293,20 @@ class Distance:
         return self + -other
 
     def __mul__(self, other):
-        return self.__class__(self.kilometers * other)
+        if isinstance(other, Distance):
+            raise TypeError(
+                "Distance instance must be multiplicated with numbers."
+            )
+        else:
+            return self.__class__(self.kilometers * other)
+
+    def __rmul__(self, other):
+        if isinstance(other, Distance):
+            raise TypeError(
+                "Distance instance must be multiplicated with numbers."
+            )
+        else:
+            return self.__class__(other * self.kilometers)
 
     def __truediv__(self, other):
         if isinstance(other, Distance):
