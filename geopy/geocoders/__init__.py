@@ -251,7 +251,6 @@ from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words, What3WordsV3
 from geopy.geocoders.yandex import Yandex
 
-
 SERVICE_TO_GEOCODER = {
     "algolia": AlgoliaPlaces,
     "arcgis": ArcGIS,

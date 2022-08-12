@@ -1,15 +1,15 @@
 from functools import partial
 
-from geopy.exc import GeocoderAuthenticationFailure
-from geopy.exc import GeocoderQueryError
-from geopy.exc import GeocoderQuotaExceeded
-from geopy.exc import GeocoderServiceError
-from geopy.exc import GeocoderTimedOut
-from geopy.geocoders.base import DEFAULT_SENTINEL
-from geopy.geocoders.base import Geocoder
+from geopy.exc import (
+    GeocoderAuthenticationFailure,
+    GeocoderQueryError,
+    GeocoderQuotaExceeded,
+    GeocoderServiceError,
+    GeocoderTimedOut,
+)
+from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
-
 
 __all__ = ("Tencent",)
 
