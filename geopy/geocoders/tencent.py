@@ -268,7 +268,7 @@ class Tencent(Geocoder):
             raise GeocoderQuotaExceeded(
                 "The number of requests daily has reached the upper limit.",
             )
-        elif status in 190:
+        elif status == 190:
             raise GeocoderAuthenticationFailure("Invalid KEY.")
         elif status == 199:
             raise GeocoderAuthenticationFailure("The webservice isn't enabled.")
