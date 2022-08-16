@@ -15,7 +15,7 @@ class TestTencent(BaseTestGeocoder):
         async with self.inject_geocoder(Tencent(api_key="DUMMYKEY1234")):
             with pytest.raises(GeocoderQueryError) as exc_info:
                 await self.geocode_run({"query": "tencent"}, None)
-            assert str(exc_info.value) == "KEY illegal or not exist."
+            assert str(exc_info.value) == "KEY illegal or not exist key格式错误."
 
     async def test_invalid_ak(self):
         async with self.inject_geocoder(
@@ -23,7 +23,7 @@ class TestTencent(BaseTestGeocoder):
         ):
             with pytest.raises(GeocoderAuthenticationFailure) as exc_info:
                 await self.geocode_run({"query": "tencent"}, None)
-            assert str(exc_info.value) == "Invalid KEY."
+            assert str(exc_info.value) == "Invalid KEY 无效的KEY."
 
     async def test_geocode_address(self):
         await self.geocode_run(
