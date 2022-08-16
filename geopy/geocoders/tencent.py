@@ -170,6 +170,7 @@ class Tencent(Geocoder):
         response,
         exactly_one=True,
         status="status",
+        message="message",
         address="address",
         location="location",
         lat="lat",
@@ -184,7 +185,7 @@ class Tencent(Geocoder):
             ``exactly_one=False``.
         """
 
-        self._check_status(response.get(status))
+        self._check_status(response.get(status), response.get(message))
         if response is None or "result" not in response:
             return
 
@@ -240,11 +241,13 @@ class Tencent(Geocoder):
 
         return (location[lat], location[lng])
 
-    def _check_status(self, status):
+    def _check_status(self, status, message):
         """
         Validates error status.
 
         :type status: int
+
+        :type message: str
 
         Documentation at:
             https://lbs.qq.com/service/webService/webServiceGuide/status
@@ -253,40 +256,41 @@ class Tencent(Geocoder):
         if status == 0:
             return
         elif status == 110:
-            raise GeocoderAuthenticationFailure("Authentication failure.")
+            raise GeocoderAuthenticationFailure(f"Authentication failure {message}.")
         elif status == 111:
-            raise GeocoderAuthenticationFailure("Signature verification failed.")
+            raise GeocoderAuthenticationFailure(f"Signature verification failed {message}.")
         elif status == 112:
-            raise GeocoderAuthenticationFailure("Invalid IP.")
+            raise GeocoderAuthenticationFailure(f"Invalid IP {message}.")
         elif status == 113:
-            raise GeocoderAuthenticationFailure("This feature is not authorized.")
+            raise GeocoderAuthenticationFailure(f"This feature is not authorized {message}.")
         elif status == 120:
             raise GeocoderQuotaExceeded(
-                "The number of requests per second has reached the upper limit.",
+                "The number of requests per second has reached the upper limit "
+                f"{message!r}.",
             )
         elif status == 121:
             raise GeocoderQuotaExceeded(
-                "The number of requests daily has reached the upper limit.",
+                f"The number of requests daily has reached the upper limit {message}.",
             )
         elif status == 190:
-            raise GeocoderAuthenticationFailure("Invalid KEY.")
+            raise GeocoderAuthenticationFailure(f"Invalid KEY {message}.")
         elif status == 199:
-            raise GeocoderAuthenticationFailure("The webservice isn't enabled.")
+            raise GeocoderAuthenticationFailure(f"The webservice isn't enabled {message}.")
         elif status in {301, 311}:
-            raise GeocoderQueryError("KEY illegal or not exist.")
+            raise GeocoderQueryError(f"KEY illegal or not exist {message}.")
         elif status in {300, 306, 301, 320, 330, 331, 348, 351, 394, 395, 399}:
-            raise GeocoderQueryError("Invalid parameters.")
+            raise GeocoderQueryError(f"Invalid parameters {message}.")
         elif status in {347, 393}:
-            raise GeocoderQueryError("No results.")
+            raise GeocoderQueryError(f"No results {message}.")
         elif status in {400, 402}:
-            raise GeocoderQueryError("Can't decode the request URL.")
+            raise GeocoderQueryError(f"Can't decode the request URL {message}.")
         elif status == 404:
-            raise GeocoderQueryError("Invalid request path.")
+            raise GeocoderQueryError(f"Invalid request path {message}.")
         elif status == 407:
-            raise GeocoderQueryError("Invalid request method.")
+            raise GeocoderQueryError(f"Invalid request method {message}.")
         elif status == 500:
-            raise GeocoderTimedOut("Request timed out.")
+            raise GeocoderTimedOut(f"Request timed out {message}.")
         elif 500 < status < 600:
-            raise GeocoderServiceError("Request server error.")
+            raise GeocoderServiceError(f"Request server error {message}.")
         else:
-            raise GeocoderQueryError(f"Unknown error. Status: {status}")
+            raise GeocoderQueryError(f"Unknown error {message}.")
