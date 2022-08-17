@@ -167,17 +167,7 @@ class Tencent(Geocoder):
         params = {k: v for k, v in params.items() if v}
         return "?".join((base_api, urlencode(params)))
 
-    def _parse_json(
-        self,
-        response,
-        exactly_one=True,
-        status="status",
-        message="message",
-        address="address",
-        location="location",
-        lat="lat",
-        lng="lng",
-    ):
+    def _parse_json(self, response, exactly_one=True, address="address"):
         """
         Returns location, (latitude, longitude) from JSON feed.
 
@@ -187,27 +177,14 @@ class Tencent(Geocoder):
             ``exactly_one=False``.
         """
 
-        self._check_status(response.get(status), response.get(message))
-        if response is None or "result" not in response:
+        self._check_status(response.get("status"), response.get("message"))
+        if response is None:
             return
 
-        place = self._parse_place(
-            response["result"],
-            location=location,
-            address=address,
-            lat=lat,
-            lng=lng,
-        )
+        place = self._parse_place(response.get("result"), address=address)
         return place if exactly_one else [place]
 
-    def _parse_place(
-        self,
-        place,
-        address="address",
-        location="location",
-        lat="lat",
-        lng="lng",
-    ):
+    def _parse_place(self, place, address="address"):
         """
         Get the location, lat, and lng from a single JSON place.
 
@@ -216,20 +193,16 @@ class Tencent(Geocoder):
         :rtype: ``None`` or :class:`geopy.location.Location`
         """
 
-        if place is None or address not in place or location not in place:
+        if place is None:
             return
 
         return Location(
-            place[address],
-            self._parse_coordinate(
-                place[location],
-                lat=lat,
-                lng=lng,
-            ),
+            place.get(address),
+            self._parse_coordinate(place.get("location")),
             place,
         )
 
-    def _parse_coordinate(self, location, lat="lat", lng="lng"):
+    def _parse_coordinate(self, location):
         """
         Get the lat and lng from a single JSON location.
 
@@ -238,10 +211,10 @@ class Tencent(Geocoder):
         :rtype: tuple of float
         """
 
-        if location is None or lat not in location or lng not in location:
+        if location is None:
             return (None, None)
 
-        return (location[lat], location[lng])
+        return (location.get("lat"), location.get("lng"))
 
     def _check_status(self, status, message):
         """
