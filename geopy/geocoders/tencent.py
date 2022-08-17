@@ -103,11 +103,7 @@ class Tencent(Geocoder):
             https://lbs.qq.com/service/webService/webServiceGuide/webServiceGeocoder
         """
 
-        params = {
-            "address": query,
-            "region": region,
-            "key": self.api_key,
-        }
+        params = {"address": query, "region": region, "key": self.api_key}
         url = self._construct_url(self.api, params)
 
         logger.debug(f"{self.__class__.__name__}.geocode: {url}")
