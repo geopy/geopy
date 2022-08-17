@@ -105,7 +105,7 @@ class Tencent(Geocoder):
 
         params = {
             "address": query,
-            **({"region": region} if region else {}),
+            "region": region,
             "key": self.api_key,
         }
         url = self._construct_url(self.api, params)
@@ -163,6 +163,8 @@ class Tencent(Geocoder):
         """
         from urllib.parse import urlencode
 
+        # Remove empty value item
+        params = {k: v for k, v in params.items() if v}
         return "?".join((base_api, urlencode(params)))
 
     def _parse_json(
