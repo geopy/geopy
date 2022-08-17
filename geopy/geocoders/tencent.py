@@ -233,11 +233,15 @@ class Tencent(Geocoder):
         elif status == 110:
             raise GeocoderAuthenticationFailure(f"Authentication failure {message}.")
         elif status == 111:
-            raise GeocoderAuthenticationFailure(f"Signature verification failed {message}.")
+            raise GeocoderAuthenticationFailure(
+                f"Signature verification failed {message}."
+            )
         elif status == 112:
             raise GeocoderAuthenticationFailure(f"Invalid IP {message}.")
         elif status == 113:
-            raise GeocoderAuthenticationFailure(f"This feature is not authorized {message}.")
+            raise GeocoderAuthenticationFailure(
+                f"This feature is not authorized {message}."
+            )
         elif status == 120:
             raise GeocoderQuotaExceeded(
                 "The number of requests per second has reached the upper limit "
@@ -250,7 +254,9 @@ class Tencent(Geocoder):
         elif status == 190:
             raise GeocoderAuthenticationFailure(f"Invalid KEY {message}.")
         elif status == 199:
-            raise GeocoderAuthenticationFailure(f"The webservice isn't enabled {message}.")
+            raise GeocoderAuthenticationFailure(
+                f"The webservice isn't enabled {message}."
+            )
         elif status in {301, 311}:
             raise GeocoderQueryError(f"KEY illegal or not exist {message}.")
         elif status in {300, 306, 301, 320, 330, 331, 348, 351, 394, 395, 399}:
