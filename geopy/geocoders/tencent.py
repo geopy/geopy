@@ -173,9 +173,10 @@ class Tencent(Geocoder):
             ``exactly_one=False``.
         """
 
-        self._check_status(response.get("status"), response.get("message"))
-        if response is None:
+        if not isinstance(response, dict):
             return
+
+        self._check_status(response.get("status"), response.get("message"))
 
         place = self._parse_place(response.get("result"), address=address)
         return place if exactly_one else [place]
@@ -189,7 +190,7 @@ class Tencent(Geocoder):
         :rtype: ``None`` or :class:`geopy.location.Location`
         """
 
-        if place is None:
+        if not isinstance(place, dict):
             return
 
         return Location(
@@ -207,7 +208,7 @@ class Tencent(Geocoder):
         :rtype: tuple of float
         """
 
-        if location is None:
+        if not isinstance(location, dict):
             return (None, None)
 
         return (location.get("lat"), location.get("lng"))
