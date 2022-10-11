@@ -9,9 +9,9 @@ jobs:
     name: Linting
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Install dependencies
@@ -24,9 +24,9 @@ jobs:
     name: RST (README.rst + docs) syntax check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python 3
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Install dependencies
@@ -37,19 +37,15 @@ jobs:
 
   test_local:
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix: # &test-matrix
-        python-version: [3.7, 3.8, 3.9, '3.10', 'pypy-3.7']
-        experimental: [false]
-        include:
-          - python-version: '3.11-dev'
-            experimental: true
+        python-version: [3.7, 3.8, 3.9, '3.10', '3.11-dev', 'pypy-3.7']
+
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -65,16 +61,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # *test-matrix  https://github.community/t/support-for-yaml-anchors/16128
-        python-version: [3.7, 3.8, 3.9, '3.10', 'pypy-3.7']
-        experimental: [false]
-        include:
-          - python-version: '3.11-dev'
-            experimental: true
+        python-version: [3.7, 3.8, 3.9, '3.10', '3.11-dev', 'pypy-3.7']
       max-parallel: 2  # Reduce load on the geocoding services
+
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
