@@ -1,9 +1,9 @@
-import base64
+import warnings
 import xml.etree.ElementTree as ET
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import ConfigurationError, GeocoderQueryError
+from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -15,7 +15,7 @@ class IGNFrance(Geocoder):
     """Geocoder using the IGN France GeoCoder OpenLS API.
 
     Documentation at:
-        https://geoservices.ign.fr/documentation/geoservices/index.html
+        https://geoservices.ign.fr/services-web-essentiels
     """
 
     xml_request = """<?xml version="1.0" encoding="UTF-8"?>
@@ -34,11 +34,11 @@ class IGNFrance(Geocoder):
         </Request>
     </XLS>"""
 
-    api_path = '/%(api_key)s/geoportail/ols'
+    api_path = '/essentiels/geoportail/ols'
 
     def __init__(
             self,
-            api_key,
+            api_key=None,
             *,
             username=None,
             password=None,
@@ -53,20 +53,27 @@ class IGNFrance(Geocoder):
     ):
         """
 
-        :param str api_key: The API key required by IGN France API
-            to perform geocoding requests. You can get your key here:
-            https://geoservices.ign.fr/documentation/services-acces.html.
-            Mandatory. For authentication with referer
-            and with username/password, the api key always differ.
+        :param str api_key: Not used.
 
-        :param str username: When making a call need HTTP simple
-            authentication username. Mandatory if no referer set
+            .. deprecated:: 2.3
+                IGNFrance geocoding methods no longer accept or require
+                authentication, see `<https://geoservices.ign.fr/actualites/2021-10-04-evolution-des-modalites-dacces-aux-services-web>`_.
+                This parameter is scheduled for removal in geopy 3.0.
 
-        :param str password: When making a call need HTTP simple
-            authentication password. Mandatory if no referer set
+        :param str username: Not used.
 
-        :param str referer: When making a call need HTTP referer.
-            Mandatory if no password and username
+            .. deprecated:: 2.3
+                See the `api_key` deprecation note.
+
+        :param str password: Not used.
+
+            .. deprecated:: 2.3
+                See the `api_key` deprecation note.
+
+        :param str referer: Not used.
+
+            .. deprecated:: 2.3
+                See the `api_key` deprecation note.
 
         :param str domain: Currently it is ``'wxs.ign.fr'``, can
             be changed for testing purposes for developer API
@@ -92,7 +99,7 @@ class IGNFrance(Geocoder):
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
             .. versionadded:: 2.0
-        """
+        """  # noqa
         super().__init__(
             scheme=scheme,
             timeout=timeout,
@@ -102,28 +109,19 @@ class IGNFrance(Geocoder):
             adapter_factory=adapter_factory,
         )
 
-        # Catch if no api key with username and password
-        # or no api key with referer
-        if not ((api_key and username and password) or (api_key and referer)):
-            raise ConfigurationError('You should provide an api key and a '
-                                     'username with a password or an api '
-                                     'key with a referer depending on '
-                                     'created api key')
-        if (username and password) and referer:
-            raise ConfigurationError('You can\'t set username/password and '
-                                     'referer together. The API key always '
-                                     'differs depending on both scenarios')
-        if username and not password:
-            raise ConfigurationError(
-                'username and password must be set together'
+        if api_key or username or password or referer:
+            warnings.warn(
+                "IGNFrance no longer accepts or requires authentication, "
+                "so api_key, username, password and referer are not used "
+                "anymore. These arguments should be removed. "
+                "In geopy 3 these options will be removed, causing "
+                "an error instead of this warning.",
+                DeprecationWarning,
+                stacklevel=2,
             )
 
-        self.api_key = api_key
-        self.username = username
-        self.password = password
-        self.referer = referer
         self.domain = domain.strip('/')
-        api_path = self.api_path % dict(api_key=self.api_key)
+        api_path = self.api_path
         self.api = '%s://%s%s' % (self.scheme, self.domain, api_path)
 
     def geocode(
@@ -447,19 +445,9 @@ class IGNFrance(Geocoder):
         """
         Send the request to get raw content.
         """
-        headers = {}
-        if self.referer is not None:
-            headers['Referer'] = self.referer
-
-        if self.username and self.password and self.referer is None:
-            credentials = '{0}:{1}'.format(self.username, self.password).encode()
-            auth_str = base64.standard_b64encode(credentials).decode()
-            headers['Authorization'] = 'Basic {}'.format(auth_str.strip())
-
         return self._call_geocoder(
             url,
             callback,
-            headers=headers,
             timeout=timeout,
             is_json=False,
         )
