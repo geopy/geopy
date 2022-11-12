@@ -41,10 +41,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # &test-matrix
-        python-version: [3.7, 3.8, 3.9, '3.10', 'pypy-3.7']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy-3.7']
         experimental: [false]
         include:
-          - python-version: '3.11-dev'
+          - python-version: '3.12-dev'
             experimental: true
     steps:
     - uses: actions/checkout@v2
@@ -65,10 +65,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # *test-matrix  https://github.community/t/support-for-yaml-anchors/16128
-        python-version: [3.7, 3.8, 3.9, '3.10', 'pypy-3.7']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy-3.7']
         experimental: [false]
         include:
-          - python-version: '3.11-dev'
+          - python-version: '3.12-dev'
             experimental: true
       max-parallel: 2  # Reduce load on the geocoding services
     steps:
