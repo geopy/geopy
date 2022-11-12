@@ -1,3 +1,4 @@
+import warnings
 from functools import partial
 from urllib.parse import urlencode
 
@@ -88,6 +89,7 @@ class Pelias(Geocoder):
             exactly_one=True,
             timeout=DEFAULT_SENTINEL,
             boundary_rect=None,
+            countries=None,
             country_bias=None,
             language=None
     ):
@@ -109,7 +111,20 @@ class Pelias(Geocoder):
         :param boundary_rect: Coordinates to restrict search within.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
 
+        :param list countries: A list of country codes specified in
+            `ISO 3166-1 alpha-2 or alpha-3
+            <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3>`_
+            format, e.g. ``['USA', 'CAN']``.
+            This is a hard filter.
+
+            .. versionadded:: 2.3
+
         :param str country_bias: Bias results to this country (ISO alpha-3).
+
+            .. deprecated:: 2.3
+                Use ``countries`` instead. This option behaves the same way,
+                i.e. it's not a soft filter as the name suggests.
+                This parameter is scheduled for removal in geopy 3.0.
 
         :param str language: Preferred language in which to return results.
             Either uses standard
@@ -136,7 +151,18 @@ class Pelias(Geocoder):
             params['boundary.rect.max_lat'] = lat2
 
         if country_bias:
+            warnings.warn(
+                "`country_bias` is deprecated, because it's not "
+                "a soft filter as the name suggests. Pass a list to the "
+                "`countries` option instead, which behaves the same "
+                "way. In geopy 3 the `country_bias` option will be removed.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             params['boundary.country'] = country_bias
+
+        if countries:
+            params['boundary.country'] = ",".join(countries)
 
         if language:
             params["lang"] = language

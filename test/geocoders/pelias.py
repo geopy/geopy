@@ -1,3 +1,5 @@
+import warnings
+
 from geopy.geocoders import Pelias
 from geopy.point import Point
 from test.geocoders.util import BaseTestGeocoder, env
@@ -57,6 +59,31 @@ class BaseTestPelias(BaseTestGeocoder):
             {},
         )
         assert result_reverse_en.raw['properties']['country'] == "Austria"
+
+    async def test_geocode_country_bias(self):
+        await self.geocode_run(
+            {"query": "moscow"},
+            {"latitude": 55.7504461, "longitude": 37.6174943},
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            await self.geocode_run(
+                {"query": "moscow",  # Idaho USA
+                 "country_bias": "USA"},
+                {"latitude": 46.7323875, "longitude": -117.0001651},
+            )
+            assert len(w) == 1
+
+    async def test_geocode_countries(self):
+        await self.geocode_run(
+            {"query": "moscow"},
+            {"latitude": 55.7504461, "longitude": 37.6174943},
+        )
+        await self.geocode_run(
+            {"query": "moscow",  # Idaho USA
+             "countries": ["USA", "CAN"]},
+            {"latitude": 46.7323875, "longitude": -117.0001651},
+        )
 
 
 class TestPelias(BaseTestPelias):
