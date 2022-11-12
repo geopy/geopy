@@ -223,7 +223,7 @@ class TestGoogleV3(BaseTestGeocoder):
 
         tz = pytz.timezone("Etc/GMT-2")
         local_aware_dt = tz.localize(datetime(2010, 1, 1, 2, 0, 0))
-        assert(
+        assert (
             utc_timestamp == self.geocoder._normalize_timezone_at_time(local_aware_dt)
         )
 

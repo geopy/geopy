@@ -8,24 +8,21 @@ INSTALL_REQUIRES = [
     'geographiclib<3,>=1.52',
 ]
 
-EXTRAS_DEV_TESTFILES_COMMON = [
-]
-
 EXTRAS_DEV_LINT = [
-    "flake8>=3.8.0,<3.9.0",
-    "isort>=5.6.0,<5.7.0",
+    "flake8>=5.0,<5.1",
+    "isort>=5.10.0,<5.11.0",
 ]
 
 EXTRAS_DEV_TEST = [
     "coverage",
     "pytest-asyncio>=0.17",
     "pytest>=3.10",
-    "sphinx",  # `docutils` from sphinx is used in tests
+    "sphinx<=4.3.2",  # `docutils` from sphinx is used in tests
 ]
 
 EXTRAS_DEV_DOCS = [
     "readme_renderer",
-    "sphinx",
+    "sphinx<=4.3.2",
     "sphinx-issues",
     "sphinx_rtd_theme>=0.5.0",
 ]
@@ -45,15 +42,12 @@ setup(
     install_requires=INSTALL_REQUIRES,
     extras_require={
         "dev": sorted(set(
-            EXTRAS_DEV_TESTFILES_COMMON +
             EXTRAS_DEV_LINT +
             EXTRAS_DEV_TEST +
             EXTRAS_DEV_DOCS
         )),
-        "dev-lint": (EXTRAS_DEV_TESTFILES_COMMON +
-                     EXTRAS_DEV_LINT),
-        "dev-test": (EXTRAS_DEV_TESTFILES_COMMON +
-                     EXTRAS_DEV_TEST),
+        "dev-lint": EXTRAS_DEV_LINT,
+        "dev-test": EXTRAS_DEV_TEST,
         "dev-docs": EXTRAS_DEV_DOCS,
         "aiohttp": ["aiohttp"],
         "requests": [
