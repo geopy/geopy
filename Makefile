@@ -30,7 +30,7 @@ test-local:
 .PHONY: test
 test: test-local
 	# Run tests with Internet:
-	coverage run -m py.test
+	coverage run -m pytest
 	coverage report
 
 .PHONY: readme_check
