@@ -260,7 +260,7 @@ class TestGoogleV3(BaseTestGeocoder):
     async def test_geocode_bounds(self):
         await self.geocode_run(
             {"query": "Washington", "bounds": [[36.47, -84.72], [43.39, -65.90]]},
-            {"latitude": 38.9071923, "longitude": -77.0368707}
+            {"latitude": 40.0, "longitude": -120.7401386, "delta": 8}
         )
 
     async def test_geocode_bounds_invalid(self):

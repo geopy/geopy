@@ -76,10 +76,10 @@ class TestMapTiler(BaseTestGeocoder):
 
     async def test_geocode_raw(self):
         result = await self.geocode_run({"query": "New York"}, {})
-        delta = 1.0
+        delta = 4.0
         expected = pytest.approx((-73.8784155, 40.6930727), abs=delta)
         assert expected == result.raw['center']
-        assert "relation175905" == result.raw['properties']['osm_id']
+        assert result.raw['properties']['osm_id'] in ("r61320", "relation175905")
 
     async def test_geocode_exactly_one_false(self):
         list_result = await self.geocode_run(

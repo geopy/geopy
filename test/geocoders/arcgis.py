@@ -100,5 +100,5 @@ class TestArcGISAuthenticated(BaseTestGeocoder):
     async def test_basic_address(self):
         await self.geocode_run(
             {"query": "Potsdamer Platz, Berlin, Deutschland"},
-            {"latitude": 52.5094982, "longitude": 13.3765983},
+            {"latitude": 52.5094982, "longitude": 13.3765983, "delta": 4},
         )

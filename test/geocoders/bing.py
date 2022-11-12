@@ -58,9 +58,9 @@ class TestBing(BaseTestGeocoder):
 
     async def test_user_location(self):
         pennsylvania = (40.98327, -74.96064)
-        colorado = (40.160, -105.10)
-
         pennsylvania_bias = (40.922351, -75.096562)
+
+        colorado = (40.160, -80.0)
         colorado_bias = (39.914231, -105.070104)
         for expected, bias in ((pennsylvania, pennsylvania_bias),
                                (colorado, colorado_bias)):
