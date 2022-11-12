@@ -304,7 +304,8 @@ class Nominatim(Geocoder):
             timeout=DEFAULT_SENTINEL,
             language=False,
             addressdetails=True,
-            zoom=None
+            zoom=None,
+            namedetails=False,
     ):
         """
         Return an address by location point.
@@ -335,6 +336,12 @@ class Nominatim(Geocoder):
             an integer in range from 0 (country level) to 18 (building level),
             default is 18.
 
+        :param bool namedetails: If you want in *Location.raw* to include
+            namedetails, set it to True. This will be a list of alternative names,
+            including language variants, etc.
+
+            .. versionadded:: 2.3
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
 
@@ -355,6 +362,9 @@ class Nominatim(Geocoder):
 
         if zoom is not None:
             params['zoom'] = zoom
+
+        if namedetails:
+            params['namedetails'] = 1
 
         url = self._construct_url(self.reverse_api, params)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)

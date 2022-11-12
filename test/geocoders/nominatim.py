@@ -283,7 +283,7 @@ class BaseTestNominatim(BaseTestGeocoder):
     async def test_featuretype_param(self, payload, expected):
         await self.geocode_run(payload, expected)
 
-    async def test_namedetails(self):
+    async def test_geocode_namedetails(self):
         query = "Kyoto, Japan"
         result = await self.geocode_run(
             {"query": query, "namedetails": True},
@@ -292,6 +292,20 @@ class BaseTestNominatim(BaseTestGeocoder):
         assert 'namedetails' in result.raw
 
         result = await self.geocode_run(
+            {"query": query, "namedetails": False},
+            {},
+        )
+        assert 'namedetails' not in result.raw
+
+    async def test_reverse_namedetails(self):
+        query = "40.689253199999996, -74.04454817144321"
+        result = await self.reverse_run(
+            {"query": query, "namedetails": True},
+            {},
+        )
+        assert 'namedetails' in result.raw
+
+        result = await self.reverse_run(
             {"query": query, "namedetails": False},
             {},
         )
