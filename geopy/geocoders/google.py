@@ -165,7 +165,7 @@ class GoogleV3(Geocoder):
                 '`components` parameter must be of type `dict` or `list`')
 
         return "|".join(
-            (":".join(item) for item in component_items)
+            ":".join(item) for item in component_items
         )
 
     def geocode(

@@ -196,9 +196,9 @@ class Yandex(Geocoder):
             except KeyError:
                 raise GeocoderParseError('Failed to parse server response')
 
-            longitude, latitude = [
+            longitude, latitude = (
                 float(_) for _ in place['Point']['pos'].split(' ')
-            ]
+            )
 
             name_elements = ['name', 'description']
             location = ', '.join([place[k] for k in name_elements if place.get(k)])

@@ -128,8 +128,8 @@ class CommonDistanceComputationCases:
             self.assertEqual(1, len(w))
 
     def test_should_get_consistent_results_for_distance_calculations(self):
-        distance1, distance2 = [self.cls((0, 0), (0, 1))
-                                for _ in range(2)]
+        distance1, distance2 = (self.cls((0, 0), (0, 1))
+                                for _ in range(2))
         self.assertEqual(distance1.kilometers, distance2.kilometers)
 
 

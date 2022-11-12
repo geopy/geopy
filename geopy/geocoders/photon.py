@@ -144,8 +144,7 @@ class Photon(Geocoder):
                 params['lon'] = lon
                 params['lat'] = lat
             except ValueError:
-                raise ValueError(("Location bias must be a"
-                                  " coordinate pair or Point"))
+                raise ValueError("Location bias must be a coordinate pair or Point")
 
         if bbox:
             params['bbox'] = self._format_bounding_box(

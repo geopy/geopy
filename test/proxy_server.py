@@ -21,7 +21,7 @@ def pipe_sockets(sock1, sock2, timeout):
                     break
                 other = next(s for s in sockets if s is not sock)
                 other.sendall(data)
-    except IOError:
+    except OSError:
         pass
     finally:
         for sock in sockets:
@@ -155,7 +155,7 @@ class ProxyServerThread(threading.Thread):
                     addr = host, int(port)
                     other_connection = \
                         socket.create_connection(addr, timeout=self.timeout)
-                except socket.error:
+                except OSError:
                     self.send_error(502, 'Bad gateway')
                     return
 
@@ -204,7 +204,7 @@ class HttpServerThread(threading.Thread):
         self.http_server = None
         self.socket_created_future = Future()
 
-        super(HttpServerThread, self).__init__()
+        super().__init__()
         self.daemon = True
 
     def __enter__(self):

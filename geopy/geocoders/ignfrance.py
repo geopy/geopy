@@ -296,11 +296,11 @@ class IGNFrance(Geocoder):
                 )
 
         point = self._coerce_point_to_string(query, "%(lat)s %(lon)s")
-        reverse_geocode_preference = '\n'.join((
+        reverse_geocode_preference = '\n'.join(
             '<ReverseGeocodePreference>%s</ReverseGeocodePreference>' % pref
             for pref
             in reverse_geocode_preference
-        ))
+        )
 
         request_string = xml_request.format(
             maximum_responses=maximum_responses,

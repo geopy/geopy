@@ -58,7 +58,7 @@ class TestGoogleV3(BaseTestGeocoder):
         geocoder = GoogleV3(
             api_key='mock',
             client_id='my_client_id',
-            secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8'))
+            secret_key=base64.urlsafe_b64encode(b'my_secret_key')
         )
         assert geocoder.premier
         # the two possible URLs handle both possible orders of the request
@@ -79,7 +79,7 @@ class TestGoogleV3(BaseTestGeocoder):
         geocoder = GoogleV3(
             api_key='mock',
             client_id='my_client_id',
-            secret_key=base64.urlsafe_b64encode('my_secret_key'.encode('utf8')),
+            secret_key=base64.urlsafe_b64encode(b'my_secret_key'),
             channel='my_channel'
         )
 

@@ -14,7 +14,7 @@ _env = {}
 try:
     with open(".test_keys") as fp:
         _env.update(json.loads(fp.read()))
-except IOError:
+except OSError:
     _env.update(os.environ)
 
 
