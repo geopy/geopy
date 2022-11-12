@@ -7,6 +7,7 @@ venv:
 
 .PHONY: develop
 develop:
+	pip install wheel
 	pip install -e '.[dev]'
 
 .PHONY: lint lint-flake8 lint-isort
