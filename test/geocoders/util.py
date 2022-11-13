@@ -25,7 +25,7 @@ class SkipIfMissingEnv(dict):
 
     def __getitem__(self, key):
         assert self.is_internet_access_allowed is not None
-        if key not in self:
+        if key not in self or not super().__getitem__(key):
             if self.is_internet_access_allowed:
                 pytest.skip("Missing geocoder credential: %s" % (key,))
             else:
