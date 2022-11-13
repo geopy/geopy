@@ -61,6 +61,8 @@ class MapBox(Geocoder):
 
         :param str referer: The URL used to satisfy the URL restriction of
             mapbox tokens.
+
+            .. versionadded:: 2.3
         """
         super().__init__(
             scheme=scheme,
@@ -131,6 +133,8 @@ class MapBox(Geocoder):
             responses, and also affects result scoring, with results matching the user’s
             query in the requested language being preferred over results that match in
             another language. You can pass two letters country codes (ISO 639-1).
+
+            .. versionadded:: 2.3
 
         :param bbox: The bounding box of the viewport within which
             to bias geocode results more prominently.
