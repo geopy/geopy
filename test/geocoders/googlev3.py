@@ -44,15 +44,21 @@ class TestGoogleV3(BaseTestGeocoder):
         GoogleV3(client_id='client_id', secret_key='secret_key')
 
     async def test_check_status(self):
-        assert self.geocoder._check_status("ZERO_RESULTS") is None
+        def make_error(status, error_message=None):
+            return {
+                "status": status,
+                **({"error_message": error_message} if error_message else {}),
+            }
+
+        assert self.geocoder._check_status(make_error("ZERO_RESULTS")) is None
         with pytest.raises(exc.GeocoderQuotaExceeded):
-            self.geocoder._check_status("OVER_QUERY_LIMIT")
+            self.geocoder._check_status(make_error("OVER_QUERY_LIMIT"))
         with pytest.raises(exc.GeocoderQueryError):
-            self.geocoder._check_status("REQUEST_DENIED")
+            self.geocoder._check_status(make_error("REQUEST_DENIED"))
         with pytest.raises(exc.GeocoderQueryError):
-            self.geocoder._check_status("INVALID_REQUEST")
-        with pytest.raises(exc.GeocoderQueryError):
-            self.geocoder._check_status("_")
+            self.geocoder._check_status(make_error("INVALID_REQUEST"))
+        with pytest.raises(exc.GeocoderServiceError):
+            self.geocoder._check_status(make_error("_"))
 
     async def test_get_signed_url(self):
         geocoder = GoogleV3(

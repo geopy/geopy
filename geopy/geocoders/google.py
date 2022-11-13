@@ -7,7 +7,13 @@ from datetime import datetime
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import ConfigurationError, GeocoderQueryError, GeocoderQuotaExceeded
+from geopy.exc import (
+    ConfigurationError,
+    GeocoderQueryError,
+    GeocoderQuotaExceeded,
+    GeocoderServiceError,
+    GeocoderUnavailable,
+)
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.timezone import ensure_pytz_is_installed, from_timezone_name
@@ -363,9 +369,7 @@ class GoogleV3(Geocoder):
         return self._call_geocoder(url, self._parse_json_timezone, timeout=timeout)
 
     def _parse_json_timezone(self, response):
-        status = response.get('status')
-        if status != 'OK':
-            self._check_status(status)
+        self._check_status(response)
 
         timezone_id = response.get("timeZoneId")
         if timezone_id is None:
@@ -393,8 +397,8 @@ class GoogleV3(Geocoder):
         '''Returns location, (latitude, longitude) from json feed.'''
 
         places = page.get('results', [])
-        if not len(places):
-            self._check_status(page.get('status'))
+        self._check_status(page)
+        if not places:
             return None
 
         def parse_place(place):
@@ -409,22 +413,35 @@ class GoogleV3(Geocoder):
         else:
             return [parse_place(place) for place in places]
 
-    def _check_status(self, status):
-        # https://developers.google.com/maps/documentation/geocoding/overview#StatusCodes
-        if status == 'ZERO_RESULTS':
-            # When there are no results, just return.
+    def _check_status(self, response):
+        # https://developers.google.com/maps/documentation/geocoding/requests-geocoding#StatusCodes
+        status = response.get('status')
+        if status == 'OK':
             return
+        if status == 'ZERO_RESULTS':
+            return
+
+        error_message = response.get('error_message')
+        # https://developers.google.com/maps/documentation/geocoding/requests-geocoding#ErrorMessages
+        #   When the geocoder returns a status code other than OK, there *may*
+        #   be an additional error_message field within the Geocoding response
+        #   object.
+
         if status in ('OVER_QUERY_LIMIT', 'OVER_DAILY_LIMIT'):
             raise GeocoderQuotaExceeded(
+                error_message or
                 'The given key has gone over the requests limit in the 24'
                 ' hour period or has submitted too many requests in too'
-                ' short a period of time.'
+                ' short a period of time'
             )
         elif status == 'REQUEST_DENIED':
-            raise GeocoderQueryError(
-                'Your request was denied.'
-            )
+            raise GeocoderQueryError(error_message or 'Your request was denied')
         elif status == 'INVALID_REQUEST':
-            raise GeocoderQueryError('Probably missing address or latlng.')
+            raise GeocoderQueryError(
+                error_message or 'Probably missing address or latlng'
+            )
+        elif status == 'UNKNOWN_ERROR':
+            raise GeocoderUnavailable(error_message or 'Server error')
         else:
-            raise GeocoderQueryError('Unknown error.')
+            # Unknown (undocumented) status.
+            raise GeocoderServiceError(error_message or 'Unknown error')
