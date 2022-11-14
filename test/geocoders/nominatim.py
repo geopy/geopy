@@ -92,11 +92,14 @@ class BaseTestNominatim(BaseTestGeocoder):
         try:
             # For some queries `city_district` might be missing in the response.
             # For this specific query on OpenMapQuest the key is also missing.
-            city_district = result.raw['address']['city_district']
+            assert 'Mitte' == result.raw['address']['city_district']
         except KeyError:
             # MapQuest
-            city_district = result.raw['address']['suburb']
-        assert city_district == 'Mitte'
+            try:
+                assert 'Mitte' == result.raw['address']['suburb']
+            except KeyError:
+                # PickPoint
+                assert 'Berlin' == result.raw['address']['city']
 
     async def test_geocode_language_parameter(self):
         query = "Mohrenstrasse Berlin"
