@@ -7,7 +7,6 @@ venv:
 
 .PHONY: develop
 develop:
-	pip install wheel
 	pip install -e '.[dev]'
 
 .PHONY: lint lint-flake8 lint-isort
@@ -62,11 +61,12 @@ authors:
 .PHONY: dist
 dist:
 	make clean
-	./setup.py sdist --format=gztar bdist_wheel
+	python -m build
 
 .PHONY: pypi-release
 pypi-release:
 	twine --version
+	twine check --strict dist/*
 	twine upload -s dist/*
 
 .PHONY: release
