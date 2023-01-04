@@ -10,7 +10,7 @@ __all__ = ("DataBC", )
 
 
 class DataBC(Geocoder):
-    """Geocoder using the Physical Address Geocoder from DataBC.
+    """Geocoder using the BC Address Geocoder from DataBC.
 
     Documentation at:
         https://www2.gov.bc.ca/gov/content?id=118DD57CD9674D57BDBD511C2E78DC0D
