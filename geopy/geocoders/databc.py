@@ -13,10 +13,10 @@ class DataBC(Geocoder):
     """Geocoder using the Physical Address Geocoder from DataBC.
 
     Documentation at:
-        http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.page
+        https://www2.gov.bc.ca/gov/content?id=118DD57CD9674D57BDBD511C2E78DC0D
     """
 
-    geocode_path = '/pub/geocoder/addresses.geojson'
+    geocode_path = '/addresses.geojson'
 
     def __init__(
             self,
@@ -59,7 +59,7 @@ class DataBC(Geocoder):
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
         )
-        domain = 'apps.gov.bc.ca'
+        domain = 'geocoder.api.gov.bc.ca'
         self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
 
     def geocode(
