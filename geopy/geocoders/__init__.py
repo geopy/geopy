@@ -186,7 +186,6 @@ __all__ = (
     #
     # Also don't forget to pull up the list of geocoders
     # in the docs: docs/index.rst
-    "AlgoliaPlaces",
     "ArcGIS",
     "AzureMaps",
     "Baidu",
@@ -220,7 +219,6 @@ __all__ = (
 
 
 from geopy.exc import GeocoderNotFound
-from geopy.geocoders.algolia import AlgoliaPlaces
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu, BaiduV3
@@ -250,7 +248,6 @@ from geopy.geocoders.what3words import What3Words, What3WordsV3
 from geopy.geocoders.yandex import Yandex
 
 SERVICE_TO_GEOCODER = {
-    "algolia": AlgoliaPlaces,
     "arcgis": ArcGIS,
     "azure": AzureMaps,
     "baidu": Baidu,
