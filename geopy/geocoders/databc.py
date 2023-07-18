@@ -60,7 +60,7 @@ class DataBC(Geocoder):
             adapter_factory=adapter_factory,
         )
         domain = 'apps.gov.bc.ca'
-        self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
+        self.api = f"{self.scheme}://{domain}{self.geocode_path}"
 
     def geocode(
             self,

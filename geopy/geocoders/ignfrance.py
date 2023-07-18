@@ -122,7 +122,7 @@ class IGNFrance(Geocoder):
 
         self.domain = domain.strip('/')
         api_path = self.api_path
-        self.api = '%s://%s%s' % (self.scheme, self.domain, api_path)
+        self.api = f"{self.scheme}://{domain}{self.api_path}"
 
     def geocode(
             self,
@@ -295,9 +295,8 @@ class IGNFrance(Geocoder):
 
         point = self._coerce_point_to_string(query, "%(lat)s %(lon)s")
         reverse_geocode_preference = '\n'.join(
-            '<ReverseGeocodePreference>%s</ReverseGeocodePreference>' % pref
-            for pref
-            in reverse_geocode_preference
+            f"<ReverseGeocodePreference>{pref}</ReverseGeocodePreference>"
+            for pref in reverse_geocode_preference
         )
 
         request_string = xml_request.format(
@@ -333,7 +332,7 @@ class IGNFrance(Geocoder):
         # Clean tree from namespace to facilitate XML manipulation
         def remove_namespace(doc, namespace):
             """Remove namespace in the document in place."""
-            ns = '{%s}' % namespace
+            ns = f"{{{namespace}}}"
             nsl = len(ns)
             for elem in doc.iter():
                 if elem.tag.startswith(ns):
@@ -466,19 +465,12 @@ class IGNFrance(Geocoder):
             else:
                 # When classic geocoding
                 # or when reverse geocoding
-                location = "%s %s" % (
-                    place.get('postal_code', ''),
-                    place.get('commune', ''),
+                location = (
+                    f"{place.get('postal_code', '')} {place.get('commune', '')}"
                 )
                 if place.get('street'):
-                    location = "%s, %s" % (
-                        place.get('street', ''),
-                        location,
-                    )
+                    location = f"{place.get('street', '')}, {location}"
                 if place.get('building'):
-                    location = "%s %s" % (
-                        place.get('building', ''),
-                        location,
-                    )
+                    location = f"{place.get('building', '')} {location}"
 
         return Location(location, (place.get('lat'), place.get('lng')), place)

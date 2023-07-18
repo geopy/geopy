@@ -66,7 +66,7 @@ class LiveAddress(Geocoder):
         self.auth_token = auth_token
 
         domain = 'api.smartystreets.com'
-        self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
+        self.api = f"{self.scheme}://{domain}{self.geocode_path}"
 
     def geocode(
             self,
@@ -106,7 +106,7 @@ class LiveAddress(Geocoder):
             'street': query,
             'candidates': candidates,
         }
-        url = '{url}?{query}'.format(url=self.api, query=urlencode(query))
+        url = f"{self.api}?{urlencode(query)}"
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)

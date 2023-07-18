@@ -20,8 +20,8 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(point.altitude, self.alt)
 
     def test_point_str_simple(self):
-        for each in ("%s,%s", "%s %s", "%s;%s"):
-            point = Point(each % (self.lat, self.lon))
+        for each in ("{},{}", "{} {}", "{};{}"):
+            point = Point(each.format(self.lat, self.lon))
             self.assertEqual(point.longitude, self.lon)
             self.assertEqual(point.latitude, self.lat)
             self.assertEqual(point.altitude, 0)
@@ -263,7 +263,7 @@ class PointTestCase(unittest.TestCase):
     def test_point_eq(self):
         self.assertEqual(
             Point(self.lat, self.lon),
-            Point("%s %s" % (self.lat, self.lon))
+            Point(f"{self.lat} {self.lon}")
         )
 
     def test_point_ne(self):

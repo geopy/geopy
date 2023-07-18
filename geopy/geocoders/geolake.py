@@ -86,7 +86,7 @@ class Geolake(Geocoder):
 
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
+        self.api = f"{self.scheme}://{domain}{self.api_path}"
 
     def geocode(
             self,

@@ -54,7 +54,7 @@ class TimezoneTestCase(unittest.TestCase):
         raw = dict(foo="bar")
         pytz_timezone = pytz.timezone(self.timezone_name)
         tz = Timezone(pytz_timezone, raw)
-        self.assertEqual(repr(tz), "Timezone(%s)" % repr(pytz_timezone))
+        self.assertEqual(repr(tz), f"Timezone({pytz_timezone!r})")
 
     def test_eq(self):
         tz = pytz.timezone("Europe/Paris")

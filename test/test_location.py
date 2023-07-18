@@ -110,7 +110,7 @@ class LocationTestCase(unittest.TestCase):
         loc = Location(address, point, {})
         self.assertEqual(
             repr(loc),
-            "Location(%s, %r)" % (address, point)
+            f"Location({address}, {point!r})"
         )
 
     def test_location_is_picklable(self):

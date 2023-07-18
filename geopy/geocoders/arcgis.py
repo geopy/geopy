@@ -115,19 +115,13 @@ class ArcGIS(Geocoder):
         self.password = password
         self.referer = referer
         self.auth_domain = auth_domain.strip('/')
-        self.auth_api = (
-            '%s://%s%s' % (self.scheme, self.auth_domain, self.auth_path)
-        )
+        self.auth_api = f"{self.scheme}://{self.auth_domain}{self.auth_path}"
 
         self.token_lifetime = token_lifetime * 60  # store in seconds
 
         self.domain = domain.strip('/')
-        self.api = (
-            '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
-        )
-        self.reverse_api = (
-            '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
-        )
+        self.api = f"{self.scheme}://{domain}{self.geocode_path}"
+        self.reverse_api = f"{self.scheme}://{self.auth_domain}{self.reverse_path}"
 
         # Mutable state
         self.token = None
@@ -221,7 +215,7 @@ class ArcGIS(Geocoder):
         params = {'location': location, 'f': 'json', 'outSR': wkid}
         if distance is not None:
             params['distance'] = distance
-        url = "?".join((self.reverse_api, urlencode(params)))
+        url = f"{self.reverse_api}?{urlencode(params)}"
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_reverse, exactly_one=exactly_one)
         return self._authenticated_call_geocoder(url, callback, timeout=timeout)
@@ -242,8 +236,8 @@ class ArcGIS(Geocoder):
 
         if response['address'].get('Address'):
             address = (
-                "%(Address)s, %(City)s, %(Region)s %(Postal)s,"
-                " %(CountryCode)s" % response['address']
+                "{Address}, {City}, {Region} {Postal}, {CountryCode}"
+                .format(**response['address'])
             )
         else:
             address = response['address']['LongLabel']
@@ -319,7 +313,7 @@ class ArcGIS(Geocoder):
             if "token" not in response:
                 raise GeocoderAuthenticationFailure(
                     "Missing token in auth request."
-                    "Request URL: %s; response JSON: %s" % (url, json.dumps(response))
+                    f"Request URL: {url}; response JSON: {json.dumps(response)}"
                 )
             self.token = response["token"]
             self.token_expiry = int(time()) + self.token_lifetime

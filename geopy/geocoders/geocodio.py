@@ -130,8 +130,7 @@ class Geocodio(Geocoder):
         if exactly_one:
             params['limit'] = 1
 
-        api = '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
-        url = "?".join((api, urlencode(params)))
+        url = f"{self.scheme}://{self.domain}{self.geocode_path}?{urlencode(params)}"
 
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
@@ -173,8 +172,7 @@ class Geocodio(Geocoder):
         if limit is not None:
             params['limit'] = limit
 
-        api = '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
-        url = "?".join((api, urlencode(params)))
+        url = f"{self.scheme}://{self.domain}{self.reverse_path}?{urlencode(params)}"
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)

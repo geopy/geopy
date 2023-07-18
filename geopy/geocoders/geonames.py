@@ -88,18 +88,12 @@ class GeoNames(Geocoder):
         self.username = username
 
         domain = 'api.geonames.org'
-        self.api = (
-            "%s://%s%s" % (self.scheme, domain, self.geocode_path)
-        )
-        self.api_reverse = (
-            "%s://%s%s" % (self.scheme, domain, self.reverse_path)
-        )
+        self.api = f"{self.scheme}://{domain}{self.geocode_path}"
+        self.api_reverse = f"{self.scheme}://{domain}{self.reverse_path}"
         self.api_reverse_nearby = (
-            "%s://%s%s" % (self.scheme, domain, self.reverse_nearby_path)
+            f"{self.scheme}://{domain}{self.reverse_nearby_path}"
         )
-        self.api_timezone = (
-            "%s://%s%s" % (self.scheme, domain, self.timezone_path)
-        )
+        self.api_timezone = f"{self.scheme}://{domain}{self.timezone_path}"
 
     def geocode(
             self,
@@ -230,7 +224,7 @@ class GeoNames(Geocoder):
             url = "?".join((self.api_reverse_nearby, urlencode(params)))
         else:
             raise GeocoderQueryError(
-                '`%s` find_nearby_type is not supported by geopy' % find_nearby_type
+                f"`{find_nearby_type}` find_nearby_type is not supported by geopy"
             )
 
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)

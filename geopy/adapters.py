@@ -248,7 +248,7 @@ def _normalize_proxies(proxies):
             # from requests (in some envs):
             #   urllib3.exceptions.ProxySchemeUnknown: Not supported
             #   proxy scheme localhost
-            url = "http://%s" % url
+            url = f"http://{url}"
         normalized[scheme] = url
     return normalized
 
@@ -330,7 +330,7 @@ class URLLibAdapter(BaseSyncAdapter):
                     for name, value in page.headers.items()
                 }
                 raise AdapterHTTPError(
-                    "Non-successful status code %s" % status_code,
+                    f"Non-successful status code {status_code}",
                     status_code=status_code,
                     headers=response_headers,
                     text=text,
@@ -449,7 +449,7 @@ class RequestsAdapter(BaseSyncAdapter):
             return resp.json()
         except ValueError:
             raise GeocoderParseError(
-                "Could not deserialize using deserializer:\n%s" % resp.text
+                f"Could not deserialize using deserializer:\n{resp.text}"
             )
 
     def _request(self, url, *, timeout, headers):
@@ -473,7 +473,7 @@ class RequestsAdapter(BaseSyncAdapter):
         else:
             if resp.status_code >= 400:
                 raise AdapterHTTPError(
-                    "Non-successful status code %s" % resp.status_code,
+                    f"Non-successful status code {resp.status_code}",
                     status_code=resp.status_code,
                     headers=resp.headers,
                     text=resp.text,
@@ -552,14 +552,13 @@ class AioHTTPAdapter(BaseAsyncAdapter):
                         return json.loads(await resp.text())
                 except ValueError:
                     raise GeocoderParseError(
-                        "Could not deserialize using deserializer:\n%s"
-                        % (await resp.text())
+                        f"Could not deserialize using deserializer:\n{await resp.text()}"
                     )
 
     async def _raise_for_status(self, resp):
         if resp.status >= 400:
             raise AdapterHTTPError(
-                "Non-successful status code %s" % resp.status,
+                f"Non-successful status code {resp.status}",
                 status_code=resp.status,
                 headers=resp.headers,
                 text=await resp.text(),

@@ -114,8 +114,8 @@ class Nominatim(Geocoder):
                 % self.headers['User-Agent']
             )
 
-        self.api = "%s://%s%s" % (self.scheme, self.domain, self.geocode_path)
-        self.reverse_api = "%s://%s%s" % (self.scheme, self.domain, self.reverse_path)
+        self.api = f"{self.scheme}://{self.domain}{self.geocode_path}"
+        self.reverse_api = f"{self.scheme}://{self.domain}{self.reverse_path}"
 
     def _construct_url(self, base_api, params):
         """

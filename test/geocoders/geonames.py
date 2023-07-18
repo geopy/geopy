@@ -190,7 +190,7 @@ class TestGeoNamesInvalidAccount(BaseTestGeocoder):
     @classmethod
     def make_geocoder(cls, **kwargs):
         return GeoNames(
-            username="geopy-not-existing-%s" % uuid.uuid4(),
+            username=f"geopy-not-existing-{uuid.uuid4()}",
             **kwargs
         )
 

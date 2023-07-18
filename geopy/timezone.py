@@ -27,8 +27,8 @@ def from_timezone_name(timezone_name, raw):
         pytz_timezone = pytz.timezone(timezone_name)
     except pytz.UnknownTimeZoneError:
         raise GeocoderParseError(
-            "pytz could not parse the timezone identifier (%s) "
-            "returned by the service." % timezone_name
+            "pytz could not parse the timezone identifier "
+            f"({timezone_name}) returned by the service."
         )
     except KeyError:
         raise GeocoderParseError(
@@ -79,7 +79,7 @@ class Timezone:
         return str(self._pytz_timezone)
 
     def __repr__(self):
-        return "Timezone(%s)" % repr(self.pytz_timezone)
+        return f"Timezone({self.pytz_timezone!r})"
 
     def __getstate__(self):
         return self._pytz_timezone, self._raw

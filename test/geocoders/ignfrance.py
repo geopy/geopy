@@ -95,17 +95,12 @@ class TestIGNFrance(BaseTestGeocoder):
     async def test_geocode_filter_by_envelope(self):
         lat_min, lng_min, lat_max, lng_max = 45.00, 5, 46, 6.40
 
-        spatial_filtering_envelope = """
+        spatial_filtering_envelope = f"""
         <gml:envelope>
             <gml:pos>{lat_min} {lng_min}</gml:pos>
             <gml:pos>{lat_max} {lng_max}</gml:pos>
         </gml:envelope>
-        """.format(
-            lat_min=lat_min,
-            lng_min=lng_min,
-            lat_max=lat_max,
-            lng_max=lng_max
-        )
+        """
 
         res_spatial_filter = await self.geocode_run(
             {"query": 'Les Molettes',
@@ -165,10 +160,10 @@ class TestIGNFrance(BaseTestGeocoder):
     async def test_reverse_by_radius(self):
         spatial_filtering_radius = """
         <gml:CircleByCenterPoint>
-            <gml:pos>{coord}</gml:pos>
-            <gml:radius>{radius}</gml:radius>
+            <gml:pos>48.8033333 2.3241667</gml:pos>
+            <gml:radius>50</gml:radius>
         </gml:CircleByCenterPoint>
-        """.format(coord='48.8033333 2.3241667', radius='50')
+        """
 
         res_call_radius = await self.reverse_run(
             {"query": '48.8033333,2.3241667',

@@ -27,7 +27,7 @@ class SkipIfMissingEnv(dict):
         assert self.is_internet_access_allowed is not None
         if key not in self or not super().__getitem__(key):
             if self.is_internet_access_allowed:
-                pytest.skip("Missing geocoder credential: %s" % (key,))
+                pytest.skip(f"Missing geocoder credential: {key}")
             else:
                 # Generate some dummy token. We won't perform a networking
                 # request anyways.
@@ -110,9 +110,9 @@ class BaseTestGeocoder(ABC):
             assert result is None
             return
         if result is None:
-            pytest.fail('%s: No result found' % cls.__name__)
+            pytest.fail(f"{cls.__name__}: No result found")
         if result == []:
-            pytest.fail('%s returned an empty list instead of None' % cls.__name__)
+            pytest.fail(f"{cls.__name__} returned an empty list instead of None")
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
@@ -136,9 +136,9 @@ class BaseTestGeocoder(ABC):
             assert result is None
             return
         if result is None:
-            pytest.fail('%s: No result found' % cls.__name__)
+            pytest.fail(f"{cls.__name__}: No result found")
         if result == []:
-            pytest.fail('%s returned an empty list instead of None' % cls.__name__)
+            pytest.fail(f"{cls.__name__} returned an empty list instead of None")
         self._verify_request(result, exactly_one=payload.get('exactly_one', True),
                              **expected)
         return result
@@ -169,20 +169,20 @@ class BaseTestGeocoder(ABC):
             if not skiptest_on_errors:
                 raise
             pytest.skip(
-                "%s: Rate-limited, retry-after %s" % (cls.__name__, e.retry_after)
+                f"{cls.__name__}: Rate-limited, retry-after {e.retry_after}"
             )
         except exc.GeocoderQuotaExceeded:
             if not skiptest_on_errors:
                 raise
-            pytest.skip("%s: Quota exceeded" % cls.__name__)
+            pytest.skip(f"{cls.__name__}: Quota exceeded")
         except exc.GeocoderTimedOut:
             if not skiptest_on_errors:
                 raise
-            pytest.skip("%s: Service timed out" % cls.__name__)
+            pytest.skip(f"{cls.__name__}: Service timed out")
         except exc.GeocoderUnavailable:
             if not skiptest_on_errors:
                 raise
-            pytest.skip("%s: Service unavailable" % cls.__name__)
+            pytest.skip(f"%{cls.__name__} Service unavailable")
         return result
 
     def _verify_request(

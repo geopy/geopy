@@ -31,7 +31,7 @@ class Location:
             self._point = Point(point)
         else:
             raise TypeError(
-                "`point` is of unsupported type: %r" % type(point)
+                f"`point` is of unsupported type: {type(point)!r}"
             )
         self._tuple = _location_tuple(self)
 
@@ -111,8 +111,9 @@ class Location:
         return self._address
 
     def __repr__(self):
-        return "Location(%s, (%s, %s, %s))" % (
-            self._address, self.latitude, self.longitude, self.altitude
+        return (
+            f"Location({self._address}, "
+            f"({self.latitude}, {self.longitude}, {self.altitude}))"
         )
 
     def __iter__(self):

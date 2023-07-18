@@ -170,12 +170,14 @@ class GeocoderPointCoercionTestCase(unittest.TestCase):
         assert latlon == self.coordinates_str
 
     def test_string_is_trimmed(self):
-        coordinates_str_spaces = "  %s  ,  %s  " % self.coordinates
+        coordinates_str_spaces = (
+            f"  {self.coordinates[0]}  ,  {self.coordinates[1]}  "
+        )
         latlon = self.method(coordinates_str_spaces)
         assert latlon == self.coordinates_str
 
     def test_output_format_is_respected(self):
-        expected = "  %s  %s  " % self.coordinates[::-1]
+        expected = f"  {self.coordinates[-1]}  {self.coordinates[0]}  "
         lonlat = self.method(self.coordinates_str, "  %(lon)s  %(lat)s  ")
         assert lonlat == expected
 

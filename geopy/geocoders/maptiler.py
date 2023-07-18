@@ -68,7 +68,7 @@ class MapTiler(Geocoder):
         )
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.api = "%s://%s%s" % (self.scheme, self.domain, self.api_path)
+        self.api = f"{self.scheme}://{self.domain}{self.api_path}"
 
     def _parse_json(self, json, exactly_one=True):
         # Returns location, (latitude, longitude) from json feed.
@@ -142,7 +142,7 @@ class MapTiler(Geocoder):
 
         if proximity:
             p = Point(proximity)
-            params['proximity'] = "%s,%s" % (p.longitude, p.latitude)
+            params['proximity'] = f"{p.longitude},{p.latitude}"
 
         quoted_query = quote(query.encode('utf-8'))
         url = "?".join((self.api % dict(query=quoted_query),

@@ -77,12 +77,8 @@ class AlgoliaPlaces(Geocoder):
         self.app_id = app_id
         self.api_key = api_key
 
-        self.geocode_api = (
-            '%s://%s%s' % (self.scheme, self.domain, self.geocode_path)
-        )
-        self.reverse_api = (
-            '%s://%s%s' % (self.scheme, self.domain, self.reverse_path)
-        )
+        self.geocode_api = f"{self.scheme}://{self.domain}{self.geocode_path}"
+        self.reverse_api = f"{self.scheme}://{self.domain}{self.reverse_path}"
 
     def geocode(
             self,
@@ -182,7 +178,7 @@ class AlgoliaPlaces(Geocoder):
 
         if around is not None:
             p = Point(around)
-            params['aroundLatLng'] = "%s,%s" % (p.latitude, p.longitude)
+            params['aroundLatLng'] = f"{p.latitude},{p.longitude}"
 
         if around_via_ip is not None:
             params['aroundLatLngViaIP'] = \

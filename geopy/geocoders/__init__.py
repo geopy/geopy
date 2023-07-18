@@ -92,7 +92,7 @@ If you need to modify the query, you can also use a one-liner with lambda.
 For example, if you only need to geocode locations in `Cleveland, Ohio`,
 you could do::
 
-    >>> geocode = lambda query: geolocator.geocode("%s, Cleveland OH" % query)
+    >>> geocode = lambda query: geolocator.geocode(f"{query}, Cleveland OH")
     >>> print(geocode("11111 Euclid Ave"))
     Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
     University Circle, Cleveland, Cuyahoga County, Ohio, 44106, United States
@@ -101,7 +101,7 @@ you could do::
 That lambda doesn't accept kwargs. If you need them, you could do::
 
     >>> _geocode = partial(geolocator.geocode, language="es")
-    >>> geocode = lambda query, **kw: _geocode("%s, Cleveland OH" % query, **kw)
+    >>> geocode = lambda query, **kw: _geocode(f"{query}, Cleveland OH", **kw)
     >>> print(geocode("11111 Euclid Ave"))
     Thwing Center, Euclid Avenue, Magnolia-Wade Park Historic District,
     University Circle, Cleveland, Cuyahoga County, Ohio, 44106, Estados Unidos

@@ -83,19 +83,19 @@ class ProxyServerThread(threading.Thread):
         self.join()
 
     def set_auth(self, username, password):
-        self.auth = "%s:%s" % (username, password)
+        self.auth = f"%{username}:{password}"
 
     def get_proxy_url(self, with_scheme=True):
         assert self.socket_created_future.result(self.spinup_timeout)
         if self.auth:
-            auth = "%s@" % self.auth
+            auth = f"{self.auth}@"
         else:
             auth = ""
         if with_scheme:
             scheme = "http://"
         else:
             scheme = ""
-        return "%s%s%s:%s" % (scheme, auth, self.proxy_host, self.proxy_port)
+        return f"{scheme}{auth}{self.proxy_host}:{self.proxy_port}"
 
     def run(self):
         assert not self.proxy_server, ("This class is not reentrable. "
@@ -113,15 +113,15 @@ class ProxyServerThread(threading.Thread):
                     b64_auth = base64.standard_b64encode(
                         proxy_thread.auth.encode()
                     ).decode()
-                    expected_auth = "Basic %s" % b64_auth
+                    expected_auth = f"Basic {b64_auth}"
                     if auth_header != expected_auth:
                         self.send_response(401)
                         self.send_header('Connection', 'close')
                         self.end_headers()
                         self.wfile.write(
                             (
-                                "not authenticated. Expected %r, received %r"
-                                % (expected_auth, auth_header)
+                                f"not authenticated. Expected "
+                                f"{expected_auth!r}, received {auth_header!r}"
                             ).encode()
                         )
                         self.connection.close()
@@ -217,7 +217,7 @@ class HttpServerThread(threading.Thread):
 
     def get_server_url(self):
         assert self.socket_created_future.result(self.spinup_timeout)
-        return "http://%s:%s" % (self.server_host, self.server_port)
+        return f"http://{self.server_host}:{self.server_port}"
 
     def run(self):
         assert not self.http_server, ("This class is not reentrable. "
