@@ -68,8 +68,8 @@ class TomTom(Geocoder):
             adapter_factory=adapter_factory,
         )
         self.api_key = api_key
-        self.api = "%s://%s%s" % (self.scheme, domain, self.geocode_path)
-        self.api_reverse = "%s://%s%s" % (self.scheme, domain, self.reverse_path)
+        self.api = f"{self.scheme}://{domain}{self.geocode_path}"
+        self.api_reverse = f"{self.scheme}://{domain}{self.reverse_path}"
 
     def geocode(
             self,

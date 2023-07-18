@@ -60,8 +60,11 @@ def _normalize_coordinates(latitude, longitude, altitude):
 
     is_all_finite = all(isfinite(x) for x in (latitude, longitude, altitude))
     if not is_all_finite:
-        raise ValueError('Point coordinates must be finite. %r has been passed '
-                         'as coordinates.' % ((latitude, longitude, altitude),))
+        raise ValueError(
+            f"Point coordinates must be finite. "
+            f"{(latitude, longitude, altitude)!r} has been passed "
+            f"as coordinates."
+        )
 
     if abs(latitude) > 90:
         warnings.warn('Latitude normalization has been prohibited in the newer '
@@ -169,7 +172,7 @@ class Point:
                     seq = iter(arg)
                 except TypeError:
                     raise TypeError(
-                        "Failed to create Point instance from %r." % (arg,)
+                        f"Failed to create Point instance from {arg!r}."
                     )
                 else:
                     return cls.from_sequence(seq)
@@ -212,7 +215,7 @@ class Point:
         self.latitude, self.longitude, self.altitude = state
 
     def __repr__(self):
-        return "Point(%r, %r, %r)" % tuple(self)
+        return f"Point({self.latitude!r}, {self.longitude!r}, {self.altitude!r})"
 
     def format(self, altitude=None, deg_char='', min_char='m', sec_char='s'):
         """
@@ -230,13 +233,13 @@ class Point:
         :param bool altitude: Whether to include ``altitude`` value.
             By default it is automatically included if it is non-zero.
         """
-        latitude = "%s %s" % (
+        latitude = "{} {}".format(
             format_degrees(abs(self.latitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
             }),
             self.latitude >= 0 and 'N' or 'S'
         )
-        longitude = "%s %s" % (
+        longitude = "{} {}".format(
             format_degrees(abs(self.longitude), symbols={
                 'deg': deg_char, 'arcmin': min_char, 'arcsec': sec_char
             }),

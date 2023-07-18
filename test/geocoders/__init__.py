@@ -68,10 +68,10 @@ def assert_rst(sig, doc, allowed_rtypes=(None,)):
                     # skip warnings/errors
                     continue
                 if child_node.nodeName == "literal":
-                    tmpl = "``%s``"
+                    tmpl = "``{}``"
                 else:
-                    tmpl = "%s"
-                text_string += tmpl % (get_all_text(child_node),)
+                    tmpl = "{}"
+                text_string += tmpl.format(get_all_text(child_node))
             return text_string
 
     documented_rtype = None
@@ -312,5 +312,5 @@ def test_no_extra_public_methods(geocoder_cls):
         "reverse_timezone",
     }
     assert methods <= allowed, (
-        "Geopy geocoders are currently allowed to only have these methods: %s" % allowed
+        f"Geopy geocoders are currently allowed to only have these methods: {allowed}"
     )

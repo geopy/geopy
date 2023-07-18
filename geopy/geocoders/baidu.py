@@ -81,8 +81,8 @@ class Baidu(Geocoder):
             adapter_factory=adapter_factory,
         )
         self.api_key = api_key
-        self.api = '%s://api.map.baidu.com%s' % (self.scheme, self.api_path)
-        self.reverse_api = '%s://api.map.baidu.com%s' % (self.scheme, self.reverse_path)
+        self.api = f"{self.scheme}://api.map.baidu.com{self.api_path}"
+        self.reverse_api = f"{self.scheme}://api.map.baidu.com{self.reverse_path}"
         self.security_key = security_key
 
     def _format_components_param(self, components):
@@ -259,17 +259,17 @@ class Baidu(Geocoder):
                 'Quota Error.'
             )
         else:
-            raise GeocoderQueryError('Unknown error. Status: %r' % status)
+            raise GeocoderQueryError(f"Unknown error. Status: {status!r}")
 
     def _construct_url(self, url, path, params):
         query_string = urlencode(params)
         if self.security_key is None:
-            return "%s?%s" % (url, query_string)
+            return f"{url}?{query_string}"
         else:
             # http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix
-            raw = "%s?%s%s" % (path, query_string, self.security_key)
+            raw = f"{url}?{query_string}{self.security_key}"
             sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
-            return "%s?%s&sn=%s" % (url, query_string, sn)
+            return f"{url}?{query_string}&sn={sn}"
 
 
 class BaiduV3(Baidu):

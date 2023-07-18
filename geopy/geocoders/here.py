@@ -138,9 +138,9 @@ class Here(Geocoder):
         self.app_code = app_code
         self.apikey = apikey
         domain = "ls.hereapi.com" if is_apikey else "api.here.com"
-        self.api = "%s://geocoder.%s%s" % (self.scheme, domain, self.geocode_path)
+        self.api = f"{self.scheme}://geocoder.{domain}{self.geocode_path}"
         self.reverse_api = (
-            "%s://reverse.geocoder.%s%s" % (self.scheme, domain, self.reverse_path)
+            f"{self.scheme}://reverse.geocoder.{domain}{self.reverse_path}"
         )
 
     def geocode(
@@ -310,7 +310,7 @@ class Here(Geocoder):
             'prox': point,
         }
         if radius is not None:
-            params['prox'] = '%s,%s' % (params['prox'], float(radius))
+            params['prox'] = f"{params['prox']},{float(radius)}"
         if pageinformation:
             params['pageinformation'] = pageinformation
         if maxresults:
@@ -324,7 +324,7 @@ class Here(Geocoder):
         else:
             params['app_id'] = self.app_id
             params['app_code'] = self.app_code
-        url = "%s?%s" % (self.reverse_api, urlencode(params))
+        url = f"{self.reverse_api}?{urlencode(params)}"
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
@@ -457,9 +457,9 @@ class HereV7(Geocoder):
         domain = "search.hereapi.com"
 
         self.apikey = apikey
-        self.api = "%s://geocode.%s%s" % (self.scheme, domain, self.geocode_path)
+        self.api = f"{self.scheme}://geocode.{domain}{self.geocode_path}"
         self.reverse_api = (
-            "%s://revgeocode.%s%s" % (self.scheme, domain, self.reverse_path)
+            f"{self.scheme}://revgeocode.{domain}{self.reverse_path}"
         )
 
     def geocode(
@@ -523,7 +523,7 @@ class HereV7(Geocoder):
 
         if components:
             parts = [
-                "{}={}".format(key, val)
+                f"{key}={val}"
                 for key, val
                 in components.items()
                 if key in self.structured_query_params
@@ -534,7 +534,7 @@ class HereV7(Geocoder):
                 if ';' in pair:
                     raise GeocoderQueryError(
                         "';' must not be used in values of the structured query. "
-                        "Offending pair: {!r}".format(pair)
+                        f"Offending pair: {pair!r}"
                     )
             params['qq'] = ';'.join(parts)
 
@@ -606,7 +606,7 @@ class HereV7(Geocoder):
         if exactly_one:
             params['limit'] = 1
 
-        url = "%s?%s" % (self.reverse_api, urlencode(params))
+        url = f"{self.reverse_api}?{urlencode(params)}"
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)

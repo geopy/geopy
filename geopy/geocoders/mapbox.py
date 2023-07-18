@@ -74,7 +74,7 @@ class MapBox(Geocoder):
         )
         self.api_key = api_key
         self.domain = domain.strip('/')
-        self.api = "%s://%s%s" % (self.scheme, self.domain, self.api_path)
+        self.api = f"{self.scheme}://{domain}{self.api_path}"
         if referer:
             self.headers['Referer'] = referer
 
@@ -161,7 +161,7 @@ class MapBox(Geocoder):
 
         if proximity:
             p = Point(proximity)
-            params['proximity'] = "%s,%s" % (p.longitude, p.latitude)
+            params['proximity'] = f"{p.longitude},{p.latitude}"
 
         if language:
             params['language'] = language

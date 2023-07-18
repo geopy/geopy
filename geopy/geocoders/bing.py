@@ -81,8 +81,8 @@ class Bing(Geocoder):
         )
         self.api_key = api_key
         domain = 'dev.virtualearth.net'
-        self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
-        self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
+        self.geocode_api = f"{self.scheme}://{domain}{self.geocode_path}"
+        self.reverse_api = f"{self.scheme}://{domain}{self.reverse_path}"
 
     def geocode(
             self,

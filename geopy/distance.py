@@ -364,10 +364,10 @@ distance=Distance(100))
         raise NotImplementedError("Distance is an abstract class")
 
     def __repr__(self):  # pragma: no cover
-        return 'Distance(%s)' % self.kilometers
+        return f"Distance({self.kilometers})"
 
     def __str__(self):  # pragma: no cover
-        return '%s km' % self.__kilometers
+        return f"{self.__kilometers} km"
 
     def __cmp__(self, other):  # py2 only
         if isinstance(other, Distance):

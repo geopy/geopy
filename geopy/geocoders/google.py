@@ -127,8 +127,8 @@ class GoogleV3(Geocoder):
 
         self.channel = channel
 
-        self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
-        self.tz_api = '%s://%s%s' % (self.scheme, self.domain, self.timezone_path)
+        self.api = f"{self.scheme}://{self.domain}{self.api_path}"
+        self.tz_api = f"{self.scheme}://{self.domain}{self.timezone_path}"
 
     def _get_signed_url(self, params):
         """
@@ -149,9 +149,7 @@ class GoogleV3(Geocoder):
         signature = base64.urlsafe_b64encode(
             signature.digest()
         ).decode('utf-8')
-        return '%s://%s%s&signature=%s' % (
-            self.scheme, self.domain, path, signature
-        )
+        return f"{self.scheme}://{self.domain}{path}&signature={signature}"
 
     def _format_components_param(self, components):
         """

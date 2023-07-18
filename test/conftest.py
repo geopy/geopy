@@ -44,11 +44,10 @@ def pytest_report_header(config):
     internet_access = "allowed" if _is_internet_access_allowed(config) else "disabled"
     adapter_type = "async" if default_adapter_is_async else "sync"
     return (
-        "geopy:\n"
-        "    internet access: %s\n"
-        "    adapter: %r\n"
-        "    adapter type: %s"
-        % (internet_access, default_adapter, adapter_type)
+        f"geopy:\n"
+        f"    internet access: {internet_access}\n"
+        f"    adapter: {default_adapter!r}\n"
+        f"    adapter type: {adapter_type}"
     )
 
 
@@ -100,11 +99,10 @@ def pretty_dict_format(heading, dict_to_format,
     else:
         max_key_len = max(len(k) for k in dict_to_format.keys())
         for k, v in sorted(dict_to_format.items()):
-            s.append('%s%s%s' % (item_prefix, k.ljust(max_key_len + 2),
-                                 value_mapper(v)))
+            s.append(f"{item_prefix}{k:{max_key_len + 2}}{value_mapper(v)}")
         if legend:
             s.append('')
-            s.append('* %s' % legend)
+            s.append(f'* {legend}')
     s.append('')  # trailing newline
     return '\n'.join(s)
 
@@ -137,17 +135,17 @@ class RequestsMonitor:
         def value_mapper(v):
             tv = v['times']
             times_format = (
-                "min:%5.2fs, median:%5.2fs, max:%5.2fs, mean:%5.2fs, total:%5.2fs"
+                "min:{:5.2f}s, median:{:5.2f}s, max:{:5.2f}s, mean:{:5.2f}s, total:{:5.2f}s"
             )
             if tv:
                 # min/max require a non-empty sequence.
-                times = times_format % (min(tv), median(tv), max(tv), mean(tv), sum(tv))
+                times = times_format.format(min(tv), median(tv), max(tv), mean(tv), sum(tv))
             else:
                 nan = float("nan")
-                times = times_format % (nan, nan, nan, nan, 0)
+                times = times_format.format(nan, nan, nan, nan, 0)
 
-            count = "count:%3d" % v['count']
-            retries = "retries:%3d" % v['retries'] if v['retries'] else ""
+            count = f"count:{v['count']:3d}"
+            retries = f"retries:{v['retries']:3d}" if v['retries'] else ""
             return "; ".join(s for s in (count, times, retries) if s)
 
         legend = (

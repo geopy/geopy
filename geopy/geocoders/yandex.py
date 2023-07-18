@@ -65,7 +65,7 @@ class Yandex(Geocoder):
         )
         self.api_key = api_key
         domain = 'geocode-maps.yandex.ru'
-        self.api = '%s://%s%s' % (self.scheme, domain, self.api_path)
+        self.api = f"{self.scheme}://{domain}{self.api_path}"
 
     def geocode(
             self,

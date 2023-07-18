@@ -30,7 +30,7 @@ __all__ = (
     "options",
 )
 
-_DEFAULT_USER_AGENT = "geopy/%s" % __version__
+_DEFAULT_USER_AGENT = f"geopy/{__version__}"
 
 _DEFAULT_ADAPTER_CLASS = next(
     adapter_cls
@@ -254,8 +254,8 @@ class Geocoder:
             self.__run_async = True
         else:
             raise ConfigurationError(
-                "Adapter %r must extend either BaseSyncAdapter or BaseAsyncAdapter"
-                % (type(self.adapter),)
+                f"Adapter {type(self.adapter)!r} "
+                "must extend either BaseSyncAdapter or BaseAsyncAdapter"
             )
 
     def __enter__(self):

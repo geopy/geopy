@@ -81,8 +81,8 @@ class What3Words(Geocoder):
 
         self.api_key = api_key
         domain = 'api.what3words.com'
-        self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
-        self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
+        self.geocode_api = f"{self.scheme}://{domain}{self.geocode_path}"
+        self.reverse_api = f"{self.scheme}://{domain}{self.reverse_path}"
 
     def geocode(
             self,
@@ -143,7 +143,7 @@ class What3Words(Geocoder):
 
         if code:
             # https://docs.what3words.com/api/v2/#errors
-            exc_msg = "Error returned by What3Words: %s" % resources['status']['message']
+            exc_msg = f"Error returned by What3Words: {resources['status']['message']}"
             if code == 401:
                 raise exc.GeocoderAuthenticationFailure(exc_msg)
 
@@ -281,8 +281,8 @@ class What3WordsV3(Geocoder):
 
         self.api_key = api_key
         domain = 'api.what3words.com'
-        self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
-        self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
+        self.geocode_api = f"{self.scheme}://{domain}{self.geocode_path}"
+        self.reverse_api = f"{self.scheme}://{domain}{self.reverse_path}"
 
     def geocode(
             self,
@@ -338,7 +338,7 @@ class What3WordsV3(Geocoder):
 
         if error is not None:
             # https://developer.what3words.com/public-api/docs#error-handling
-            exc_msg = "Error returned by What3Words: %s" % resources["error"]["message"]
+            exc_msg = f"Error returned by What3Words: {resources['error']['message']}"
             exc_code = error.get('code')
             if exc_code in ['MissingKey', 'InvalidKey']:
                 raise exc.GeocoderAuthenticationFailure(exc_msg)
