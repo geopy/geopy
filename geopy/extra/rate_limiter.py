@@ -210,9 +210,9 @@ class RateLimiter(BaseRateLimiter):
         self,
         func,
         *,
-        min_delay_seconds=0.0,
+        min_delay_seconds=0,
         max_retries=2,
-        error_wait_seconds=5.0,
+        error_wait_seconds=5,
         swallow_exceptions=True,
         return_value_on_exception=None
     ):
@@ -333,9 +333,9 @@ class AsyncRateLimiter(BaseRateLimiter):
         self,
         func,
         *,
-        min_delay_seconds=0.0,
+        min_delay_seconds=0,
         max_retries=2,
-        error_wait_seconds=5.0,
+        error_wait_seconds=5,
         swallow_exceptions=True,
         return_value_on_exception=None
     ):

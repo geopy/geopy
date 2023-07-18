@@ -44,8 +44,8 @@ def _normalize_angle(x, limit):
     """
     Normalize angle `x` to be within `[-limit; limit)` range.
     """
-    double_limit = limit * 2.0
-    modulo = fmod(x, double_limit) or 0.0  # `or 0` is to turn -0 to +0.
+    double_limit = limit * 2
+    modulo = fmod(x, double_limit) or 0  # `or 0` is to turn -0 to +0.
     if modulo < -limit:
         return modulo + double_limit
     if modulo >= limit:
@@ -54,9 +54,9 @@ def _normalize_angle(x, limit):
 
 
 def _normalize_coordinates(latitude, longitude, altitude):
-    latitude = float(latitude or 0.0)
-    longitude = float(longitude or 0.0)
-    altitude = float(altitude or 0.0)
+    latitude = float(latitude or 0)
+    longitude = float(longitude or 0)
+    altitude = float(altitude or 0)
 
     is_all_finite = all(isfinite(x) for x in (latitude, longitude, altitude))
     if not is_all_finite:
@@ -76,7 +76,7 @@ def _normalize_coordinates(latitude, longitude, altitude):
     if abs(longitude) > 180:
         # Longitude normalization is pretty straightforward and doesn't seem
         # to be error-prone, so there's nothing to complain about.
-        longitude = _normalize_angle(longitude, 180.0)
+        longitude = _normalize_angle(longitude, 180)
 
     return latitude, longitude, altitude
 
@@ -437,15 +437,15 @@ class Point:
             elif match.group("longitude_direction_back"):
                 longitude_direction = match.group("longitude_direction_back")
             latitude = cls.parse_degrees(
-                match.group('latitude_degrees') or 0.0,
-                match.group('latitude_arcminutes') or 0.0,
-                match.group('latitude_arcseconds') or 0.0,
+                match.group('latitude_degrees') or 0,
+                match.group('latitude_arcminutes') or 0,
+                match.group('latitude_arcseconds') or 0,
                 latitude_direction
             )
             longitude = cls.parse_degrees(
-                match.group('longitude_degrees') or 0.0,
-                match.group('longitude_arcminutes') or 0.0,
-                match.group('longitude_arcseconds') or 0.0,
+                match.group('longitude_degrees') or 0,
+                match.group('longitude_arcminutes') or 0,
+                match.group('longitude_arcseconds') or 0,
                 longitude_direction
             )
             altitude = cls.parse_altitude(

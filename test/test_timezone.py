@@ -17,7 +17,7 @@ except ImportError:
 @pytest.mark.skipif("not pytz_available")
 class TimezoneTestCase(unittest.TestCase):
 
-    timezone_gmt_offset_hours = 3.0
+    timezone_gmt_offset_hours = 3
     timezone_name = "Europe/Moscow"  # a DST-less timezone
 
     def test_create_from_timezone_name(self):
