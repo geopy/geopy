@@ -221,7 +221,7 @@ class Photon(Geocoder):
         """
         Parse display name, latitude, and longitude from a JSON response.
         """
-        if not len(resources['features']):  # pragma: no cover
+        if not resources['features']:  # pragma: no cover
             return None
         if exactly_one:
             return self._parse_resource(resources['features'][0])

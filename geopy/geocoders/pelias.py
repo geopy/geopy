@@ -238,7 +238,7 @@ class Pelias(Geocoder):
         if response is None:
             return None
         features = response['features']
-        if not len(features):
+        if not features:
             return None
         if exactly_one:
             return self._parse_code(features[0])

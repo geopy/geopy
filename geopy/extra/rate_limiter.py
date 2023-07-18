@@ -51,7 +51,7 @@ a violation.
 import asyncio
 import inspect
 import threading
-from itertools import chain, count
+from itertools import chain, count, repeat
 from time import sleep
 from timeit import default_timer
 
@@ -63,7 +63,7 @@ __all__ = ("AsyncRateLimiter", "RateLimiter")
 
 def _is_last_gen(count):
     """list(_is_last_gen(2)) -> [False, False, True]"""
-    return chain((False for _ in range(count)), [True])
+    return chain(repeat(False, count), [True])
 
 
 class BaseRateLimiter:

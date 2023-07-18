@@ -125,7 +125,7 @@ class DataBC(Geocoder):
 
     def _parse_json(self, response, exactly_one):
         # Success; convert from GeoJSON
-        if not len(response['features']):
+        if not response['features']:
             return None
         geocoded = []
         for feature in response['features']:

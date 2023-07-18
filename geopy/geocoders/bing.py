@@ -230,7 +230,7 @@ class Bing(Geocoder):
                 raise GeocoderServiceError(err)
 
         resources = doc['resourceSets'][0]['resources']
-        if resources is None or not len(resources):
+        if not resources:
             return None
 
         def parse_resource(resource):

@@ -172,7 +172,7 @@ class BANFrance(Geocoder):
         if response is None or 'features' not in response:
             return None
         features = response['features']
-        if not len(features):
+        if not features:
             return None
         if exactly_one:
             return self._parse_feature(features[0])

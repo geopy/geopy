@@ -177,7 +177,7 @@ class ArcGIS(Geocoder):
             raise GeocoderServiceError(str(response['error']))
 
         # Success; convert from the ArcGIS JSON format.
-        if not len(response['candidates']):
+        if not response['candidates']:
             return None
         geocoded = []
         for resource in response['candidates']:
@@ -227,7 +227,7 @@ class ArcGIS(Geocoder):
         return self._authenticated_call_geocoder(url, callback, timeout=timeout)
 
     def _parse_reverse(self, response, exactly_one):
-        if not len(response):
+        if not response:
             return None
         if 'error' in response:
             # https://developers.arcgis.com/rest/geocode/api-reference/geocoding-service-output.htm

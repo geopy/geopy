@@ -296,7 +296,7 @@ class URLLibAdapter(BaseSyncAdapter):
         try:
             page = self.urlopen(req, timeout=timeout)
         except Exception as error:
-            message = str(error.args[0]) if len(error.args) else str(error)
+            message = str(error.args[0]) if error.args else str(error)
             if isinstance(error, HTTPError):
                 code = error.getcode()
                 response_headers = {

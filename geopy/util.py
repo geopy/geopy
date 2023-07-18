@@ -13,8 +13,7 @@ def pairwise(seq):
     """
     Pair an iterable, e.g., (1, 2, 3, 4) -> ((1, 2), (2, 3), (3, 4))
     """
-    for i in range(0, len(seq) - 1):
-        yield (seq[i], seq[i + 1])
+    yield from zip(seq, seq[1:])
 
 
 def join_filter(sep, seq, pred=bool):
