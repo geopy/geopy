@@ -1,7 +1,7 @@
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import GeocoderQueryError
+from geopy.exc import ConfigurationError, GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -16,7 +16,7 @@ class DataBC(Geocoder):
         http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.page
     """
 
-    geocode_path = '/pub/geocoder/addresses.geojson'
+    geocode_path = '/addresses.geojson'
 
     def __init__(
             self,
@@ -59,7 +59,12 @@ class DataBC(Geocoder):
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
         )
-        domain = 'apps.gov.bc.ca'
+
+        if self.scheme != 'https':
+            raise ConfigurationError(
+                'DataBC only supports `https` scheme as of December 2020.'
+            )
+        domain = 'geocoder.api.gov.bc.ca'
         self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
 
     def geocode(
