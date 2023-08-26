@@ -16,6 +16,8 @@
 1. `make release`. When prompted add the same changelog to the git tag,
    but in markdown instead of rst.
 1. Create a new release for the pushed tag at https://github.com/geopy/geopy/releases
+1. Upload a GPG signature of the tarball to the just created GitHub release,
+   see https://wiki.debian.org/Creating%20signed%20GitHub%20releases
 1. Close the milestone, add a new one.
 
 ## Check
