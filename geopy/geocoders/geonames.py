@@ -44,7 +44,8 @@ class GeoNames(Geocoder):
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
             adapter_factory=None,
-            scheme='http'
+            scheme='http',
+            domain='api.geonames.org',
     ):
         """
 
@@ -76,6 +77,10 @@ class GeoNames(Geocoder):
             :attr:`geopy.geocoders.options.default_scheme` is not respected.
             This parameter is present to make it possible to switch to
             `https` once GeoNames adds support for it.
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme=scheme,
@@ -87,7 +92,6 @@ class GeoNames(Geocoder):
         )
         self.username = username
 
-        domain = 'api.geonames.org'
         self.api = (
             "%s://%s%s" % (self.scheme, domain, self.geocode_path)
         )

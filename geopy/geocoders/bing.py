@@ -43,7 +43,8 @@ class Bing(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            domain='dev.virtualearth.net',
     ):
         """
 
@@ -70,6 +71,10 @@ class Bing(Geocoder):
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
             .. versionadded:: 2.0
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme=scheme,
@@ -80,7 +85,6 @@ class Bing(Geocoder):
             adapter_factory=adapter_factory,
         )
         self.api_key = api_key
-        domain = 'dev.virtualearth.net'
         self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
         self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
 

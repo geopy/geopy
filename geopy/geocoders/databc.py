@@ -26,7 +26,8 @@ class DataBC(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            domain='geocoder.api.gov.bc.ca',
     ):
         """
 
@@ -50,6 +51,10 @@ class DataBC(Geocoder):
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
             .. versionadded:: 2.0
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme=scheme,
@@ -59,7 +64,6 @@ class DataBC(Geocoder):
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
         )
-        domain = 'geocoder.api.gov.bc.ca'
         self.api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
 
     def geocode(

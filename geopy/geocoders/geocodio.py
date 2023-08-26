@@ -45,7 +45,8 @@ class Geocodio(Geocoder):
         proxies=DEFAULT_SENTINEL,
         user_agent=None,
         ssl_context=DEFAULT_SENTINEL,
-        adapter_factory=None
+        adapter_factory=None,
+        domain=None,
     ):
         """
         :param str api_key:
@@ -69,6 +70,10 @@ class Geocodio(Geocoder):
 
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme=scheme,
@@ -79,6 +84,8 @@ class Geocodio(Geocoder):
             adapter_factory=adapter_factory,
         )
         self.api_key = api_key
+        if domain:
+            self.domain = domain
 
     def geocode(
         self,

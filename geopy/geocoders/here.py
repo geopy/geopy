@@ -418,7 +418,8 @@ class HereV7(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            domain="search.hereapi.com",
     ):
         """
 
@@ -444,6 +445,10 @@ class HereV7(Geocoder):
 
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme=scheme,
@@ -453,8 +458,6 @@ class HereV7(Geocoder):
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
         )
-
-        domain = "search.hereapi.com"
 
         self.apikey = apikey
         self.api = "%s://geocode.%s%s" % (self.scheme, domain, self.geocode_path)

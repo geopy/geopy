@@ -45,7 +45,8 @@ class What3Words(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            domain='api.what3words.com',
     ):
         """
 
@@ -69,6 +70,10 @@ class What3Words(Geocoder):
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
             .. versionadded:: 2.0
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme='https',
@@ -80,7 +85,6 @@ class What3Words(Geocoder):
         )
 
         self.api_key = api_key
-        domain = 'api.what3words.com'
         self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
         self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
 
@@ -247,7 +251,8 @@ class What3WordsV3(Geocoder):
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            domain='api.what3words.com',
     ):
         """
 
@@ -269,6 +274,10 @@ class What3WordsV3(Geocoder):
 
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
+
+        :param str domain: base api domain
+
+            .. versionadded:: 2.4
         """
         super().__init__(
             scheme='https',
@@ -280,7 +289,6 @@ class What3WordsV3(Geocoder):
         )
 
         self.api_key = api_key
-        domain = 'api.what3words.com'
         self.geocode_api = '%s://%s%s' % (self.scheme, domain, self.geocode_path)
         self.reverse_api = '%s://%s%s' % (self.scheme, domain, self.reverse_path)
 
