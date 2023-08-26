@@ -13,7 +13,7 @@ class DataBC(Geocoder):
     """Geocoder using the Physical Address Geocoder from DataBC.
 
     Documentation at:
-        http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.page
+        https://github.com/bcgov/ols-geocoder/blob/gh-pages/geocoder-developer-guide.md
     """
 
     geocode_path = '/addresses.geojson'
