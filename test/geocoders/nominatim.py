@@ -99,7 +99,8 @@ class BaseTestNominatim(BaseTestGeocoder):
                 assert 'Mitte' == result.raw['address']['suburb']
             except KeyError:
                 # PickPoint
-                assert 'Berlin' == result.raw['address']['city']
+                assert 'Deutschland' == result.raw['address']['country']
+                # {'postcode': '10117', 'country': 'Deutschland', 'country_code': 'de'}
 
     async def test_geocode_language_parameter(self):
         query = "Mohrenstrasse Berlin"
