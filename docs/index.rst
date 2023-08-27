@@ -94,14 +94,6 @@ Rate Limiter
 
    .. automethod:: __init__
 
-AlgoliaPlaces
--------------
-
-.. autoclass:: geopy.geocoders.AlgoliaPlaces
-   :members:
-
-   .. automethod:: __init__
-
 ArcGIS
 ------
 
