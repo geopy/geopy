@@ -94,6 +94,7 @@ jobs:
         BING_KEY: ${{ secrets.BING_KEY }}
         GEOCODEEARTH_KEY: ${{ secrets.GEOCODEEARTH_KEY }}
         GEOCODIO_KEY: ${{ secrets.GEOCODIO_KEY }}
+        GEOKEY_KEY: ${{ secrets.GEOKEY_KEY }}
         GEOLAKE_KEY: ${{ secrets.GEOLAKE_KEY }}
         GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
         GOOGLE_KEY: ${{ secrets.GOOGLE_KEY }}

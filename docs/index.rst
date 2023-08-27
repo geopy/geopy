@@ -179,6 +179,14 @@ Geocodio
 
    .. automethod:: __init__
 
+Geokeo
+------------
+
+.. autoclass:: geopy.geocoders.Geokeo
+   :members:
+
+   .. automethod:: __init__
+
 Geolake
 --------
 
