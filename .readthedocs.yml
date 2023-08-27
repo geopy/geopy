@@ -12,6 +12,5 @@ python:
         - dev-docs
     - method: setuptools
       path: .
-  system_packages: true
 
 formats: all
