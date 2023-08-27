@@ -18,6 +18,7 @@ import asyncio
 import contextlib
 import email
 import json
+import ssl
 import time
 import warnings
 from socket import timeout as SocketTimeout
@@ -369,6 +370,15 @@ class RequestsAdapter(BaseSyncAdapter):
     allows response compression and uses HTTP/1.1 [currently].
 
     ``requests`` package must be installed in order to use this adapter.
+
+    The requests' ``trust_env`` value is set to false, meaning that
+    environment doesn't affect the requests' configuration.
+    The ``ssl_context`` and ``proxies`` settings can be used for configuration.
+
+    .. versionchanged:: 2.4
+        This adapter used to use the `certifi` CA bundle by default,
+        if an ``ssl_context`` wasn't provided explicitly. This has been
+        changed to use the system CA store by default.
     """
 
     is_available = requests_available
@@ -391,6 +401,21 @@ class RequestsAdapter(BaseSyncAdapter):
                 '`pip install "geopy[requests]"`.'
             )
         proxies = _normalize_proxies(proxies)
+        if ssl_context is None:
+            # By default requests uses CA bundle from `certifi` package.
+            # This is typically overridden with the `REQUESTS_CA_BUNDLE`
+            # environment variable. However, trust_env is disabled
+            # below to turn off the requests-specific logic of proxy
+            # servers configuration, which is re-implemented in geopy
+            # so that it's similar between different Adapters implementations.
+            #
+            # Here, in order to align the adapter's behavior with
+            # the default URLLibAdapter, we explicitly pass an ssl context,
+            # which would be initialized with the system's CA store
+            # rather than the certifi's bundle requests uses by default.
+            #
+            # See also https://github.com/geopy/geopy/issues/546
+            ssl_context = ssl.create_default_context()
         super().__init__(proxies=proxies, ssl_context=ssl_context)
 
         self.session = requests.Session()
