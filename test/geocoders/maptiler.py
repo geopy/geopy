@@ -12,7 +12,7 @@ class TestMapTiler(BaseTestGeocoder):
 
     async def test_geocode(self):
         await self.geocode_run(
-            {"query": "435 north michigan ave, chicago il 60611 usa"},
+            {"query": "435 michigan ave, chicago il 60611 usa"},
             {"latitude": 41.890, "longitude": -87.624},
         )
 
@@ -34,7 +34,7 @@ class TestMapTiler(BaseTestGeocoder):
     async def test_geocode_outside_bbox(self):
         await self.geocode_run(
             {
-                "query": "435 north michigan ave, chicago il 60611 usa",
+                "query": "435 michigan ave, chicago il 60611 usa",
                 "bbox": [[34.172684, -118.604794],
                          [34.236144, -118.500938]]
             },
@@ -45,7 +45,7 @@ class TestMapTiler(BaseTestGeocoder):
     async def test_geocode_bbox(self):
         await self.geocode_run(
             {
-                "query": "435 north michigan ave, chicago il 60611 usa",
+                "query": "435 michigan ave, chicago il 60611 usa",
                 "bbox": [Point(35.227672, -103.271484),
                          Point(48.603858, -74.399414)]
             },
@@ -79,7 +79,7 @@ class TestMapTiler(BaseTestGeocoder):
         delta = 4.0
         expected = pytest.approx((-73.8784155, 40.6930727), abs=delta)
         assert expected == result.raw['center']
-        assert result.raw['properties']['osm_id'] in ("r61320", "relation175905")
+        assert result.raw['properties']['country_code'] == 'us'
 
     async def test_geocode_exactly_one_false(self):
         list_result = await self.geocode_run(

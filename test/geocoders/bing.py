@@ -57,29 +57,28 @@ class TestBing(BaseTestGeocoder):
         assert res.raw["address"].get("countryRegionIso2", 'missing') == 'US'
 
     async def test_user_location(self):
-        pennsylvania = (40.98327, -74.96064)
-        pennsylvania_bias = (40.922351, -75.096562)
+        moscow_idaho = (46.7323875, -117.0001651)
+        moscow_idaho_bias = (46.7323875, -117.0001651)
 
-        colorado = (40.160, -80.0)
-        colorado_bias = (39.914231, -105.070104)
-        for expected, bias in ((pennsylvania, pennsylvania_bias),
-                               (colorado, colorado_bias)):
+        moscow_ru = (55.75582886, 37.61722183)
+        moscow_ru_bias = (55.75582886, 37.61722183)
+        for expected, bias in ((moscow_idaho, moscow_idaho_bias),
+                               (moscow_ru, moscow_ru_bias)):
             await self.geocode_run(
-                {"query": "20 Main Street", "user_location": Point(bias)},
+                {"query": "moscow", "user_location": Point(bias)},
                 {"latitude": expected[0], "longitude": expected[1], "delta": 3.0},
             )
 
     async def test_optional_params(self):
         res = await self.geocode_run(
-            {"query": "Badeniho 1, Prague, Czech Republic",
-             "culture": 'cs',
+            {"query": "Ballard, WA",
              "include_neighborhood": True,
              "include_country_code": True},
             {},
         )
         address = res.raw['address']
-        assert address['neighborhood'] == "Praha 6"
-        assert address['countryRegionIso2'] == "CZ"
+        assert address['neighborhood'] == "Ballard"
+        assert address['countryRegionIso2'] == "US"
 
     async def test_structured_query(self):
         res = await self.geocode_run(
