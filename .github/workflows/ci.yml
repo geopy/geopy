@@ -117,4 +117,5 @@ jobs:
         PICKPOINT_KEY: ${{ secrets.PICKPOINT_KEY }}
         TOMTOM_KEY: ${{ secrets.TOMTOM_KEY }}
         WHAT3WORDS_KEY: ${{ secrets.WHAT3WORDS_KEY }}
+        WOOSMAP_KEY: ${{ secrets.WOOSMAP_KEY }}
         YANDEX_KEY: ${{ secrets.YANDEX_KEY }}

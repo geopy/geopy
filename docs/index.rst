@@ -335,6 +335,14 @@ What3WordsV3
 
    .. automethod:: __init__
 
+Woosmap
+------------
+
+.. autoclass:: geopy.geocoders.Woosmap
+   :members:
+
+   .. automethod:: __init__
+
 Yandex
 ------
 
