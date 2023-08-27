@@ -2,12 +2,7 @@ import collections.abc
 from functools import partial
 from urllib.parse import urlencode
 
-from geopy.exc import (
-    ConfigurationError,
-    GeocoderQueryError,
-    GeocoderServiceError,
-    GeocoderUnavailable,
-)
+from geopy.exc import GeocoderQueryError, GeocoderServiceError, GeocoderUnavailable
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
@@ -21,13 +16,14 @@ class Woosmap(Geocoder):
     Documentation at:
         https://developers.woosmap.com/products/address-api/geocode/
 
+    .. versionadded:: 2.4
     """
 
     api_path = '/address/geocode/json'
 
     def __init__(
         self,
-        api_key=None,
+        api_key,
         *,
         domain='api.woosmap.com',
         scheme=None,
@@ -77,21 +73,11 @@ class Woosmap(Geocoder):
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
         )
-
-        if not api_key:
-            raise ConfigurationError(
-                'You must pass a valid Private API Key as parameter `api_key` to '
-                'Woosmap geocoder'
-            )
-
         self.api_key = api_key
         self.domain = domain.strip('/')
         self.api = '%s://%s%s' % (self.scheme, self.domain, self.api_path)
 
     def _format_components_param(self, components):
-        """
-        Format the components dict to something Woosmap understands.
-        """
         component_items = []
 
         if isinstance(components, collections.abc.Mapping):
@@ -111,7 +97,7 @@ class Woosmap(Geocoder):
 
     def geocode(
         self,
-        query=None,
+        query,
         *,
         limit=None,
         exactly_one=True,
@@ -119,7 +105,7 @@ class Woosmap(Geocoder):
         location=None,
         components=None,
         language=None,
-        cc_format=None,
+        country_code_format=None,
     ):
         """
         Return a location point by address.
@@ -155,23 +141,20 @@ class Woosmap(Geocoder):
         :param str language: The language in which to return results.
             Must be a ISO 639-1 language code.
 
-        :param str cc_format: Default country code format in responses is Alpha3.
+        :param str country_code_format: Default country code format
+            in responses is Alpha3.
             However, format in responses can be changed
             by specifying components in alpha2.
-            Available cc_format are (`alpha2`, `alpha3`)
+            Available formats: ``alpha2``, ``alpha3``.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
-        params = {}
+        params = {
+            'address': query,
+            'private_key': self.api_key,
+        }
 
-        if query is not None:
-            params['address'] = query
-        else:
-            raise ValueError('`query` must be set.')
-
-        if self.api_key:
-            params['private_key'] = self.api_key
         if location:
             point = self._coerce_point_to_string(location,
                                                  output_format="%(lat)s,%(lon)s")
@@ -180,15 +163,14 @@ class Woosmap(Geocoder):
             params['components'] = self._format_components_param(components)
         if language:
             params['language'] = language
-        if cc_format:
-            params['cc_format'] = cc_format
+        if country_code_format:
+            params['cc_format'] = country_code_format
         if limit:
             params['limit'] = limit
         if exactly_one:
             params['limit'] = 1
 
         url = "?".join((self.api, urlencode(params)))
-        print(url)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
@@ -201,7 +183,7 @@ class Woosmap(Geocoder):
         exactly_one=True,
         timeout=DEFAULT_SENTINEL,
         language=None,
-        cc_format=None,
+        country_code_format=None,
     ):
         """
         Return an address by location point.
@@ -224,38 +206,36 @@ class Woosmap(Geocoder):
 
         :param str language: The language in which to return results.
 
-        :param str cc_format: Default country code format in responses is Alpha3.
+        :param str country_code_format: Default country code format
+            in responses is Alpha3.
             However, format in responses can be changed
             by specifying components in alpha2.
-            Available cc_format are (`alpha2`, `alpha3`)
+            Available formats: ``alpha2``, ``alpha3``.
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
 
+        latlng = self._coerce_point_to_string(query, output_format="%(lat)s,%(lon)s")
         params = {
-            'latlng': self._coerce_point_to_string(query, output_format="%(lat)s,%(lon)s")
+            'latlng': latlng,
+            'private_key': self.api_key,
         }
         if language:
             params['language'] = language
-        if cc_format:
-            params['cc_format'] = cc_format
+        if country_code_format:
+            params['cc_format'] = country_code_format
         if limit:
             params['limit'] = limit
         if exactly_one:
             params['limit'] = 1
-        if self.api_key:
-            params['private_key'] = self.api_key
 
         url = "?".join((self.api, urlencode(params)))
-        print(url)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
         callback = partial(self._parse_json, exactly_one=exactly_one)
         return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, response, exactly_one=True):
-        """Returns location, (latitude, longitude) from json feed."""
-
         addresses = response.get('results', [])
 
         self._check_status(response)
@@ -281,13 +261,16 @@ class Woosmap(Geocoder):
             return
         if status == 'ZERO_RESULTS':
             return
-        elif status == 'INVALID_REQUEST':
-            raise GeocoderQueryError('Invalid request or missing address or latlng')
+
+        error_message = response.get('error_message')
+        if status == 'INVALID_REQUEST':
+            raise GeocoderQueryError(
+                error_message or 'Invalid request or missing address or latlng')
         elif status == 'REQUEST_DENIED':
-            raise GeocoderQueryError('Your request was denied. Please check your API Key')
+            raise GeocoderQueryError(
+                error_message or 'Your request was denied. Please check your API Key')
         elif status == 'UNKNOWN_ERROR':
-            raise GeocoderUnavailable(
-                'Server error. The request may succeed if you try again.')
+            raise GeocoderUnavailable(error_message or 'Server error')
         else:
-            # Unknown status.
-            raise GeocoderServiceError('Unknown error')
+            # Unknown (undocumented) status.
+            raise GeocoderServiceError(error_message or 'Unknown error')

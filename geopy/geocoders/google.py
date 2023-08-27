@@ -154,9 +154,6 @@ class GoogleV3(Geocoder):
         )
 
     def _format_components_param(self, components):
-        """
-        Format the components dict to something Google understands.
-        """
         component_items = []
 
         if isinstance(components, collections.abc.Mapping):
@@ -394,8 +391,6 @@ class GoogleV3(Geocoder):
         return timestamp
 
     def _parse_json(self, page, exactly_one=True):
-        '''Returns location, (latitude, longitude) from json feed.'''
-
         places = page.get('results', [])
         self._check_status(page)
         if not places:

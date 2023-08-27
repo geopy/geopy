@@ -7,9 +7,6 @@ from test.geocoders.util import BaseTestGeocoder, env
 
 
 class TestWoosmap(BaseTestGeocoder):
-    london_point = Point(51.50940214, -0.133012)
-    address_query = "12 Oxford Street, London"
-
     @classmethod
     def make_geocoder(cls, **kwargs):
         return Woosmap(api_key=env['WOOSMAP_KEY'], **kwargs)
@@ -20,10 +17,6 @@ class TestWoosmap(BaseTestGeocoder):
             user_agent='my_user_agent/1.0'
         )
         assert geocoder.headers['User-Agent'] == 'my_user_agent/1.0'
-
-    async def test_error_with_no_api_key(self):
-        with pytest.raises(exc.ConfigurationError):
-            Woosmap()
 
     async def test_check_status(self):
         def make_status(status):
@@ -65,7 +58,7 @@ class TestWoosmap(BaseTestGeocoder):
 
     async def test_geocode(self):
         await self.geocode_run(
-            {"query": self.address_query},
+            {"query": "12 Oxford Street, London"},
             {"latitude": 51.51652, "longitude": -0.131},
         )
 
@@ -101,20 +94,20 @@ class TestWoosmap(BaseTestGeocoder):
 
     async def test_geocode_with_language(self):
         result = await self.geocode_run(
-            {"query": self.address_query, "language": "fr"},
+            {"query": "12 Oxford Street, London", "language": "fr"},
             {}
         )
         assert "Royaume-Uni" in result.address
 
         result = await self.geocode_run(
-            {"query": self.address_query, "language": "en"},
+            {"query": "12 Oxford Street, London", "language": "en"},
             {}
         )
         assert "United Kingdom" in result.address
 
-    async def test_geocode_with_cc_format(self):
+    async def test_geocode_with_country_code_format(self):
         result = await self.geocode_run(
-            {"query": self.address_query, "cc_format": "alpha3"},
+            {"query": "12 Oxford Street, London", "country_code_format": "alpha3"},
             {}
         )
         country_component = [comp for comp in result.raw["address_components"] if
@@ -122,7 +115,7 @@ class TestWoosmap(BaseTestGeocoder):
         assert country_component.get('short_name') == "GBR"
 
         result = await self.geocode_run(
-            {"query": self.address_query, "cc_format": "alpha2"},
+            {"query": "12 Oxford Street, London", "country_code_format": "alpha2"},
             {}
         )
         country_component = [comp for comp in result.raw["address_components"] if
@@ -141,27 +134,30 @@ class TestWoosmap(BaseTestGeocoder):
         assert len(result) == 5
 
     async def test_reverse(self):
+        london_point = Point(51.50940214, -0.133012)
         await self.reverse_run(
-            {"query": self.london_point},
+            {"query": london_point},
             {"latitude": 51.50940214, "longitude": -0.133012},
         )
 
     async def test_reverse_with_language(self):
+        london_point = Point(51.50940214, -0.133012)
         result = await self.reverse_run(
-            {"query": self.london_point, "language": "fr"},
+            {"query": london_point, "language": "fr"},
             {}
         )
         assert "Royaume-Uni" in result.address
 
         result = await self.reverse_run(
-            {"query": self.london_point, "language": "en"},
+            {"query": london_point, "language": "en"},
             {}
         )
         assert "United Kingdom" in result.address
 
-    async def test_reverse_with_cc_format(self):
+    async def test_reverse_with_country_code_format(self):
+        london_point = Point(51.50940214, -0.133012)
         result = await self.reverse_run(
-            {"query": self.london_point, "cc_format": "alpha3"},
+            {"query": london_point, "country_code_format": "alpha3"},
             {}
         )
         country_component = [comp for comp in result.raw["address_components"] if
@@ -169,7 +165,7 @@ class TestWoosmap(BaseTestGeocoder):
         assert country_component.get('short_name') == "GBR"
 
         result = await self.reverse_run(
-            {"query": self.london_point, "cc_format": "alpha2"},
+            {"query": london_point, "country_code_format": "alpha2"},
             {}
         )
         country_component = [comp for comp in result.raw["address_components"] if
@@ -177,9 +173,10 @@ class TestWoosmap(BaseTestGeocoder):
         assert country_component.get('short_name') == "GB"
 
     async def test_reverse_limit(self):
+        london_point = Point(51.50940214, -0.133012)
         result = await self.reverse_run(
             {
-                "query": self.london_point,
+                "query": london_point,
                 "limit": 5,
                 "exactly_one": False
             },
@@ -188,9 +185,15 @@ class TestWoosmap(BaseTestGeocoder):
         assert len(result) == 5
 
     async def test_geocode_empty_result(self):
-        with pytest.raises(exc.GeocoderQueryError):
-            await self.geocode_run(
-                {"query": ''},
-                {},
-                expect_failure=True,
-            )
+        await self.geocode_run(
+            {"query": "dsadjkasdjasd"},
+            {},
+            expect_failure=True,
+        )
+
+    async def test_reverse_empty_result(self):
+        await self.reverse_run(
+            {"query": Point(0.05, -0.15)},
+            {},
+            expect_failure=True,
+        )
