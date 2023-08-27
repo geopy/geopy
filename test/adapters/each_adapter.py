@@ -102,7 +102,7 @@ def http_server(timeout):
 
 @pytest.fixture
 def remote_website_trusted_https(skip_if_internet_access_is_not_allowed):
-    return "https://httpbin.org/html"  # must be trusted by the system CAs
+    return "https://httpbingo.org/html"  # must be trusted by the system CAs
 
 
 @pytest.fixture
