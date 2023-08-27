@@ -3,6 +3,50 @@
 Changelog
 =========
 
+.. _v2-4-0:
+
+2.4.0
+-----
+2023-08-27
+
+New Features
+~~~~~~~~~~~~
+
+- New geocoder: :class:`.Woosmap`.
+  Contributed by galela. (:issue:`541`)
+- New geocoder: :class:`.Geokeo`.
+  Contributed by Geokeo. (:issue:`490`)
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- Removed Algolia Places geocoder: the service is shut down.
+  Contributed by mtmail. (:issue:`547`)
+
+Packaging Changes
+~~~~~~~~~~~~~~~~~
+
+- Add support for Python 3.12. (:issue:`559`)
+- Update maintainer email.
+- GitHub releases are now signed with GPG. (:issue:`550`)
+- tests: switch from httpbin.org to httpbingo.org. (:issue:`551`)
+- tests: use tox ``allowlist_externals`` instead of ``whitelist_externals``.
+  Contributed by galela. (:issue:`540`)
+
+Bugfixes
+~~~~~~~~
+
+- RequestsAdapter: use system CA store by default instead of ``certifi``.
+  (:issue:`558`)
+- :class:`.DataBC`: update service domain and endpoint.
+  Contributed by nickpcrogers. (:issue:`557`)
+
+Code Improvements
+~~~~~~~~~~~~~~~~~
+
+- Move hardcoded domains to ``__init__`` args for all geocoders.
+
+
 .. _v2-3-0:
 
 2.3.0
