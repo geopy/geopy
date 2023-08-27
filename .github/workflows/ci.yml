@@ -41,11 +41,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # &test-matrix
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy-3.7']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12-dev', 'pypy-3.7']
         experimental: [false]
-        include:
-          - python-version: '3.12-dev'
-            experimental: true
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -62,14 +59,12 @@ jobs:
     if: ${{ github.event_name != 'pull_request' }}
     needs: [lint, check-docs, test_local]
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      matrix: # *test-matrix  https://github.community/t/support-for-yaml-anchors/16128
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy-3.7']
+      matrix: # *test-matrix  https://github.com/actions/runner/issues/1182
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12-dev', 'pypy-3.7']
         experimental: [false]
-        include:
-          - python-version: '3.12-dev'
-            experimental: true
       max-parallel: 2  # Reduce load on the geocoding services
     steps:
     - uses: actions/checkout@v2
