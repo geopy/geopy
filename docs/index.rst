@@ -102,6 +102,14 @@ ArcGIS
 
    .. automethod:: __init__
 
+AMap
+------
+
+.. autoclass:: geopy.geocoders.ArcGIS
+   :members:
+
+   .. automethod:: __init__
+
 AzureMaps
 ---------
 
