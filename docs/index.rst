@@ -105,7 +105,7 @@ ArcGIS
 AMap
 ------
 
-.. autoclass:: geopy.geocoders.ArcGIS
+.. autoclass:: geopy.geocoders.AMap
    :members:
 
    .. automethod:: __init__
