@@ -424,7 +424,7 @@ class Geocoder:
 def _format_coordinate(coordinate):
     if abs(coordinate) >= 1:
         return coordinate  # use the default arbitrary precision scientific notation
-    return f"{coordinate:.7f}"
+    return f"{coordinate:.7f}"  # noqa
 
 
 def _synchronized(func):

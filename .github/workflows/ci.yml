@@ -41,8 +41,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # &test-matrix
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12-dev', 'pypy-3.7']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', 'pypy-3.7']
         experimental: [false]
+        include:
+          - python-version: '3.13-dev'
+            experimental: true
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -63,8 +66,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix: # *test-matrix  https://github.com/actions/runner/issues/1182
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12-dev', 'pypy-3.7']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', 'pypy-3.7']
         experimental: [false]
+        include:
+          - python-version: '3.13-dev'
+            experimental: true
       max-parallel: 2  # Reduce load on the geocoding services
     steps:
     - uses: actions/checkout@v2
