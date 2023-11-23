@@ -289,7 +289,7 @@ class Nominatim(Geocoder):
                 )
 
         if featuretype:
-            params['featuretype'] = featuretype
+            params['featureType'] = featuretype
 
         url = self._construct_url(self.api, params)
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)

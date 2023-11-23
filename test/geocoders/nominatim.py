@@ -264,25 +264,34 @@ class BaseTestNominatim(BaseTestGeocoder):
             pytest.param(
                 {"query": "mexico", "featuretype": 'country'},
                 {"latitude": 22.5000485, "longitude": -100.0000375, "delta": 5.0},
-                id="country",
-            ),
-            pytest.param(
-                {"query": "mexico", "featuretype": 'state', "country_codes": "US"},
-                {"latitude": 34.5708167, "longitude": -105.993007, "delta": 2.0},
-                id="state",
-                marks=pytest.mark.xfail(reason='OSM responds incorrectly here'),
+                id="mexico_country",
             ),
             pytest.param(
                 {"query": "mexico", "featuretype": 'city'},
                 {"latitude": 19.4326009, "longitude": -99.1333416, "delta": 2.0},
-                id="city",
-                marks=pytest.mark.xfail(reason='OSM responds incorrectly here'),
+                id="mexico_city",
+            ),
+            #
+            pytest.param(
+                {"query": "georgia", "featuretype": 'country', 'language': 'en'},
+                {"latitude": 41.6809707, "longitude": 44.0287382, "delta": 5.0},
+                id="georgia_country",
             ),
             pytest.param(
-                {"query": "georgia", "featuretype": 'settlement'},
+                {"query": "georgia", "featuretype": 'settlement', 'language': 'en'},
                 {"latitude": 32.3293809, "longitude": -83.1137366, "delta": 2.0},
-                id="settlement",
-                marks=pytest.mark.xfail(reason='OSM responds incorrectly here'),
+                id="georgia_settlement",
+            ),
+            #
+            pytest.param(
+                {"query": "new york", "featuretype": 'city'},
+                {"latitude": 40.7127281, "longitude": -74.0060152, "delta": 1.0},
+                id="new_york_city",
+            ),
+            pytest.param(
+                {"query": "new york", "featuretype": 'state'},
+                {"latitude": 43.1561681, "longitude": -75.8449946, "delta": 1.0},
+                id="new_york_state",
             ),
         ]
     )
