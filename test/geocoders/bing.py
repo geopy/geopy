@@ -57,17 +57,14 @@ class TestBing(BaseTestGeocoder):
         assert res.raw["address"].get("countryRegionIso2", 'missing') == 'US'
 
     async def test_user_location(self):
-        moscow_idaho = (46.7323875, -117.0001651)
-        moscow_idaho_bias = (46.7323875, -117.0001651)
-
-        moscow_ru = (55.75582886, 37.61722183)
-        moscow_ru_bias = (55.75582886, 37.61722183)
-        for expected, bias in ((moscow_idaho, moscow_idaho_bias),
-                               (moscow_ru, moscow_ru_bias)):
-            await self.geocode_run(
-                {"query": "moscow", "user_location": Point(bias)},
-                {"latitude": expected[0], "longitude": expected[1], "delta": 3.0},
-            )
+        await self.geocode_run(
+            {"query": "Kings Road", "user_location": Point(51.5043, -0.1260)},
+            {"latitude": 51.4615, "longitude": -0.2926, "delta": 0.5},
+        )
+        await self.geocode_run(
+            {"query": "Kings Road"},
+            {"latitude": 53.3356, "longitude": -2.2464, "delta": 0.5},
+        )
 
     async def test_optional_params(self):
         res = await self.geocode_run(

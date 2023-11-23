@@ -148,9 +148,7 @@ class Bing(Geocoder):
                 'key': self.api_key
             }
         if user_location:
-            params['userLocation'] = ",".join(
-                (str(user_location.latitude), str(user_location.longitude))
-            )
+            params['userLocation'] = self._coerce_point_to_string(user_location)
         if exactly_one:
             params['maxResults'] = 1
         if culture:
