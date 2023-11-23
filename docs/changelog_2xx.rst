@@ -3,6 +3,18 @@
 Changelog
 =========
 
+.. _v2-4-1:
+
+2.4.1
+-----
+2023-11-23
+
+Bugfixes
+~~~~~~~~
+
+- :class:`.Nominatim`: fix broken ``featuretype`` parameter. (:issue:`564`)
+
+
 .. _v2-4-0:
 
 2.4.0
