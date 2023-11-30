@@ -212,6 +212,7 @@ __all__ = (
     "Pelias",
     "Photon",
     "LiveAddress",
+    "Tencent",
     "TomTom",
     "What3Words",
     "What3WordsV3",
@@ -246,6 +247,7 @@ from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
 from geopy.geocoders.pickpoint import PickPoint
 from geopy.geocoders.smartystreets import LiveAddress
+from geopy.geocoders.tencent import Tencent
 from geopy.geocoders.tomtom import TomTom
 from geopy.geocoders.what3words import What3Words, What3WordsV3
 from geopy.geocoders.woosmap import Woosmap
@@ -279,6 +281,7 @@ SERVICE_TO_GEOCODER = {
     "pelias": Pelias,
     "photon": Photon,
     "liveaddress": LiveAddress,
+    "tencent": Tencent,
     "tomtom": TomTom,
     "what3words": What3Words,
     "what3wordsv3": What3WordsV3,
