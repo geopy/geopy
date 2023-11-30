@@ -188,6 +188,7 @@ __all__ = (
     # in the docs: docs/index.rst
     "ArcGIS",
     "AzureMaps",
+    "AMap",
     "Baidu",
     "BaiduV3",
     "BANFrance",
@@ -222,6 +223,7 @@ __all__ = (
 
 from geopy.exc import GeocoderNotFound
 from geopy.geocoders.arcgis import ArcGIS
+from geopy.geocoders.amap import AMap
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu, BaiduV3
 from geopy.geocoders.banfrance import BANFrance
@@ -253,6 +255,7 @@ from geopy.geocoders.yandex import Yandex
 
 SERVICE_TO_GEOCODER = {
     "arcgis": ArcGIS,
+    "amap": AMap,
     "azure": AzureMaps,
     "baidu": Baidu,
     "baiduv3": BaiduV3,
