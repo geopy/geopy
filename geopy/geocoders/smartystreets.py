@@ -124,7 +124,7 @@ class LiveAddress(Geocoder):
         """
         Parse responses as JSON objects.
         """
-        if not len(response):
+        if not response:
             return None
         if exactly_one:
             return self._format_structured_address(response[0])

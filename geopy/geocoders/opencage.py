@@ -206,7 +206,7 @@ class OpenCage(Geocoder):
         '''Returns location, (latitude, longitude) from json feed.'''
 
         places = page.get('results', [])
-        if not len(places):
+        if not places:
             self._check_status(page.get('status'))
             return None
 

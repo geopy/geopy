@@ -18,10 +18,7 @@ def _check_query(query):
     """
     Check query validity with regex
     """
-    if not _MULTIPLE_WORD_RE.match(query):
-        return False
-    else:
-        return True
+    return bool(_MULTIPLE_WORD_RE.match(query))
 
 
 class What3Words(Geocoder):

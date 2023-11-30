@@ -332,7 +332,7 @@ class GeoNames(Geocoder):
         """
         places = doc.get('geonames', [])
         self._raise_for_error(doc)
-        if not len(places):
+        if not places:
             return None
 
         def parse_code(place):
