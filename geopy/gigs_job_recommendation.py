@@ -123,7 +123,8 @@ class GigsJobRecommendation:
         if response.status_code == 200:
             return self._parse_job_data(response.json())
         else:
-            return "Error fetching job listings"
+            # TODO: Raise error here using whichever error handling library preferred
+            return []
 
     def _parse_job_data(self, json_data):
         """
