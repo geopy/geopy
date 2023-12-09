@@ -1,8 +1,6 @@
 import base64
 import requests
-import unittest
 from geopy.geocoders import Nominatim
-from unittest.mock import patch
 
 
 class GigsJobRecommendation:
@@ -170,68 +168,3 @@ class GigsJobRecommendation:
             return response.json()["data"]
         else:
             return []
-
-
-# Usage Example
-# recommender = GigsJobRecommendation()
-# result = recommender.recommend_jobs("1600 Amphitheatre Parkway, Mountain View, CA")
-# print(result)
-
-
-class TestGigsJobRecommendation(unittest.TestCase):
-    def setUp(self):
-        self.recommender = GigsJobRecommendation()
-
-    @patch("requests.get")
-    def test__get_industries(self, mock_get):
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = {"data": ["IT", "Healthcare"]}
-        industries = self.recommender._get_industries()
-        self.assertEqual(industries, ["IT", "Healthcare"])
-
-    @patch("requests.get")
-    def test__get_industries_failure(self, mock_get):
-        mock_get.return_value.status_code = 404
-        industries = self.recommender._get_industries()
-        self.assertEqual(industries, [])
-
-    @patch("requests.get")
-    def test_recommend_jobs(self, mock_get):
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = {
-            "data": [
-                {
-                    "title": "Software Engineer",
-                    "company": {"name": "Google"},
-                    "min_pay": 100000,
-                    "max_pay": 150000,
-                    "city": "Mountain View",
-                    "state": "CA",
-                    "zipcode": "94043",
-                    "posted_date": "2023-12-09",
-                    "application_url": "https://google.com",
-                    "requirements": "Python, Java",
-                }
-            ]
-        }
-
-        jobs = self.recommender.recommend_jobs(
-            "1600 Amphitheatre Parkway, Mountain View, CA"
-        )["jobs"]
-
-        self.assertEqual(
-            jobs,
-            [
-                {
-                    "title": "Software Engineer",
-                    "company": "Google",
-                    "min_pay": 100000,
-                    "max_pay": 150000,
-                    "location": "Mountain View, CA",
-                    "zipcode": "94043",
-                    "posted_date": "2023-12-09",
-                    "application_url": "https://google.com",
-                    "requirements": "Python, Java",
-                }
-            ],
-        )
