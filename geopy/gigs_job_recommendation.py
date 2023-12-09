@@ -48,11 +48,13 @@ class GigsJobRecommendation:
         address : str
             the address to geocode and search for jobs around
         radius : int, optional
-            the radius around the address to search for jobs (default is 8047)
+            the radius (in meters) around the address to search for jobs
+            (default is 8047 meters / 5 miles)
         min_pay : int, optional
-            the minimum pay for the jobs to recommend (default is None)
+            the minimum pay (format: DD.CC) for the jobs to recommend (default is None)
         industry : str, optional
             the industry of the jobs to recommend (default is None)
+            can retrieve full list of industry options by calling _get_industries()
 
         Returns
         -------
