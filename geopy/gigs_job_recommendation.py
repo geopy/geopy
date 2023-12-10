@@ -24,7 +24,7 @@ class GigsJobRecommendation:
         Returns a dictionary containing the geocoded location and a list of nearby jobs.
     """
 
-    def __init__(self, geolocator=None):
+    def __init__(self, geolocator: Nominatim = None):
         """
         Constructs all the necessary attributes for the GigsJobRecommendation object.
 
@@ -39,7 +39,13 @@ class GigsJobRecommendation:
 
         self.industries = self._get_industries()
 
-    def recommend_jobs(self, address, radius=8047, min_pay=None, industry=None):
+    def recommend_jobs(
+                self,
+                address: str,
+                radius: int = 8047,
+                min_pay: float = None,
+                industry: str = None
+            ) -> dict:
         """
         Returns a dictionary containing the geocoded location and a list of nearby jobs.
 
@@ -72,7 +78,7 @@ class GigsJobRecommendation:
         jobs = self._get_nearby_jobs(encoded_crd, radius, min_pay, industry)
         return {"location": location, "jobs": jobs}
 
-    def _encode_coordinates(self, lat, lon):
+    def _encode_coordinates(self, lat: float, lon: float) -> str:
         """
         Returns a base64 encoded string of the latitude and longitude.
 
@@ -92,7 +98,13 @@ class GigsJobRecommendation:
         encoded_crd = base64.b64encode(crd_str.encode()).decode()
         return encoded_crd
 
-    def _get_nearby_jobs(self, encoded_crd, radius, min_pay, industry):
+    def _get_nearby_jobs(
+                self,
+                encoded_crd: str,
+                radius: int,
+                min_pay: float,
+                industry: str
+            ) -> list:
         """
         Returns a list of nearby jobs fetched from the Gigs API.
 
@@ -126,7 +138,7 @@ class GigsJobRecommendation:
             # TODO: Raise error here using whichever error handling library preferred
             return []
 
-    def _parse_job_data(self, json_data):
+    def _parse_job_data(self, json_data: dict) -> list:
         """
         Returns a list of job information dictionaries parsed from the JSON data.
 
@@ -156,7 +168,7 @@ class GigsJobRecommendation:
             jobs.append(job_info)
         return jobs
 
-    def _get_industries(self):
+    def _get_industries(self) -> list:
         """
         Returns a list of industries fetched from the Gigs API.
 
