@@ -154,6 +154,14 @@ DataBC
 
    .. automethod:: __init__
 
+Geoapify
+--------
+
+.. autoclass:: geopy.geocoders.Geoapify
+   :members:
+
+   .. automethod:: __init__
+
 GeocodeEarth
 ------------
 
