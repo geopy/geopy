@@ -98,6 +98,7 @@ jobs:
         BAIDU_V3_KEY_REQUIRES_SK: ${{ secrets.BAIDU_V3_KEY_REQUIRES_SK }}
         BAIDU_V3_SEC_KEY: ${{ secrets.BAIDU_V3_SEC_KEY }}
         BING_KEY: ${{ secrets.BING_KEY }}
+        GEOAPIFY_KEY: ${{ secrets.GEOAPIFY_KEY }}
         GEOCODEEARTH_KEY: ${{ secrets.GEOCODEEARTH_KEY }}
         GEOCODIO_KEY: ${{ secrets.GEOCODIO_KEY }}
         GEOKEY_KEY: ${{ secrets.GEOKEY_KEY }}
