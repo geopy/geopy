@@ -306,6 +306,7 @@ class Nominatim(Geocoder):
             addressdetails=True,
             zoom=None,
             namedetails=False,
+            extratags=False,
     ):
         """
         Return an address by location point.
@@ -340,6 +341,9 @@ class Nominatim(Geocoder):
             namedetails, set it to True. This will be a list of alternative names,
             including language variants, etc.
 
+        :param bool extratags: Include additional information in the result if available,
+            e.g. wikipedia link, opening hours.
+
             .. versionadded:: 2.3
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
@@ -365,6 +369,9 @@ class Nominatim(Geocoder):
 
         if namedetails:
             params['namedetails'] = 1
+
+        if extratags:
+            params['extratags'] = 1
 
         url = self._construct_url(self.reverse_api, params)
         logger.debug("%s.reverse: %s", self.__class__.__name__, url)
