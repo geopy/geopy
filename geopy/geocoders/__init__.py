@@ -194,6 +194,7 @@ __all__ = (
     "Bing",
     "DataBC",
     "GeocodeEarth",
+    "GeocodeFarm",
     "Geocodio",
     "Geokeo",
     "GeoNames",
@@ -229,6 +230,7 @@ from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
 from geopy.geocoders.geocodeearth import GeocodeEarth
+from geopy.geocoders.geocodeearth import GeocodeFarm
 from geopy.geocoders.geocodio import Geocodio
 from geopy.geocoders.geokeo import Geokeo
 from geopy.geocoders.geolake import Geolake
@@ -260,6 +262,7 @@ SERVICE_TO_GEOCODER = {
     "bing": Bing,
     "databc": DataBC,
     "geocodeearth": GeocodeEarth,
+    "geocodeearth": GeocodeFarm,
     "geocodio": Geocodio,
     "geokeo": Geokeo,
     "geonames": GeoNames,
