@@ -1,0 +1,1 @@
+* Correction mineure : ajout d’une ligne de test pour la Pull Request.
