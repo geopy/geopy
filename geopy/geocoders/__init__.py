@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
 Each geolocation service you might use, such as Google Maps, Bing Maps, or
 Nominatim, has its own class in ``geopy.geocoders`` abstracting the service's
@@ -190,7 +192,6 @@ __all__ = (
     "AzureMaps",
     "Baidu",
     "BaiduV3",
-    "BANFrance",
     "Bing",
     "DataBC",
     "GeocodeEarth",
@@ -224,7 +225,6 @@ from geopy.exc import GeocoderNotFound
 from geopy.geocoders.arcgis import ArcGIS
 from geopy.geocoders.azure import AzureMaps
 from geopy.geocoders.baidu import Baidu, BaiduV3
-from geopy.geocoders.banfrance import BANFrance
 from geopy.geocoders.base import options
 from geopy.geocoders.bing import Bing
 from geopy.geocoders.databc import DataBC
@@ -256,7 +256,7 @@ SERVICE_TO_GEOCODER = {
     "azure": AzureMaps,
     "baidu": Baidu,
     "baiduv3": BaiduV3,
-    "banfrance": BANFrance,
+    "banfrance": IGNFrance,
     "bing": Bing,
     "databc": DataBC,
     "geocodeearth": GeocodeEarth,
