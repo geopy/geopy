@@ -121,7 +121,7 @@ class TomTom(Geocoder):
         if language:
             params['language'] = language
 
-        quoted_query = quote(query.encode('utf-8'))
+        quoted_query = quote(query.encode('utf-8'), safe="")
         url = "?".join((self.api % dict(query=quoted_query),
                         urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
