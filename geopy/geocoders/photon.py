@@ -1,5 +1,6 @@
 import collections.abc
 from functools import partial
+from typing import Optional, Union
 from urllib.parse import urlencode
 
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
@@ -82,9 +83,9 @@ class Photon(Geocoder):
             query,
             *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
             location_bias=None,
-            language=False,
+            language: Optional[str] = None,
             limit=None,
             osm_tag=None,
             bbox=None
@@ -170,8 +171,8 @@ class Photon(Geocoder):
             query,
             *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
-            language=False,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
+            language: Optional[str] = None,
             limit=None
     ):
         """
