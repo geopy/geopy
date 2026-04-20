@@ -199,6 +199,7 @@ __all__ = (
     "GeoNames",
     "GoogleV3",
     "Geolake",
+    "Ip2geo",
     "Here",
     "HereV7",
     "IGNFrance",
@@ -235,6 +236,7 @@ from geopy.geocoders.geolake import Geolake
 from geopy.geocoders.geonames import GeoNames
 from geopy.geocoders.google import GoogleV3
 from geopy.geocoders.here import Here, HereV7
+from geopy.geocoders.ip2geo import Ip2geo
 from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.mapquest import MapQuest
@@ -269,6 +271,7 @@ SERVICE_TO_GEOCODER = {
     "here": Here,
     "herev7": HereV7,
     "ignfrance": IGNFrance,
+    "ip2geo": Ip2geo,
     "mapbox": MapBox,
     "mapquest": MapQuest,
     "maptiler": MapTiler,
