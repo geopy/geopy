@@ -189,8 +189,10 @@ class options:
 
 # Create an object which `repr` returns 'DEFAULT_SENTINEL'. Sphinx (docs) uses
 # this value when generating method's signature.
-DEFAULT_SENTINEL = type('object', (object,),
-                        {'__repr__': lambda self: 'DEFAULT_SENTINEL'})()
+# Keep the static type broad so source-based type checkers don't infer each
+# DEFAULT_SENTINEL-backed parameter as accepting only this singleton.
+DEFAULT_SENTINEL: object = type('object', (object,),
+                                {'__repr__': lambda self: 'DEFAULT_SENTINEL'})()
 
 ERROR_CODE_MAP = {
     400: GeocoderQueryError,
