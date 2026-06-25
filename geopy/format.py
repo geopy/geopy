@@ -62,13 +62,21 @@ def format_degrees(degrees, fmt=DEGREES_FORMAT, symbols=None):
     TODO docs.
     """
     symbols = symbols or ASCII_SYMBOLS
-    arcminutes = units.arcminutes(degrees=degrees - int(degrees))
-    arcseconds = units.arcseconds(arcminutes=arcminutes - int(arcminutes))
+    # Convert to total arcseconds and round to remove floating-point noise
+    # before decomposing, to avoid small errors (e.g. 2.1e-12 arcseconds)
+    # that arise from the cascading degrees -> arcminutes -> arcseconds chain.
+    total_arcsec = round(abs(degrees) * 3600, 8)
+    whole_degrees = int(total_arcsec) // 3600
+    remaining = total_arcsec - whole_degrees * 3600
+    arcminutes = int(remaining) // 60
+    arcseconds = remaining - arcminutes * 60
+    if degrees < 0:
+        whole_degrees = -whole_degrees
     format_dict = dict(
         symbols,
-        degrees=degrees,
-        minutes=abs(arcminutes),
-        seconds=abs(arcseconds)
+        degrees=whole_degrees,
+        minutes=arcminutes,
+        seconds=arcseconds,
     )
     return fmt % format_dict
 
