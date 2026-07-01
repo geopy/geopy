@@ -80,9 +80,10 @@ def proxy_url(request, proxy_server):
     return proxy_server.get_proxy_url(with_scheme)
 
 
-@pytest.mark.skipif(WITH_SYSTEM_PROXIES, reason="There're active system proxies")
 @pytest.fixture
 def inject_proxy_to_system_env(proxy_url):
+    if WITH_SYSTEM_PROXIES:
+        pytest.skip("There're active system proxies")
     assert os.environ.get("http_proxy") is None
     assert os.environ.get("https_proxy") is None
     os.environ["http_proxy"] = proxy_url
