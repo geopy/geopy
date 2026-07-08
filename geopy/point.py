@@ -151,6 +151,13 @@ class Point:
 
     POINT_PATTERN = POINT_PATTERN
 
+    # Upper bound on the length of a string parsed by ``from_string``. A valid
+    # coordinate string is short (the longest realistic one is well under this),
+    # so longer inputs cannot be valid points. Capping the length keeps
+    # ``POINT_PATTERN`` from doing pathological amounts of backtracking on very
+    # long adversarial inputs (ReDoS, CWE-1333). See GH-608.
+    _MAX_STRING_LENGTH = 256
+
     def __new__(cls, latitude=None, longitude=None, altitude=None):
         """
         :param float latitude: Latitude of point.
@@ -423,6 +430,10 @@ class Point:
             - ``UT: N 39°20' 0'' / W 74°35' 0''``
 
         """
+        if len(string) > cls._MAX_STRING_LENGTH:
+            raise ValueError(
+                "Failed to create Point instance from string: unknown format."
+            )
         match = re.match(cls.POINT_PATTERN, re.sub(r"''", r'"', string))
         if match:
             latitude_direction = None
