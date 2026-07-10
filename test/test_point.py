@@ -72,6 +72,13 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(Point("UT: N 39\xb020' 0'' / W 74\xb035' 0''"),
                          (39.333333333333336, -74.58333333333333, 0.0))
 
+    def test_point_from_string_tolerates_irrelevant_surroundings(self):
+        self.assertEqual(Point("aaa 41.5 -81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("  41.5 -81.0  "), (41.5, -81.0, 0.0))
+        with self.assertRaises(ValueError):
+            # Non-whitespace trailing data is not tolerated:
+            Point("41.5 -81.0 aaa")
+
     def test_point_from_string_rejects_overlong_input(self):
         # A valid coordinate string is short. A very long adversarial string
         # must be rejected quickly rather than triggering catastrophic regex
