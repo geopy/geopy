@@ -1,4 +1,4 @@
-from distutils.version import LooseVersion
+from packaging.version import Version
 
 from geopy import __version__, __version_info__, get_version
 
@@ -8,7 +8,7 @@ def test_version():
 
 
 def test_version_info():
-    expected_version_info = tuple(LooseVersion(__version__).version)
+    expected_version_info = Version(__version__).release
     assert expected_version_info == __version_info__
 
 
