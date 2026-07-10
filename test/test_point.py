@@ -1,6 +1,7 @@
 import math
 import pickle
 import sys
+import time
 import unittest
 import warnings
 
@@ -70,6 +71,25 @@ class PointTestCase(unittest.TestCase):
                          (23.439444444444444, 23.458333333333332, 0.0))
         self.assertEqual(Point("UT: N 39\xb020' 0'' / W 74\xb035' 0''"),
                          (39.333333333333336, -74.58333333333333, 0.0))
+
+    def test_point_from_string_tolerates_irrelevant_surroundings(self):
+        self.assertEqual(Point("aaa 41.5 -81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("  41.5 -81.0  "), (41.5, -81.0, 0.0))
+        with self.assertRaises(ValueError):
+            # Non-whitespace trailing data is not tolerated:
+            Point("41.5 -81.0 aaa")
+
+    def test_point_from_string_rejects_overlong_input(self):
+        # A valid coordinate string is short. A very long adversarial string
+        # must be rejected quickly rather than triggering catastrophic regex
+        # backtracking in POINT_PATTERN (ReDoS, GH-608). Without the length
+        # guard this input takes tens of seconds; the bound below has a huge
+        # margin so it is not timing-sensitive.
+        adversarial = "<" + " " * 100_000 + "X"
+        start = time.perf_counter()
+        with self.assertRaises(ValueError):
+            Point(adversarial)
+        self.assertLess(time.perf_counter() - start, 1.0)
 
     def test_point_format_altitude(self):
         point = Point(latitude=41.5, longitude=81.0, altitude=2.5)
