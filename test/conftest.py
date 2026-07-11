@@ -78,15 +78,6 @@ def skip_if_internet_access_is_not_allowed(is_internet_access_allowed):
         pytest.skip("Skipping a test requiring Internet access")
 
 
-@pytest.fixture(autouse=True, scope="session")
-def event_loop():
-    # Geocoder instances have class scope, so the event loop
-    # should have session scope.
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    return loop
-
-
 def netloc_from_url(url):
     return urlparse(url).netloc
 
