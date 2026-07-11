@@ -211,7 +211,7 @@ class TestGoogleV3(BaseTestGeocoder):
     async def test_timezone_datetime(self):
         await self.reverse_timezone_run(
             {"query": self.new_york_point,
-             "at_time": datetime.utcfromtimestamp(0)},
+             "at_time": datetime(1970, 1, 1)},
             pytz.timezone("America/New_York"),
         )
 

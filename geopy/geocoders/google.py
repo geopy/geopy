@@ -1,9 +1,9 @@
 import base64
 import collections.abc
+import datetime
 import hashlib
 import hmac
 from calendar import timegm
-from datetime import datetime
 from functools import partial
 from urllib.parse import urlencode
 
@@ -379,8 +379,10 @@ class GoogleV3(Geocoder):
 
     def _normalize_timezone_at_time(self, at_time):
         if at_time is None:
-            timestamp = timegm(datetime.utcnow().utctimetuple())
-        elif isinstance(at_time, datetime):
+            timestamp = timegm(
+                datetime.datetime.now(datetime.timezone.utc).utctimetuple()
+            )
+        elif isinstance(at_time, datetime.datetime):
             # Naive datetimes are silently treated as UTC.
             # Timezone-aware datetimes are handled correctly.
             timestamp = timegm(at_time.utctimetuple())
