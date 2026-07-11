@@ -207,8 +207,9 @@ class TestIGNFranceUsernameAuthProxy(BaseTestGeocoder):
             **kwargs
         )
 
+    @classmethod
     @pytest.fixture(scope='class', autouse=True)
-    async def start_proxy(_, request, class_geocoder):
+    async def start_proxy(cls, request, class_geocoder):
         cls = request.cls
         cls.proxy_server = ProxyServerThread(timeout=cls.proxy_timeout)
         cls.proxy_server.start()

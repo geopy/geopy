@@ -46,8 +46,9 @@ class BaseTestGeocoder(ABC):
     geocoder = None
     delta = 0.5
 
+    @classmethod
     @pytest.fixture(scope='class', autouse=True)
-    async def class_geocoder(_, request, patch_adapter, is_internet_access_allowed):
+    async def class_geocoder(cls, request, patch_adapter, is_internet_access_allowed):
         """Prepare a class-level Geocoder instance."""
         cls = request.cls
         env.is_internet_access_allowed = is_internet_access_allowed
