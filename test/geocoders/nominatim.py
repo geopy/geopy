@@ -71,7 +71,7 @@ class BaseTestNominatim(BaseTestGeocoder):
 
     async def test_reverse_near_zero(self):
         location = await self.reverse_run(
-            {"query": Point(31.0, -1.0e-5)},
+            {"query": Point(31.0, -1.0e-5), "language": "en"},
             {"latitude": 32.3096365, "longitude": 0.2450916, "delta": 3}
         )
         assert "El Bayadh" in location.address
