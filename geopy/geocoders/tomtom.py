@@ -14,7 +14,10 @@ class TomTom(Geocoder):
     """TomTom geocoder.
 
     Documentation at:
-        https://developer.tomtom.com/search-api/search-api-documentation
+        https://docs.tomtom.com/geocoding-api/documentation/product-information/introduction
+
+    Reverse Geocoding documentation at:
+        https://docs.tomtom.com/reverse-geocoding-api/documentation/product-information/introduction
     """
 
     geocode_path = '/search/2/geocode/%(query)s.json'
@@ -105,7 +108,7 @@ class TomTom(Geocoder):
             returned. When data in specified language is not
             available for a specific field, default language is used.
             List of supported languages (case-insensitive):
-            https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
+            https://docs.tomtom.com/geocoding-api/documentation/product-information/supported-languages
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
@@ -156,7 +159,7 @@ class TomTom(Geocoder):
             returned. When data in specified language is not
             available for a specific field, default language is used.
             List of supported languages (case-insensitive):
-            https://developer.tomtom.com/online-search/online-search-documentation/supported-languages
+            https://docs.tomtom.com/reverse-geocoding-api/documentation/product-information/supported-languages
 
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
