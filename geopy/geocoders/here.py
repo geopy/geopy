@@ -166,11 +166,11 @@ class Here(Geocoder):
         :param query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
-            are one of: `city`, `county`, `district`, `country`, `state`,
-            `street`, `housenumber`, or `postalcode`.
+            are one of: ``city``, ``county``, ``district``, ``country``, ``state``,
+            ``street``, ``housenumber``, or ``postalcode``.
         :type query: str or dict
 
-        :param bbox: A type of spatial filter, limits the search for any other attributes
+        :param bbox: A spatial filter that limits the search for any other attributes
             in the request. Specified by two coordinate (lat/lon)
             pairs -- corners of the box. `The bbox search is currently similar
             to mapview but it is not extended` (cited from the REST API docs).
@@ -485,9 +485,8 @@ class HereV7(Geocoder):
 
         :param dict components: A structured query. Can be used along with
             the free-text ``query``. Should be a dictionary whose keys
-            are one of:
-            `country`, `state`, `county`, `city`, `district`, `street`,
-            `houseNumber`, `postalCode`.
+            are one of: ``country``, ``state``, ``county``, ``city``,
+            ``district``, ``street``, ``houseNumber``, ``postalCode``.
 
         :param at: The center of the search context.
         :type at: :class:`geopy.point.Point`, list or tuple of ``(latitude,

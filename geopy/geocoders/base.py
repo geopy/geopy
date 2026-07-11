@@ -164,7 +164,7 @@ class options:
             Pass `None` to disable timeout.
 
         default_user_agent
-            User-Agent header to send with the requests to geocoder API.
+            User-Agent header to send with requests to the geocoding APIs.
     """
 
     # Please keep the attributes sorted (Sphinx sorts them in the rendered
@@ -279,7 +279,7 @@ class Geocoder:
 
         In asynchronous mode context manager usage is not required,
         however, it is strongly advised to avoid warnings about
-        resources leaks.
+        resource leaks.
         """
         if not self.__run_async:
             raise TypeError("`async with` cannot be used with sync adapters")
@@ -333,7 +333,7 @@ class Geocoder:
     def _geocoder_exception_handler(self, error):
         """
         Geocoder-specific exceptions handler.
-        Override if custom exceptions processing is needed.
+        Override if custom exception processing is needed.
         For example, raising an appropriate GeocoderQuotaExceeded on non-200
         response with a textual message in the body about the exceeded quota.
 

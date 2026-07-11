@@ -175,9 +175,9 @@ class Nominatim(Geocoder):
         :param int limit: Maximum amount of results to return from Nominatim.
             Unless exactly_one is set to False, limit will always be 1.
 
-        :param bool addressdetails: If you want in *Location.raw* to include
+        :param bool addressdetails: If you want *Location.raw* to include
             address details such as house_number, city_district, postcode, etc
-            (in a structured form) set it to True
+            (in a structured form), set it to True
 
         :param str language: Preferred language in which to return results.
             Either uses standard
@@ -215,7 +215,7 @@ class Nominatim(Geocoder):
         :param str featuretype: If present, restrict results to certain type of features.
             Allowed values: `country`, `state`, `city`, `settlement`.
 
-        :param bool namedetails: If you want in *Location.raw* to include
+        :param bool namedetails: If you want *Location.raw* to include
             namedetails, set it to True. This will be a list of alternative names,
             including language variants, etc.
 
@@ -336,7 +336,7 @@ class Nominatim(Geocoder):
             an integer in range from 0 (country level) to 18 (building level),
             default is 18.
 
-        :param bool namedetails: If you want in *Location.raw* to include
+        :param bool namedetails: If you want *Location.raw* to include
             namedetails, set it to True. This will be a list of alternative names,
             including language variants, etc.
 

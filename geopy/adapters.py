@@ -66,7 +66,7 @@ class AdapterHTTPError(IOError):
     """An exception which must be raised by adapters when an HTTP response
     with a non-successful status code has been received.
 
-    Base Geocoder class translates this exception to an instance of
+    The Base Geocoder class translates this exception to an instance of
     :class:`geopy.exc.GeocoderServiceError`.
 
     """
@@ -76,7 +76,7 @@ class AdapterHTTPError(IOError):
 
         :param str message: Standard exception message.
         :param int status_code: HTTP status code.
-        :param dict headers: HTTP response readers. A mapping object
+        :param dict headers: HTTP response headers. A mapping object
             with lowercased or case-insensitive keys.
 
             .. versionadded:: 2.2

@@ -1,4 +1,4 @@
-"""``geopy.units`` module provides utility functions for performing
+"""The ``geopy.units`` module provides utility functions for performing
 angle and distance unit conversions.
 
 Some shortly named aliases are provided for convenience (e.g.

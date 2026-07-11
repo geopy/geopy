@@ -33,7 +33,7 @@ class MapBox(Geocoder):
     ):
         """
         :param str api_key: The API key required by Mapbox to perform
-            geocoding requests. API keys are managed through Mapox's account
+            geocoding requests. API keys are managed through Mapbox's account
             page (https://www.mapbox.com/account/access-tokens).
 
         :param str scheme:

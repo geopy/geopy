@@ -109,9 +109,9 @@ class OpenCage(Geocoder):
             Might be a Python list of strings.
         :type country: str or list
 
-        :param str language: an IETF format language code (such as `es`
-            for Spanish or pt-BR for Brazilian Portuguese); if this is
-            omitted a code of `en` (English) will be assumed by the remote
+        :param str language: an IETF-format language code (such as ``es``
+            for Spanish or ``pt-BR`` for Brazilian Portuguese); if this is
+            omitted, a code of ``en`` (English) will be assumed by the remote
             service.
 
         :param bool annotations: Enable

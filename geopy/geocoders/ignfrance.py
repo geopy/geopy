@@ -148,10 +148,10 @@ class IGNFrance(Geocoder):
             to ask to the API in the query body.
 
         :param str is_freeform: Set if return is structured with
-            freeform structure or a more structured returned.
+            freeform structure or a more structured response.
             By default, value is False.
 
-        :param str filtering: Provide string that help setting geocoder
+        :param str filtering: Provide a string that helps set the geocoder
             filter. It contains an XML string. See examples in documentation
             and ignfrance.py file in directory tests.
 
@@ -172,14 +172,15 @@ class IGNFrance(Geocoder):
         if query_type not in ['PositionOfInterest',
                               'StreetAddress',
                               'CadastralParcel']:
-            raise GeocoderQueryError("""You did not provided a query_type the
-            webservice can consume. It should be PositionOfInterest,
-            'StreetAddress or CadastralParcel""")
+            raise GeocoderQueryError(
+                "You did not provide a query_type the webservice can consume. "
+                "It should be PositionOfInterest, StreetAddress, or CadastralParcel"
+            )
 
         # Check query validity for CadastralParcel
         if query_type == 'CadastralParcel' and len(query.strip()) != 14:
-            raise GeocoderQueryError("""You must send a string of fourteen
-                characters long to match the cadastre required code""")
+            raise GeocoderQueryError("""You must send a string exactly fourteen
+                characters long to match the cadastre-required code""")
 
         sub_request = """
                 <GeocodeRequest returnFreeForm="{is_freeform}">
@@ -251,7 +252,7 @@ class IGNFrance(Geocoder):
         :param int maximum_responses: The maximum number of responses
             to ask to the API in the query body.
 
-        :param str filtering: Provide string that help setting geocoder
+        :param str filtering: Provide a string that helps set the geocoder
             filter. It contains an XML string. See examples in documentation
             and ignfrance.py file in directory tests.
 

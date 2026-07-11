@@ -26,7 +26,7 @@ class GeoNames(Geocoder):
     Documentation at:
         http://www.geonames.org/export/geonames-search.html
 
-    Reverse geocoding documentation at:
+    Reverse Geocoding documentation at:
         http://www.geonames.org/export/web-services.html#findNearbyPlaceName
     """
 
@@ -186,10 +186,10 @@ class GeoNames(Geocoder):
             exception. Set this only if you wish to override, on this call
             only, the value set during the geocoder's initialization.
 
-        :param str feature_code: A GeoNames feature code
+        :param str feature_code: A GeoNames feature code.
 
-        :param str lang: language of the returned ``name`` element (the pseudo
-            language code 'local' will return it in local language)
+        :param str lang: Language of the returned ``name`` element (the pseudo
+            language code 'local' will return it in the local language).
             Full list of supported languages can be found here:
             https://www.geonames.org/countries/
 
@@ -270,8 +270,8 @@ class GeoNames(Geocoder):
         timezone is used to produce the :class:`geopy.timezone.Timezone`.
 
         :param query: The coordinates for which you want a timezone.
-        :type query: :class:`geopy.point.Point`, list or tuple of (latitude,
-            longitude), or string as "%(latitude)s, %(longitude)s"
+        :type query: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
 
         :param int timeout: Time, in seconds, to wait for the geocoding service
             to respond before raising a :class:`geopy.exc.GeocoderTimedOut`

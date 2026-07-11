@@ -16,7 +16,7 @@ __all__ = ("Geokeo", )
 
 
 class Geokeo(Geocoder):
-    """Geocoder using the geokeo API.
+    """Geocoder using the Geokeo API.
 
     Documentation at:
         https://geokeo.com/documentation.php
@@ -175,7 +175,7 @@ class Geokeo(Geocoder):
             return None
 
         def parse_place(place):
-            '''Get the location, lat, lng from a single json place.'''
+            '''Get the location, lat, lng from a single JSON place.'''
             location = place.get('formatted_address')
             latitude = place['geometry']['location']['lat']
             longitude = place['geometry']['location']['lng']

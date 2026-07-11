@@ -73,9 +73,9 @@ class Location:
         Location's altitude.
 
         .. note::
-            Geocoding services usually don't consider altitude neither in
-            requests nor in responses, so almost always the value of this
-            property would be zero.
+            Geocoding services usually do not consider altitude in
+            requests or responses, so the value of this
+            property is almost always zero.
 
         :rtype: float
         """

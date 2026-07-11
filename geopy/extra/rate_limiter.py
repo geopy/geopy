@@ -1,4 +1,4 @@
-""":class:`.RateLimiter` and :class:`.AsyncRateLimiter` allow to perform bulk
+""":class:`.RateLimiter` and :class:`.AsyncRateLimiter` allow performing bulk
 operations while gracefully handling error responses and adding delays
 when needed.
 
@@ -43,7 +43,7 @@ To see a progress bar::
     tqdm.pandas()
     df['location'] = df['name'].progress_apply(geocode)
 
-Before using rate limiting classes, please consult with the Geocoding
+Before using rate limiting classes, please consult the Geocoding
 service ToS, which might explicitly consider bulk requests (even throttled)
 a violation.
 """

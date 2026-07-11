@@ -16,8 +16,8 @@ class Photon(Geocoder):
     Documentation at:
         https://github.com/komoot/photon
 
-    Photon/Komoot geocoder aims to let you `search as you type with
-    OpenStreetMap`. No API Key is needed by this platform.
+    Photon/Komoot geocoder aims to let you `search as-you-type
+    with OpenStreetMap`. No API Key is needed by this platform.
 
     .. versionchanged:: 2.2
         Changed default domain from ``photon.komoot.de``
@@ -112,8 +112,8 @@ class Photon(Geocoder):
         :param int limit: Limit the number of returned results, defaults to no
             limit.
 
-        :param osm_tag: The expression to filter (include/exclude) by key and/
-            or value, str as ``'key:value'`` or list/set of str if multiple
+        :param osm_tag: The expression to filter (include/exclude) by key and/or
+            value, str as ``'key:value'`` or list/set of str if multiple
             filters are required as ``['key:!val', '!key', ':!value']``.
         :type osm_tag: str or list or set
 

@@ -215,7 +215,7 @@ class Bing(Geocoder):
 
     def _parse_json(self, doc, exactly_one=True):
         """
-        Parse a location name, latitude, and longitude from an JSON response.
+        Parse a location name, latitude, and longitude from a JSON response.
         """
         status_code = doc.get("statusCode", 200)
         if status_code != 200:

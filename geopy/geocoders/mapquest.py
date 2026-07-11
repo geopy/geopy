@@ -38,7 +38,7 @@ class MapQuest(Geocoder):
             domain='www.mapquestapi.com'
     ):
         """
-        :param str api_key: The API key required by Mapquest to perform
+        :param str api_key: The API key required by MapQuest to perform
             geocoding requests. API keys are managed through MapQuest's "Manage Keys"
             page (https://developer.mapquest.com/user/me/apps).
 
@@ -63,7 +63,7 @@ class MapQuest(Geocoder):
 
             .. versionadded:: 2.0
 
-        :param str domain: base api domain for mapquest
+        :param str domain: base api domain for MapQuest
         """
         super().__init__(
             scheme=scheme,

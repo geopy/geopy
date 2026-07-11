@@ -47,10 +47,10 @@ class GeocoderRateLimited(GeocoderQuotaExceeded, IOError):
     The remote geocoding service has rate-limited the request.
     Retrying later might help.
 
-    Exception of this type has a ``retry_after`` attribute,
-    which contains amount of time (in seconds) the service
-    has asked to wait. Might be ``None`` if there were no such
-    data in response.
+    An exception of this type has a ``retry_after`` attribute,
+    which contains the amount of time (in seconds) the service
+    has asked to wait. It might be ``None`` if there was no such
+    data in the response.
 
     .. versionadded:: 2.2
     """

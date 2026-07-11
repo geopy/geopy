@@ -10,14 +10,14 @@ with a default of the geodesic distance available as the function
 Great-circle distance (:class:`.great_circle`) uses a spherical model of
 the earth, using the mean earth radius as defined by the International
 Union of Geodesy and Geophysics, (2\\ *a* + *b*)/3 = 6371.0087714150598
-kilometers approx 6371.009 km (for WGS-84), resulting in an error of up
+kilometers, approximately 6371.009 km (for WGS-84), resulting in an error of up
 to about 0.5%. The radius value is stored in
 :const:`distance.EARTH_RADIUS`, so it can be customized (it should
 always be in kilometers, however).
 
 The geodesic distance is the shortest distance on the surface of an
 ellipsoidal model of the earth.  The default algorithm uses the method
-is given by `Karney (2013)
+given by `Karney (2013)
 <https://doi.org/10.1007%2Fs00190-012-0578-z>`_ (:class:`.geodesic`);
 this is accurate to round-off and always converges.
 
@@ -38,7 +38,7 @@ most globally accurate.  geopy includes a few other models in the
                   'GRS-67':        (6378.1600,   6356.774719,   1 / 298.25),
                   }
 
-Here are examples of ``distance.distance`` usage, taking pair
+Here are examples of ``distance.distance`` usage, taking pairs
 of :code:`(lat, lon)` tuples::
 
     >>> from geopy import distance

@@ -68,7 +68,7 @@ class GoogleV3(Geocoder):
 
         :param str domain: Should be the localized Google Maps domain to
             connect to. The default is 'maps.googleapis.com', but if you're
-            geocoding address in the UK (for example), you may want to set it
+            geocoding an address in the UK (for example), you may want to set it
             to 'maps.google.co.uk' to properly bias results.
 
         :param str scheme:

@@ -47,7 +47,7 @@ def from_fixed_gmt_offset(gmt_offset_hours, raw):
 class Timezone:
     """
     Contains a parsed response for a timezone request, which is
-    implemented in few geocoders which provide such lookups.
+    implemented in a few geocoders that provide such lookups.
     """
 
     __slots__ = ("_pytz_timezone", "_raw")
@@ -59,7 +59,7 @@ class Timezone:
     @property
     def pytz_timezone(self):
         """
-        pytz timezone instance.
+        A pytz timezone instance.
 
         :rtype: :class:`pytz.tzinfo.BaseTzInfo`
         """

@@ -385,7 +385,7 @@ class Point:
                 return CONVERTERS[unit](distance)
             except KeyError:
                 raise NotImplementedError(
-                    'Bad distance unit specified, valid are: %r' %
+                    'Bad distance unit specified, valid ones are: %r' %
                     CONVERTERS.keys()
                 )
         else:
@@ -410,7 +410,7 @@ class Point:
         surrounding whitespace).
 
         Altitude, if supplied, must be a decimal number with given units.
-        The following unit abbrevations (case-insensitive) are supported:
+        The following unit abbreviations (case-insensitive) are supported:
 
             - ``km`` (kilometers)
             - ``m`` (meters)

@@ -155,7 +155,7 @@ class Geocodio(Geocoder):
         """Return an address by location point.
 
         :param str query: The coordinates for which you wish to obtain the
-            closest human-readable addresses
+            closest human-readable addresses.
 
         :param bool exactly_one: Return one result or a list of results, if
             available.
@@ -188,14 +188,14 @@ class Geocodio(Geocoder):
         return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, page, exactly_one=True):
-        """Returns location, (latitude, longitude) from json feed."""
+        """Returns location, (latitude, longitude) from JSON feed."""
 
         places = page.get('results', [])
         if not places:
             return None
 
         def parse_place(place):
-            """Get the location, lat, lng from a single json place."""
+            """Get the location, lat, lng from a single JSON place."""
             location = place.get('formatted_address')
             latitude = place['location']['lat']
             longitude = place['location']['lng']

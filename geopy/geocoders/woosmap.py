@@ -139,7 +139,7 @@ class Woosmap(Geocoder):
                 >>> [('country', 'FRA'), ('country', 'DE')]
 
         :param str language: The language in which to return results.
-            Must be a ISO 639-1 language code.
+            Must be an ISO 639-1 language code.
 
         :param str country_code_format: Default country code format
             in responses is Alpha3.

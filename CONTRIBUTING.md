@@ -2,28 +2,28 @@
 
 ## Reporting issues
 
-If you caught an exception from geopy please try to Google the error first.
+If you catch an exception from geopy, please try to Google the error first.
 There is a great chance that it has already been discussed somewhere
 and solutions have been provided (usually on GitHub or on Stack Overflow).
 
-Before reporting an issue please ensure that you have tried
-to get the answer from the doc: https://geopy.readthedocs.io/.
+Before reporting an issue, please ensure that you have tried
+to get the answer from the docs: https://geopy.readthedocs.io/.
 
 Keep in mind that if a specific geocoding service's API is not behaving
 correctly then it probably won't be helpful to report that issue
-here, see https://geopy.readthedocs.io/en/latest/#geopy-is-not-a-service
+here. See https://geopy.readthedocs.io/en/latest/#geopy-is-not-a-service
 
 The following resources are available for your input:
 
 1. Stack Overflow with [geopy tag](https://stackoverflow.com/questions/tagged/geopy).
    There's a somewhat active community here so you will probably get
-   a solution quicker. And also there is a large amount of already
+   a solution quicker. There is also a large number of already
    resolved questions which can help too! Just remember to put the `geopy`
-   tag if you'd decide to open a question.
+   tag if you decide to open a question.
 1. [GitHub Discussions](https://github.com/geopy/geopy/discussions) is
    a good place to start if Stack Overflow didn't help or you have
    some idea or a feature request you'd like to bring up, or if you
-   just have trouble and not sure you're doing everything right.
+   just have trouble and are not sure you're doing everything right.
    Solutions and helpful snippets/patterns are also very welcome here.
 1. [GitHub Issues](https://github.com/geopy/geopy/issues) should only
    be used for definite bug reports and specific tasks. If you're not sure
@@ -33,7 +33,7 @@ The following resources are available for your input:
 
 ## Submitting patches
 
-If you contribute code to geopy, you agree to license your code under the MIT.
+If you contribute code to geopy, you agree to license your code under the MIT license.
 
 The new code should follow [PEP8](https://pep8.org/) coding style (except
 the line length limit, which is 90) and adhere to the style of 
@@ -42,8 +42,8 @@ the surrounding code.
 You must document any functionality using Sphinx-compatible RST, and
 implement tests for any functionality in the `test` directory.
 
-In your Pull Requests there's no need to fill the changelog or AUTHORS,
-this is a maintainer's responsibility.
+In your Pull Requests, there's no need to update the changelog or AUTHORS file;
+this is the maintainer's responsibility.
 
 For your convenience the contributing-friendly issues are marked with
 `help wanted` label, and the beginner-friendly ones with
@@ -95,22 +95,22 @@ Some geocoders require credentials (like API keys) for testing. They must
 remain secret, so if you need to test a code which requires them, you should
 obtain your own valid credentials.
 
-Tests in CI from forks and PRs run in `test-local` mode only, i.e. no network
+Tests in CI from forks and PRs run in `test-local` mode only, i.e., no network
 requests are performed. Full test suite with network requests is run only
 for pushes to branches by maintainers. This
 helps to reduce load on the geocoding services and save some quotas associated
 with the credentials used by geopy. It means that PR builds won't actually test
 network requests. Code changing a geocoder should be tested locally.
-But it's acceptable to not test such code if obtaining the required credentials 
+But it's acceptable not to test such code if obtaining the required credentials
 seems problematic: just leave a note
-so the maintainers would be aware that the code hasn't been tested.
+so the maintainers are aware that the code hasn't been tested.
 
 You may wonder: why not commit captured data and run mocked tests?
 Because there are copyright constraints on the data returned by services.
-Another reason is that this data goes obsolete quite fast, and maintaining
+Another reason is that this data becomes obsolete quite fast, and maintaining
 it is cumbersome.
 
-To ease local testing the credentials can be stored in a json format
+To ease local testing, the credentials can be stored in a json format
 in a file called `.test_keys` located at the root of the project
 instead of env variables.
 
@@ -126,7 +126,7 @@ Example contents of `.test_keys`:
 
     make docs
 
-Open `docs/_build/html/index.html` with a browser to see the docs. On macOS you 
+Open `docs/_build/html/index.html` with a browser to see the docs. On macOS, you
 can use the following command for that:
 
     open docs/_build/html/index.html

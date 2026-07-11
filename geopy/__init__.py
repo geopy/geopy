@@ -6,7 +6,7 @@ addresses, cities, countries, and landmarks across the globe using third-party
 geocoders and other data sources.
 
 geopy is tested against CPython (versions 3.8 to 3.15)
-and PyPy3. geopy 1.x line also supported CPython 2.7, 3.4 and PyPy2.
+and PyPy3. The geopy 1.x line also supported CPython 2.7, 3.4, and PyPy2.
 """
 
 from geopy.geocoders import *  # noqa
@@ -16,7 +16,7 @@ from geopy.timezone import Timezone  # noqa
 from geopy.util import __version__, __version_info__, get_version  # noqa
 
 # geopy.geocoders.options must not be importable as `geopy.options`,
-# because that is ambiguous (which options are that).
+# because that is ambiguous (what those options are).
 del options  # noqa
 
 # `__all__` is intentionally not defined in order to not duplicate

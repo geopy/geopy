@@ -67,17 +67,17 @@ or timing out).
 
 :mod:`geopy.extra.rate_limiter` classes provide a convenient
 wrapper, which can be used to automatically add delays between geocoding
-calls to reduce the load on the Geocoding service. Also it can retry
+calls to reduce the load on the Geocoding service. Also, it can retry
 failed requests and swallow errors for individual rows.
 
 If you're having the `Too Many Requests` error, you may try the following:
 
 - Use :mod:`geopy.extra.rate_limiter` with non-zero
   ``min_delay_seconds``.
-- Try a different Geocoding service (please consult with their ToS first,
+- Try a different Geocoding service (please consult their ToS first,
   as some services prohibit bulk geocoding).
 - Take a paid plan on the chosen Geocoding service, which provides
-  higher quota.
+  a higher quota.
 - Provision your own local copy of the Geocoding service (such as Nominatim).
 
 Rate Limiter
@@ -508,16 +508,16 @@ are still being made in minor releases, such as:
 
 - Behavior for invalid input and peculiar edge cases might be altered.
   For example, :class:`geopy.point.Point` instances previously did
-  coordinate values normalization, though it's not documented, and it was
+  coordinate value normalization, though it's not documented, and it was
   completely wrong for the latitudes outside the `[-90; 90]` range.
-  So instead of using an incorrectly normalized value for latitude,
-  a :class:`ValueError` exception is now thrown (:issue:`294`).
+  So instead of returning an incorrectly normalized latitude value,
+  a :class:`ValueError` exception is now raised (:issue:`294`).
 
 Features and usages being phased out are covered with deprecation :mod:`warnings`
-when possible. Make sure to run your python with the ``-Wd`` switch to see
-if your code emits the warnings.
+when possible. Make sure to run your Python with the ``-Wd`` switch to see
+if your code emits any warnings.
 
-To make the upgrade less painful, please read the changelog before upgrading.
+To make the upgrade smoother, please read the changelog before upgrading.
 
 
 Changelog

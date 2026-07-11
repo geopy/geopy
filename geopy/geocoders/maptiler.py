@@ -31,8 +31,8 @@ class MapTiler(Geocoder):
             domain='api.maptiler.com'
     ):
         """
-        :param str api_key: The API key required by Maptiler to perform
-            geocoding requests. API keys are managed through Maptiler's account
+        :param str api_key: The API key required by MapTiler to perform
+            geocoding requests. API keys are managed through MapTiler's account
             page (https://cloud.maptiler.com/account/keys).
 
         :param str scheme:
@@ -56,7 +56,7 @@ class MapTiler(Geocoder):
 
             .. versionadded:: 2.0
 
-        :param str domain: base api domain for Maptiler
+        :param str domain: base api domain for MapTiler
         """
         super().__init__(
             scheme=scheme,

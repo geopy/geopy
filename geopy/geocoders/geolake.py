@@ -102,8 +102,8 @@ class Geolake(Geocoder):
         :param query: The address or query you wish to geocode.
 
             For a structured query, provide a dictionary whose keys
-            are one of: `country`, `state`, `city`, `zipcode`, `street`, `address`,
-            `houseNumber` or `subNumber`.
+            are one of: ``country``, ``state``, ``city``, ``zipcode``,
+            ``street``, ``address``, ``houseNumber`` or ``subNumber``.
         :type query: str or dict
 
         :param country_codes: Provides the geocoder with a list
@@ -155,7 +155,7 @@ class Geolake(Geocoder):
         return self._call_geocoder(url, callback, timeout=timeout)
 
     def _parse_json(self, page, exactly_one):
-        """Returns location, (latitude, longitude) from json feed."""
+        """Returns location, (latitude, longitude) from JSON feed."""
 
         if not page.get('success'):
             return None

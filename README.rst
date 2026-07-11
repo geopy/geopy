@@ -32,7 +32,7 @@ Geocoder classes are located in `geopy.geocoders`_.
 .. _geopy.geocoders: https://github.com/geopy/geopy/tree/master/geopy/geocoders
 
 geopy is tested against CPython (versions 3.8 to 3.15)
-and PyPy3. geopy 1.x line also supported CPython 2.7, 3.4 and PyPy2.
+and PyPy3. The geopy 1.x line also supported CPython 2.7, 3.4, and PyPy2.
 
 © geopy contributors 2006-2026 (see AUTHORS) under the `MIT
 License <https://github.com/geopy/geopy/blob/master/LICENSE>`__.
@@ -91,7 +91,7 @@ Geopy can calculate geodesic distance between two points using the
 with a default of the geodesic distance available as the function
 `geopy.distance.distance`.
 
-Here's an example usage of the geodesic distance, taking pair
+Here's an example usage of the geodesic distance, taking pairs
 of :code:`(lat, lon)` tuples:
 
 .. code:: pycon
@@ -102,7 +102,7 @@ of :code:`(lat, lon)` tuples:
     >>> print(geodesic(newport_ri, cleveland_oh).miles)
     538.390445368
 
-Using great-circle distance, also taking pair of :code:`(lat, lon)` tuples:
+Using great-circle distance, also taking pairs of :code:`(lat, lon)` tuples:
 
 .. code:: pycon
 
