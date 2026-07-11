@@ -3,7 +3,6 @@ import functools
 import inspect
 import threading
 
-from geopy import compat
 from geopy.adapters import (
     AdapterHTTPError,
     BaseAsyncAdapter,
@@ -456,14 +455,14 @@ def _synchronized(func):
 
         if async_lock.locked():
             assert async_lock_task is not None
-            if compat.current_task() is async_lock_task:
+            if asyncio.current_task() is async_lock_task:
                 res = func(self, *args, **kwargs)
                 if inspect.isawaitable(res):
                     res = await res
                 return res
 
         async with async_lock:
-            async_lock_task = compat.current_task()
+            async_lock_task = asyncio.current_task()
             try:
                 res = func(self, *args, **kwargs)
                 if inspect.isawaitable(res):

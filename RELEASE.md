@@ -23,7 +23,7 @@
 ## Check
 
 1. Ensure that the uploaded version works in a clean environment
-   (e.g. `docker run -it --rm python:3.7 bash`)
+   (e.g. `docker run -it --rm python:3.8 bash`)
    and execute the examples in README.
 1. Ensure that RTD builds have passed and the `stable` version has updated:
    https://readthedocs.org/projects/geopy/builds/

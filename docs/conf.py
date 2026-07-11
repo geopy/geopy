@@ -52,7 +52,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "GeoPy"
-copyright = "2006-2018, GeoPy Contributors"
+copyright = "2006-2026, GeoPy Contributors"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
