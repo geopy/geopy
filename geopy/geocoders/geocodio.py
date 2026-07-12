@@ -223,7 +223,7 @@ class Geocodio(Geocoder):
             if (
                 'could not geocode address' in error_message.lower()
                 and 'postal code or city required' in error_message.lower()
-            ):
+            ) or 'no matches found' in error_message.lower():
                 return NONE_RESULT
             raise GeocoderQueryError(error_message) from error
         if error.status_code == 403:
