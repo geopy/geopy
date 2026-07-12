@@ -2,7 +2,7 @@ import pytest
 
 from geopy.exc import GeocoderQueryError
 from geopy.geocoders import IGNFrance
-from test.geocoders.util import BaseTestGeocoder
+from test.geocoders.util import BaseTestGeocoder, asyncgen_classmethod_pytest91
 from test.proxy_server import ProxyServerThread
 
 
@@ -207,10 +207,9 @@ class TestIGNFranceUsernameAuthProxy(BaseTestGeocoder):
             **kwargs
         )
 
-    @classmethod
     @pytest.fixture(scope='class', autouse=True)
+    @asyncgen_classmethod_pytest91
     async def start_proxy(cls, request, class_geocoder):
-        cls = request.cls
         cls.proxy_server = ProxyServerThread(timeout=cls.proxy_timeout)
         cls.proxy_server.start()
         cls.proxy_url = cls.proxy_server.get_proxy_url()
