@@ -429,6 +429,11 @@ class Point:
             - ``23 26' 22" N 23 27' 30" E``
             - ``UT: N 39°20' 0'' / W 74°35' 0''``
 
+        .. versionchanged:: 2.5
+            Strings longer than 256 characters are now unconditionally rejected
+            with a :class:`ValueError` to guard against ReDoS attacks
+            (:issue:`608`, :ghsa:`mhvh-fq92-pfmr`).
+
         """
         if len(string) > cls._MAX_STRING_LENGTH:
             raise ValueError(
