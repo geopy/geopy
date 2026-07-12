@@ -1,5 +1,6 @@
 import collections.abc
 from functools import partial
+from typing import Optional, Union
 from urllib.parse import urlencode
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
@@ -137,10 +138,10 @@ class Nominatim(Geocoder):
             query,
             *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
             limit=None,
             addressdetails=False,
-            language=False,
+            language: Optional[str] = None,
             geometry=None,
             extratags=False,
             country_codes=None,
@@ -301,8 +302,8 @@ class Nominatim(Geocoder):
             query,
             *,
             exactly_one=True,
-            timeout=DEFAULT_SENTINEL,
-            language=False,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
+            language: Optional[str] = None,
             addressdetails=True,
             zoom=None,
             namedetails=False,
