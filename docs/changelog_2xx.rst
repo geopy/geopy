@@ -3,6 +3,73 @@
 Changelog
 =========
 
+.. _v2-5-0:
+
+2.5.0
+-----
+2026-07-12
+
+Security Advisory
+~~~~~~~~~~~~~~~~~
+
+GitHub Security advisory: :ghsa:`mhvh-fq92-pfmr`.
+
+Regular Expression Denial of Service (ReDoS) in :class:`.Point`:
+:meth:`.Point.from_string` may take excessive CPU time when parsing long,
+malformed coordinate strings due to inefficient regular-expression behavior.
+
+The numeric :class:`.Point` constructor is not affected.
+
+Geocoders' ``reverse`` methods called with string inputs exercise the vulnerable path.
+
+Reported by Younghun Lee in :issue:`608`,
+fix contributed by Apoorv Darshan in :issue:`610`.
+
+The fix rejects any inputs longer than 256 chars unconditionally,
+which may start falsely rejecting previously valid Point strings
+with long irrelevant prefixes.
+
+Bugfixes
+~~~~~~~~
+
+- :class:`.Geocodio`: fix ``GeocoderQueryError`` being raised for empty results.
+- :class:`.GoogleV3`: fix ``utcnow`` deprecation warnings.
+
+Packaging Changes
+~~~~~~~~~~~~~~~~~
+
+- Drop support for Python 3.7.
+- Add support for Python 3.13, 3.14, and 3.15.
+- Migrate build metadata from ``setup.py`` to ``setup.cfg``.
+  Remove ``download_url`` from the metadata.
+  Contributed by Mike Taves. (:issue:`535`)
+- Replace ``distutils`` with ``packaging`` in tests (fixes Python 3.12+).
+
+Code Improvements
+~~~~~~~~~~~~~~~~~
+
+- Remove Python 2 relics.
+  Contributed by Miroslav Šedivý. (:issue:`552`)
+
+Test Improvements
+~~~~~~~~~~~~~~~~~
+
+- Fix applying pytest marks to fixtures (pytest >= 9.1 compatibility).
+  Contributed by Tomáš Hrnčiar. (:issue:`609`)
+- Fix unclosed event loop warning in tests.
+- Fix pytest classmethod warning.
+- :class:`.Nominatim`: fix ``test_reverse_near_zero`` which was failing due to
+  locale-specific response formatting.
+  Contributed by Alfredo Tupone. (:issue:`606`)
+
+Docs Improvements
+~~~~~~~~~~~~~~~~~
+
+- :class:`.TomTom`: update documentation links.
+  Contributed by Przemek Malolepszy. (:issue:`602`)
+- Improve English grammar in docs.
+
+
 .. _v2-4-1:
 
 2.4.1

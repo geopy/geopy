@@ -33,10 +33,15 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.extlinks",
     "sphinx_issues",
 ]
 
 issues_github_path = "geopy/geopy"
+
+extlinks = {
+    "ghsa": ("https://github.com/geopy/geopy/security/advisories/GHSA-%s", "GHSA-%s"),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
