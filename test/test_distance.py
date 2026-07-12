@@ -65,6 +65,21 @@ class CommonDistanceComputationCases:
             self.assertAlmostEqual(p.latitude, 59.9878, delta=1e-3)
             self.assertAlmostEqual(p.longitude, 161.79, delta=1e-2)
 
+    def test_bearing(self):
+        distance = self.cls()
+        east = distance.bearing((0, 150), (0, 151))
+        north = distance.bearing((45, 150), (46, 150))
+        south = distance.bearing((45, 100), (-45, 100))
+        west = distance.bearing((0, 150), (0, 10))
+        # East-West bearing deviates as you travel from the equator
+        not_east = distance.bearing((45, 150), (45, 151))
+
+        self.assertAlmostEqual(east, 90.0)
+        self.assertAlmostEqual(north, 0.0)
+        self.assertAlmostEqual(south, 180.0)
+        self.assertAlmostEqual(west, -90.0)
+        self.assertNotAlmostEqual(not_east, 90.0)
+
     def test_should_recognize_equivalence_of_pos_and_neg_180_longitude(self):
         distance1 = self.cls((0, -180), (0, 180)).kilometers
         distance2 = self.cls((0, 180), (0, -180)).kilometers

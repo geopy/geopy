@@ -122,7 +122,7 @@ from geographiclib.geodesic import Geodesic
 
 from geopy import units, util
 from geopy.point import Point
-from geopy.units import radians
+from geopy.units import degrees, radians
 
 # IUGG mean earth radius in kilometers, from
 # https://en.wikipedia.org/wiki/Earth_radius#Mean_radius.  Using a
@@ -331,6 +331,35 @@ class Distance:
         # to be used directly.
         raise NotImplementedError("Distance is an abstract class")
 
+    def bearing(self, start, end):
+        """
+        Calculate the bearing from a starting point to an end point as defined
+        at the starting point.
+
+        Example: Bearing due North::
+
+            >>> import geopy.distance
+            >>> geopy.distance.distance().bearing((34, 148), (34, 140))
+            0.0
+
+        Example: A bearing due East::
+
+            >>> import geopy.distance
+            >>> geopy.distance.distance().bearing((0,150),(0,155))
+            90.0
+
+        :param start: Starting point, bearing is calculated from start
+        :type point: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+        :param end: Ending point.
+        :type point: :class:`geopy.point.Point`, list or tuple of ``(latitude,
+            longitude)``, or string as ``"%(latitude)s, %(longitude)s"``.
+
+        :return: Bearing at ``start`` towards ``end`` in degrees clockwise from true north
+        :rtype: float
+        """
+        raise NotImplementedError("Distance is an abstract class")
+
     def destination(self, point, bearing, distance=None):
         """
         Calculate destination point using a starting point, bearing
@@ -480,6 +509,19 @@ class great_circle(Distance):
 
         return self.RADIUS * d
 
+    def bearing(self, start, end):
+        # Uses bearing formula from https://www.movable-type.co.uk/scripts/latlong.html
+        start, end = Point(start), Point(end)
+        _ensure_same_altitude(start, end)
+
+        lat1, lng1 = radians(degrees=start.latitude), radians(degrees=start.longitude)
+        lat2, lng2 = radians(degrees=end.latitude), radians(degrees=end.longitude)
+
+        return degrees(atan2(
+            sin(lng2 - lng1) * cos(lat2),
+            cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lng2 - lng1)
+            ))
+
     def destination(self, point, bearing, distance=None):
         point = Point(point)
         lat1 = units.radians(degrees=point.latitude)
@@ -567,6 +609,21 @@ class geodesic(Distance):
                                 Geodesic.DISTANCE)['s12']
 
         return s12
+
+    def bearing(self, start, end):
+        start, end = Point(start), Point(end)
+        _ensure_same_altitude(start, end)
+        lat1, lon1 = start.latitude, start.longitude
+        lat2, lon2 = end.latitude, end.longitude
+
+        if not (isinstance(self.geod, Geodesic) and
+                self.geod.a == self.ELLIPSOID[0] and
+                self.geod.f == self.ELLIPSOID[2]):
+            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
+
+        azi1 = self.geod.Inverse(lat1, lon1, lat2, lon2, Geodesic.AZIMUTH)['azi1']
+
+        return azi1
 
     def destination(self, point, bearing, distance=None):
         point = Point(point)
