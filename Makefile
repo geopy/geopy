@@ -7,7 +7,7 @@ venv:
 
 .PHONY: develop
 develop:
-	pip install -e '.[dev]'
+	pip install -e --group dev
 
 .PHONY: lint lint-flake8 lint-isort
 lint-flake8:

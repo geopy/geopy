@@ -54,7 +54,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install --upgrade pip
         python3 -m pip install tox tox-gh-actions
     - run: GEOPY_TOX_TARGET=test-local tox
 
@@ -80,7 +80,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install --upgrade pip
         python3 -m pip install tox tox-gh-actions
     - run: tox
       env:
