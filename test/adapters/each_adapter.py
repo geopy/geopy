@@ -12,6 +12,7 @@ from geopy.adapters import (
     AdapterHTTPError,
     AioHTTPAdapter,
     BaseAsyncAdapter,
+    HttpxAsyncAdapter,
     RequestsAdapter,
     URLLibAdapter,
 )
@@ -47,6 +48,13 @@ except ImportError:
     NOT_AVAILABLE_ADAPTERS.append(AioHTTPAdapter)
 else:
     AVAILABLE_ADAPTERS.append(AioHTTPAdapter)
+
+try:
+    import httpx  # noqa
+except ImportError:
+    NOT_AVAILABLE_ADAPTERS.append(HttpxAsyncAdapter)
+else:
+    AVAILABLE_ADAPTERS.append(HttpxAsyncAdapter)
 
 
 class DummyGeocoder(Geocoder):

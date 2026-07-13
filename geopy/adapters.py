@@ -61,6 +61,12 @@ try:
 except ImportError:
     aiohttp_available = False
 
+try:
+    import httpx
+    httpx_available = True
+except ImportError:
+    httpx_available = False
+
 
 class AdapterHTTPError(IOError):
     """An exception which must be raised by adapters when an HTTP response
@@ -681,3 +687,113 @@ class RequestsHTTPWithSSLContextAdapter(RequestsHTTPAdapter):
             conn.ca_cert_dir = None
             conn.cert_file = None
             conn.key_file = None
+
+
+class HttpxAsyncAdapter(BaseAsyncAdapter):
+    """The adapter which uses `httpx`_ library.
+
+    .. _httpx: https://www.python-httpx.org/
+
+    `httpx` supports keep-alives, persists Cookies, allows response
+    compression and uses HTTP/2, when installed alongside ``h2``.
+
+    ``httpx`` package must be installed in order to use this adapter.
+    """
+    is_available = httpx_available
+
+    def __init__(
+        self,
+        *,
+        proxies,
+        ssl_context,
+        max_keepalive_connections=20,
+        max_connections=100,
+        keepalive_expiry=5,
+    ):
+        if not httpx_available:
+            raise ImportError(
+                "`httpx` must be installed in order to use HttpxAsyncAdapter. "
+                "If you have installed geopy via pip, you may use "
+                "this command to install httpx: "
+                '`pip install httpx`.'
+            )
+        proxies = _normalize_proxies(proxies)
+        if ssl_context is None:
+            # Like requests, httpx uses CA bundle from `certifi` package.
+            # This is typically overridden with the `SSL_CERT_FILE`
+            # or `SSL_CERT_DIR` environment variable. However, trust_env
+            # is disabled below to turn off the httpx-specific logic of proxy
+            # servers configuration, which is re-implemented in geopy
+            # so that it's similar between different Adapters implementations.
+            #
+            # Here, in order to align the adapter's behavior with
+            # the default URLLibAdapter, we explicitly pass an ssl context,
+            # which would be initialized with the system's CA store
+            # rather than the certifi's bundle requests uses by default.
+            #
+            # See also https://github.com/geopy/geopy/issues/546
+            ssl_context = ssl.create_default_context()
+        super().__init__(proxies=proxies, ssl_context=ssl_context)
+
+        limits = httpx.Limits(
+            max_keepalive_connections=max_keepalive_connections,
+            max_connections=max_connections,
+            keepalive_expiry=keepalive_expiry,
+        )
+
+        self._proxy_mounts = {
+            ("%s://" % scheme): httpx.AsyncHTTPTransport(
+                verify=ssl_context if scheme == "https" else False,
+                proxy=proxy,
+                limits=limits,
+            )
+            for scheme, proxy
+            in proxies.items()
+        }
+        self.ssl_context = ssl_context
+
+    @property
+    def client(self):
+        # Lazy client creation, which allows to avoid "unclosed socket"
+        # warnings if a Geocoder instance is created without entering
+        # async context and making any requests.
+        client = self.__dict__.get("client")
+        if client is None:
+            client = httpx.AsyncClient(
+                trust_env=False,  # don't use system proxies
+                mounts=self._proxy_mounts,
+            )
+            self.__dict__["client"] = client
+        return client
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.client.aclose()
+
+    async def get_text(self, url, *, timeout, headers):
+        response = await self._request(url, timeout=timeout, headers=headers)
+        return response.text
+
+    async def get_json(self, url, *, timeout, headers):
+        response = await self._request(url, timeout=timeout, headers=headers)
+        try:
+            return response.json()
+        except json.decoder.JSONDecodeError as error:
+            raise GeocoderParseError from error
+
+    async def _request(self, url, *, timeout, headers):
+        response = await self.client.get(
+            url,
+            timeout=httpx.Timeout(timeout),
+            headers=headers
+        )
+        if response.status_code >= 400:
+            raise AdapterHTTPError(
+                "Non-successful status code %s" % response.status_code,
+                status_code=response.status_code,
+                headers=response.headers,
+                text=response.text,
+            )
+        return response
