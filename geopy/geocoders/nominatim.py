@@ -59,7 +59,8 @@ class Nominatim(Geocoder):
             scheme=None,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            email=None,
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. PickPoint).
     ):
@@ -87,7 +88,14 @@ class Nominatim(Geocoder):
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
-            .. versionadded:: 2.0
+        :param str email: Valid email address of the application owner,
+            included as the ``email`` query parameter in requests to
+            Nominatim. This allows Nominatim administrators to contact
+            you in case of operational issues. See the Nominatim
+            `usage policy <https://operations.osmfoundation.org/policies/nominatim/>`_
+            for details.
+
+            .. versionadded:: 2.5
         """
         super().__init__(
             scheme=scheme,
@@ -99,7 +107,7 @@ class Nominatim(Geocoder):
         )
 
         self.domain = domain.strip('/')
-
+        self.email = email
         if (self.domain == _DEFAULT_NOMINATIM_DOMAIN
                 and self.headers['User-Agent'] in _REJECTED_USER_AGENTS):
             raise ConfigurationError(
@@ -130,6 +138,8 @@ class Nominatim(Geocoder):
 
         :return: string URL.
         """
+        if self.email:
+            params["email"] = self.email
         return "?".join((base_api, urlencode(params)))
 
     def geocode(

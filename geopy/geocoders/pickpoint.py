@@ -24,7 +24,8 @@ class PickPoint(Nominatim):
             scheme=None,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            email=None
     ):
         """
 
@@ -64,6 +65,7 @@ class PickPoint(Nominatim):
             user_agent=user_agent,
             ssl_context=ssl_context,
             adapter_factory=adapter_factory,
+            email=email
         )
         self.api_key = api_key
 
