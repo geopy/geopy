@@ -59,7 +59,8 @@ class Nominatim(Geocoder):
             scheme=None,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,
-            adapter_factory=None
+            adapter_factory=None,
+            email=None,
             # Make sure to synchronize the changes of this signature in the
             # inheriting classes (e.g. PickPoint).
     ):
@@ -99,7 +100,7 @@ class Nominatim(Geocoder):
         )
 
         self.domain = domain.strip('/')
-
+        self.email = email
         if (self.domain == _DEFAULT_NOMINATIM_DOMAIN
                 and self.headers['User-Agent'] in _REJECTED_USER_AGENTS):
             raise ConfigurationError(
@@ -130,6 +131,8 @@ class Nominatim(Geocoder):
 
         :return: string URL.
         """
+        if self.email:
+            params["email"] = self.email
         return "?".join((base_api, urlencode(params)))
 
     def geocode(

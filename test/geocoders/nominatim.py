@@ -375,3 +375,21 @@ class TestNominatim(BaseTestNominatim):
             from geopy.geocoders.osm import Nominatim as OsmNominatim
         assert len(w) == 1
         assert OsmNominatim is Nominatim
+
+    async def test_email_stored(self):
+        geocoder = self.make_geocoder(email='test@example.com')
+        assert geocoder.email == 'test@example.com'
+
+    async def test_email_none_by_default(self):
+        geocoder = self.make_geocoder()
+        assert geocoder.email is None
+
+    async def test_email_in_constructed_url(self):
+        geocoder = self.make_geocoder(email='test@example.com')
+        url = geocoder._construct_url(geocoder.api, {'q': 'London', 'format': 'json'})
+        assert 'email=test%40example.com' in url
+
+    async def test_no_email_in_constructed_url(self):
+        geocoder = self.make_geocoder()
+        url = geocoder._construct_url(geocoder.api, {'q': 'London', 'format': 'json'})
+        assert 'email' not in url
