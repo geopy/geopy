@@ -88,7 +88,14 @@ class Nominatim(Geocoder):
         :param callable adapter_factory:
             See :attr:`geopy.geocoders.options.default_adapter_factory`.
 
-            .. versionadded:: 2.0
+        :param str email: Valid email address of the application owner,
+            included as the ``email`` query parameter in requests to
+            Nominatim. This allows Nominatim administrators to contact
+            you in case of operational issues. See the Nominatim
+            `usage policy <https://operations.osmfoundation.org/policies/nominatim/>`_
+            for details.
+
+            .. versionadded:: 2.5
         """
         super().__init__(
             scheme=scheme,
