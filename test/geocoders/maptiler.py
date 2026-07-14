@@ -91,3 +91,10 @@ class TestMapTiler(BaseTestGeocoder):
             {},
         )
         assert len(list_result) >= 3
+
+    async def test_geocode_limit(self):
+        list_result = await self.geocode_run(
+            {"query": "maple street", "exactly_one": False, "limit": 2},
+            {},
+        )
+        assert len(list_result) == 2

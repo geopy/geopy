@@ -95,6 +95,7 @@ class MapTiler(Geocoder):
             timeout=DEFAULT_SENTINEL,
             proximity=None,
             language=None,
+            limit=None,
             bbox=None
     ):
         """
@@ -119,6 +120,8 @@ class MapTiler(Geocoder):
             a single string like ``"en"`` or a list like ``["de", "en"]``.
         :type language: str or list
 
+        :param int limit: Limit the number of returned results, defaults to 50.
+
         :param bbox: The bounding box of the viewport within which
             to bias geocode results more prominently.
             Example: ``[Point(22, 180), Point(-22, -180)]``.
@@ -139,7 +142,8 @@ class MapTiler(Geocoder):
             language = [language]
         if language:
             params['language'] = ','.join(language)
-
+        if limit:
+            params['limit'] = int(limit)
         if proximity:
             p = Point(proximity)
             params['proximity'] = "%s,%s" % (p.longitude, p.latitude)
