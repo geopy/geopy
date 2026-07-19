@@ -29,7 +29,7 @@ POINT_PATTERN = re.compile(r"""
     %(SEP)s
       (?P<altitude>
         (?P<altitude_distance>[+-]?%(FLOAT)s)[ ]*
-        (?P<altitude_units>km|m|mi|ft|nm|nmi)))?
+        (?P<altitude_units>(?i:km|m|mi|ft|nm|nmi))))?
     \s*$
 """ % {
     "FLOAT": r'\d+(?:\.\d+)?',
@@ -382,7 +382,7 @@ class Point:
                 'nmi': lambda d: units.kilometers(nautical=d)
             }
             try:
-                return CONVERTERS[unit](distance)
+                return CONVERTERS[unit.lower()](distance)
             except KeyError:
                 raise NotImplementedError(
                     'Bad distance unit specified, valid ones are: %r' %
