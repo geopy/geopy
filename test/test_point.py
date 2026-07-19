@@ -91,6 +91,17 @@ class PointTestCase(unittest.TestCase):
             Point(adversarial)
         self.assertLess(time.perf_counter() - start, 1.0)
 
+    def test_point_from_string_altitude_units_case_insensitive(self):
+        # from_string's docstring promises the unit abbreviations are
+        # case-insensitive, so an upper- or mixed-case unit must parse to the
+        # same altitude as its lowercase spelling.
+        for unit in ("km", "m", "mi", "ft", "nm", "nmi"):
+            expected = Point("1,2,2.5" + unit).altitude
+            self.assertEqual(Point("1,2,2.5" + unit.upper()).altitude, expected)
+            self.assertEqual(
+                Point("1,2,2.5" + unit.capitalize()).altitude, expected
+            )
+
     def test_point_format_altitude(self):
         point = Point(latitude=41.5, longitude=81.0, altitude=2.5)
         self.assertEqual(point.format(), "41 30m 0s N, 81 0m 0s E, 2.5km")
