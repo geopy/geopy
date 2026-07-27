@@ -84,3 +84,26 @@ class TestBing(BaseTestGeocoder):
         )
         address = res.raw['address']
         assert address['locality'] == "Broomfield"
+
+    async def test_structured_strict_match(self):
+        payload = {"strict_match": False,
+                   "include_country_code": True,
+                   "query": {'postalCode': '316000', 'countryRegion': 'HK',
+                             'locality': 'Hong Kong',
+                             'addressLine': '100 Castle Perk Road'}}
+
+        res = await self.geocode_run(
+            payload,
+            {},
+        )
+        address = res.raw['address']
+        assert address['countryRegionIso2'] == "US"
+
+        payload["strict_match"] = True
+
+        res_strict_match_true = await self.geocode_run(
+            payload,
+            {},
+        )
+        address = res_strict_match_true.raw['address']
+        assert address['countryRegionIso2'] == "HK"

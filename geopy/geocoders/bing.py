@@ -97,7 +97,8 @@ class Bing(Geocoder):
             timeout=DEFAULT_SENTINEL,
             culture=None,
             include_neighborhood=None,
-            include_country_code=False
+            include_country_code=False,
+            strict_match=False
     ):
         """
         Return a location point by address.
@@ -131,6 +132,13 @@ class Bing(Geocoder):
             two-letter ISO code of the country in the response (field name
             'countryRegionIso2').
 
+        :param bool strict_match: Restricts the geocode result to the country
+            or region that is specified in the countryRegion field and the state,
+            province or territory specified in the adminDistrict field.
+                - 1: Restrict results to the specified countryRegion and adminDistrict.
+                - 0 [default]: Do not restrict results to the specified countryRegion
+                and adminDistrict.
+
         :rtype: ``None``, :class:`geopy.location.Location` or a list of them, if
             ``exactly_one=False``.
         """
@@ -157,6 +165,7 @@ class Bing(Geocoder):
             params['includeNeighborhood'] = include_neighborhood
         if include_country_code:
             params['include'] = 'ciso2'  # the only acceptable value
+        params['strictMatch'] = int(strict_match)
 
         url = "?".join((self.geocode_api, urlencode(params)))
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
