@@ -1,5 +1,6 @@
 import collections.abc
 from functools import partial
+from typing import Optional, Union
 from urllib.parse import urlencode
 
 from geopy.exc import ConfigurationError, GeocoderQueryError
@@ -53,7 +54,7 @@ class Nominatim(Geocoder):
     def __init__(
             self,
             *,
-            timeout=DEFAULT_SENTINEL,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain=_DEFAULT_NOMINATIM_DOMAIN,
             scheme=None,

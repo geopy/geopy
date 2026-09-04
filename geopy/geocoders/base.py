@@ -2,6 +2,7 @@ import asyncio
 import functools
 import inspect
 import threading
+from typing import Optional, Union
 
 from geopy.adapters import (
     AdapterHTTPError,
@@ -219,7 +220,7 @@ class Geocoder:
             self,
             *,
             scheme=None,
-            timeout=DEFAULT_SENTINEL,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             user_agent=None,
             ssl_context=DEFAULT_SENTINEL,

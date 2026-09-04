@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from geopy.geocoders.base import DEFAULT_SENTINEL
 from geopy.geocoders.nominatim import Nominatim
 
@@ -18,7 +20,7 @@ class PickPoint(Nominatim):
             self,
             api_key,
             *,
-            timeout=DEFAULT_SENTINEL,
+            timeout: Optional[Union[int, float]] = DEFAULT_SENTINEL,
             proxies=DEFAULT_SENTINEL,
             domain='api.pickpoint.io',
             scheme=None,
