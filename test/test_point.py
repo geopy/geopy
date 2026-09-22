@@ -40,9 +40,8 @@ class PointTestCase(unittest.TestCase):
         point = Point("51 19m 12.9s N, -1 1m 24.95s E, 15000m")
         self.assertEqual(point.format(), "51 19m 12.9s N, 1 1m 24.95s W, 15.0km")
 
-        # TODO
-        # point = Point("51 19m 12.9s N, -0 1m 24.95s E")
-        # self.assertEqual(point.format(), "51 19m 12.9s N, 0 1m 24.95s W")
+        point = Point("51 19m 12.9s N, -0 1m 24.95s E")
+        self.assertEqual(point.format(), "51 19m 12.9s N, 0 1m 24.95s W")
 
         # TODO
         # with self.assertRaises(ValueError):
@@ -71,6 +70,28 @@ class PointTestCase(unittest.TestCase):
                          (23.439444444444444, 23.458333333333332, 0.0))
         self.assertEqual(Point("UT: N 39\xb020' 0'' / W 74\xb035' 0''"),
                          (39.333333333333336, -74.58333333333333, 0.0))
+
+    def test_parse_degrees_preserves_negative_zero(self):
+        for degrees in (-0.0, '-0', '-0.0'):
+            for minutes, seconds, expected in (
+                (30, 0, -0.5),
+                (0, 45, -0.0125),
+                (30, 18, -0.505),
+            ):
+                with self.subTest(degrees=degrees, minutes=minutes, seconds=seconds):
+                    self.assertAlmostEqual(
+                        Point.parse_degrees(degrees, minutes, seconds), expected
+                    )
+
+    def test_point_from_string_negative_zero_degrees(self):
+        for text, expected in (
+            ('-0 30m, -0 15s', (-0.5, -1 / 240, 0)),
+            ('-0.0 30m, -0.0 15s', (-0.5, -1 / 240, 0)),
+            ('-0 30m N, -0 15s E', (-0.5, -1 / 240, 0)),
+            ('-0 30m S, -0 15s W', (0.5, 1 / 240, 0)),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(Point(text), expected)
 
     def test_point_from_string_tolerates_irrelevant_surroundings(self):
         self.assertEqual(Point("aaa 41.5 -81.0"), (41.5, -81.0, 0.0))
