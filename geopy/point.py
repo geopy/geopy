@@ -6,7 +6,7 @@ import collections.abc
 import re
 import warnings
 from itertools import islice
-from math import fmod, isfinite
+from math import copysign, fmod, isfinite
 
 from geopy import units, util
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
@@ -337,7 +337,7 @@ class Point:
         :rtype: float
         """
         degrees = float(degrees)
-        negative = degrees < 0
+        negative = copysign(1.0, degrees) < 0
         arcminutes = float(arcminutes)
         arcseconds = float(arcseconds)
 
