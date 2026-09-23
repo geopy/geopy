@@ -15,3 +15,12 @@ def test_version_info():
 def test_get_version():
     version = get_version()
     assert isinstance(version, str) and version == __version__
+
+
+def test_aiohttp_extra_requires_yarl():
+    from importlib.metadata import requires
+
+    reqs = requires("geopy") or []
+    aiohttp_reqs = [r for r in reqs if 'extra == "aiohttp"' in r]
+    assert any("aiohttp" in r for r in aiohttp_reqs)
+    assert any("yarl" in r for r in aiohttp_reqs)
