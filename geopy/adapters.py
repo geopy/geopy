@@ -17,6 +17,7 @@ import abc
 import asyncio
 import contextlib
 import email
+import importlib.util
 import json
 import ssl
 import time
@@ -52,14 +53,43 @@ except ImportError:
     RequestsHTTPAdapter = object
     requests_available = False
 
-try:
-    import aiohttp
-    import aiohttp.client_exceptions
-    import yarl
 
-    aiohttp_available = True
-except ImportError:
-    aiohttp_available = False
+def _check_aiohttp_available():
+    try:
+        return (
+            importlib.util.find_spec("aiohttp") is not None
+            and importlib.util.find_spec("yarl") is not None
+        )
+    except (ImportError, ValueError, AttributeError):
+        return False
+
+
+aiohttp_available = _check_aiohttp_available()
+
+_aiohttp = None
+_aiohttp_client_exceptions = None
+_yarl = None
+
+
+def _get_aiohttp():
+    global _aiohttp, _aiohttp_client_exceptions, _yarl
+    if _aiohttp is None:
+        try:
+            import aiohttp
+            import aiohttp.client_exceptions
+            import yarl
+
+            _aiohttp = aiohttp
+            _aiohttp_client_exceptions = aiohttp.client_exceptions
+            _yarl = yarl
+        except ImportError:
+            raise ImportError(
+                "`aiohttp` must be installed in order to use AioHTTPAdapter. "
+                "If you have installed geopy via pip, you may use "
+                "this command to install aiohttp: "
+                '`pip install "geopy[aiohttp]"`.'
+            )
+    return _aiohttp, _aiohttp_client_exceptions, _yarl
 
 
 class AdapterHTTPError(IOError):
@@ -528,6 +558,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
                 "this command to install aiohttp: "
                 '`pip install "geopy[aiohttp]"`.'
             )
+        _get_aiohttp()
         proxies = _normalize_proxies(proxies)
         super().__init__(proxies=proxies, ssl_context=ssl_context)
 
@@ -541,6 +572,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
         # async context and making any requests.
         session = self.__dict__.get("session")
         if session is None:
+            aiohttp, _, _ = _get_aiohttp()
             session = aiohttp.ClientSession(
                 trust_env=False,  # don't use system proxies
                 raise_for_status=False
@@ -565,13 +597,14 @@ class AioHTTPAdapter(BaseAsyncAdapter):
                 return await resp.text()
 
     async def get_json(self, url, *, timeout, headers):
+        _, aiohttp_client_exceptions, _ = _get_aiohttp()
         with self._normalize_exceptions():
             async with self._request(url, timeout=timeout, headers=headers) as resp:
                 await self._raise_for_status(resp)
                 try:
                     try:
                         return await resp.json()
-                    except aiohttp.client_exceptions.ContentTypeError:
+                    except aiohttp_client_exceptions.ContentTypeError:
                         # `Attempt to decode JSON with unexpected mimetype:
                         # text/plain;charset=utf-8`
                         return json.loads(await resp.text())
@@ -601,6 +634,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
         # A string url might be re-encoded by yarl, which might cause
         # a hashsum of params to change. Some geocoders use that
         # to authenticate their requests (such as Baidu SK).
+        _, _, yarl = _get_aiohttp()
         url = yarl.URL(url, encoded=True)  # `encoded` param disables url re-encoding
         return self.session.get(
             url, timeout=timeout, headers=headers, proxy=proxy, ssl=self.ssl_context
@@ -608,6 +642,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
 
     @contextlib.contextmanager
     def _normalize_exceptions(self):
+        aiohttp, _, _ = _get_aiohttp()
         try:
             yield
         except (GeopyError, AdapterHTTPError, AssertionError):
@@ -681,3 +716,22 @@ class RequestsHTTPWithSSLContextAdapter(RequestsHTTPAdapter):
             conn.ca_cert_dir = None
             conn.cert_file = None
             conn.key_file = None
+
+
+def __getattr__(name):
+    if name in ("aiohttp", "yarl"):
+        try:
+            aiohttp, _, yarl = _get_aiohttp()
+            if name == "aiohttp":
+                return aiohttp
+            if name == "yarl":
+                return yarl
+        except ImportError:
+            raise AttributeError(
+                f"module {__name__!r} has no attribute {name!r}"
+            ) from None
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(list(globals().keys()) + ["aiohttp", "yarl"])
