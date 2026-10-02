@@ -379,22 +379,34 @@ distance=Distance(100))
         return hash(self.kilometers)
 
     def __eq__(self, other):
-        return self.__cmp__(other) == 0
+        if isinstance(other, Distance):
+            other = other.kilometers
+        return self.kilometers == other
 
     def __ne__(self, other):
-        return self.__cmp__(other) != 0
+        if isinstance(other, Distance):
+            other = other.kilometers
+        return self.kilometers != other
 
     def __gt__(self, other):
-        return self.__cmp__(other) > 0
+        if isinstance(other, Distance):
+            other = other.kilometers
+        return self.kilometers > other
 
     def __lt__(self, other):
-        return self.__cmp__(other) < 0
+        if isinstance(other, Distance):
+            other = other.kilometers
+        return self.kilometers < other
 
     def __ge__(self, other):
-        return self.__cmp__(other) >= 0
+        if isinstance(other, Distance):
+            other = other.kilometers
+        return self.kilometers >= other
 
     def __le__(self, other):
-        return self.__cmp__(other) <= 0
+        if isinstance(other, Distance):
+            other = other.kilometers
+        return self.kilometers <= other
 
     @property
     def feet(self):

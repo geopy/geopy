@@ -1,4 +1,5 @@
 import math
+import operator
 import unittest
 import warnings
 
@@ -250,6 +251,18 @@ class CommonConversionCases:
 class CommonComparisonCases:
 
     cls = None
+
+    def test_comparison_with_nan_matches_float_behavior(self):
+        nan = float('nan')
+        for comparison in (operator.eq, operator.ne, operator.lt,
+                           operator.le, operator.gt, operator.ge):
+            for left, right in ((self.cls(1), nan), (nan, self.cls(1)),
+                                (self.cls(nan), 1), (1, self.cls(nan)),
+                                (self.cls(nan), self.cls(1)),
+                                (self.cls(1), self.cls(nan))):
+                with self.subTest(comparison=comparison, left=left, right=right):
+                    expected = comparison(float('nan'), 1.0)
+                    self.assertEqual(comparison(left, right), expected)
 
     def test_should_support_comparison_with_distance(self):
         self.assertTrue(self.cls(1) <= self.cls(1))
