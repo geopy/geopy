@@ -205,6 +205,7 @@ __all__ = (
     "MapBox",
     "MapQuest",
     "MapTiler",
+    "MyGeocode",
     "Nominatim",
     "OpenCage",
     "OpenMapQuest",
@@ -239,6 +240,7 @@ from geopy.geocoders.ignfrance import IGNFrance
 from geopy.geocoders.mapbox import MapBox
 from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.maptiler import MapTiler
+from geopy.geocoders.mygeocode import MyGeocode
 from geopy.geocoders.nominatim import Nominatim
 from geopy.geocoders.opencage import OpenCage
 from geopy.geocoders.openmapquest import OpenMapQuest
@@ -272,6 +274,7 @@ SERVICE_TO_GEOCODER = {
     "mapbox": MapBox,
     "mapquest": MapQuest,
     "maptiler": MapTiler,
+    "mygeocode": MyGeocode,
     "nominatim": Nominatim,
     "opencage": OpenCage,
     "openmapquest": OpenMapQuest,

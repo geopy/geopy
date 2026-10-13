@@ -259,6 +259,14 @@ MapTiler
 
    .. automethod:: __init__
 
+MyGeocode
+---------
+
+.. autoclass:: geopy.geocoders.MyGeocode
+   :members:
+
+   .. automethod:: __init__
+
 OpenCage
 --------
 

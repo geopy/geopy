@@ -114,6 +114,7 @@ jobs:
         MAPBOX_KEY: ${{ secrets.MAPBOX_KEY }}
         MAPQUEST_KEY: ${{ secrets.MAPQUEST_KEY }}
         MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
+        MYGEOCODE_KEY: ${{ secrets.MYGEOCODE_KEY }}
         OPENCAGE_KEY: ${{ secrets.OPENCAGE_KEY }}
         OPENMAPQUEST_APIKEY: ${{ secrets.OPENMAPQUEST_APIKEY }}
         PICKPOINT_KEY: ${{ secrets.PICKPOINT_KEY }}
