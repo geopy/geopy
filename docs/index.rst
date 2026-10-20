@@ -267,6 +267,14 @@ OpenCage
 
    .. automethod:: __init__
 
+OpenGeocoding
+-------------
+
+.. autoclass:: geopy.geocoders.OpenGeocoding
+   :members:
+
+   .. automethod:: __init__
+
 OpenMapQuest
 ------------
 
