@@ -207,6 +207,7 @@ __all__ = (
     "MapTiler",
     "Nominatim",
     "OpenCage",
+    "OpenGeocoding",
     "OpenMapQuest",
     "PickPoint",
     "Pelias",
@@ -241,6 +242,7 @@ from geopy.geocoders.mapquest import MapQuest
 from geopy.geocoders.maptiler import MapTiler
 from geopy.geocoders.nominatim import Nominatim
 from geopy.geocoders.opencage import OpenCage
+from geopy.geocoders.opengeocoding import OpenGeocoding
 from geopy.geocoders.openmapquest import OpenMapQuest
 from geopy.geocoders.pelias import Pelias
 from geopy.geocoders.photon import Photon
@@ -274,6 +276,7 @@ SERVICE_TO_GEOCODER = {
     "maptiler": MapTiler,
     "nominatim": Nominatim,
     "opencage": OpenCage,
+    "opengeocoding": OpenGeocoding,
     "openmapquest": OpenMapQuest,
     "pickpoint": PickPoint,
     "pelias": Pelias,
