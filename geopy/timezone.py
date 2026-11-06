@@ -13,6 +13,14 @@ __all__ = (
 
 
 def ensure_pytz_is_installed():
+    """
+    Check that :mod:`pytz` is installed.
+
+    Timezone lookups require :mod:`pytz`, which is an optional
+    dependency of geopy. Raise ``ImportError`` if it is not
+    installed. It can be installed with
+    ``pip install "geopy[timezone]"``.
+    """
     if not pytz_available:
         raise ImportError(
             'pytz must be installed in order to locate timezones. '
@@ -22,6 +30,21 @@ def ensure_pytz_is_installed():
 
 
 def from_timezone_name(timezone_name, raw):
+    """
+    Create a :class:`Timezone` from a timezone name.
+
+    :param str timezone_name: A timezone identifier, such as an
+        IANA/Olson database name (e.g. ``"Europe/Paris"``), as
+        returned by a geocoding service.
+    :param raw: The raw, unparsed geocoder response the timezone
+        was extracted from.
+    :return: A timezone for the given name.
+    :rtype: :class:`Timezone`
+
+    Raise :class:`~geopy.exc.GeocoderParseError` if ``pytz`` cannot
+    parse the timezone name, or if no timezone could be found in
+    the response.
+    """
     ensure_pytz_is_installed()
     try:
         pytz_timezone = pytz.timezone(timezone_name)
@@ -39,6 +62,21 @@ def from_timezone_name(timezone_name, raw):
 
 
 def from_fixed_gmt_offset(gmt_offset_hours, raw):
+    """
+    Create a :class:`Timezone` from a fixed offset from GMT.
+
+    Use this when a geocoding service returns a numeric GMT offset
+    instead of a timezone name. The resulting timezone has a fixed
+    offset and does not observe daylight saving time.
+
+    :param float gmt_offset_hours: Offset from GMT in hours, e.g.
+        ``3.0`` for a timezone three hours ahead of GMT. Fractional
+        values are supported, e.g. ``5.5`` for UTC+05:30.
+    :param raw: The raw, unparsed geocoder response the offset
+        was extracted from.
+    :return: A timezone with the given fixed offset from GMT.
+    :rtype: :class:`Timezone`
+    """
     ensure_pytz_is_installed()
     pytz_timezone = pytz.FixedOffset(gmt_offset_hours * 60)
     return Timezone(pytz_timezone, raw)
