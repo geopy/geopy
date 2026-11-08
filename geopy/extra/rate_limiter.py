@@ -153,6 +153,10 @@ class BaseRateLimiter:
                 # A successful run -- stop retrying:
                 return  # pragma: no cover
 
+    def _error_wait(self, error):
+        retry_after = getattr(error, "retry_after", None) or 0
+        return max(self.error_wait_seconds, retry_after)
+
     def _handle_exc(self, args, kwargs):
         if self.swallow_exceptions:
             logger.warning(
@@ -236,7 +240,10 @@ class RateLimiter(BaseRateLimiter):
 
         :param float error_wait_seconds:
             Time to wait between retries after errors. Must be
-            greater or equal to ``min_delay_seconds``.
+            greater or equal to ``min_delay_seconds``. If the service
+            responded with a ``Retry-After`` header
+            (see :class:`geopy.exc.GeocoderRateLimited`), the longer of
+            the two is used.
 
         :param bool swallow_exceptions:
             Should an exception be swallowed after retries? If not,
@@ -282,7 +289,7 @@ class RateLimiter(BaseRateLimiter):
                 if gen.throw(e):
                     # A final try
                     return self._handle_exc(args, kwargs)
-                self._sleep(self.error_wait_seconds)
+                self._sleep(self._error_wait(e))
 
         raise RuntimeError("Should not have been reached")  # pragma: no cover
 
@@ -359,7 +366,10 @@ class AsyncRateLimiter(BaseRateLimiter):
 
         :param float error_wait_seconds:
             Time to wait between retries after errors. Must be
-            greater or equal to ``min_delay_seconds``.
+            greater or equal to ``min_delay_seconds``. If the service
+            responded with a ``Retry-After`` header
+            (see :class:`geopy.exc.GeocoderRateLimited`), the longer of
+            the two is used.
 
         :param bool swallow_exceptions:
             Should an exception be swallowed after retries? If not,
@@ -399,6 +409,6 @@ class AsyncRateLimiter(BaseRateLimiter):
                 if gen.throw(e):
                     # A final try
                     return self._handle_exc(args, kwargs)
-                await self._sleep(self.error_wait_seconds)
+                await self._sleep(self._error_wait(e))
 
         raise RuntimeError("Should not have been reached")  # pragma: no cover
