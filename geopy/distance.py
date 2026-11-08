@@ -280,14 +280,14 @@ class Distance:
 
     def __add__(self, other):
         if isinstance(other, Distance):
-            return self.__class__(self.kilometers + other.kilometers)
+            return self._new(self.kilometers + other.kilometers)
         else:
             raise TypeError(
                 "Distance instance must be added with Distance instance."
             )
 
     def __neg__(self):
-        return self.__class__(-self.kilometers)
+        return self._new(-self.kilometers)
 
     def __sub__(self, other):
         return self + -other
@@ -298,7 +298,7 @@ class Distance:
                 "Distance instance must be multiplicated with numbers."
             )
         else:
-            return self.__class__(self.kilometers * other)
+            return self._new(self.kilometers * other)
 
     def __rmul__(self, other):
         if isinstance(other, Distance):
@@ -306,25 +306,28 @@ class Distance:
                 "Distance instance must be multiplicated with numbers."
             )
         else:
-            return self.__class__(other * self.kilometers)
+            return self._new(other * self.kilometers)
 
     def __truediv__(self, other):
         if isinstance(other, Distance):
             return self.kilometers / other.kilometers
         else:
-            return self.__class__(self.kilometers / other)
+            return self._new(self.kilometers / other)
 
     def __floordiv__(self, other):
         if isinstance(other, Distance):
             return self.kilometers // other.kilometers
         else:
-            return self.__class__(self.kilometers // other)
+            return self._new(self.kilometers // other)
 
     def __abs__(self):
-        return self.__class__(abs(self.kilometers))
+        return self._new(abs(self.kilometers))
 
     def __bool__(self):
         return bool(self.kilometers)
+
+    def _new(self, kilometers):
+        return self.__class__(kilometers)
 
     def measure(self, a, b):
         # Intentionally not documented, because this method is not supposed
@@ -460,6 +463,9 @@ class great_circle(Distance):
         self.RADIUS = kwargs.pop('radius', EARTH_RADIUS)
         super().__init__(*args, **kwargs)
 
+    def _new(self, kilometers):
+        return self.__class__(kilometers, radius=self.RADIUS)
+
     def measure(self, a, b):
         a, b = Point(a), Point(b)
         _ensure_same_altitude(a, b)
@@ -538,6 +544,11 @@ class geodesic(Distance):
         self.set_ellipsoid(kwargs.pop('ellipsoid', 'WGS-84'))
         major, minor, f = self.ELLIPSOID
         super().__init__(*args, **kwargs)
+
+    def _new(self, kilometers):
+        return self.__class__(
+            kilometers, ellipsoid=self.ellipsoid_key or self.ELLIPSOID
+        )
 
     def set_ellipsoid(self, ellipsoid):
         if isinstance(ellipsoid, str):

@@ -326,6 +326,13 @@ class TestWhenComputingGreatCircleDistance(CommonDistanceCases,
         # Equal non-zero altitudes don't raise:
         self.cls((10, 10, 10), (20, 20, 10))
 
+    def test_arithmetic_keeps_radius(self):
+        distance = self.cls(1, radius=1000)
+        for result in (distance + distance, distance - distance, -distance,
+                       distance * 2, 2 * distance, distance / 2,
+                       distance // 2, abs(distance)):
+            self.assertEqual(result.RADIUS, 1000)
+
 
 class TestWhenComputingGeodesicDistance(CommonDistanceCases,
                                         unittest.TestCase):
@@ -339,6 +346,16 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
 
         # Equal non-zero altitudes don't raise:
         self.cls((10, 10, 10), (20, 20, 10))
+
+    def test_arithmetic_keeps_ellipsoid(self):
+        distance = self.cls(1, ellipsoid='Intl 1924')
+        for result in (distance + distance, distance - distance, -distance,
+                       distance * 2, 2 * distance, distance / 2,
+                       distance // 2, abs(distance)):
+            self.assertEqual(result.ellipsoid_key, 'Intl 1924')
+
+        custom = (6377.0, 6356.0, 1 / 297.0)
+        self.assertEqual((self.cls(1, ellipsoid=custom) * 2).ELLIPSOID, custom)
 
     def test_miscellaneous_high_accuracy_cases(self):
 
