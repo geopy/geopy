@@ -1,4 +1,3 @@
-import asyncio
 import functools
 import inspect
 import threading
@@ -449,6 +448,8 @@ def _synchronized(func):
     async def locked_async(self, *args, **kwargs):
         nonlocal async_lock
         nonlocal async_lock_task
+
+        import asyncio  # lazy: slow to import, needed in async mode only
 
         if async_lock is None:
             async_lock = asyncio.Lock()

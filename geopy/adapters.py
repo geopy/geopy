@@ -14,7 +14,6 @@ HTTP client settings.
     .. _provisional basis: https://docs.python.org/3/glossary.html#term-provisional-api
 """
 import abc
-import asyncio
 import contextlib
 import email
 import json
@@ -613,6 +612,8 @@ class AioHTTPAdapter(BaseAsyncAdapter):
         except (GeopyError, AdapterHTTPError, AssertionError):
             raise
         except Exception as error:
+            import asyncio  # lazy: slow to import, needed in async mode only
+
             message = str(error)
             if isinstance(error, asyncio.TimeoutError):
                 raise GeocoderTimedOut("Service timed out")
