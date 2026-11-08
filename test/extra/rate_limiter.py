@@ -3,7 +3,11 @@ from unittest.mock import MagicMock, patch, sentinel
 
 import pytest
 
-from geopy.exc import GeocoderQuotaExceeded, GeocoderServiceError
+from geopy.exc import (
+    GeocoderQuotaExceeded,
+    GeocoderRateLimited,
+    GeocoderServiceError,
+)
 from geopy.extra.rate_limiter import AsyncRateLimiter, RateLimiter
 
 
@@ -150,6 +154,30 @@ async def test_error_wait_seconds(
     assert 3 == mock_sleep.call_count
     mock_sleep.assert_called_with(error_wait)
     mock_func.reset_mock()
+
+
+async def test_error_wait_seconds_respects_retry_after(
+    rate_limiter_cls, mock_clock, mock_sleep, auto_async_side_effect, auto_async
+):
+    mock_func = MagicMock()
+    mock_clock.return_value = 1
+    rl = rate_limiter_cls(
+        mock_func, max_retries=1, error_wait_seconds=3,
+        return_value_on_exception=sentinel.return_value,
+    )
+
+    mock_func.side_effect = auto_async_side_effect(
+        GeocoderRateLimited("429", retry_after=60)
+    )
+    assert sentinel.return_value == await auto_async(rl(sentinel.arg))
+    mock_sleep.assert_called_once_with(60)
+    mock_sleep.reset_mock()
+
+    mock_func.side_effect = auto_async_side_effect(
+        GeocoderRateLimited("429", retry_after=1)
+    )
+    assert sentinel.return_value == await auto_async(rl(sentinel.arg))
+    mock_sleep.assert_called_once_with(3)
 
 
 async def test_sync_raises_for_awaitable():
