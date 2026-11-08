@@ -116,6 +116,7 @@ An attempt to calculate distances between points with different altitudes
 would result in a :class:`ValueError` exception.
 
 """
+from functools import lru_cache
 from math import asin, atan2, cos, sin, sqrt
 
 from geographiclib.geodesic import Geodesic
@@ -185,6 +186,11 @@ def _ensure_same_altitude(a, b):
     # Note: non-zero equal altitudes are fine: assuming that
     # the elevation is many times smaller than the Earth radius
     # it won't give much error.
+
+
+# Building a Geodesic precomputes series coefficients, which costs about
+# a quarter of a distance call. Instances are immutable, so share them.
+_geodesic = lru_cache(maxsize=16)(Geodesic)
 
 
 class Distance:
@@ -561,7 +567,7 @@ class geodesic(Distance):
         if not (isinstance(self.geod, Geodesic) and
                 self.geod.a == self.ELLIPSOID[0] and
                 self.geod.f == self.ELLIPSOID[2]):
-            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
+            self.geod = _geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
 
         s12 = self.geod.Inverse(lat1, lon1, lat2, lon2,
                                 Geodesic.DISTANCE)['s12']
@@ -582,7 +588,7 @@ class geodesic(Distance):
         if not (isinstance(self.geod, Geodesic) and
                 self.geod.a == self.ELLIPSOID[0] and
                 self.geod.f == self.ELLIPSOID[2]):
-            self.geod = Geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
+            self.geod = _geodesic(self.ELLIPSOID[0], self.ELLIPSOID[2])
 
         r = self.geod.Direct(lat1, lon1, azi1, distance,
                              Geodesic.LATITUDE | Geodesic.LONGITUDE)

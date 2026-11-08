@@ -340,6 +340,13 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
         # Equal non-zero altitudes don't raise:
         self.cls((10, 10, 10), (20, 20, 10))
 
+    def test_geodesic_instance_is_reused(self):
+        self.assertIs(self.cls((0, 0), (1, 1)).geod, self.cls((0, 0), (2, 2)).geod)
+        self.assertIsNot(
+            self.cls((0, 0), (1, 1)).geod,
+            self.cls((0, 0), (1, 1), ellipsoid='Intl 1924').geod,
+        )
+
     def test_miscellaneous_high_accuracy_cases(self):
 
         testcases = [
