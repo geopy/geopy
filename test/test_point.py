@@ -74,6 +74,10 @@ class PointTestCase(unittest.TestCase):
 
     def test_point_from_string_tolerates_irrelevant_surroundings(self):
         self.assertEqual(Point("aaa 41.5 -81.0"), (41.5, -81.0, 0.0))
+        self.assertEqual(Point("Station 12: 41.5 -81.0"), (41.5, -81.0, 0.0))
+
+        with self.assertRaises(ValueError):
+            Point("41.5, -81.0, 100")
         self.assertEqual(Point("  41.5 -81.0  "), (41.5, -81.0, 0.0))
         with self.assertRaises(ValueError):
             # Non-whitespace trailing data is not tolerated:

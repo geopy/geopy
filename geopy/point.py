@@ -12,7 +12,7 @@ from geopy import units, util
 from geopy.format import DEGREE, DOUBLE_PRIME, PRIME, format_degrees, format_distance
 
 POINT_PATTERN = re.compile(r"""
-    .*?
+    (?:.*?[^0-9.,+\-\s])?\s*
     (?P<latitude>
       (?P<latitude_direction_front>[NS])?[ ]*
         (?P<latitude_degrees>[+-]?%(FLOAT)s)(?:[%(DEGREE)sD\*\u00B0\s][ ]*
