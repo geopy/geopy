@@ -104,6 +104,9 @@ class Geolake(Geocoder):
             For a structured query, provide a dictionary whose keys
             are one of: ``country``, ``state``, ``city``, ``zipcode``,
             ``street``, ``address``, ``houseNumber`` or ``subNumber``.
+            Unsupported structured query keys are ignored with a
+            :class:`UserWarning`.
+
         :type query: str or dict
 
         :param country_codes: Provides the geocoder with a list
@@ -128,12 +131,7 @@ class Geolake(Geocoder):
         """
 
         if isinstance(query, collections.abc.Mapping):
-            params = {
-                key: val
-                for key, val
-                in query.items()
-                if key in self.structured_query_params
-            }
+            params = self._filter_structured_query(query, self.structured_query_params)
             params['api_key'] = self.api_key
         else:
             params = {
