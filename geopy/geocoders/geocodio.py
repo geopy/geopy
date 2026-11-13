@@ -103,6 +103,9 @@ class Geocodio(Geocoder):
 
             For a structured query, provide a dictionary whose keys
             are one of: `street`, `city`, `state`, `postal_code` or `country`.
+            Unsupported structured query keys are ignored with a
+            :class:`UserWarning`.
+
         :type query: dict or str
 
         :param int limit: The maximum number of matches to return. This will be reset
@@ -121,12 +124,7 @@ class Geocodio(Geocoder):
         """
 
         if isinstance(query, collections.abc.Mapping):
-            params = {
-                key: val
-                for key, val
-                in query.items()
-                if key in self.structured_query_params
-            }
+            params = self._filter_structured_query(query, self.structured_query_params)
         else:
             params = {'q': query}
 
