@@ -2,6 +2,7 @@ import asyncio
 import functools
 import inspect
 import threading
+import warnings
 
 from geopy.adapters import (
     AdapterHTTPError,
@@ -289,6 +290,17 @@ class Geocoder:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.adapter.__aexit__(exc_type, exc_val, exc_tb)
+
+    def _filter_structured_query(self, query, valid_keys):
+        unsupported = [key for key in query if key not in valid_keys]
+        if unsupported:
+            warnings.warn(
+                "%s ignored unsupported structured query keys: %s"
+                % (type(self).__name__, ", ".join(repr(key) for key in unsupported)),
+                UserWarning,
+                stacklevel=3,
+            )
+        return {key: value for key, value in query.items() if key in valid_keys}
 
     def _coerce_point_to_string(self, point, output_format="%(lat)s,%(lon)s"):
         """
