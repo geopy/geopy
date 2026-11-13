@@ -162,6 +162,9 @@ class Nominatim(Geocoder):
 
                 https://nominatim.org/release-docs/develop/api/Search
 
+            Unsupported structured query keys are ignored with a
+            :class:`UserWarning`.
+
         :type query: dict or str
 
         :param bool exactly_one: Return one result or a list of results, if
@@ -225,12 +228,7 @@ class Nominatim(Geocoder):
         """
 
         if isinstance(query, collections.abc.Mapping):
-            params = {
-                key: val
-                for key, val
-                in query.items()
-                if key in self.structured_query_params
-            }
+            params = self._filter_structured_query(query, self.structured_query_params)
         else:
             params = {'q': query}
 

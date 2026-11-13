@@ -107,6 +107,9 @@ class Bing(Geocoder):
             For a structured query, provide a dictionary whose keys
             are one of: `addressLine`, `locality` (city),
             `adminDistrict` (state), `countryRegion`, or `postalCode`.
+            Unsupported structured query keys are ignored with a
+            :class:`UserWarning`.
+
         :type query: str or dict
 
         :param bool exactly_one: Return one result or a list of results, if
@@ -135,12 +138,7 @@ class Bing(Geocoder):
             ``exactly_one=False``.
         """
         if isinstance(query, collections.abc.Mapping):
-            params = {
-                key: val
-                for key, val
-                in query.items()
-                if key in self.structured_query_params
-            }
+            params = self._filter_structured_query(query, self.structured_query_params)
             params['key'] = self.api_key
         else:
             params = {
