@@ -168,6 +168,9 @@ class Here(Geocoder):
             For a structured query, provide a dictionary whose keys
             are one of: ``city``, ``county``, ``district``, ``country``, ``state``,
             ``street``, ``housenumber``, or ``postalcode``.
+            Unsupported structured query keys are ignored with a
+            :class:`UserWarning`.
+
         :type query: str or dict
 
         :param bbox: A spatial filter that limits the search for any other attributes
@@ -215,12 +218,7 @@ class Here(Geocoder):
             ``exactly_one=False``.
         """
         if isinstance(query, collections.abc.Mapping):
-            params = {
-                key: val
-                for key, val
-                in query.items()
-                if key in self.structured_query_params
-            }
+            params = self._filter_structured_query(query, self.structured_query_params)
         else:
             params = {'searchtext': query}
         if bbox:
@@ -487,6 +485,7 @@ class HereV7(Geocoder):
             the free-text ``query``. Should be a dictionary whose keys
             are one of: ``country``, ``state``, ``county``, ``city``,
             ``district``, ``street``, ``houseNumber``, ``postalCode``.
+            Unsupported keys are ignored with a :class:`UserWarning`.
 
         :param at: The center of the search context.
         :type at: :class:`geopy.point.Point`, list or tuple of ``(latitude,
@@ -527,8 +526,9 @@ class HereV7(Geocoder):
             parts = [
                 "{}={}".format(key, val)
                 for key, val
-                in components.items()
-                if key in self.structured_query_params
+                in self._filter_structured_query(
+                    components, self.structured_query_params
+                ).items()
             ]
             if not parts:
                 raise GeocoderQueryError("`components` dict must not be empty")
