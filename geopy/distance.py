@@ -540,6 +540,23 @@ class geodesic(Distance):
         super().__init__(*args, **kwargs)
 
     def set_ellipsoid(self, ellipsoid):
+        ```
+        Change the ellipsoidal model of the earth used by this instance.
+
+        The model is used for subsequent ``measure`` and ``destination``
+        computations; it does not change the distance value this
+        instance was already computed with. The ``ellipsoid`` keyword
+        argument of the constructor calls this method.
+
+        :param ellipsoid: If a string, the name of a model from the
+            :const:`ELLIPSOIDS` dictionary (e.g. ``'WGS-84'``).
+            Otherwise, a tuple of the major and minor semiaxes in
+            kilometers and the flattening, e.g.
+            ``(6377., 6356., 1 / 297.)``.
+
+        Raise ``Exception`` if the given string is not a known model
+        name. The previously set model is kept in that case.
+        ```
         if isinstance(ellipsoid, str):
             try:
                 self.ELLIPSOID = ELLIPSOIDS[ellipsoid]
