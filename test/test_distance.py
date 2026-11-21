@@ -340,6 +340,31 @@ class TestWhenComputingGeodesicDistance(CommonDistanceCases,
         # Equal non-zero altitudes don't raise:
         self.cls((10, 10, 10), (20, 20, 10))
 
+    def test_set_ellipsoid_by_name(self):
+        # Switching the model changes subsequent measurements, and the
+        # model name is remembered:
+        p1, p2 = (41.49008, -71.312796), (41.499498, -81.695391)
+        d = self.cls(p1, p2)
+        wgs84_km = d.measure(p1, p2)
+        d.set_ellipsoid('Airy (1830)')
+        self.assertEqual(d.ellipsoid_key, 'Airy (1830)')
+        self.assertNotEqual(d.measure(p1, p2), wgs84_km)
+
+    def test_set_ellipsoid_by_tuple(self):
+        # A tuple of (major, minor, flattening) is accepted, and no
+        # model name is remembered for it:
+        d = self.cls((0, 0), (0, 1))
+        d.set_ellipsoid((6377., 6356., 1 / 297.))
+        self.assertIsNone(d.ellipsoid_key)
+        self.assertEqual(d.ELLIPSOID, (6377., 6356., 1 / 297.))
+
+    def test_set_ellipsoid_unknown_name(self):
+        # An unknown model name raises, and the previous model is kept:
+        d = self.cls((0, 0), (0, 1))
+        with self.assertRaises(Exception):
+            d.set_ellipsoid('Not-A-Model')
+        self.assertEqual(d.ellipsoid_key, 'WGS-84')
+
     def test_miscellaneous_high_accuracy_cases(self):
 
         testcases = [
