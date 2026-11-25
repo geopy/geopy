@@ -7,7 +7,7 @@ import pytest
 import geopy.geocoders
 import geopy.geocoders.base
 from geopy.adapters import BaseAsyncAdapter, BaseSyncAdapter
-from geopy.exc import GeocoderNotFound, GeocoderQueryError
+from geopy.exc import ConfigurationError, GeocoderNotFound, GeocoderQueryError
 from geopy.geocoders import GoogleV3, get_geocoder_for_service
 from geopy.geocoders.base import Geocoder, _synchronized
 from geopy.point import Point
@@ -66,6 +66,10 @@ class GeocoderTestCase(unittest.TestCase):
             assert locals()[attr] == getattr(geocoder, attr)
         assert user_agent == geocoder.headers['User-Agent']
         assert adapter is geocoder.adapter
+
+def test_init_with_invalid_scheme_raises(self):
+    with self.assertRaises(ConfigurationError):
+        Geocoder(scheme='ftp')
 
     @patch.object(geopy.geocoders.options, 'default_adapter_factory',
                   DummySyncAdapter)
