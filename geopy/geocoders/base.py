@@ -225,6 +225,23 @@ class Geocoder:
             ssl_context=DEFAULT_SENTINEL,
             adapter_factory=None
     ):
+        """
+
+    :param str scheme:
+        See :attr:`geopy.geocoders.options.default_scheme`. Must be
+            ``'http'`` or ``'https'``; any other value raises
+                :class:`geopy.exc.ConfigurationError`.
+                :param int timeout:
+                    See :attr:`geopy.geocoders.options.default_timeout`.
+                    :param dict proxies:
+                        See :attr:`geopy.geocoders.options.default_proxies`.
+                        :param str user_agent:
+                            See :attr:`geopy.geocoders.options.default_user_agent`.
+                            :param ssl_context:
+                                See :attr:`geopy.geocoders.options.default_ssl_context`.
+                                :param adapter_factory:
+                                    See :attr:`geopy.geocoders.options.default_adapter_factory`.
+                                    """
         self.scheme = scheme or options.default_scheme
         if self.scheme not in ('http', 'https'):
             raise ConfigurationError(
