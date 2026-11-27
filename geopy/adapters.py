@@ -17,8 +17,10 @@ import abc
 import asyncio
 import contextlib
 import email
+import importlib.util
 import json
 import ssl
+import sys
 import time
 import warnings
 from socket import timeout as SocketTimeout
@@ -52,14 +54,43 @@ except ImportError:
     RequestsHTTPAdapter = object
     requests_available = False
 
-try:
-    import aiohttp
-    import aiohttp.client_exceptions
-    import yarl
+_AIOHTTP_IMPORT_ERROR = (
+    "`aiohttp` must be installed in order to use AioHTTPAdapter. "
+    "If you have installed geopy via pip, you may use "
+    "this command to install aiohttp: "
+    '`pip install "geopy[aiohttp]"`.'
+)
 
-    aiohttp_available = True
-except ImportError:
-    aiohttp_available = False
+aiohttp = None
+yarl = None
+
+
+def _is_module_available(name):
+    if name in sys.modules:
+        return sys.modules[name] is not None
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, ValueError):
+        return False
+
+
+def _import_aiohttp():
+    global aiohttp, yarl
+    if not aiohttp_available:
+        raise ImportError(_AIOHTTP_IMPORT_ERROR)
+    try:
+        import aiohttp as _aiohttp
+        import aiohttp.client_exceptions  # noqa: F401
+        import yarl as _yarl
+    except ImportError as err:
+        raise ImportError(_AIOHTTP_IMPORT_ERROR) from err
+    aiohttp = _aiohttp
+    yarl = _yarl
+
+
+aiohttp_available = (
+    _is_module_available("aiohttp") and _is_module_available("yarl")
+)
 
 
 class AdapterHTTPError(IOError):
@@ -521,13 +552,7 @@ class AioHTTPAdapter(BaseAsyncAdapter):
     is_available = aiohttp_available
 
     def __init__(self, *, proxies, ssl_context):
-        if not aiohttp_available:
-            raise ImportError(
-                "`aiohttp` must be installed in order to use AioHTTPAdapter. "
-                "If you have installed geopy via pip, you may use "
-                "this command to install aiohttp: "
-                '`pip install "geopy[aiohttp]"`.'
-            )
+        _import_aiohttp()
         proxies = _normalize_proxies(proxies)
         super().__init__(proxies=proxies, ssl_context=ssl_context)
 
