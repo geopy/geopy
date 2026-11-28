@@ -19,6 +19,18 @@ class Location:
     __slots__ = ("_address", "_point", "_tuple", "_raw")
 
     def __init__(self, address, point, raw):
+        """
+
+        :param str address:
+            Location as a formatted string returned by the geocoder or
+            constructed by geopy. Must not be ``None``.
+        :param point:
+            A :class:`geopy.point.Point`, a string, or a sequence of
+            coordinates. Anything else raises :class:`TypeError`.
+        :param dict raw:
+            A dictionary of the geocoder's response for this item. Must
+            not be ``None``.
+        """
         if address is None:
             raise TypeError("`address` must not be None")
         self._address = address
